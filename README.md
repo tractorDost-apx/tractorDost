@@ -1,4 +1,5 @@
 # 🚜 TractorDost — Frontend Folder Structure
+
 > **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · ShadCN UI · TanStack Query · Redux Toolkit · next-intl
 > **Version:** v1.0 | April 2026
 
@@ -822,26 +823,26 @@ src/styles/
 
 ## Component Count Summary
 
-| Category | Files |
-|---|---|
-| UI Primitives (ShadCN) | 25 |
-| Shared / Global | 12 |
-| Layout (Header, Footer, Sidebars) | 18 |
-| Homepage Sections | 15 |
-| New Tractor Catalog + PDP | 20 |
-| Used Marketplace + Sell Funnel | 22 |
-| Comparison Engine | 6 |
-| EMI & Finance | 5 |
-| Valuation Engine | 5 |
-| Dealers & Locator | 6 |
-| Lead Capture Forms | 6 |
-| Auth Flow | 5 |
-| User Dashboard | 9 |
-| Dealer Panel | 5 |
-| Admin Panel | 14 |
-| Search | 5 |
-| Form Primitives | 7 |
-| **Total Components** | **~185** |
+| Category                          | Files    |
+| --------------------------------- | -------- |
+| UI Primitives (ShadCN)            | 25       |
+| Shared / Global                   | 12       |
+| Layout (Header, Footer, Sidebars) | 18       |
+| Homepage Sections                 | 15       |
+| New Tractor Catalog + PDP         | 20       |
+| Used Marketplace + Sell Funnel    | 22       |
+| Comparison Engine                 | 6        |
+| EMI & Finance                     | 5        |
+| Valuation Engine                  | 5        |
+| Dealers & Locator                 | 6        |
+| Lead Capture Forms                | 6        |
+| Auth Flow                         | 5        |
+| User Dashboard                    | 9        |
+| Dealer Panel                      | 5        |
+| Admin Panel                       | 14       |
+| Search                            | 5        |
+| Form Primitives                   | 7        |
+| **Total Components**              | **~185** |
 
 ---
 
@@ -859,4 +860,4 @@ Phase 7 → Content CMS + SEO pages + Notifications
 
 ---
 
-*TractorDost — Frontend Structure v1.0 | April 2026 | Confidential*
+_TractorDost — Frontend Structure v1.0 | April 2026 | Confidential_

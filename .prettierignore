@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+build
+dist
+.vercel
+*.min.js
+*.min.css
+public
