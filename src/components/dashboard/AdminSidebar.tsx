@@ -22,7 +22,11 @@ import {
   AlertTriangle,
   Tag,
   Layers,
-  ChevronDown
+  ChevronDown,
+  FileSpreadsheet,
+  IndianRupee,
+  Image as ImageIcon,
+  BarChart2
 } from 'lucide-react';
 
 const NAV_GROUPS = [
@@ -45,14 +49,18 @@ const NAV_GROUPS = [
       { label: 'Brands', href: '/admin/tractors/brands', icon: Tag },
       { label: 'Tractor Categories', href: '/admin/tractors/categories', icon: Layers },
       { label: 'Tractors', href: '/admin/tractors', icon: Tractor },
-      { label: 'Implements', href: '/admin/implements', icon: Wrench },
+      { label: 'Tractor Specs', href: '/admin/tractors/specs', icon: FileSpreadsheet },
+      { label: 'State Pricing', href: '/admin/tractors/price-by-state', icon: IndianRupee },
+      { label: 'Media Gallery', href: '/admin/media', icon: ImageIcon },
+      { label: 'Compare Analytics', href: '/admin/compare', icon: BarChart2 },
     ]
   },
   {
     title: 'Marketplace',
     items: [
       { label: 'Used Listings', href: '/admin/used-listings', icon: Search },
-      { label: 'Inspections & Valuations', href: '/admin/inspections', icon: FileCheck },
+      { label: 'Inspections & Valuations', href: '/admin/valuation', icon: FileCheck },
+      { label: 'Listing Boosts', href: '/admin/listing-boosts', icon: Layers },
     ]
   },
   {

@@ -27,6 +27,144 @@ export enum EmissionNorm {
   TREM_V = 'TREM_V'
 }
 
+export enum CoolingType {
+  AIR_COOLED = 'AIR_COOLED',
+  WATER_COOLED = 'WATER_COOLED',
+  OIL_COOLED = 'OIL_COOLED'
+}
+
+export enum SteeringType {
+  POWER = 'POWER',
+  MECHANICAL = 'MECHANICAL',
+  HYDROSTATIC = 'HYDROSTATIC'
+}
+
+export enum BrakeType {
+  OIL_IMMERSED_DISC = 'OIL_IMMERSED_DISC',
+  DRUM = 'DRUM',
+  DRY_DISC = 'DRY_DISC'
+}
+
+export enum ClutchType {
+  SINGLE = 'SINGLE',
+  DOUBLE = 'DOUBLE',
+  INDEPENDENT = 'INDEPENDENT'
+}
+
+export enum HydraulicsType {
+  POSITION_CONTROL = 'POSITION_CONTROL',
+  DRAFT_CONTROL = 'DRAFT_CONTROL',
+  POSITION_AND_DRAFT = 'POSITION_AND_DRAFT',
+  ADDC = 'ADDC'
+}
+
+export enum PtoType {
+  INDEPENDENT = 'INDEPENDENT',
+  LIVE = 'LIVE',
+  TRANSMISSION = 'TRANSMISSION',
+  GROUND_DRIVEN = 'GROUND_DRIVEN'
+}
+
+export enum GearboxType {
+  CONSTANT_MESH = 'CONSTANT_MESH',
+  SYNCHROMESH = 'SYNCHROMESH',
+  SYNCHRO_SHUTTLE = 'SYNCHRO_SHUTTLE',
+  POWER_SHUTTLE = 'POWER_SHUTTLE',
+  CVT = 'CVT'
+}
+
+export interface TractorPriceByState {
+  id?: number;
+  tractorId?: number;
+  state: string;
+  exShowroom: number;
+  rtoCharges?: number | null;
+  insuranceEst?: number | null;
+  dealerCharges?: number | null;
+  onRoadPrice?: number | null;
+}
+
+export interface TractorSpec {
+  id?: number;
+  tractorId?: number;
+
+  engineCc?: number | null;
+  cylinders?: number | null;
+  ratedRpm?: number | null;
+  maxTorqueNm?: number | null;
+  coolingType?: CoolingType | null;
+  aspiration?: string | null;
+  airFilterType?: string | null;
+  fuelInjectionType?: string | null;
+  governorType?: string | null;
+  engineOilCapacityL?: number | null;
+
+  gearboxType?: GearboxType | null;
+  clutchType?: ClutchType | null;
+  forwardGears?: number | null;
+  reverseGears?: number | null;
+  maxSpeedFwdKmph?: number | null;
+  maxSpeedRevKmph?: number | null;
+  hasCreeper?: boolean;
+  hasShuttle?: boolean;
+  differentialLock?: boolean;
+
+  ptoType?: PtoType | null;
+  ptoHp?: number | null;
+  ptoRpm?: number | null;
+  ptoRpmOptions?: string | null;
+  ptoShaftType?: string | null;
+
+  hydraulicsType?: HydraulicsType | null;
+  liftingCapacityKg?: number | null;
+  pumpFlowRateLpm?: number | null;
+  linkageCategory?: string | null;
+  auxHydraulicPorts?: number | null;
+
+  steeringType?: SteeringType | null;
+  brakeType?: BrakeType | null;
+  parkingBrake?: boolean;
+
+  overallLengthMm?: number | null;
+  overallWidthMm?: number | null;
+  overallHeightMm?: number | null;
+  wheelbaseMm?: number | null;
+  groundClearanceMm?: number | null;
+  turningRadiusM?: number | null;
+  totalWeightKg?: number | null;
+
+  frontTyreSize?: string | null;
+  rearTyreSize?: string | null;
+  tyreType?: string | null;
+
+  fuelTankCapacityL?: number | null;
+  fuelConsumptionLph?: number | null;
+  batteryVoltage?: number | null;
+  batteryAh?: number | null;
+  alternatorAmps?: number | null;
+
+  batteryCapacityKwh?: number | null;
+  motorKw?: number | null;
+  chargingTimeHours?: number | null;
+  rangePerChargeKm?: number | null;
+
+  warrantyYears?: number | null;
+  warrantyHours?: number | null;
+  firstServiceHours?: number | null;
+  regularServiceIntervalH?: number | null;
+  oilChangeIntervalH?: number | null;
+  engineOilSpec?: string | null;
+  coolantType?: string | null;
+  annualServiceCostEstimate?: number | null;
+  commonSpareParts?: any | null;
+
+  hasAcCabin?: boolean;
+  hasGps?: boolean;
+  hasTpms?: boolean;
+  includedAccessories?: any | null;
+}
+
+
 export interface Tractor {
   id: number;
   brandId: number;
@@ -64,6 +202,11 @@ export interface Tractor {
   updatedAt: string;
   
   brand?: Brand;
+  spec?: TractorSpec | null;
+  priceByState?: TractorPriceByState[] | null;
+  media?: any[] | null;
+  primaryMedia?: any | null;
+  categories?: any[] | null;
 }
 
 export interface PaginatedResponse<T> {
@@ -122,8 +265,28 @@ export const tractorAPI = {
   /**
    * Delete a tractor
    */
+  /**
+   * Delete a tractor
+   */
   deleteTractor: async (id: number) => {
     const response = await apiClient.delete<{ success: boolean; data: Tractor }>(`/tractor/delete/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Fetch all Tractor Specs
+   */
+  getAllTractorSpecs: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const response = await apiClient.get<PaginatedResponse<TractorSpec>>('/tractor-specs/get', { params });
+    return response.data;
+  },
+
+  /**
+   * Fetch all State Prices
+   */
+  getAllTractorPricesByState: async (params?: { page?: number; limit?: number; search?: string }) => {
+    // The backend returns a direct array in data, not paginated in the standard way, let's assume standard response structure
+    const response = await apiClient.get<{ success: boolean; data: TractorPriceByState[] }>('/tractor-price-by-state/getAll', { params });
     return response.data;
   }
 };

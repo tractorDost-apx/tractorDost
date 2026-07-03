@@ -12,6 +12,10 @@ export interface Category {
   createdAt: string;
   // Included in tree queries
   children?: Category[];
+  _count?: {
+    tractors: number;
+    children?: number;
+  };
 }
 
 export const categoryAPI = {

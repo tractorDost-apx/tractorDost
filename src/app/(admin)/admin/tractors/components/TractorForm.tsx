@@ -6,6 +6,8 @@ import { tractorAPI, Tractor, LaunchStatus, FuelType, DriveType } from '@/lib/ap
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { categoryAPI, Category } from '@/lib/api/categories';
 import MediaUploader from '@/components/shared/MediaUploader';
+import TractorSpecForm from './TractorSpecForm';
+import TractorStatePrices from './TractorStatePrices';
 import { Save, X, Info, Settings, IndianRupee, Image as ImageIcon, ChevronRight } from 'lucide-react';
 
 interface TractorFormProps {
@@ -44,6 +46,8 @@ export default function TractorForm({ initialData, isEdit = false }: TractorForm
     seoTitle: '',
     seoDescription: '',
     financeAvailable: false,
+    spec: {},
+    priceByState: [],
   });
 
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
@@ -273,19 +277,20 @@ export default function TractorForm({ initialData, isEdit = false }: TractorForm
             </div>
           )}
 
-          {/* TAB 2: SPECS (Placeholder for large nested objects) */}
+          {/* TAB 2: SPECS */}
           {activeTab === 'specs' && (
-            <div className="flex flex-col gap-6 animate-fade-in">
-              <h2 className="text-2xl font-black text-foreground mb-2">Technical Specifications</h2>
-              <div className="p-12 text-center rounded-2xl bg-foreground/5 border-2 border-dashed border-foreground/10">
-                <Settings className="mx-auto text-muted mb-4" size={32} />
-                <h3 className="text-lg font-bold text-foreground mb-2">Detailed Specs Engine</h3>
-                <p className="text-sm text-muted">
-                  This section will contain the complex nested form for Engine, Transmission, Hydraulics, Tyres, and Dimensions. 
-                  (To be implemented based on exact TractorSpec schema)
-                </p>
-              </div>
-            </div>
+            <TractorSpecForm 
+              spec={formData.spec || {}} 
+              onChange={(field, value) => {
+                setFormData(prev => ({
+                  ...prev,
+                  spec: {
+                    ...(prev.spec || {}),
+                    [field]: value
+                  }
+                }));
+              }} 
+            />
           )}
 
           {/* TAB 3: PRICING */}
@@ -339,7 +344,7 @@ export default function TractorForm({ initialData, isEdit = false }: TractorForm
                 </div>
               </div>
 
-              <div className="mt-6 flex gap-8 p-6 rounded-2xl bg-foreground/5">
+              <div className="mt-6 flex gap-8 p-6 rounded-2xl bg-foreground/5 mb-6">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" name="financeAvailable" checked={formData.financeAvailable} onChange={handleChange} className="w-5 h-5 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)] bg-background border-foreground/20" />
                   <span className="text-sm font-bold">Finance Available</span>
@@ -353,6 +358,11 @@ export default function TractorForm({ initialData, isEdit = false }: TractorForm
                   <span className="text-sm font-bold">Is Featured</span>
                 </label>
               </div>
+
+              <TractorStatePrices 
+                prices={formData.priceByState || []} 
+                onChange={(prices) => setFormData(prev => ({ ...prev, priceByState: prices }))} 
+              />
             </div>
           )}
 

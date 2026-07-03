@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node -e \"const fs=require('fs'); try{fs.mkdirSync('src/app/(public)/used-tractors/details', {recursive:true}); fs.renameSync('src/app/(public)/used-tractors/[id]','src/app/(public)/used-tractors/details/[id]')}catch(e){} try{fs.rmSync('.next', {recursive:true, force:true})}catch(e){}\" && next dev",
+    "build": "node -e \"const fs=require('fs'); try{fs.mkdirSync('src/app/(public)/used-tractors/details', {recursive:true}); fs.renameSync('src/app/(public)/used-tractors/[id]','src/app/(public)/used-tractors/details/[id]')}catch(e){} try{fs.rmSync('.next', {recursive:true, force:true})}catch(e){}\" && next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",

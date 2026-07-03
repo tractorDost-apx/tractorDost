@@ -16,13 +16,17 @@ export default function ImplementsPage() {
   const fetchImplements = async () => {
     setLoading(true);
     try {
-      const response = await implementAPI.getAllImplements({ page, limit: 10, search });
-      if (response.success) {
-        const payload = response.data as any;
-        setImplementsList(payload.implements || payload.data || []);
-        setTotalPages(payload.pagination?.totalPages || payload.totalPages || 1);
-        setTotalCount(payload.pagination?.total || payload.totalCount || 0);
-      }
+      // Temporarily disabled as requested
+      // const response = await implementAPI.getAllImplements({ page, limit: 10, search });
+      // if (response.success) {
+      //   const payload = response.data as any;
+      //   setImplementsList(payload.implements || payload.data || []);
+      //   setTotalPages(payload.pagination?.totalPages || payload.totalPages || 1);
+      //   setTotalCount(payload.pagination?.total || payload.totalCount || 0);
+      // }
+      setImplementsList([]);
+      setTotalPages(1);
+      setTotalCount(0);
     } catch (error) {
       console.error('Failed to fetch implements', error);
     } finally {
