@@ -1,0 +1,16 @@
+import React from 'react';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AdminSidebar from '@/components/dashboard/AdminSidebar';
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <ProtectedRoute allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
+      <div className="flex flex-col md:flex-row gap-6 w-full max-w-[1400px] mx-auto h-[calc(100vh-10rem)]">
+        <AdminSidebar />
+        <div className="glass-panel p-6 sm:p-8 w-full overflow-y-auto hidden-scrollbar relative">
+          {children}
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+}

@@ -1,26 +1,244 @@
 @import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Brand Colors from User's CMYK Image */
+  --color-brand-green: #4A7635; /* Primary */
+  --color-brand-green-dark: #375926;
+  --color-brand-orange: #BA5B34; /* Accent */
+  --color-brand-orange-light: #d46b3f;
+  
+  --color-brand-charcoal: #090b0a; /* Velvety deep moss-black */
+  --color-brand-light: #fcfdfb; /* Creamy, pristine off-white */
+
+  --color-spatial-bg-light: var(--color-brand-light);
+  --color-spatial-bg-dark: var(--color-brand-charcoal);
+  
+  --color-spatial-text-light: #111827; /* Very sharp, premium dark charcoal */
+  --color-spatial-text-dark: #e8ebe6; /* Warm, soft off-white */
+  
+  --color-spatial-muted-light: #6b7280; /* Clean, modern gray */
+  --color-spatial-muted-dark: #829379;
+  
+  /* We map the previous spatial variables to the new brand colors so we don't have to rewrite the whole app */
+  --color-spatial-accent-blue: var(--color-brand-green);
+  --color-spatial-accent-yellow: var(--color-brand-orange);
+  --color-spatial-accent-pink: var(--color-brand-orange);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: var(--color-spatial-bg-light);
+  --foreground: var(--color-spatial-text-light);
+  --muted: var(--color-spatial-muted-light);
+  
+  /* Glass panels - Ultra Premium Light (VisionOS Style) */
+  --panel-bg: rgba(255, 255, 255, 0.45);
+  --panel-border: rgba(255, 255, 255, 0.8);
+  --panel-shadow: 
+    0 30px 60px -15px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.4);
+  
+  /* Cards - Soft & floaty */
+  --card-bg: rgba(255, 255, 255, 0.55);
+  --card-border: rgba(255, 255, 255, 0.9);
+  --card-shadow: 
+    0 15px 35px -10px rgba(0, 0, 0, 0.06),
+    inset 0 1px 1px rgba(255, 255, 255, 1);
+  --card-shadow-hover: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 1);
+    
+  /* Navbar Scrolled */
+  --nav-bg-scrolled: rgba(255, 255, 255, 0.55);
+  --nav-shadow-scrolled: 
+    0 15px 40px -10px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 1);
+}
+
+.dark {
+  --background: var(--color-spatial-bg-dark);
+  --foreground: var(--color-spatial-text-dark);
+  --muted: var(--color-spatial-muted-dark);
+  
+  /* Glass panels - Ultra Premium Dark (Deep & Cinematic) */
+  --panel-bg: rgba(20, 26, 22, 0.45);
+  --panel-border: rgba(255, 255, 255, 0.03);
+  --panel-shadow: 
+    0 30px 80px -20px rgba(0, 0, 0, 1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.4);
+  
+  /* Cards - Deep & grounded */
+  --card-bg: rgba(14, 18, 15, 0.5);
+  --card-border: rgba(255, 255, 255, 0.02);
+  --card-shadow: 
+    0 15px 40px -10px rgba(0, 0, 0, 0.9),
+    inset 0 1px 1px rgba(255, 255, 255, 0.03);
+  --card-shadow-hover: 
+    0 25px 60px -15px rgba(0, 0, 0, 1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.06);
+    
+  /* Navbar Scrolled */
+  --nav-bg-scrolled: rgba(9, 11, 10, 0.65);
+  --nav-shadow-scrolled: 
+    0 20px 60px -15px rgba(0, 0, 0, 1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.04);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  @apply transition-colors duration-1000 min-h-screen overflow-x-hidden ease-out;
 }
+
+/* Ambient Glowing Orbs - Living Background */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  top: -50%; left: -50%; right: -50%; bottom: -50%;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 1s ease-out;
+}
+
+/* Green Orb */
+body::before {
+  background: radial-gradient(circle at 35% 35%, rgba(74, 118, 53, 0.05) 0%, transparent 35%);
+  animation: float-orb 20s ease-in-out infinite alternate;
+}
+
+/* Orange Orb */
+body::after {
+  background: radial-gradient(circle at 65% 65%, rgba(186, 91, 52, 0.04) 0%, transparent 35%);
+  animation: float-orb-reverse 25s ease-in-out infinite alternate;
+}
+
+.dark body::before {
+  background: radial-gradient(circle at 35% 35%, rgba(74, 118, 53, 0.12) 0%, transparent 35%);
+}
+
+.dark body::after {
+  background: radial-gradient(circle at 65% 65%, rgba(186, 91, 52, 0.09) 0%, transparent 35%);
+}
+
+@keyframes float-orb {
+  0% { transform: scale(1) translate(0, 0) rotate(0deg); opacity: 0.6; }
+  33% { transform: scale(1.1) translate(2%, 4%) rotate(2deg); opacity: 1; }
+  66% { transform: scale(0.9) translate(-2%, 2%) rotate(-1deg); opacity: 0.8; }
+  100% { transform: scale(1.05) translate(-4%, -2%) rotate(1deg); opacity: 0.6; }
+}
+
+@keyframes float-orb-reverse {
+  0% { transform: scale(1) translate(0, 0) rotate(0deg); opacity: 0.6; }
+  33% { transform: scale(0.9) translate(-4%, -2%) rotate(-2deg); opacity: 0.9; }
+  66% { transform: scale(1.1) translate(2%, -4%) rotate(1deg); opacity: 0.7; }
+  100% { transform: scale(0.95) translate(4%, 2%) rotate(-1deg); opacity: 1; }
+}
+
+/* 
+  Spatial Panel: Huge immersive frosted glass 
+*/
+@utility spatial-panel {
+  backdrop-filter: blur(40px) saturate(120%);
+  -webkit-backdrop-filter: blur(40px) saturate(120%);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  border-radius: 2rem;
+}
+
+/* 
+  Spatial Card: Inner Neumann frosted glass 
+*/
+@utility spatial-card {
+  backdrop-filter: blur(25px) saturate(120%);
+  -webkit-backdrop-filter: blur(25px) saturate(120%);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: 1.5rem;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+  }
+}
+
+/* 
+  Spatial Pill: Floating capsule 
+*/
+@utility spatial-pill {
+  backdrop-filter: blur(30px) saturate(120%);
+  -webkit-backdrop-filter: blur(30px) saturate(120%);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  border-radius: 9999px;
+}
+
+@utility spatial-button {
+  background: linear-gradient(135deg, var(--color-brand-green), var(--color-brand-green-dark));
+  color: white;
+  border-radius: 9999px;
+  box-shadow: 
+    0 8px 24px -6px rgba(74, 118, 53, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  font-weight: 600;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 32px -6px rgba(74, 118, 53, 0.8),
+      inset 0 1px 1px rgba(255, 255, 255, 0.6),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.05);
+  }
+}
+
+/* Floating animation for elements like cards or hero images */
+@utility animate-float {
+  animation: float-element 6s ease-in-out infinite;
+}
+
+@keyframes float-element {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Word Flip Animation for Hero Section */
+@utility animate-word-flip {
+  animation: word-flip 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-style: preserve-3d;
+}
+
+@keyframes word-flip {
+  0% { transform: perspective(600px) rotateX(-90deg) translateY(20px); opacity: 0; filter: blur(4px); }
+  12% { transform: perspective(600px) rotateX(0deg) translateY(0px); opacity: 1; filter: blur(0px); }
+  88% { transform: perspective(600px) rotateX(0deg) translateY(0px); opacity: 1; filter: blur(0px); }
+  100% { transform: perspective(600px) rotateX(90deg) translateY(-20px); opacity: 0; filter: blur(4px); }
+}
+
+@utility text-gradient-brand {
+  background: linear-gradient(135deg, var(--color-brand-green), var(--color-brand-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom Logo Theme Swapping */
+.logo-light { display: block; }
+.logo-dark { display: none; }
+
+.dark .logo-light { display: none; }
+.dark .logo-dark { display: block; }
