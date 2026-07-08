@@ -29,14 +29,14 @@ export default function ProfilePage() {
 
       <div className="flex flex-col items-center mb-8">
         <div className="relative group cursor-pointer">
-          <div className="h-28 w-28 rounded-full bg-foreground/5 border-2 border-dashed border-foreground/20 flex items-center justify-center overflow-hidden transition-all group-hover:border-[var(--color-brand-green)]">
+          <div className="h-28 w-28 rounded-full bg-foreground/5 border-2 border-dashed border-[var(--border-brand)] flex items-center justify-center overflow-hidden transition-all group-hover:border-[var(--color-brand-green)]">
             {user?.profilePhoto ? (
               <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <User size={40} className="text-muted group-hover:text-[var(--color-brand-green)] transition-colors" />
             )}
           </div>
-          <div className="absolute bottom-0 right-0 h-8 w-8 bg-[var(--color-brand-green)] rounded-full flex items-center justify-center text-black shadow-lg">
+          <div className="absolute bottom-0 right-0 h-8 w-8 bg-[var(--color-brand-green)] rounded-full flex items-center justify-center text-white shadow-lg">
             <Camera size={14} />
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function ProfilePage() {
             <input 
               type="text" 
               defaultValue={user?.fullName || ''}
-              className="w-full h-14 bg-foreground/5 border border-foreground/10 rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all"
+              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all"
               placeholder="Enter your full name"
             />
           </div>
@@ -64,7 +64,7 @@ export default function ProfilePage() {
               type="text" 
               defaultValue={user?.mobile ? String(user.mobile) : ''}
               disabled
-              className="w-full h-14 bg-foreground/5 border border-foreground/10 rounded-2xl pl-12 pr-4 font-bold text-muted cursor-not-allowed"
+              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-muted cursor-not-allowed"
             />
           </div>
           <p className="text-xs text-muted mt-1 ml-1">Mobile number cannot be changed.</p>
@@ -77,7 +77,7 @@ export default function ProfilePage() {
             <input 
               type="email" 
               defaultValue={user?.email || ''}
-              className="w-full h-14 bg-foreground/5 border border-foreground/10 rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all"
+              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all"
               placeholder="Enter your email"
             />
           </div>
@@ -89,7 +89,7 @@ export default function ProfilePage() {
             <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
             <select 
               defaultValue={user?.preferredLanguage || 'English'}
-              className="w-full h-14 bg-foreground/5 border border-foreground/10 rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all appearance-none"
+              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all appearance-none"
             >
               <option value="English">English</option>
               <option value="Marathi">मराठी (Marathi)</option>

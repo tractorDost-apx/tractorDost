@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { Plus, Search, Edit2, Trash2, ShieldCheck, ChevronDown, ChevronUp, Globe, FileText, BarChart, Tag, Activity } from 'lucide-react';
 import BrandModal from './components/BrandModal';
+import BrandModelsModal from './components/BrandModelsModal';
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -17,6 +18,7 @@ export default function BrandsPage() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [modelsBrand, setModelsBrand] = useState<Brand | null>(null);
 
   const fetchBrands = async () => {
     setLoading(true);
@@ -124,7 +126,7 @@ export default function BrandsPage() {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/5">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted font-bold">
@@ -149,7 +151,7 @@ export default function BrandsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center p-1.5 border border-foreground/10 shrink-0 shadow-sm">
+                          <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center p-1.5 border border-[var(--border-subtle)] shrink-0 shadow-sm">
                             {brand.logoUrl ? (
                               <img src={brand.logoUrl} alt={brand.name} className="max-h-full max-w-full object-contain" />
                             ) : (
@@ -171,9 +173,12 @@ export default function BrandsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-foreground/5 text-foreground/80">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setModelsBrand(brand); }}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-foreground/5 text-foreground/80 hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] transition-colors"
+                        >
                           {brand.totalModels || 0} Models
-                        </span>
+                        </button>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex gap-2 items-center">
@@ -215,20 +220,20 @@ export default function BrandsPage() {
                               
                               {/* Left Column - General Info */}
                               <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-foreground/10 pb-2">
+                                <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-[var(--border-subtle)] pb-2">
                                   <FileText size={18} />
                                   <h3 className="font-black text-sm uppercase tracking-wide">Brand Identity & About</h3>
                                 </div>
-                                <p className="text-sm text-foreground/80 font-medium leading-relaxed bg-background p-4 rounded-xl border border-foreground/5 shadow-sm">
+                                <p className="text-sm text-foreground/80 font-medium leading-relaxed bg-background p-4 rounded-xl border border-[var(--border-subtle)] shadow-sm">
                                   {brand.aboutBrand || "No description provided for this brand yet."}
                                 </p>
                                 
                                 <div className="grid grid-cols-2 gap-4 mt-2">
-                                  <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-1">
+                                  <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
                                     <span className="text-[10px] font-black uppercase text-muted tracking-wider flex items-center gap-1.5"><Activity size={12}/> Sort Order</span>
                                     <span className="text-lg font-black text-foreground">{brand.sortOrder || 0}</span>
                                   </div>
-                                  <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-1">
+                                  <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
                                     <span className="text-[10px] font-black uppercase text-muted tracking-wider flex items-center gap-1.5"><Tag size={12}/> DB ID</span>
                                     <span className="text-lg font-black text-foreground">#{brand.id}</span>
                                   </div>
@@ -237,12 +242,12 @@ export default function BrandsPage() {
 
                               {/* Right Column - SEO Info */}
                               <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-foreground/10 pb-2">
+                                <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2">
                                   <BarChart size={18} />
                                   <h3 className="font-black text-sm uppercase tracking-wide">SEO & Meta Configuration</h3>
                                 </div>
                                 
-                                <div className="flex flex-col gap-4 bg-background p-4 rounded-xl border border-foreground/5 shadow-sm">
+                                <div className="flex flex-col gap-4 bg-background p-4 rounded-xl border border-[var(--border-subtle)] shadow-sm">
                                   <div className="flex flex-col gap-1.5">
                                     <span className="text-[10px] font-black uppercase text-muted tracking-wider">SEO Title</span>
                                     <span className="text-sm font-bold text-foreground">
@@ -283,7 +288,7 @@ export default function BrandsPage() {
 
         {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="mt-auto p-4 border-t border-foreground/5 flex items-center justify-between">
+          <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between">
             <button 
               disabled={page === 1}
               onClick={() => setPage(p => p - 1)}
@@ -305,6 +310,10 @@ export default function BrandsPage() {
 
       {isModalOpen && (
         <BrandModal brand={selectedBrand} onClose={handleModalClose} />
+      )}
+      
+      {modelsBrand && (
+        <BrandModelsModal brand={modelsBrand} onClose={() => setModelsBrand(null)} />
       )}
     </div>
   );

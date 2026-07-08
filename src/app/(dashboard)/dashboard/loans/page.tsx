@@ -23,15 +23,15 @@ export default function LoansPage() {
         {dummyLoans.map((loan) => {
           const StatusIcon = loan.icon;
           return (
-            <div key={loan.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-foreground/10 transition-colors cursor-pointer">
+            <div key={loan.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-[var(--border-subtle)] transition-colors cursor-pointer">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-foreground/5 flex items-center justify-center flex-shrink-0 text-muted">
+                <div className="h-12 w-12 rounded-full bg-[var(--border-subtle)] flex items-center justify-center flex-shrink-0 text-muted">
                   <FileText size={24} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-foreground text-lg">{loan.tractor}</h3>
-                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-foreground/10 text-muted">
+                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-[var(--border-subtle)] text-muted">
                       {loan.id}
                     </span>
                   </div>
@@ -39,7 +39,7 @@ export default function LoansPage() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between md:flex-col md:items-end gap-2 border-t border-foreground/5 md:border-t-0 pt-4 md:pt-0">
+              <div className="flex items-center justify-between md:flex-col md:items-end gap-2 border-t border-[var(--border-subtle)] md:border-t-0 pt-4 md:pt-0">
                 <p className="text-2xl font-black text-foreground">{loan.amount}</p>
                 <div className={`flex items-center gap-1.5 font-bold text-sm ${loan.color}`}>
                   <StatusIcon size={16} /> {loan.status}

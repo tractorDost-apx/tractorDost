@@ -26,10 +26,17 @@ export const authAPI = {
   },
 
   logout: async () => {
-    // Clear cookies client-side since accessToken is not httpOnly
+    try {
+      await apiClient.post('/auth/logout');
+    } catch (error: any) {
+      if (error?.response?.status !== 404) {
+        console.error('Failed to logout from backend', error.message);
+      }
+    }
+    
+    // Clear any client-accessible cookies just in case
     if (typeof document !== 'undefined') {
       document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     }
     return Promise.resolve();
   }

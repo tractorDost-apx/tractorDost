@@ -88,9 +88,10 @@ export default function LoginPage() {
         <div className="absolute top-[-20%] right-[-10%] h-[200px] w-[200px] rounded-full bg-[var(--color-brand-green)]/20 blur-[60px] pointer-events-none" />
         <div className="absolute bottom-[-10%] left-[-20%] h-[150px] w-[150px] rounded-full bg-[var(--color-spatial-accent-blue)]/15 blur-[50px] pointer-events-none" />
         
-        {/* Logo or Icon */}
-        <div className="h-16 w-16 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] rounded-2xl flex items-center justify-center mb-6 shadow-inner">
-          {step === 1 ? <Phone size={32} /> : <ShieldCheck size={32} />}
+        {/* Logo */}
+        <div className="flex items-center justify-center mb-6">
+          <img src="/TD%20Black.png" alt="TractorDost Logo" className="h-14 w-auto logo-light object-contain" />
+          <img src="/TD%20White.png" alt="TractorDost Logo" className="h-14 w-auto logo-dark object-contain" />
         </div>
         
         <h1 className="text-2xl md:text-3xl font-black text-foreground mb-2 text-center tracking-tight">
@@ -120,7 +121,7 @@ export default function LoginPage() {
                 placeholder="Mobile Number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                className="w-full h-14 bg-foreground/5 border border-foreground/10 rounded-2xl pl-14 pr-4 text-lg font-bold text-foreground placeholder:text-muted focus:outline-none focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-14 pr-4 text-lg font-bold text-foreground placeholder:text-muted focus:outline-none focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
                 required
                 disabled={isLoading}
               />
@@ -149,7 +150,7 @@ export default function LoginPage() {
                 placeholder="Enter 6-character OTP"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                className="w-full h-14 bg-foreground/5 border border-foreground/10 rounded-2xl px-4 text-center text-2xl tracking-[0.5em] font-black text-foreground placeholder:text-muted placeholder:tracking-normal placeholder:text-base focus:outline-none focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl px-4 text-center text-2xl tracking-[0.5em] font-black text-foreground placeholder:text-muted placeholder:tracking-normal placeholder:text-base focus:outline-none focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
                 required
                 disabled={isLoading}
               />

@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import TractorForm from '../components/TractorForm';
 import { tractorAPI, Tractor } from '@/lib/api/tractors';
 import { Loader2 } from 'lucide-react';
 
 export default function EditTractorPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params?.id ? parseInt(params.id as string) : null;
+  const initialTab = searchParams?.get('tab') || 'basic';
   
   const [tractor, setTractor] = useState<Tractor | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ export default function EditTractorPage() {
         <p className="text-sm font-bold text-muted">Update catalog information for {tractor.modelName}.</p>
       </div>
 
-      <TractorForm isEdit={true} initialData={tractor} />
+      <TractorForm isEdit={true} initialData={tractor} initialTab={initialTab} />
     </div>
   );
 }

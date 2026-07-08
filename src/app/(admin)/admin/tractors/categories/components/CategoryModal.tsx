@@ -127,7 +127,7 @@ export default function CategoryModal({ category, categories, onClose }: Categor
   };
 
   const SectionTitle = ({ icon: Icon, title }: { icon: any, title: string }) => (
-    <div className="flex items-center gap-2 text-foreground mb-4 border-b border-foreground/10 pb-2">
+    <div className="flex items-center gap-2 text-foreground mb-4 border-b border-[var(--border-subtle)] pb-2">
       <Icon size={18} className="text-[var(--color-brand-green)]" />
       <h3 className="font-black text-sm uppercase tracking-wider">{title}</h3>
     </div>
@@ -136,11 +136,11 @@ export default function CategoryModal({ category, categories, onClose }: Categor
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-sm">
       <div 
-        className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl animate-fade-in shadow-2xl border border-foreground/10 overflow-hidden"
+        className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl animate-fade-in shadow-2xl border border-[var(--border-subtle)] overflow-hidden"
         style={{ background: 'var(--background)' }}
       >
         {/* Sticky Header */}
-        <div className="px-6 py-5 border-b border-foreground/10 flex justify-between items-center bg-background shrink-0 z-10">
+        <div className="px-6 py-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-background shrink-0 z-10">
           <h2 className="text-2xl font-black text-foreground tracking-tight">
             {isEditing ? 'Edit Category Master' : 'Create New Category'}
           </h2>
@@ -172,7 +172,7 @@ export default function CategoryModal({ category, categories, onClose }: Categor
                 <div className="md:col-span-4 flex flex-col gap-2">
                   <label className="text-xs font-bold text-muted uppercase tracking-wider">Category Icon</label>
                   <div 
-                    className="aspect-square w-full rounded-2xl border-2 border-dashed border-foreground/20 flex flex-col items-center justify-center bg-foreground/5 overflow-hidden cursor-pointer hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 transition-colors group relative"
+                    className="aspect-square w-full rounded-2xl border-2 border-dashed border-[var(--border-brand)] flex flex-col items-center justify-center bg-foreground/5 overflow-hidden cursor-pointer hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 transition-colors group relative"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {iconPreview ? (
@@ -247,14 +247,14 @@ export default function CategoryModal({ category, categories, onClose }: Categor
             {/* SECTION 2: Hierarchy & Structure */}
             <section>
               <SectionTitle icon={Layers} title="Hierarchy & Tree" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-foreground/[0.02] p-6 rounded-2xl border border-foreground/5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-foreground/[0.02] p-6 rounded-2xl border border-[var(--border-subtle)]">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-muted uppercase tracking-wider">Parent Category</label>
                   <select 
                     name="parentId" 
                     value={formData.parentId}
                     onChange={handleChange}
-                    className="w-full bg-background border border-foreground/10 rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="w-full bg-background border border-[var(--border-subtle)] rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
                   >
                     <option value="">-- None (Root Category) --</option>
                     {renderCategoryOptions(categories)}
@@ -292,7 +292,7 @@ export default function CategoryModal({ category, categories, onClose }: Categor
                         onChange={handleChange}
                         className="peer sr-only" 
                       />
-                      <div className="w-6 h-6 rounded-md border-2 border-foreground/20 peer-checked:bg-[var(--color-brand-green)] peer-checked:border-[var(--color-brand-green)] transition-all flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-md border-2 border-[var(--border-brand)] peer-checked:bg-[var(--color-brand-green)] peer-checked:border-[var(--color-brand-green)] transition-all flex items-center justify-center">
                         <Check size={14} className="text-white opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100 transition-all" strokeWidth={4} />
                       </div>
                     </div>
@@ -310,7 +310,7 @@ export default function CategoryModal({ category, categories, onClose }: Categor
         </div>
 
         {/* Sticky Footer */}
-        <div className="px-6 py-4 border-t border-foreground/10 bg-background shrink-0 flex justify-end gap-3 z-10">
+        <div className="px-6 py-4 border-t border-[var(--border-subtle)] bg-background shrink-0 flex justify-end gap-3 z-10">
           <button 
             type="button" 
             onClick={onClose}

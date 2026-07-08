@@ -152,7 +152,7 @@ export default function TractorsPage() {
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center border border-foreground/10 shrink-0 shadow-sm overflow-hidden p-1">
+                            <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center border border-[var(--border-subtle)] shrink-0 shadow-sm overflow-hidden p-1">
                               {primaryImage ? (
                                 <img src={primaryImage.url} alt={tractor.modelName} className="w-full h-full object-contain" />
                               ) : (
@@ -241,23 +241,23 @@ export default function TractorsPage() {
                                 
                                 {/* SEO & Meta Data */}
                                 <div className="md:col-span-5 flex flex-col gap-4">
-                                  <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-foreground/10 pb-2">
+                                  <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2">
                                     <BarChart size={18} />
                                     <h3 className="font-black text-sm uppercase tracking-wide">SEO & Engagement</h3>
                                   </div>
                                   
                                   <div className="grid grid-cols-2 gap-4 mb-2">
-                                    <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-1">
+                                    <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
                                       <span className="text-[10px] font-black uppercase text-muted tracking-wider">Total Views</span>
                                       <span className="text-lg font-black text-foreground">{tractor.viewsCount || 0}</span>
                                     </div>
-                                    <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-1">
+                                    <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
                                       <span className="text-[10px] font-black uppercase text-muted tracking-wider">Total Leads</span>
                                       <span className="text-lg font-black text-[var(--color-brand-green)]">{tractor.leadsCount || 0}</span>
                                     </div>
                                   </div>
 
-                                  <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-3">
+                                  <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-3">
                                     <div>
                                       <span className="text-[10px] font-black uppercase text-muted tracking-wider block mb-1">SEO Title</span>
                                       <p className="text-sm font-bold text-foreground">{tractor.seoTitle || "Not specified"}</p>
@@ -272,25 +272,25 @@ export default function TractorsPage() {
 
                                 {/* Quick Specs Highlight */}
                                 <div className="md:col-span-7 flex flex-col gap-4">
-                                  <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-foreground/10 pb-2">
+                                  <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-[var(--border-subtle)] pb-2">
                                     <Settings2 size={18} />
                                     <h3 className="font-black text-sm uppercase tracking-wide">Key Technical Specs</h3>
                                   </div>
                                   
                                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
+                                    <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
                                       <span className="text-[10px] font-black uppercase text-muted tracking-wider">Engine CC</span>
                                       <span className="text-sm font-black text-foreground">{tractor.spec?.engineCc || '-'}</span>
                                     </div>
-                                    <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
+                                    <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
                                       <span className="text-[10px] font-black uppercase text-muted tracking-wider">Cylinders</span>
                                       <span className="text-sm font-black text-foreground">{tractor.spec?.cylinders || '-'}</span>
                                     </div>
-                                    <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
+                                    <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
                                       <span className="text-[10px] font-black uppercase text-muted tracking-wider">PTO HP</span>
                                       <span className="text-sm font-black text-foreground">{tractor.spec?.ptoHp || '-'}</span>
                                     </div>
-                                    <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
+                                    <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col items-center text-center gap-1">
                                       <span className="text-[10px] font-black uppercase text-muted tracking-wider">Lift Cap.</span>
                                       <span className="text-sm font-black text-foreground">{tractor.spec?.liftingCapacityKg ? `${tractor.spec.liftingCapacityKg} kg` : '-'}</span>
                                     </div>
@@ -317,7 +317,7 @@ export default function TractorsPage() {
 
                               </div>
                               
-                              <div className="flex justify-between items-center pt-4 border-t border-foreground/5">
+                              <div className="flex justify-between items-center pt-4 border-t border-[var(--border-subtle)]">
                                 <div className="flex items-center gap-2 text-xs font-bold text-muted">
                                   <ImageIcon size={14} />
                                   {tractor.media?.length || 0} Media File(s) Attached
@@ -343,7 +343,7 @@ export default function TractorsPage() {
 
         {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="mt-auto p-4 border-t border-foreground/5 flex items-center justify-between bg-background z-10 relative">
+          <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between bg-background z-10 relative">
             <button 
               disabled={page === 1}
               onClick={() => setPage(p => p - 1)}

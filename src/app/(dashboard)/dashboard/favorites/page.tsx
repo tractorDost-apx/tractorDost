@@ -32,7 +32,7 @@ export default function FavoritesPage() {
               <MapPin size={16} /> <span className="truncate">{tractor.location}</span>
             </div>
             
-            <button className="w-full bg-[var(--color-brand-green)] text-black font-bold py-3 rounded-xl hover:bg-[var(--color-brand-green)]/90 transition-colors">
+            <button className="w-full bg-[var(--color-brand-green)] text-white font-bold py-3 rounded-xl hover:bg-[var(--color-brand-green)]/90 transition-colors">
               View Details
             </button>
           </div>

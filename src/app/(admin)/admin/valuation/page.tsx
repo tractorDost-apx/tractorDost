@@ -55,7 +55,7 @@ export default function AdminValuationPage() {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-background rounded-2xl border border-foreground/10 p-5 shadow-sm">
+        <div className="bg-background rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm">
            <div className="flex justify-between items-start mb-4">
               <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-500">
                 <Clock size={20} />
@@ -73,7 +73,7 @@ export default function AdminValuationPage() {
            <p className="text-sm font-bold text-[var(--color-brand-green)] uppercase tracking-widest">Certified Tractors</p>
            <p className="text-3xl font-black text-[var(--color-brand-green)] mt-1">{completedInspections.length}</p>
         </div>
-        <div className="bg-background rounded-2xl border border-foreground/10 p-5 shadow-sm">
+        <div className="bg-background rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm">
            <div className="flex justify-between items-start mb-4">
               <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-500">
                 <FileText size={20} />
@@ -85,7 +85,7 @@ export default function AdminValuationPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-foreground/10">
+      <div className="flex gap-2 border-b border-[var(--border-subtle)]">
          <button 
            onClick={() => setActiveTab('PENDING')}
            className={`px-6 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'PENDING' ? 'border-[var(--color-brand-green)] text-[var(--color-brand-green)]' : 'border-transparent text-muted hover:text-foreground'}`}
@@ -101,18 +101,18 @@ export default function AdminValuationPage() {
       </div>
 
       {/* Inspection List */}
-      <div className="bg-background rounded-3xl border border-foreground/10 shadow-sm overflow-hidden">
+      <div className="bg-background rounded-3xl border border-[var(--border-subtle)] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-foreground/5 border-b border-foreground/10">
+              <tr className="bg-foreground/5 border-b border-[var(--border-subtle)]">
                 <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Tractor & Location</th>
                 <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Seller Details</th>
                 <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Condition / Age</th>
                 <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/10">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {loading ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center">
@@ -131,7 +131,7 @@ export default function AdminValuationPage() {
                   <tr key={listing.id} className="hover:bg-foreground/[0.02] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-12 rounded-lg overflow-hidden bg-foreground/10 shrink-0 border border-foreground/10 relative">
+                        <div className="w-16 h-12 rounded-lg overflow-hidden bg-foreground/10 shrink-0 border border-[var(--border-subtle)] relative">
                           {listing.imageUrl ? (
                             <img src={listing.imageUrl} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -166,7 +166,7 @@ export default function AdminValuationPage() {
                     <td className="px-6 py-4 text-right">
                       <Link 
                         href={`/admin/used-listings/${listing.id}`}
-                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-colors ${activeTab === 'PENDING' ? 'bg-[var(--color-brand-green)] text-white hover:bg-[var(--color-brand-green)]/90 shadow-sm' : 'bg-foreground/5 hover:bg-foreground/10 border border-foreground/10'}`}
+                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-colors ${activeTab === 'PENDING' ? 'bg-[var(--color-brand-green)] text-white hover:bg-[var(--color-brand-green)]/90 shadow-sm' : 'bg-foreground/5 hover:bg-foreground/10 border border-[var(--border-subtle)]'}`}
                       >
                         {activeTab === 'PENDING' ? (
                           <>Start Inspection</>

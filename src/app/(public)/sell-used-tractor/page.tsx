@@ -120,7 +120,7 @@ export default function SellUsedTractorPage() {
   if (isSuccess) {
     return (
       <div className="min-h-screen pt-24 pb-16 px-4 bg-background flex items-center justify-center">
-        <div className="max-w-md w-full bg-foreground/5 rounded-3xl p-10 text-center shadow-xl border border-foreground/10 relative overflow-hidden">
+        <div className="max-w-md w-full bg-foreground/5 rounded-3xl p-10 text-center shadow-xl border border-[var(--border-subtle)] relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-[var(--color-brand-green)]"></div>
           
           <div className="w-24 h-24 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] rounded-full flex items-center justify-center mx-auto mb-6">
@@ -190,7 +190,7 @@ export default function SellUsedTractorPage() {
                   className={`w-12 h-12 rounded-full flex items-center justify-center font-black shadow-lg transition-colors duration-300 ${
                     currentStep >= step.id 
                       ? 'bg-[var(--color-brand-green)] text-white shadow-[var(--color-brand-green)]/20' 
-                      : 'bg-background text-muted border-2 border-foreground/10'
+                      : 'bg-background text-muted border-2 border-[var(--border-subtle)]'
                   }`}
                 >
                   {currentStep > step.id ? <CheckCircle2 size={24} /> : step.icon}
@@ -206,7 +206,7 @@ export default function SellUsedTractorPage() {
         </div>
 
         {/* Form Container */}
-        <div className="bg-foreground/5 p-6 md:p-10 rounded-[2rem] border border-foreground/10 shadow-2xl relative overflow-hidden">
+        <div className="bg-foreground/5 p-6 md:p-10 rounded-[2rem] border border-[var(--border-subtle)] shadow-2xl relative overflow-hidden">
           {/* Decorative element */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)] opacity-5 blur-[100px] rounded-full pointer-events-none"></div>
           
@@ -215,7 +215,7 @@ export default function SellUsedTractorPage() {
             {/* STEP 1: BASICS */}
             {currentStep === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-foreground/10">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[var(--border-subtle)]">
                   <Tractor className="text-[var(--color-brand-green)]" size={28} />
                   <h2 className="text-2xl font-black uppercase">Tractor Details</h2>
                 </div>
@@ -228,7 +228,7 @@ export default function SellUsedTractorPage() {
                       required
                       value={formData.tractorBrand}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
                     >
                       <option value="">Select Brand</option>
                       {brands.map(b => (
@@ -245,7 +245,7 @@ export default function SellUsedTractorPage() {
                       placeholder="e.g. 575 DI XP Plus"
                       value={formData.tractorModel}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export default function SellUsedTractorPage() {
                       max={new Date().getFullYear()}
                       value={formData.yearOfManufacture}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -274,7 +274,7 @@ export default function SellUsedTractorPage() {
                       placeholder="e.g. 1500"
                       value={formData.hoursUsed || ''}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -284,7 +284,7 @@ export default function SellUsedTractorPage() {
                       required
                       value={formData.ownership}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
                     >
                       <option value={1}>1st Owner</option>
                       <option value={2}>2nd Owner</option>
@@ -295,7 +295,7 @@ export default function SellUsedTractorPage() {
                 </div>
 
                 <div className="mt-8">
-                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-foreground/10">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[var(--border-subtle)]">
                     <MapPin className="text-[var(--color-brand-green)]" size={28} />
                     <h2 className="text-2xl font-black uppercase">Location</h2>
                   </div>
@@ -310,7 +310,7 @@ export default function SellUsedTractorPage() {
                         placeholder="e.g. Maharashtra"
                         value={formData.state}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -322,7 +322,7 @@ export default function SellUsedTractorPage() {
                         placeholder="e.g. Pune"
                         value={formData.district}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -334,7 +334,7 @@ export default function SellUsedTractorPage() {
                         placeholder="e.g. Baramati"
                         value={formData.villageCity || ''}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -345,12 +345,12 @@ export default function SellUsedTractorPage() {
             {/* STEP 2: CONDITION */}
             {currentStep === 2 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-foreground/10">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[var(--border-subtle)]">
                   <Wrench className="text-[var(--color-brand-green)]" size={28} />
                   <h2 className="text-2xl font-black uppercase">Detailed Condition</h2>
                 </div>
 
-                <div className="bg-background rounded-2xl p-6 border border-foreground/10 mb-8">
+                <div className="bg-background rounded-2xl p-6 border border-[var(--border-subtle)] mb-8">
                   <label className="text-sm font-black uppercase tracking-widest mb-4 block flex justify-between items-center">
                     <span>Engine Condition</span>
                     <span className="text-2xl text-[var(--color-brand-green)]">{formData.engineConditionPct}%</span>
@@ -378,7 +378,7 @@ export default function SellUsedTractorPage() {
                       name="conditionGrade"
                       value={formData.conditionGrade}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
                     >
                       {Object.values(ConditionGrade).map(c => (
                         <option key={c} value={c}>{c}</option>
@@ -391,7 +391,7 @@ export default function SellUsedTractorPage() {
                       name="tyreCondition"
                       value={formData.tyreCondition}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
                     >
                       {Object.values(ConditionGrade).map(c => (
                         <option key={c} value={c}>{c}</option>
@@ -404,7 +404,7 @@ export default function SellUsedTractorPage() {
                       name="hydraulicsCondition"
                       value={formData.hydraulicsCondition}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
                     >
                       {Object.values(ConditionGrade).map(c => (
                         <option key={c} value={c}>{c}</option>
@@ -417,7 +417,7 @@ export default function SellUsedTractorPage() {
                       name="bodyCondition"
                       value={formData.bodyCondition}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
                     >
                       {Object.values(ConditionGrade).map(c => (
                         <option key={c} value={c}>{c}</option>
@@ -431,7 +431,7 @@ export default function SellUsedTractorPage() {
             {/* STEP 3: PRICING */}
             {currentStep === 3 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-foreground/10">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[var(--border-subtle)]">
                   <IndianRupee className="text-[var(--color-brand-green)]" size={28} />
                   <h2 className="text-2xl font-black uppercase">Pricing & Docs</h2>
                 </div>
@@ -473,9 +473,9 @@ export default function SellUsedTractorPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-muted mb-4 border-b border-foreground/10 pb-2">Documents</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-muted mb-4 border-b border-[var(--border-subtle)] pb-2">Documents</h3>
                     
-                    <label className="flex items-center gap-4 cursor-pointer p-4 bg-background border border-foreground/10 rounded-2xl hover:border-[var(--color-brand-green)] transition-colors">
+                    <label className="flex items-center gap-4 cursor-pointer p-4 bg-background border border-[var(--border-subtle)] rounded-2xl hover:border-[var(--color-brand-green)] transition-colors">
                       <input 
                         type="checkbox" 
                         name="rcAvailable"
@@ -492,7 +492,7 @@ export default function SellUsedTractorPage() {
                         name="loanClearanceStatus"
                         value={formData.loanClearanceStatus}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
                       >
                         <option value="CLEAR">Loan Cleared (NOC Available)</option>
                         <option value="UNDER_HYPOTHECATION">Active Loan (Under Hypothecation)</option>
@@ -502,9 +502,9 @@ export default function SellUsedTractorPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-muted mb-4 border-b border-foreground/10 pb-2">Sales Info</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-muted mb-4 border-b border-[var(--border-subtle)] pb-2">Sales Info</h3>
                     
-                    <label className="flex items-center gap-4 cursor-pointer p-4 bg-background border border-foreground/10 rounded-2xl hover:border-[var(--color-brand-green)] transition-colors">
+                    <label className="flex items-center gap-4 cursor-pointer p-4 bg-background border border-[var(--border-subtle)] rounded-2xl hover:border-[var(--color-brand-green)] transition-colors">
                       <input 
                         type="checkbox" 
                         name="financeAvailable"
@@ -524,7 +524,7 @@ export default function SellUsedTractorPage() {
                         name="urgency"
                         value={formData.urgency}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none appearance-none"
                       >
                         <option value={UrgencyLevel.NO_RUSH}>No Rush (Whenever I get a good price)</option>
                         <option value={UrgencyLevel.THIRTY_DAYS}>Within 30 Days</option>
@@ -539,7 +539,7 @@ export default function SellUsedTractorPage() {
             {/* STEP 4: DESCRIPTION & PHOTOS */}
             {currentStep === 4 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-foreground/10">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[var(--border-subtle)]">
                   <FileText className="text-[var(--color-brand-green)]" size={28} />
                   <h2 className="text-2xl font-black uppercase">Final Details</h2>
                 </div>
@@ -554,7 +554,7 @@ export default function SellUsedTractorPage() {
                         placeholder="Tell buyers why they should buy your tractor... e.g., 'Single hand driven, mostly used for light trolley work. Company serviced.'"
                         value={formData.description || ''}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all resize-none"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all resize-none"
                       />
                     </div>
                     
@@ -566,14 +566,14 @@ export default function SellUsedTractorPage() {
                         placeholder="e.g., Engine overhauled at 4000 hours, Clutch plate changed recently."
                         value={formData.majorRepairs || ''}
                         onChange={handleChange}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all resize-none"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all resize-none"
                       />
                     </div>
                   </div>
 
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Upload Photos</label>
-                    <div className="h-full min-h-[200px] border-2 border-dashed border-foreground/20 rounded-3xl bg-background flex flex-col items-center justify-center p-8 text-center hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 transition-all cursor-pointer group">
+                    <div className="h-full min-h-[200px] border-2 border-dashed border-[var(--border-brand)] rounded-3xl bg-background flex flex-col items-center justify-center p-8 text-center hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 transition-all cursor-pointer group">
                       <div className="w-16 h-16 bg-foreground/5 rounded-full flex items-center justify-center mb-4 group-hover:bg-[var(--color-brand-green)]/20 transition-colors">
                          <UploadCloud className="text-muted group-hover:text-[var(--color-brand-green)]" size={32} />
                       </div>
@@ -596,14 +596,14 @@ export default function SellUsedTractorPage() {
             )}
 
             {/* Navigation Buttons */}
-            <div className="mt-12 pt-6 border-t border-foreground/10 flex justify-between items-center">
+            <div className="mt-12 pt-6 border-t border-[var(--border-subtle)] flex justify-between items-center">
               <button
                 type="button"
                 onClick={handlePrev}
                 className={`flex items-center gap-2 px-6 py-4 rounded-xl font-black uppercase tracking-wider text-sm transition-all ${
                   currentStep === 1 
                     ? 'opacity-0 pointer-events-none' 
-                    : 'bg-background hover:bg-foreground/5 border border-foreground/10'
+                    : 'bg-background hover:bg-foreground/5 border border-[var(--border-subtle)]'
                 }`}
               >
                 <ChevronLeft size={18} /> Back

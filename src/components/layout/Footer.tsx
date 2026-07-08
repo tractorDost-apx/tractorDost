@@ -13,7 +13,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-foreground/5 bg-background pt-20 pb-10 z-10">
+    <footer className="relative mt-24 overflow-hidden border-t border-[var(--border-subtle)] bg-background pt-20 pb-10 z-10">
       <div className="relative z-10 mx-auto max-w-7xl px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           
@@ -64,7 +64,7 @@ export function Footer() {
 
         </div>
 
-        <div className="mt-20 flex flex-col items-center justify-between border-t border-foreground/10 pt-8 sm:flex-row">
+        <div className="mt-20 flex flex-col items-center justify-between border-t border-[var(--border-subtle)] pt-8 sm:flex-row">
           <p className="text-sm text-muted">
             © {new Date().getFullYear()} TractorDost. All rights reserved.
           </p>

@@ -83,7 +83,7 @@ export default function MediaUploader({
         className={`relative w-full rounded-2xl border-2 border-dashed transition-all p-8 flex flex-col items-center justify-center gap-4 text-center cursor-pointer ${
           dragActive 
             ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/5' 
-            : 'border-foreground/20 bg-foreground/5 hover:border-foreground/40'
+            : 'border-[var(--border-brand)] bg-[var(--border-subtle)] hover:border-foreground/40'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -114,7 +114,7 @@ export default function MediaUploader({
           
           {/* Existing Media */}
           {existingMedia.map((media) => (
-            <div key={media.id} className="relative group rounded-xl overflow-hidden bg-foreground/5 aspect-square border border-foreground/10">
+            <div key={media.id} className="relative group rounded-xl overflow-hidden bg-foreground/5 aspect-square border border-[var(--border-subtle)]">
               {media.type.includes('image') || accept.includes('image') ? (
                 <img src={media.url} alt="Media" className="w-full h-full object-cover" />
               ) : (
@@ -141,7 +141,7 @@ export default function MediaUploader({
 
           {/* New Files */}
           {files.map((file, idx) => (
-            <div key={idx} className="relative group rounded-xl overflow-hidden bg-foreground/5 aspect-square border border-foreground/10">
+            <div key={idx} className="relative group rounded-xl overflow-hidden bg-foreground/5 aspect-square border border-[var(--border-subtle)]">
               {file.type.includes('image') ? (
                 <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
               ) : (

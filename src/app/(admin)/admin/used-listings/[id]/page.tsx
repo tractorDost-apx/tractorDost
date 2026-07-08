@@ -105,7 +105,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
         </div>
         
         {/* Moderation Controls */}
-        <div className="flex flex-wrap items-center gap-3 bg-foreground/5 p-2 rounded-2xl border border-foreground/10 shadow-sm backdrop-blur-xl">
+        <div className="flex flex-wrap items-center gap-3 bg-foreground/5 p-2 rounded-2xl border border-[var(--border-subtle)] shadow-sm backdrop-blur-xl">
           {listing.listingStatus !== ListingStatus.ACTIVE && (
             <button 
               disabled={isUpdating}
@@ -133,7 +133,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
         <div className="lg:col-span-3 space-y-8">
            
            {/* Tabs */}
-           <div className="flex gap-2 border-b border-foreground/10 overflow-x-auto no-scrollbar">
+           <div className="flex gap-2 border-b border-[var(--border-subtle)] overflow-x-auto no-scrollbar">
              {['OVERVIEW', 'INSPECTION', 'LEADS'].map((tab) => (
                 <button
                   key={tab}
@@ -148,13 +148,13 @@ export default function AdminListingModerationPage({ params }: { params: Promise
            {/* OVERVIEW TAB */}
            {activeTab === 'OVERVIEW' && (
              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-               <div className="bg-background rounded-[2rem] border border-foreground/10 p-8 shadow-sm relative overflow-hidden">
+               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm relative overflow-hidden">
                  
                  {/* Decorative Background */}
                  <div className="absolute top-[-50%] right-[-10%] w-[400px] h-[400px] bg-[var(--color-brand-green)] opacity-[0.03] blur-[80px] rounded-full pointer-events-none" />
 
                  <div className="flex flex-col md:flex-row gap-8 mb-8">
-                    <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-foreground/5 border border-foreground/10 shrink-0 relative group">
+                    <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-foreground/5 border border-[var(--border-subtle)] shrink-0 relative group">
                        {listing.imageUrl ? (
                          <img src={listing.imageUrl} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                        ) : (
@@ -173,13 +173,13 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                        <h2 className="text-3xl font-black mb-2">{listing.yearOfManufacture} {listing.tractorBrand} {listing.tractorModel}</h2>
                        <p className="text-muted font-bold flex items-center gap-2 mb-6"><MapPin size={16}/> {listing.district}, {listing.state} • {listing.pinCode}</p>
                        
-                       <div className="flex flex-wrap gap-6 p-6 bg-foreground/5 rounded-2xl border border-foreground/10">
+                       <div className="flex flex-wrap gap-6 p-6 bg-[var(--border-subtle)] rounded-2xl border border-[var(--border-subtle)]">
                           <div>
                             <p className="text-xs text-muted font-bold uppercase tracking-widest">Asking Price</p>
                             <p className="text-3xl font-black text-[var(--color-brand-green)] mt-1">₹{listing.askingPrice.toLocaleString('en-IN')}</p>
-                            <span className="inline-block mt-2 px-2 py-0.5 bg-background border border-foreground/10 rounded text-xs font-bold text-muted uppercase">Negotiable: {listing.isNegotiable ? 'Yes' : 'No'}</span>
+                            <span className="inline-block mt-2 px-2 py-0.5 bg-background border border-[var(--border-subtle)] rounded text-xs font-bold text-muted uppercase">Negotiable: {listing.isNegotiable ? 'Yes' : 'No'}</span>
                           </div>
-                          <div className="hidden md:block w-px bg-foreground/10"></div>
+                          <div className="hidden md:block w-px border-[var(--border-subtle)]"></div>
                           <div>
                             <p className="text-xs text-muted font-bold uppercase tracking-widest">Market Est.</p>
                             <p className="text-xl font-black mt-1">₹{listing.estimatedMarketPrice?.toLocaleString('en-IN') || 'N/A'}</p>
@@ -188,7 +188,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                     </div>
                  </div>
 
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-foreground/10">
+                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-[var(--border-subtle)]">
                    <div className="bg-foreground/5 p-4 rounded-xl">
                      <p className="text-xs text-muted font-bold uppercase tracking-widest flex items-center gap-1.5"><Clock size={14}/> Hours</p>
                      <p className="text-lg font-black mt-2">{listing.hoursUsed} Hrs</p>
@@ -208,15 +208,15 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                  </div>
                </div>
 
-               <div className="bg-background rounded-[2rem] border border-foreground/10 p-8 shadow-sm">
+               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
                  <h3 className="text-xl font-black mb-4 flex items-center gap-2"><FileText className="text-[var(--color-brand-green)]"/> Seller's Description</h3>
-                 <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10">
+                 <div className="bg-foreground/5 p-6 rounded-2xl border border-[var(--border-subtle)]">
                    <p className="text-muted font-medium leading-relaxed whitespace-pre-wrap">{listing.description}</p>
                  </div>
                </div>
 
                {/* Documents verification status */}
-               <div className="bg-background rounded-[2rem] border border-foreground/10 p-8 shadow-sm">
+               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
                  <h3 className="text-xl font-black mb-6 flex items-center gap-2"><FileCheck className="text-[var(--color-brand-green)]"/> Verification & Documents</h3>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center justify-between p-4 bg-foreground/5 rounded-xl">
@@ -239,7 +239,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
            {/* INSPECTION TAB */}
            {activeTab === 'INSPECTION' && (
              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-               <div className="bg-background rounded-[2rem] border border-foreground/10 p-8 shadow-sm relative overflow-hidden">
+               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm relative overflow-hidden">
                  
                  <div className="flex items-center justify-between mb-8">
                    <h3 className="text-2xl font-black flex items-center gap-3">
@@ -254,7 +254,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {['engineScore', 'tyreScore', 'hydraulicsScore', 'bodyScore', 'clutchScore'].map((field) => (
-                      <div key={field} className="bg-foreground/5 p-5 rounded-2xl border border-foreground/10">
+                      <div key={field} className="bg-foreground/5 p-5 rounded-2xl border border-[var(--border-subtle)]">
                         <label className="flex justify-between items-center mb-3">
                           <span className="font-black capitalize">{field.replace('Score', '')} Condition</span>
                           <span className="text-xl font-black text-[var(--color-brand-green)]">{inspectionScores[field] || 0}/10</span>
@@ -270,7 +270,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                     ))}
                  </div>
 
-                 <div className="flex justify-end gap-4 border-t border-foreground/10 pt-6">
+                 <div className="flex justify-end gap-4 border-t border-[var(--border-subtle)] pt-6">
                     <button 
                       onClick={handleInspectionSave}
                       disabled={isUpdating}
@@ -288,7 +288,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
            {/* LEADS TAB */}
            {activeTab === 'LEADS' && (
              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-               <div className="bg-background rounded-[2rem] border border-foreground/10 p-8 shadow-sm">
+               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
                  <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
                     <MessageCircle className="text-[var(--color-brand-green)]" size={28}/> 
                     Buyer Enquiries ({listing.leadCount})
@@ -298,9 +298,9 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                    <div className="space-y-4">
                      {/* Mocking a list of leads for demo purposes */}
                      {[1, 2, 3].slice(0, Math.min(3, listing.leadCount)).map((i) => (
-                       <div key={i} className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 bg-foreground/5 rounded-2xl border border-foreground/10 gap-4">
+                       <div key={i} className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] gap-4">
                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center text-xl font-black text-[var(--color-brand-green)] border border-foreground/10 shadow-sm">
+                            <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center text-xl font-black text-[var(--color-brand-green)] border border-[var(--border-subtle)] shadow-sm">
                               {['R', 'K', 'S'][i-1]}
                             </div>
                             <div>
@@ -316,7 +316,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                      ))}
                    </div>
                  ) : (
-                   <div className="p-12 text-center bg-foreground/5 rounded-2xl border border-foreground/10">
+                   <div className="p-12 text-center bg-foreground/5 rounded-2xl border border-[var(--border-subtle)]">
                       <p className="text-muted font-bold">No leads have been received for this tractor yet.</p>
                    </div>
                  )}
@@ -328,7 +328,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
         {/* RIGHT COLUMN: Certification & Status Panel */}
         <div className="space-y-6">
-          <div className="bg-background rounded-[2rem] border border-foreground/10 p-6 shadow-sm relative overflow-hidden group">
+          <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm relative overflow-hidden group">
              <div className={`absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none transition-all duration-700 blur-[50px] ${listing.isCertified ? 'bg-[var(--color-brand-green)] opacity-20 group-hover:opacity-40 group-hover:scale-150' : 'bg-foreground opacity-5'}`}></div>
              
              <div className="flex flex-col items-center text-center gap-4 py-4 relative z-10">
@@ -352,7 +352,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
              </button>
           </div>
 
-          <div className="bg-background rounded-[2rem] border border-foreground/10 p-6 shadow-sm">
+          <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm">
              <h3 className="text-lg font-black mb-5">Listing Performance</h3>
              <div className="space-y-3">
                 <div className="flex justify-between items-center bg-foreground/5 px-4 py-3.5 rounded-xl">

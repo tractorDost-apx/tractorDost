@@ -5,8 +5,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/store/AuthContext';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useState, useEffect } from 'react';
-import { User as UserIcon, LogOut, Heart, LayoutDashboard, Menu, X, Search } from 'lucide-react';
+import { User as UserIcon, LogOut, Heart, LayoutDashboard, Menu, X, Search, Bell } from 'lucide-react';
 import { DashboardNavbar } from './DashboardNavbar';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -39,12 +40,7 @@ export function Navbar() {
     <>
       <div className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4 md:px-6 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'top-2' : 'top-6'}`}>
         <nav
-          className={`spatial-panel !rounded-2xl flex items-center justify-between px-6 py-2.5 w-full max-w-[1380px] pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'border-white/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]' : 'border-transparent shadow-none !bg-transparent'}`}
-          style={{
-            background: scrolled ? 'var(--nav-bg-scrolled)' : 'transparent',
-            backdropFilter: scrolled ? 'blur(24px)' : 'none',
-            WebkitBackdropFilter: scrolled ? 'blur(24px)' : 'none'
-          }}
+          className={`spatial-panel !rounded-2xl flex items-center justify-between px-6 py-2.5 w-full max-w-[1380px] pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'shadow-[var(--nav-shadow-scrolled)] border-[var(--border-subtle)]' : 'shadow-none border-[var(--border-subtle)] bg-background/40 backdrop-blur-md'}`}
         >
 
           {/* Logo */}
@@ -129,60 +125,64 @@ export function Navbar() {
               <ThemeToggle />
             </div>
 
-            <button className="hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-foreground/70 transition-all hover:bg-foreground/10 hover:text-foreground">
+            <button className="hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-foreground/70 transition-all hover:bg-foreground/10 hover:text-foreground hover:scale-110 active:scale-95">
               <Search size={18} strokeWidth={2.5} />
             </button>
 
             <div className="h-5 w-[1px] bg-foreground/20 mx-1 hidden sm:block" />
 
             {isAuthenticated ? (
-              <div className="relative group ml-1">
-                <button className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-foreground/10 overflow-hidden hover:border-[var(--color-brand-green)] transition-all">
-                  {user?.profilePhoto ? (
-                    <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <UserIcon size={20} className="text-foreground/80" />
-                  )}
+              <div className="flex items-center gap-1 sm:gap-2 ml-1">
+                {/* Notification Bell */}
+                <button className="hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:bg-foreground/10 transition-all relative hover:scale-110 active:scale-95">
+                  <Bell size={18} strokeWidth={2.5} />
+                  <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[var(--color-brand-orange)] border border-background shadow-sm" />
                 </button>
-                <div className="absolute top-full right-0 w-full h-3" />
 
-              {/* Dropdown Menu */}
-              <div 
-                className="absolute right-0 top-[120%] w-60 rounded-2xl opacity-0 translate-y-4 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] p-2 flex flex-col gap-1 z-50"
-                style={{ background: 'var(--background)', border: '1px solid var(--panel-border)', boxShadow: 'var(--card-shadow-hover)' }}
-              >
-                <div className="px-3 py-3 border-b border-foreground/5 mb-1 bg-foreground/5 rounded-xl">
-                    <p className="text-sm font-black text-foreground tracking-tight">{user?.fullName || 'TractorDost User'}</p>
-                    <p className="text-xs text-muted font-medium mt-0.5">{user?.mobile ? `+91 ${user.mobile}` : 'Welcome'}</p>
-                </div>
-                <Link href="/profile" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
-                  <UserIcon size={16} /> My Profile
-                </Link>
-                <Link href="/wishlist" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
-                  <Heart size={16} /> Wishlist
-                </Link>
-                <button 
-                  onClick={() => logout()}
-                  className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-500/10 rounded-xl transition-colors text-left w-full mt-1"
+                <div className="relative group">
+                  <button onClick={() => router.push(user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN' ? '/admin/dashboard' : user?.role?.name === 'DEALER' ? '/dealer/dashboard' : '/dashboard')} className="flex items-center justify-center rounded-full focus:outline-none cursor-pointer">
+                    <UserAvatar photoUrl={user?.profilePhoto} name={user?.fullName} size={40} />
+                  </button>
+                  <div className="absolute top-full right-0 w-full h-3" />
+
+                {/* Dropdown Menu */}
+                <div 
+                  className="absolute right-0 top-[120%] w-64 rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 backdrop-blur-3xl"
+                  style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
                 >
-                  <LogOut size={16} /> Log Out
-                </button>
-              </div>
+                  <div className="px-3 py-3 border-b border-[var(--border-subtle)] mb-1 bg-foreground/5 rounded-xl">
+                      <p className="text-sm font-black text-foreground tracking-tight truncate">{user?.fullName || 'TractorDost User'}</p>
+                      <p className="text-xs text-muted font-medium mt-0.5 truncate">{user?.mobile ? `+91 ${user.mobile}` : 'Welcome'}</p>
+                  </div>
+                  
+                  {/* Dashboard Link based on role */}
+                  <Link href={user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN' ? '/admin/dashboard' : user?.role?.name === 'DEALER' ? '/dealer/dashboard' : '/dashboard'} className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
+                    <LayoutDashboard size={16} /> My Dashboard
+                  </Link>
+
+                  <Link href="/profile" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
+                    <UserIcon size={16} /> My Profile
+                  </Link>
+                  <Link href="/wishlist" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
+                    <Heart size={16} /> Wishlist
+                  </Link>
+                  <button 
+                    onClick={() => logout()}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-500/10 rounded-xl transition-colors text-left w-full mt-1"
+                  >
+                    <LogOut size={16} /> Log Out
+                  </button>
+                </div>
+                </div>
               </div>
             ) : (
               /* Auth Buttons */
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => router.push('/login')}
-                  className="hidden sm:block text-sm font-bold text-foreground/80 hover:text-foreground transition-colors px-3 py-2 rounded-full hover:bg-foreground/10"
+                  onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)}
+                  className="spatial-button px-6 py-2 text-sm rounded-full shadow-lg shrink-0 whitespace-nowrap"
                 >
-                  Log in
-                </button>
-                <button
-                  onClick={() => router.push('/login')}
-                  className="spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg shrink-0 whitespace-nowrap"
-                >
-                  Sign Up
+                  Login
                 </button>
               </div>
             )}
@@ -210,15 +210,15 @@ export function Navbar() {
           <Link href="/loan" className="hover:text-[var(--color-brand-green)] transition-colors">Finance & EMI</Link>
           <Link href="/news" className="hover:text-[var(--color-brand-green)] transition-colors">News & Reviews</Link>
 
-          <div className="h-[1px] bg-foreground/10 my-2" />
+          <div className="h-[1px] bg-[var(--border-subtle)] my-2" />
           <Link href="/sell-used-tractor" className="text-[var(--color-brand-orange)] flex items-center gap-2">
             <span>+</span> Sell Your Tractor
           </Link>
         </div>
-        <div className="mt-auto mb-10 flex justify-between items-center border-t border-foreground/10 pt-6">
+        <div className="mt-auto mb-10 flex justify-between items-center border-t border-[var(--border-subtle)] pt-6">
           <ThemeToggle />
           {!isAuthenticated ? (
-            <button onClick={() => { router.push('/login'); setMobileMenuOpen(false); }} className="text-lg font-bold text-[var(--color-brand-green)]">
+            <button onClick={() => { router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`); setMobileMenuOpen(false); }} className="text-lg font-bold text-[var(--color-brand-green)]">
               Log In to Account →
             </button>
           ) : (
@@ -284,8 +284,8 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
 
       {/* Dropdown Content */}
       <div 
-        className={`absolute ${alignmentClasses[align]} top-[calc(100%+1rem)] w-[280px] rounded-2xl opacity-0 translate-y-4 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] p-2 flex flex-col gap-1 z-50`}
-        style={{ background: 'var(--background)', border: '1px solid var(--panel-border)', boxShadow: 'var(--card-shadow-hover)' }}
+        className={`absolute ${alignmentClasses[align]} top-[calc(100%+1rem)] w-[280px] rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 backdrop-blur-3xl`}
+        style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
       >
         {items.map((item, i) => (
           <Link key={i} href={item.href} className="flex flex-col px-4 py-3 rounded-xl hover:bg-foreground/10 transition-colors group/item">

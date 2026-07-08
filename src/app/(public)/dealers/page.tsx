@@ -99,7 +99,7 @@ export default function DealersPage() {
         
         {/* Left Column: Filters */}
         <div className="w-full lg:w-1/4 flex flex-col gap-6 animate-slide-in">
-          <div className="spatial-panel rounded-3xl p-6 sticky top-24 border border-foreground/5 bg-background/50 backdrop-blur-xl">
+          <div className="spatial-panel rounded-3xl p-6 sticky top-24 border border-[var(--border-subtle)] bg-background/50 backdrop-blur-xl">
             <div className="flex items-center justify-between mb-6 text-foreground font-black">
               <div className="flex items-center gap-2">
                 <Filter size={18} />
@@ -225,10 +225,10 @@ export default function DealersPage() {
 
           {loading ? (
             <div className="w-full flex justify-center py-32">
-              <div className="w-12 h-12 border-4 border-foreground/10 border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
             </div>
           ) : dealers.length === 0 ? (
-            <div className="spatial-panel rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in border border-foreground/5 bg-background/50 backdrop-blur-xl">
+            <div className="spatial-panel rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in border border-[var(--border-subtle)] bg-background/50 backdrop-blur-xl">
                <Store size={64} className="text-muted mb-6 opacity-40" />
                <h3 className="text-2xl font-black text-foreground mb-3">No Dealerships Found</h3>
                <p className="text-muted font-bold text-base max-w-md mb-8">Try adjusting your advanced filters or searching for a different area to find authorized dealers near you.</p>
@@ -241,20 +241,20 @@ export default function DealersPage() {
             </div>
           ) : viewMode === 'map' ? (
             // MAP VIEW MOCKUP
-            <div className="spatial-panel rounded-3xl h-[600px] border border-foreground/5 bg-foreground/5 relative overflow-hidden flex items-center justify-center animate-fade-in">
+            <div className="spatial-panel rounded-3xl h-[600px] border border-[var(--border-subtle)] bg-foreground/5 relative overflow-hidden flex items-center justify-center animate-fade-in">
               <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--color-foreground) 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-              <div className="text-center z-10 p-8 bg-background/80 backdrop-blur-md rounded-3xl shadow-2xl border border-foreground/10 max-w-sm">
+              <div className="text-center z-10 p-8 bg-background/80 backdrop-blur-md rounded-3xl shadow-2xl border border-[var(--border-subtle)] max-w-sm">
                 <Map size={48} className="mx-auto text-[var(--color-brand-green)] mb-4" />
                 <h3 className="text-xl font-black mb-2">Interactive Map Integration</h3>
                 <p className="text-sm font-bold text-muted mb-6">This section is architected to inject Google Maps or Mapbox SDK to render {dealers.length} active pins instantly.</p>
-                <button onClick={() => setViewMode('list')} className="w-full py-3 bg-foreground/10 hover:bg-foreground/20 rounded-xl font-black text-sm transition-colors">Return to List View</button>
+                <button onClick={() => setViewMode('list')} className="w-full py-3 bg-[var(--border-subtle)] hover:border-[var(--border-brand)] rounded-xl font-black text-sm transition-colors">Return to List View</button>
               </div>
             </div>
           ) : (
             // LIST VIEW
             <div className="flex flex-col gap-6 animate-fade-in">
               {dealers.map((dealer) => (
-                <div key={dealer.id} className="spatial-panel rounded-[2rem] p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:gap-8 border border-foreground/5 bg-background/50 hover:bg-foreground/[0.02] hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5 backdrop-blur-xl transition-all duration-300 group">
+                <div key={dealer.id} className="spatial-panel rounded-[2rem] p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:gap-8 border border-[var(--border-subtle)] bg-background/50 hover:bg-foreground/[0.02] hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5 backdrop-blur-xl transition-all duration-300 group">
                   
                   {/* Info Section */}
                   <div className="flex-1 flex flex-col justify-between">
@@ -303,7 +303,7 @@ export default function DealersPage() {
                         <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-2">Authorized Dealer For</p>
                         <div className="flex flex-wrap gap-2">
                           {dealer.brands.map(b => (
-                            <div key={b.brandId} className="flex items-center gap-2 px-3 py-2 bg-background rounded-xl border border-foreground/10 shadow-sm hover:border-[var(--color-brand-green)]/50 transition-colors cursor-default">
+                            <div key={b.brandId} className="flex items-center gap-2 px-3 py-2 bg-background rounded-xl border border-[var(--border-subtle)] shadow-sm hover:border-[var(--color-brand-green)]/50 transition-colors cursor-default">
                               {b.brand.logoUrl && <img src={b.brand.logoUrl} alt={b.brand.name} className="w-5 h-5 object-contain mix-blend-multiply dark:mix-blend-normal" />}
                               <span className="text-xs font-black text-foreground">{b.brand.name}</span>
                             </div>
@@ -348,7 +348,7 @@ export default function DealersPage() {
       {inquiryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" onClick={() => setInquiryModalOpen(null)} />
-          <div className="relative w-full max-w-lg bg-background rounded-[2.5rem] border border-foreground/10 shadow-2xl p-8 overflow-hidden animate-slide-up">
+          <div className="relative w-full max-w-lg bg-background rounded-[2.5rem] border border-[var(--border-subtle)] shadow-2xl p-8 overflow-hidden animate-slide-up">
             
             <button onClick={() => setInquiryModalOpen(null)} className="absolute top-6 right-6 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors">
               <X size={20} />

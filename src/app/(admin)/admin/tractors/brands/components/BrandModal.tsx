@@ -90,14 +90,14 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
       const data = new FormData();
       data.append('name', formData.name);
       data.append('slug', formData.slug);
-      if (formData.country) data.append('country', formData.country);
-      if (formData.foundedYear) data.append('foundedYear', parseInt(formData.foundedYear).toString());
-      if (formData.aboutBrand) data.append('aboutBrand', formData.aboutBrand);
+      data.append('country', formData.country || '');
+      data.append('foundedYear', formData.foundedYear ? parseInt(formData.foundedYear).toString() : '');
+      data.append('aboutBrand', formData.aboutBrand || '');
       data.append('isActive', formData.isActive.toString());
       data.append('isFeatured', formData.isFeatured.toString());
       data.append('sortOrder', parseInt(formData.sortOrder || '0').toString());
-      if (formData.seoTitle) data.append('seoTitle', formData.seoTitle);
-      if (formData.seoDescription) data.append('seoDescription', formData.seoDescription);
+      data.append('seoTitle', formData.seoTitle || '');
+      data.append('seoDescription', formData.seoDescription || '');
       
       if (logoFile) {
         data.append('logo', logoFile);

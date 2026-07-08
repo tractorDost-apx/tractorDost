@@ -282,6 +282,22 @@ export const tractorAPI = {
   },
 
   /**
+   * Create a Tractor Spec
+   */
+  createTractorSpec: async (data: Partial<TractorSpec>) => {
+    const response = await apiClient.post<{ success: boolean; data: TractorSpec }>('/tractor-specs/create', data);
+    return response.data;
+  },
+
+  /**
+   * Update an existing Tractor Spec
+   */
+  updateTractorSpec: async (id: number, data: Partial<TractorSpec>) => {
+    const response = await apiClient.put<{ success: boolean; data: TractorSpec }>(`/tractor-specs/update/${id}`, data);
+    return response.data;
+  },
+
+  /**
    * Fetch all State Prices
    */
   getAllTractorPricesByState: async (params?: { page?: number; limit?: number; search?: string }) => {

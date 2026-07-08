@@ -86,17 +86,17 @@ export default function PublicHomePage() {
 
             <div className="flex w-full md:w-auto gap-4">
               <select className="bg-background/50 border border-white/5 rounded-2xl px-6 py-3 text-white font-bold appearance-none outline-none focus:border-[var(--color-brand-green)]/50">
-                <option value="">Any Budget</option>
-                <option value="under5">Under 5 Lakh</option>
-                <option value="5to8">5 - 8 Lakh</option>
-                <option value="over8">Above 8 Lakh</option>
+                <option value="" className="bg-background text-foreground">Any Budget</option>
+                <option value="under5" className="bg-background text-foreground">Under 5 Lakh</option>
+                <option value="5to8" className="bg-background text-foreground">5 - 8 Lakh</option>
+                <option value="over8" className="bg-background text-foreground">Above 8 Lakh</option>
               </select>
               
               <select className="bg-background/50 border border-white/5 rounded-2xl px-6 py-3 text-white font-bold appearance-none outline-none focus:border-[var(--color-brand-green)]/50">
-                <option value="">Any HP</option>
-                <option value="under30">Under 30 HP</option>
-                <option value="30to50">30 - 50 HP</option>
-                <option value="over50">Above 50 HP</option>
+                <option value="" className="bg-background text-foreground">Any HP</option>
+                <option value="under30" className="bg-background text-foreground">Under 30 HP</option>
+                <option value="30to50" className="bg-background text-foreground">30 - 50 HP</option>
+                <option value="over50" className="bg-background text-foreground">Above 50 HP</option>
               </select>
             </div>
 
@@ -127,7 +127,7 @@ export default function PublicHomePage() {
                 <div key={i} className="aspect-square bg-foreground/5 rounded-2xl animate-pulse" />
               ))
             ) : brands.map((brand) => (
-              <Link key={brand.id} href={`/tractors?brand=${brand.id}`} className="aspect-square bg-background border border-foreground/10 rounded-2xl flex flex-col items-center justify-center p-4 hover:border-[var(--color-brand-orange)] hover:shadow-lg transition-all group">
+              <Link key={brand.id} href={`/tractors?brand=${brand.id}`} className="aspect-square bg-background border border-[var(--border-subtle)] rounded-2xl flex flex-col items-center justify-center p-4 hover:border-[var(--color-brand-orange)] hover:shadow-lg transition-all group">
                 <div className="w-16 h-16 relative flex items-center justify-center mb-2">
                   {brand.logoUrl ? (
                     <img src={brand.logoUrl} alt={brand.name} className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform" />
@@ -195,7 +195,7 @@ export default function PublicHomePage() {
                     </div>
                   </div>
 
-                  <div className="mt-auto flex items-center justify-between border-t border-foreground/10 pt-4">
+                  <div className="mt-auto flex items-center justify-between border-t border-[var(--border-subtle)] pt-4">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Starting Price</span>
                       <span className="text-lg font-black text-[var(--color-brand-green)]">{formatPrice(tractor.exShowroomPriceMin)}</span>
@@ -211,7 +211,7 @@ export default function PublicHomePage() {
         </section>
 
         {/* 4. TRENDING COMPARISONS (HOT VS BATTLES) */}
-        <section className="flex flex-col gap-8 bg-gradient-to-br from-foreground/5 to-transparent p-8 md:p-12 rounded-[3rem] border border-foreground/10 relative overflow-hidden">
+        <section className="flex flex-col gap-8 bg-gradient-to-br from-foreground/5 to-transparent p-8 md:p-12 rounded-[3rem] border border-[var(--border-subtle)] relative overflow-hidden">
           {/* Decorative Background */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--color-brand-orange)]/5 rounded-full blur-[100px] -z-10 translate-x-1/2 -translate-y-1/2" />
           
@@ -233,12 +233,12 @@ export default function PublicHomePage() {
             ) : comparisons.map((comp, idx) => {
               const hotness = (comp.frequency / maxFreq) * 100;
               return (
-                <Link key={idx} href={`/compare?left=${comp.tractorLeft?.id}&right=${comp.tractorRight?.id}`} className="bg-background rounded-3xl p-6 shadow-sm hover:shadow-xl border border-foreground/5 hover:border-[var(--color-brand-orange)]/50 transition-all flex flex-col gap-4 group cursor-pointer">
+                <Link key={idx} href={`/compare?left=${comp.tractorLeft?.id}&right=${comp.tractorRight?.id}`} className="bg-background rounded-3xl p-6 shadow-sm hover:shadow-xl border border-[var(--border-subtle)] hover:border-[var(--color-brand-orange)]/50 transition-all flex flex-col gap-4 group cursor-pointer">
                   
                   <div className="flex items-center justify-between">
                     {/* Left Tractor */}
                     <div className="flex flex-col items-center text-center w-5/12">
-                       <div className="w-16 h-16 rounded-full bg-foreground/5 p-2 mb-2 flex items-center justify-center overflow-hidden border border-transparent group-hover:border-foreground/10 transition-colors">
+                       <div className="w-16 h-16 rounded-full bg-foreground/5 p-2 mb-2 flex items-center justify-center overflow-hidden border border-transparent group-hover:border-[var(--border-subtle)] transition-colors">
                           {comp.tractorLeft?.primaryMedia?.url ? (
                             <img src={comp.tractorLeft.primaryMedia.url} alt="L" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
                           ) : (
@@ -259,7 +259,7 @@ export default function PublicHomePage() {
 
                     {/* Right Tractor */}
                     <div className="flex flex-col items-center text-center w-5/12">
-                       <div className="w-16 h-16 rounded-full bg-foreground/5 p-2 mb-2 flex items-center justify-center overflow-hidden border border-transparent group-hover:border-foreground/10 transition-colors">
+                       <div className="w-16 h-16 rounded-full bg-foreground/5 p-2 mb-2 flex items-center justify-center overflow-hidden border border-transparent group-hover:border-[var(--border-subtle)] transition-colors">
                           {comp.tractorRight?.primaryMedia?.url ? (
                             <img src={comp.tractorRight.primaryMedia.url} alt="R" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
                           ) : (

@@ -130,7 +130,7 @@ export default function UsedTractorsPage() {
         
         {/* Left Column: Filters */}
         <div className="w-full lg:w-1/4 flex flex-col gap-6 animate-slide-in">
-          <div className="spatial-panel rounded-3xl p-6 sticky top-24 border border-foreground/5 bg-background/50 backdrop-blur-xl shadow-xl shadow-[var(--color-brand-green)]/5">
+          <div className="spatial-panel rounded-3xl p-6 sticky top-24 border border-[var(--border-subtle)] bg-background/50 backdrop-blur-xl shadow-xl shadow-[var(--color-brand-green)]/5">
             <div className="flex items-center justify-between mb-6 text-foreground font-black">
               <div className="flex items-center gap-2">
                 <Filter size={18} className="text-[var(--color-brand-green)]" />
@@ -316,10 +316,10 @@ export default function UsedTractorsPage() {
 
           {loading ? (
             <div className="w-full flex justify-center py-32">
-              <div className="w-12 h-12 border-4 border-foreground/10 border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
             </div>
           ) : tractors.length === 0 ? (
-            <div className="spatial-panel rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in border border-foreground/5 bg-background/50 backdrop-blur-xl">
+            <div className="spatial-panel rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in border border-[var(--border-subtle)] bg-background/50 backdrop-blur-xl">
                <Search size={64} className="text-muted mb-6 opacity-40" />
                <h3 className="text-2xl font-black text-foreground mb-3">No Tractors Found</h3>
                <p className="text-muted font-bold text-base max-w-md mb-8">We couldn't find any used tractors matching your specific criteria. Try broadening your search.</p>
@@ -338,7 +338,7 @@ export default function UsedTractorsPage() {
             // LISTINGS VIEW
             <div className="flex flex-col gap-6 animate-fade-in">
               {tractors.map((tractor) => (
-                <div key={tractor.id} className="spatial-panel rounded-[2rem] p-4 sm:p-6 flex flex-col md:flex-row gap-6 border border-foreground/5 bg-background/50 hover:bg-foreground/[0.02] hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5 backdrop-blur-xl transition-all duration-300 group overflow-hidden relative">
+                <div key={tractor.id} className="spatial-panel rounded-[2rem] p-4 sm:p-6 flex flex-col md:flex-row gap-6 border border-[var(--border-subtle)] bg-background/50 hover:bg-foreground/[0.02] hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5 backdrop-blur-xl transition-all duration-300 group overflow-hidden relative">
                   
                   {tractor.isCertified && (
                      <div className="absolute top-0 right-0 bg-[var(--color-brand-green)] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-2xl z-10 shadow-md">
@@ -354,7 +354,7 @@ export default function UsedTractorsPage() {
                       <div className="w-full h-full flex items-center justify-center text-muted">No Image</div>
                     )}
                     <div className="absolute bottom-3 left-3 flex gap-2">
-                       <span className="bg-background/90 backdrop-blur-sm text-foreground text-xs font-black px-2 py-1 rounded-md shadow-sm border border-foreground/10">
+                       <span className="bg-background/90 backdrop-blur-sm text-foreground text-xs font-black px-2 py-1 rounded-md shadow-sm border border-[var(--border-subtle)]">
                          {tractor.viewsCount} Views
                        </span>
                     </div>
@@ -412,10 +412,10 @@ export default function UsedTractorsPage() {
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                          <div className="flex flex-wrap gap-2">
                            {tractor.rcAvailable && (
-                             <span className="px-2.5 py-1 bg-foreground/5 rounded-md text-xs font-bold text-foreground border border-foreground/10 shadow-sm">RC Available</span>
+                             <span className="px-2.5 py-1 bg-foreground/5 rounded-md text-xs font-bold text-foreground border border-[var(--border-subtle)] shadow-sm">RC Available</span>
                            )}
                            {tractor.loanClearanceStatus === 'CLEAR' && (
-                             <span className="px-2.5 py-1 bg-foreground/5 rounded-md text-xs font-bold text-foreground border border-foreground/10 shadow-sm">Loan Cleared</span>
+                             <span className="px-2.5 py-1 bg-foreground/5 rounded-md text-xs font-bold text-foreground border border-[var(--border-subtle)] shadow-sm">Loan Cleared</span>
                            )}
                            {tractor.financeAvailable && (
                              <span className="px-2.5 py-1 bg-blue-500/10 rounded-md text-xs font-bold text-blue-600 border border-blue-500/20 shadow-sm">Finance Available</span>
@@ -456,7 +456,7 @@ export default function UsedTractorsPage() {
       {enquiryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" onClick={() => setEnquiryModalOpen(null)} />
-          <div className="relative w-full max-w-lg bg-background rounded-[2.5rem] border border-foreground/10 shadow-2xl p-8 overflow-hidden animate-slide-up">
+          <div className="relative w-full max-w-lg bg-background rounded-[2.5rem] border border-[var(--border-subtle)] shadow-2xl p-8 overflow-hidden animate-slide-up">
             
             <button onClick={() => setEnquiryModalOpen(null)} className="absolute top-6 right-6 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors">
               <X size={20} />

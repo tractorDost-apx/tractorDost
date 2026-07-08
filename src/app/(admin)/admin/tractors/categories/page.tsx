@@ -92,7 +92,7 @@ export default function CategoriesPage() {
       rows.push(
         <React.Fragment key={category.id}>
           <tr 
-            className={`hover:bg-foreground/5 transition-colors cursor-pointer border-b border-foreground/5 last:border-0 ${isDeepExpanded ? 'bg-foreground/5' : ''}`}
+            className={`hover:bg-foreground/5 transition-colors cursor-pointer border-b border-[var(--border-subtle)] last:border-0 ${isDeepExpanded ? 'bg-foreground/5' : ''}`}
             onClick={() => toggleDeepExpand(category.id)}
           >
             <td className="px-6 py-4">
@@ -112,7 +112,7 @@ export default function CategoriesPage() {
                 </div>
 
                 {/* Icon */}
-                <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center p-1 border border-foreground/10 shrink-0 shadow-sm">
+                <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center p-1 border border-[var(--border-subtle)] shrink-0 shadow-sm">
                   {category.iconUrl ? (
                     <img src={category.iconUrl} alt={category.name} className="max-h-full max-w-full object-contain" />
                   ) : (
@@ -174,32 +174,32 @@ export default function CategoriesPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full whitespace-normal">
                     {/* Description Area */}
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-foreground/10 pb-2">
+                      <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-[var(--border-subtle)] pb-2">
                         <AlignLeft size={18} />
                         <h3 className="font-black text-sm uppercase tracking-wide">Category Description</h3>
                       </div>
-                      <p className="text-sm text-foreground/80 font-medium leading-relaxed bg-background p-4 rounded-xl border border-foreground/5 shadow-sm">
+                      <p className="text-sm text-foreground/80 font-medium leading-relaxed bg-background p-4 rounded-xl border border-[var(--border-subtle)] shadow-sm">
                         {category.description || "No description provided for this category."}
                       </p>
                     </div>
 
                     {/* Meta Info Area */}
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-foreground/10 pb-2">
+                      <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2">
                         <Info size={18} />
                         <h3 className="font-black text-sm uppercase tracking-wide">Database & Relations</h3>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-1">
+                        <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
                           <span className="text-[10px] font-black uppercase text-muted tracking-wider flex items-center gap-1.5"><Hash size={12}/> DB ID</span>
                           <span className="text-lg font-black text-foreground">#{category.id}</span>
                         </div>
-                        <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-1">
+                        <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
                           <span className="text-[10px] font-black uppercase text-muted tracking-wider flex items-center gap-1.5"><Layers size={12}/> Sub-Categories</span>
                           <span className="text-lg font-black text-foreground">{category._count?.children || 0}</span>
                         </div>
-                        <div className="bg-background border border-foreground/5 p-4 rounded-xl shadow-sm flex flex-col gap-1 col-span-2">
+                        <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1 col-span-2">
                           <span className="text-[10px] font-black uppercase text-muted tracking-wider flex items-center gap-1.5"><Hash size={12}/> Parent Category ID</span>
                           <span className="text-lg font-black text-foreground">{category.parentId ? `#${category.parentId}` : 'None (Root Level)'}</span>
                         </div>

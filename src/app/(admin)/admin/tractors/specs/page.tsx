@@ -44,7 +44,7 @@ export default function TractorSpecsPage() {
   const InfoBlock = ({ label, value }: { label: string, value: string | number | null | undefined | boolean }) => {
     if (value === null || value === undefined || value === '') return null;
     return (
-      <div className="flex flex-col gap-1 border-b border-foreground/5 pb-2 last:border-0 last:pb-0">
+      <div className="flex flex-col gap-1 border-b border-[var(--border-subtle)] pb-2 last:border-0 last:pb-0">
         <span className="text-[10px] uppercase font-black tracking-wider text-muted">{label}</span>
         <span className="text-sm font-bold text-foreground flex items-center gap-2">
           {typeof value === 'boolean' ? (
@@ -67,8 +67,8 @@ export default function TractorSpecsPage() {
     if (!hasContent) return null;
 
     return (
-      <div className="bg-foreground/5 rounded-xl p-5 flex flex-col gap-5 border border-foreground/10 hover:border-[var(--color-brand-green)]/30 transition-colors">
-        <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-foreground/10 pb-3">
+      <div className="bg-foreground/5 rounded-xl p-5 flex flex-col gap-5 border border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/30 transition-colors">
+        <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-[var(--border-subtle)] pb-3">
           <Icon size={18} />
           <h3 className="font-black text-sm uppercase tracking-wide">{title}</h3>
         </div>
@@ -123,7 +123,7 @@ export default function TractorSpecsPage() {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/5">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted font-bold">Loading deep specifications...</td>
@@ -311,7 +311,7 @@ export default function TractorSpecsPage() {
         </div>
 
         {!loading && totalPages > 1 && (
-          <div className="mt-auto p-4 border-t border-foreground/5 flex items-center justify-between z-10 bg-background relative">
+          <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between z-10 bg-background relative">
             <button 
               disabled={page === 1}
               onClick={() => setPage(p => p - 1)}

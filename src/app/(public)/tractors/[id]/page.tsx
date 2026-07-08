@@ -86,7 +86,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center pt-20 pb-20">
-        <div className="w-16 h-16 border-4 border-foreground/10 border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
       </div>
     );
   }
@@ -115,7 +115,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
     <div className="w-full max-w-[1440px] mx-auto min-h-screen flex flex-col pt-6 pb-24 px-4 sm:px-6 lg:px-8 animate-fade-in relative">
       
       {/* Back button */}
-      <Link href="/tractors" className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors font-bold text-sm mb-6 w-max bg-background/50 backdrop-blur-md px-4 py-2 rounded-full border border-foreground/5 shadow-sm">
+      <Link href="/tractors" className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors font-bold text-sm mb-6 w-max bg-background/50 backdrop-blur-md px-4 py-2 rounded-full border border-[var(--border-subtle)] shadow-sm">
         <ArrowLeft size={16} /> Back to Catalog
       </Link>
 
@@ -127,18 +127,18 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
           {/* MEDIA GALLERY */}
           <div className="spatial-panel rounded-[2.5rem] p-4 flex flex-col gap-4">
              {/* Main Image */}
-              <div className="w-full h-[400px] md:h-[500px] bg-gradient-to-br from-foreground/5 to-transparent rounded-[2rem] border border-foreground/5 flex items-center justify-center relative overflow-hidden group">
+              <div className="w-full h-[400px] md:h-[500px] bg-gradient-to-br from-foreground/5 to-transparent rounded-[2rem] border border-[var(--border-subtle)] flex items-center justify-center relative overflow-hidden group">
                 <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-                  <button onClick={handleShare} className="w-10 h-10 bg-background/80 backdrop-blur-md border border-foreground/10 text-foreground rounded-full flex items-center justify-center hover:bg-[var(--color-brand-green)] hover:text-white transition-colors shadow-sm" title="Share via WhatsApp">
+                  <button onClick={handleShare} className="w-10 h-10 bg-background/80 backdrop-blur-md border border-[var(--border-subtle)] text-foreground rounded-full flex items-center justify-center hover:bg-[var(--color-brand-green)] hover:text-white transition-colors shadow-sm" title="Share via WhatsApp">
                     <Share2 size={18} />
                   </button>
-                  {tractor.brochurePdf && (
-                    <a href={tractor.brochurePdf} target="_blank" rel="noreferrer" className="w-10 h-10 bg-background/80 backdrop-blur-md border border-foreground/10 text-foreground rounded-full flex items-center justify-center hover:bg-[var(--color-brand-green)] hover:text-white transition-colors shadow-sm" title="Download Brochure">
+                  {(tractor.brochurePdf || tractor.media?.find((m: any) => m.mediaType === 'pdf')?.url) && (
+                    <a href={tractor.brochurePdf || tractor.media?.find((m: any) => m.mediaType === 'pdf')?.url} target="_blank" rel="noreferrer" className="w-10 h-10 bg-background/80 backdrop-blur-md border border-[var(--border-subtle)] text-foreground rounded-full flex items-center justify-center hover:bg-[var(--color-brand-green)] hover:text-white transition-colors shadow-sm" title="Download Brochure">
                       <Download size={18} />
                     </a>
                   )}
                   {tractor.videoUrl && (
-                    <a href={tractor.videoUrl} target="_blank" rel="noreferrer" className="w-10 h-10 bg-background/80 backdrop-blur-md border border-foreground/10 text-[var(--color-brand-orange)] rounded-full flex items-center justify-center hover:bg-[var(--color-brand-orange)] hover:text-white transition-colors shadow-sm" title="Watch Video">
+                    <a href={tractor.videoUrl} target="_blank" rel="noreferrer" className="w-10 h-10 bg-background/80 backdrop-blur-md border border-[var(--border-subtle)] text-[var(--color-brand-orange)] rounded-full flex items-center justify-center hover:bg-[var(--color-brand-orange)] hover:text-white transition-colors shadow-sm" title="Watch Video">
                       <Play size={18} className="ml-1" />
                     </a>
                   )}
@@ -173,7 +173,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
 
           {/* OVERVIEW / TABS */}
           <div className="spatial-panel rounded-[2.5rem] p-8 md:p-10 flex flex-col gap-8">
-             <div className="flex items-center gap-6 border-b border-foreground/10 pb-4">
+             <div className="flex items-center gap-6 border-b border-[var(--border-subtle)] pb-4">
                {['specs', 'overview', 'features'].map(tab => (
                  <button 
                    key={tab}
@@ -189,22 +189,22 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                <div className="flex flex-col gap-8 animate-fade-in">
                  {/* Quick Engine Matrix */}
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-background border border-foreground/5 rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
+                    <div className="bg-background border border-[var(--border-subtle)] rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
                        <div className="w-10 h-10 rounded-full bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] flex items-center justify-center mb-2"><Wrench size={18}/></div>
                        <span className="text-lg font-black text-foreground">{tractor.hp || '--'} HP</span>
                        <span className="text-[10px] uppercase font-bold text-muted tracking-widest">Engine Power</span>
                     </div>
-                    <div className="bg-background border border-foreground/5 rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
+                    <div className="bg-background border border-[var(--border-subtle)] rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
                        <div className="w-10 h-10 rounded-full bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] flex items-center justify-center mb-2"><CheckCircle2 size={18}/></div>
                        <span className="text-lg font-black text-foreground">{tractor.spec?.engineCc || '--'} CC</span>
                        <span className="text-[10px] uppercase font-bold text-muted tracking-widest">Displacement</span>
                     </div>
-                    <div className="bg-background border border-foreground/5 rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
+                    <div className="bg-background border border-[var(--border-subtle)] rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
                        <div className="w-10 h-10 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-2"><CheckCircle2 size={18}/></div>
                        <span className="text-lg font-black text-foreground">{tractor.spec?.cylinders || '--'}</span>
                        <span className="text-[10px] uppercase font-bold text-muted tracking-widest">Cylinders</span>
                     </div>
-                    <div className="bg-background border border-foreground/5 rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
+                    <div className="bg-background border border-[var(--border-subtle)] rounded-2xl p-4 flex flex-col items-center text-center shadow-sm">
                        <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mb-2"><CheckCircle2 size={18}/></div>
                        <span className="text-lg font-black text-foreground">{tractor.spec?.liftingCapacityKg || '--'} Kg</span>
                        <span className="text-[10px] uppercase font-bold text-muted tracking-widest">Lifting Cap.</span>
@@ -215,28 +215,157 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                  <div className="flex flex-col gap-6">
                     <h3 className="text-xl font-black text-foreground">Detailed Specifications</h3>
                     
-                    <div className="border border-foreground/10 rounded-2xl overflow-hidden">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-foreground/10">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-[var(--color-brand-green)]">Engine & Transmission</h4>
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-[var(--color-brand-green)]">Engine & Performance</h4>
                        </div>
                        <div className="flex flex-col divide-y divide-foreground/5 bg-background">
                          <SpecRow label="Fuel Type" value={tractor.fuelType} />
-                         <SpecRow label="Drive Type" value={tractor.driveType.replace('_', ' ')} />
-                         <SpecRow label="Gearbox" value={tractor.spec?.gearboxType?.replace('_', ' ')} />
-                         <SpecRow label="Clutch" value={tractor.spec?.clutchType?.replace('_', ' ')} />
-                         <SpecRow label="PTO HP" value={tractor.spec?.ptoHp ? `${tractor.spec?.ptoHp} HP` : undefined} />
+                         <SpecRow label="Engine CC" value={tractor.spec?.engineCc ? `${tractor.spec?.engineCc} CC` : undefined} />
+                         <SpecRow label="Cylinders" value={tractor.spec?.cylinders} />
+                         <SpecRow label="Rated RPM" value={tractor.spec?.ratedRpm} />
+                         <SpecRow label="Max Torque (Nm)" value={tractor.spec?.maxTorqueNm} />
+                         <SpecRow label="Cooling Type" value={tractor.spec?.coolingType?.replace(/_/g, ' ')} />
+                         <SpecRow label="Aspiration" value={tractor.spec?.aspiration} />
+                         <SpecRow label="Air Filter Type" value={tractor.spec?.airFilterType} />
+                         <SpecRow label="Fuel Injection Type" value={tractor.spec?.fuelInjectionType} />
+                         <SpecRow label="Governor Type" value={tractor.spec?.governorType} />
+                         <SpecRow label="Engine Oil Capacity (L)" value={tractor.spec?.engineOilCapacityL} />
                        </div>
                     </div>
 
-                    <div className="border border-foreground/10 rounded-2xl overflow-hidden">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-foreground/10">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-[var(--color-brand-orange)]">Hydraulics & Dimensions</h4>
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-[var(--color-brand-orange)]">Transmission</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="Drive Type" value={tractor.driveType?.replace('_', ' ')} />
+                         <SpecRow label="Gearbox Type" value={tractor.spec?.gearboxType?.replace(/_/g, ' ')} />
+                         <SpecRow label="Clutch Type" value={tractor.spec?.clutchType?.replace(/_/g, ' ')} />
+                         <SpecRow label="Forward Gears" value={tractor.spec?.forwardGears} />
+                         <SpecRow label="Reverse Gears" value={tractor.spec?.reverseGears} />
+                         <SpecRow label="Max Speed Fwd (Kmph)" value={tractor.spec?.maxSpeedFwdKmph} />
+                         <SpecRow label="Max Speed Rev (Kmph)" value={tractor.spec?.maxSpeedRevKmph} />
+                         <SpecRow label="Has Creeper" value={tractor.spec?.hasCreeper} />
+                         <SpecRow label="Has Shuttle" value={tractor.spec?.hasShuttle} />
+                         <SpecRow label="Differential Lock" value={tractor.spec?.differentialLock} />
+                       </div>
+                    </div>
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-blue-500">Power Take Off (PTO)</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="PTO Type" value={tractor.spec?.ptoType?.replace(/_/g, ' ')} />
+                         <SpecRow label="PTO HP" value={tractor.spec?.ptoHp ? `${tractor.spec?.ptoHp} HP` : undefined} />
+                         <SpecRow label="PTO RPM" value={tractor.spec?.ptoRpm} />
+                         <SpecRow label="PTO RPM Options" value={tractor.spec?.ptoRpmOptions} />
+                         <SpecRow label="PTO Shaft Type" value={tractor.spec?.ptoShaftType} />
+                       </div>
+                    </div>
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-purple-500">Hydraulics</h4>
                        </div>
                        <div className="flex flex-col divide-y divide-foreground/5 bg-background">
                          <SpecRow label="Hydraulics Type" value={tractor.spec?.hydraulicsType?.replace(/_/g, ' ')} />
-                         <SpecRow label="Wheelbase" value={tractor.spec?.wheelbaseMm ? `${tractor.spec?.wheelbaseMm} mm` : undefined} />
-                         <SpecRow label="Total Weight" value={tractor.spec?.totalWeightKg ? `${tractor.spec?.totalWeightKg} Kg` : undefined} />
-                         <SpecRow label="Ground Clearance" value={tractor.spec?.groundClearanceMm ? `${tractor.spec?.groundClearanceMm} mm` : undefined} />
+                         <SpecRow label="Lifting Capacity (Kg)" value={tractor.spec?.liftingCapacityKg ? `${tractor.spec?.liftingCapacityKg} Kg` : undefined} />
+                         <SpecRow label="Pump Flow Rate (LPM)" value={tractor.spec?.pumpFlowRateLpm} />
+                         <SpecRow label="Linkage Category" value={tractor.spec?.linkageCategory} />
+                         <SpecRow label="Aux Hydraulic Ports" value={tractor.spec?.auxHydraulicPorts} />
+                       </div>
+                    </div>
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-rose-500">Steering & Brakes</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="Steering Type" value={tractor.spec?.steeringType?.replace(/_/g, ' ')} />
+                         <SpecRow label="Brake Type" value={tractor.spec?.brakeType?.replace(/_/g, ' ')} />
+                         <SpecRow label="Parking Brake" value={tractor.spec?.parkingBrake} />
+                       </div>
+                    </div>
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-amber-500">Dimensions & Weight</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="Overall Length (mm)" value={tractor.spec?.overallLengthMm} />
+                         <SpecRow label="Overall Width (mm)" value={tractor.spec?.overallWidthMm} />
+                         <SpecRow label="Overall Height (mm)" value={tractor.spec?.overallHeightMm} />
+                         <SpecRow label="Wheelbase (mm)" value={tractor.spec?.wheelbaseMm} />
+                         <SpecRow label="Ground Clearance (mm)" value={tractor.spec?.groundClearanceMm} />
+                         <SpecRow label="Turning Radius (m)" value={tractor.spec?.turningRadiusM} />
+                         <SpecRow label="Total Weight (Kg)" value={tractor.spec?.totalWeightKg} />
+                       </div>
+                    </div>
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-teal-500">Tyres</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="Front Tyre Size" value={tractor.spec?.frontTyreSize} />
+                         <SpecRow label="Rear Tyre Size" value={tractor.spec?.rearTyreSize} />
+                         <SpecRow label="Tyre Type" value={tractor.spec?.tyreType} />
+                       </div>
+                    </div>
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-indigo-500">Fuel & Electrical</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="Fuel Tank Capacity (L)" value={tractor.spec?.fuelTankCapacityL} />
+                         <SpecRow label="Fuel Consumption (Lph)" value={tractor.spec?.fuelConsumptionLph} />
+                         <SpecRow label="Battery Voltage" value={tractor.spec?.batteryVoltage} />
+                         <SpecRow label="Battery Ah" value={tractor.spec?.batteryAh} />
+                         <SpecRow label="Alternator Amps" value={tractor.spec?.alternatorAmps} />
+                       </div>
+                    </div>
+
+                    {tractor.spec?.batteryCapacityKwh && (
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-lime-500">Electric Tractor</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="Battery Capacity (kWh)" value={tractor.spec?.batteryCapacityKwh} />
+                         <SpecRow label="Motor kW" value={tractor.spec?.motorKw} />
+                         <SpecRow label="Charging Time (Hours)" value={tractor.spec?.chargingTimeHours} />
+                         <SpecRow label="Range per Charge (km)" value={tractor.spec?.rangePerChargeKm} />
+                       </div>
+                    </div>
+                    )}
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Maintenance & Service</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="Warranty Years" value={tractor.spec?.warrantyYears} />
+                         <SpecRow label="Warranty Hours" value={tractor.spec?.warrantyHours} />
+                         <SpecRow label="First Service Hours" value={tractor.spec?.firstServiceHours} />
+                         <SpecRow label="Regular Service Interval (H)" value={tractor.spec?.regularServiceIntervalH} />
+                         <SpecRow label="Oil Change Interval (H)" value={tractor.spec?.oilChangeIntervalH} />
+                         <SpecRow label="Engine Oil Spec" value={tractor.spec?.engineOilSpec} />
+                         <SpecRow label="Coolant Type" value={tractor.spec?.coolantType} />
+                         <SpecRow label="Annual Service Cost Estimate" value={tractor.spec?.annualServiceCostEstimate ? `₹${tractor.spec?.annualServiceCostEstimate}` : undefined} />
+                       </div>
+                    </div>
+
+                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
+                         <h4 className="text-xs font-black uppercase tracking-widest text-fuchsia-500">Optional Features</h4>
+                       </div>
+                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
+                         <SpecRow label="AC Cabin" value={tractor.spec?.hasAcCabin} />
+                         <SpecRow label="GPS" value={tractor.spec?.hasGps} />
+                         <SpecRow label="TPMS" value={tractor.spec?.hasTpms} />
                        </div>
                     </div>
                  </div>
@@ -258,7 +387,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                  {tractor.pros && Array.isArray(tractor.pros) && tractor.pros.length > 0 ? (
                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      {tractor.pros.map((pro: string, i: number) => (
-                       <li key={i} className="flex items-start gap-3 bg-background border border-foreground/5 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                       <li key={i} className="flex items-start gap-3 bg-background border border-[var(--border-subtle)] p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                          <div className="w-8 h-8 rounded-full bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] flex items-center justify-center shrink-0 mt-0.5"><CheckCircle2 size={16}/></div>
                          <span className="font-bold text-foreground leading-snug">{pro}</span>
                        </li>
@@ -269,7 +398,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                  ) : (
                    <ul className="flex flex-col gap-4">
                      {['Advanced Synchromesh Transmission for smooth gear changes', 'Heavy-duty hydraulic lift capacity for versatile implement usage', 'Fuel-efficient highly reliable engine', 'Extended warranty and low maintenance cost'].map((feat, i) => (
-                       <li key={i} className="flex items-center gap-3 bg-background border border-foreground/5 p-4 rounded-xl shadow-sm">
+                       <li key={i} className="flex items-center gap-3 bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm">
                          <div className="w-8 h-8 rounded-full bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] flex items-center justify-center shrink-0"><CheckCircle2 size={16}/></div>
                          <span className="font-bold text-foreground">{feat}</span>
                        </li>
@@ -296,7 +425,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                 <h1 className="text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">{tractor.modelName}</h1>
               </div>
 
-              <div className="flex items-end justify-between border-y border-foreground/10 py-6">
+              <div className="flex items-end justify-between border-y border-[var(--border-subtle)] py-6">
                  <div>
                    <p className="text-xs font-black uppercase tracking-widest text-muted mb-2">Ex-Showroom Price</p>
                    <div className="flex items-center gap-2">
@@ -324,7 +453,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                )}
 
               {/* State Pricing Engine Widget */}
-              <div className="flex flex-col gap-4 bg-background border border-foreground/10 p-5 rounded-[1.5rem]">
+              <div className="flex flex-col gap-4 bg-background border border-[var(--border-subtle)] p-5 rounded-[1.5rem]">
                  <div className="flex items-center justify-between mb-2">
                    <h3 className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2">
                      <MapPin size={16} className="text-[var(--color-brand-orange)]" /> On-Road Price Check
@@ -410,8 +539,8 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                     const compImage = competitor.media?.find((m: any) => m.isPrimary)?.url || competitor.media?.[0]?.url;
 
                     return (
-                      <Link key={i} href={`/compare?left=${tractor.id}&right=${competitor.id}`} className="flex items-center gap-4 bg-background border border-foreground/5 p-4 rounded-[1.5rem] hover:border-[var(--color-brand-orange)]/30 hover:shadow-lg transition-all group">
-                         <div className="w-16 h-16 bg-gradient-to-br from-foreground/5 to-transparent rounded-xl flex items-center justify-center p-2 border border-foreground/5 shrink-0 overflow-hidden">
+                      <Link key={i} href={`/compare?left=${tractor.id}&right=${competitor.id}`} className="flex items-center gap-4 bg-background border border-[var(--border-subtle)] p-4 rounded-[1.5rem] hover:border-[var(--color-brand-orange)]/30 hover:shadow-lg transition-all group">
+                         <div className="w-16 h-16 bg-gradient-to-br from-foreground/5 to-transparent rounded-xl flex items-center justify-center p-2 border border-[var(--border-subtle)] shrink-0 overflow-hidden">
                            {compImage ? (
                              <img src={compImage} alt={competitor.modelName} className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform" />
                            ) : (
@@ -457,7 +586,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                  
                return (
                  <Link key={st.id} href={`/tractors/${st.id}`} className="spatial-card flex flex-col overflow-hidden relative group cursor-pointer transition-all duration-500 rounded-[2.5rem] p-5 hover:border-[var(--color-brand-green)]/30 hover:shadow-[0_20px_40px_-10px_rgba(74,118,53,0.15)] hover:-translate-y-2 bg-background">
-                   <div className="h-40 w-full rounded-2xl bg-gradient-to-br from-foreground/5 to-transparent border border-foreground/5 flex items-center justify-center relative mb-4 overflow-hidden group/img p-4">
+                   <div className="h-40 w-full rounded-2xl bg-gradient-to-br from-foreground/5 to-transparent border border-[var(--border-subtle)] flex items-center justify-center relative mb-4 overflow-hidden group/img p-4">
                      {stPrimaryImage ? (
                        <img 
                          src={stPrimaryImage} 
@@ -488,7 +617,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
       )}
 
       {/* Mobile Sticky Action Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-background/90 backdrop-blur-xl border-t border-foreground/10 p-4 z-50 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-background/90 backdrop-blur-xl border-t border-[var(--border-subtle)] p-4 z-50 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
         <div className="flex flex-col">
           <span className="text-[10px] uppercase font-bold text-muted tracking-widest">Starting at</span>
           <span className="text-lg font-black text-foreground leading-none">{formatPrice(tractor.exShowroomPriceMin)}</span>
@@ -501,12 +630,13 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
   );
 }
 
-function SpecRow({ label, value }: { label: string; value: string | undefined }) {
-  if (!value || value === 'null') return null;
+function SpecRow({ label, value }: { label: string; value: any }) {
+  if (value === undefined || value === null || value === '' || value === 'null') return null;
+  const displayValue = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
   return (
     <div className="flex items-center justify-between px-6 py-4 hover:bg-foreground/5 transition-colors">
       <span className="text-sm font-bold text-muted">{label}</span>
-      <span className="text-sm font-black text-foreground text-right">{value}</span>
+      <span className="text-sm font-black text-foreground text-right">{displayValue}</span>
     </div>
   );
 }

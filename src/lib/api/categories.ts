@@ -1,4 +1,5 @@
 import { apiClient } from './axios/axios';
+import { PaginatedResponse } from './tractors';
 
 export interface Category {
   id: number;
@@ -22,8 +23,8 @@ export const categoryAPI = {
   /**
    * Fetch all tractor categories (includes nested children tree)
    */
-  getAllCategories: async () => {
-    const response = await apiClient.get<{ success: boolean; data: Category[] }>('/category/get-all-tractor-categories');
+  getAllCategories: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const response = await apiClient.get<PaginatedResponse<Category>>('/category/get-all-tractor-categories', { params });
     return response.data;
   },
 
@@ -40,14 +41,10 @@ export const categoryAPI = {
    * Uses FormData because it handles file uploads (image)
    */
   createCategory: async (data: FormData) => {
-    const response = await apiClient.post<{ success: boolean; data: Category }>(
+    const response = await apiClient.postForm<{ success: boolean; data: Category }>(
       '/category/create-tractor-category', 
       data,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      { headers: { 'Content-Type': 'multipart/form-data' } }
     );
     return response.data;
   },
@@ -57,14 +54,10 @@ export const categoryAPI = {
    * Uses FormData because it handles file uploads (image)
    */
   updateCategory: async (id: number, data: FormData) => {
-    const response = await apiClient.put<{ success: boolean; data: Category }>(
+    const response = await apiClient.putForm<{ success: boolean; data: Category }>(
       `/category/update-tractor-category/${id}`, 
       data,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      { headers: { 'Content-Type': 'multipart/form-data' } }
     );
     return response.data;
   },

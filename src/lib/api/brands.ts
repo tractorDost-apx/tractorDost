@@ -54,14 +54,10 @@ export const brandAPI = {
    * Uses FormData because it handles file uploads (logo)
    */
   createBrand: async (data: FormData) => {
-    const response = await apiClient.post<{ success: boolean; data: Brand }>(
+    const response = await apiClient.postForm<{ success: boolean; data: Brand }>(
       '/brand/create-brand', 
       data,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      { headers: { 'Content-Type': 'multipart/form-data' } }
     );
     return response.data;
   },
@@ -71,14 +67,10 @@ export const brandAPI = {
    * Uses FormData because it handles file uploads (logo)
    */
   updateBrand: async (id: number, data: FormData) => {
-    const response = await apiClient.put<{ success: boolean; data: Brand }>(
+    const response = await apiClient.putForm<{ success: boolean; data: Brand }>(
       `/brand/update-brand/${id}`, 
       data,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      { headers: { 'Content-Type': 'multipart/form-data' } }
     );
     return response.data;
   },

@@ -28,4 +28,15 @@ export const compareAPI = {
     const response = await apiClient.get<CompareFrequencyResponse>('/compare/frequency-of-compare', { params });
     return response.data;
   },
+
+  /**
+   * Compare multiple tractors by IDs
+   */
+  compareTractors: async (ids: number[], state?: string) => {
+    const params: any = { ids: ids.join(',') };
+    if (state) params.state = state;
+    
+    const response = await apiClient.get<{ success: boolean; data: Tractor[] }>('/compare', { params });
+    return response.data;
+  },
 };

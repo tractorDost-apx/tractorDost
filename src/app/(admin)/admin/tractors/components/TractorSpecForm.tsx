@@ -6,9 +6,89 @@ import { TractorSpec, CoolingType, SteeringType, BrakeType, ClutchType, Hydrauli
 interface TractorSpecFormProps {
   spec: Partial<TractorSpec>;
   onChange: (field: keyof TractorSpec, value: any) => void;
+  touched?: Record<string, boolean>;
 }
 
-export default function TractorSpecForm({ spec, onChange }: TractorSpecFormProps) {
+const SectionTitle = ({ title }: { title: string }) => (
+  <h3 className="text-lg font-black text-foreground mt-8 mb-4 pb-2 border-b border-[var(--border-subtle)]">{title}</h3>
+);
+
+const InputField = ({ label, name, type = 'text', spec, handleChange, required = false, touched }: any) => {
+  const isMissing = required && (spec[name as keyof TractorSpec] === undefined || spec[name as keyof TractorSpec] === null || spec[name as keyof TractorSpec] === '');
+  const isError = isMissing && touched?.[`spec_${name}`];
+
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <label className="text-[11px] uppercase tracking-wider font-extrabold text-foreground/60 flex items-center">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input 
+        type={type} 
+        name={name} 
+        value={spec[name as keyof TractorSpec] ?? ''} 
+        onChange={handleChange} 
+        className={`w-full bg-foreground/5 border rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:ring-2 transition-all ${
+          isError
+            ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20'
+            : 'border-transparent focus:border-[var(--color-brand-green)]/50 focus:ring-[var(--color-brand-green)]/20'
+        }`}
+        placeholder={type === 'number' ? '0' : 'Not Specified'}
+      />
+      {isError && (
+        <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{label} is required</p>
+      )}
+    </div>
+  );
+};
+
+const SelectField = ({ label, name, options, spec, handleChange, required = false, touched }: any) => {
+  const value = spec[name as keyof TractorSpec];
+  const isMissing = required && (!value || value === '');
+  const isError = isMissing && touched?.[`spec_${name}`];
+
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <label className="text-[11px] uppercase tracking-wider font-extrabold text-foreground/60 flex items-center">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <select 
+        name={name}
+        value={value || ''}
+        onChange={handleChange}
+        className={`w-full bg-foreground/5 border rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:ring-2 transition-all appearance-none ${
+          isError
+            ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20'
+            : 'border-transparent focus:border-[var(--color-brand-green)]/50 focus:ring-[var(--color-brand-green)]/20'
+        }`}
+      >
+        <option value="">Not Specified</option>
+        {options.map((opt: string) => (
+          <option key={opt} value={opt}>{opt.replace(/_/g, ' ')}</option>
+        ))}
+      </select>
+      {isError && (
+        <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{label} is required</p>
+      )}
+    </div>
+  );
+};
+
+const CheckboxField = ({ label, name, spec, handleChange }: any) => (
+  <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-foreground/5">
+    <input 
+      type="checkbox" 
+      name={name} 
+      checked={!!spec[name as keyof TractorSpec]} 
+      onChange={handleChange} 
+      className="w-5 h-5 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)] bg-background border-[var(--border-brand)]" 
+    />
+    <span className="text-sm font-bold">{label}</span>
+  </label>
+);
+
+export default function TractorSpecForm({ spec, onChange, touched }: TractorSpecFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
@@ -20,163 +100,117 @@ export default function TractorSpecForm({ spec, onChange }: TractorSpecFormProps
     }
   };
 
-  const SectionTitle = ({ title }: { title: string }) => (
-    <h3 className="text-lg font-black text-foreground mt-8 mb-4 pb-2 border-b border-foreground/10">{title}</h3>
-  );
-
-  const InputField = ({ label, name, type = 'text', placeholder = '' }: any) => (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs font-bold text-muted uppercase tracking-wider">{label}</label>
-      <input 
-        type={type} 
-        name={name}
-        value={spec[name as keyof TractorSpec] as any || ''}
-        onChange={handleChange}
-        placeholder={placeholder}
-        className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
-      />
-    </div>
-  );
-
-  const SelectField = ({ label, name, options }: any) => (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs font-bold text-muted uppercase tracking-wider">{label}</label>
-      <select 
-        name={name}
-        value={spec[name as keyof TractorSpec] as any || ''}
-        onChange={handleChange}
-        className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
-      >
-        <option value="">Not Specified</option>
-        {options.map((opt: string) => (
-          <option key={opt} value={opt}>{opt.replace(/_/g, ' ')}</option>
-        ))}
-      </select>
-    </div>
-  );
-
-  const CheckboxField = ({ label, name }: any) => (
-    <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-foreground/5">
-      <input 
-        type="checkbox" 
-        name={name} 
-        checked={!!spec[name as keyof TractorSpec]} 
-        onChange={handleChange} 
-        className="w-5 h-5 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)] bg-background border-foreground/20" 
-      />
-      <span className="text-sm font-bold">{label}</span>
-    </label>
-  );
 
   return (
     <div className="flex flex-col gap-2 animate-fade-in">
       <h2 className="text-2xl font-black text-foreground mb-2">Technical Specifications</h2>
+      <p className="text-xs text-muted mb-4">Fields marked with <span className="text-red-500 font-bold">*</span> are mandatory.</p>
       
       <SectionTitle title="Engine Details" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InputField label="Engine CC" name="engineCc" type="number" />
-        <InputField label="Cylinders" name="cylinders" type="number" />
-        <InputField label="Rated RPM" name="ratedRpm" type="number" />
-        <InputField label="Max Torque (Nm)" name="maxTorqueNm" type="number" />
-        <SelectField label="Cooling Type" name="coolingType" options={Object.values(CoolingType)} />
-        <InputField label="Aspiration" name="aspiration" />
-        <InputField label="Air Filter Type" name="airFilterType" />
-        <InputField label="Fuel Injection Type" name="fuelInjectionType" />
-        <InputField label="Engine Oil Capacity (L)" name="engineOilCapacityL" type="number" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <InputField label="Engine CC" name="engineCc" type="number" spec={spec} handleChange={handleChange} required touched={touched} />
+        <InputField label="Cylinders" name="cylinders" type="number" spec={spec} handleChange={handleChange} required touched={touched} />
+        <InputField label="Rated RPM" name="ratedRpm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Max Torque (Nm)" name="maxTorqueNm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <SelectField label="Cooling Type" name="coolingType" options={Object.values(CoolingType)} spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Aspiration" name="aspiration" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Air Filter Type" name="airFilterType" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Fuel Injection Type" name="fuelInjectionType" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Engine Oil Capacity (L)" name="engineOilCapacityL" type="number" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Transmission" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <SelectField label="Gearbox Type" name="gearboxType" options={Object.values(GearboxType)} />
-        <SelectField label="Clutch Type" name="clutchType" options={Object.values(ClutchType)} />
-        <InputField label="Forward Gears" name="forwardGears" type="number" />
-        <InputField label="Reverse Gears" name="reverseGears" type="number" />
-        <InputField label="Max Speed Fwd (Kmph)" name="maxSpeedFwdKmph" type="number" />
-        <InputField label="Max Speed Rev (Kmph)" name="maxSpeedRevKmph" type="number" />
+        <SelectField label="Gearbox Type" name="gearboxType" options={Object.values(GearboxType)} spec={spec} handleChange={handleChange} touched={touched} />
+        <SelectField label="Clutch Type" name="clutchType" options={Object.values(ClutchType)} spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Forward Gears" name="forwardGears" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Reverse Gears" name="reverseGears" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Max Speed Fwd (Kmph)" name="maxSpeedFwdKmph" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Max Speed Rev (Kmph)" name="maxSpeedRevKmph" type="number" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-        <CheckboxField label="Has Creeper" name="hasCreeper" />
-        <CheckboxField label="Has Shuttle" name="hasShuttle" />
-        <CheckboxField label="Differential Lock" name="differentialLock" />
+        <CheckboxField label="Has Creeper" name="hasCreeper" spec={spec} handleChange={handleChange} />
+        <CheckboxField label="Has Shuttle" name="hasShuttle" spec={spec} handleChange={handleChange} />
+        <CheckboxField label="Differential Lock" name="differentialLock" spec={spec} handleChange={handleChange} />
       </div>
 
       <SectionTitle title="PTO (Power Take-Off)" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <SelectField label="PTO Type" name="ptoType" options={Object.values(PtoType)} />
-        <InputField label="PTO HP" name="ptoHp" type="number" />
-        <InputField label="PTO RPM" name="ptoRpm" type="number" />
-        <InputField label="PTO RPM Options" name="ptoRpmOptions" placeholder="e.g. 540 / 1000" />
-        <InputField label="PTO Shaft Type" name="ptoShaftType" />
+        <SelectField label="PTO Type" name="ptoType" options={Object.values(PtoType)} spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="PTO HP" name="ptoHp" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="PTO RPM" name="ptoRpm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="PTO RPM Options" name="ptoRpmOptions" placeholder="e.g. 540 / 1000" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="PTO Shaft Type" name="ptoShaftType" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Hydraulics" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <SelectField label="Hydraulics Type" name="hydraulicsType" options={Object.values(HydraulicsType)} />
-        <InputField label="Lifting Capacity (Kg)" name="liftingCapacityKg" type="number" />
-        <InputField label="Pump Flow Rate (Lpm)" name="pumpFlowRateLpm" type="number" />
-        <InputField label="Linkage Category" name="linkageCategory" placeholder="e.g. CAT II" />
-        <InputField label="Aux Hydraulic Ports" name="auxHydraulicPorts" type="number" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SelectField label="Hydraulics Type" name="hydraulicsType" options={Object.values(HydraulicsType)} spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Lifting Capacity (Kg)" name="liftingCapacityKg" type="number" spec={spec} handleChange={handleChange} required touched={touched} />
+        <InputField label="Pump Flow Rate (Lpm)" name="pumpFlowRateLpm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Linkage Category" name="linkageCategory" placeholder="e.g. CAT II" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Aux Hydraulic Ports" name="auxHydraulicPorts" type="number" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Steering & Brakes" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <SelectField label="Steering Type" name="steeringType" options={Object.values(SteeringType)} />
-        <SelectField label="Brake Type" name="brakeType" options={Object.values(BrakeType)} />
-        <CheckboxField label="Parking Brake" name="parkingBrake" />
+        <SelectField label="Steering Type" name="steeringType" options={Object.values(SteeringType)} spec={spec} handleChange={handleChange} touched={touched} />
+        <SelectField label="Brake Type" name="brakeType" options={Object.values(BrakeType)} spec={spec} handleChange={handleChange} touched={touched} />
+        <CheckboxField label="Parking Brake" name="parkingBrake" spec={spec} handleChange={handleChange} />
       </div>
 
-      <SectionTitle title="Dimensions & Weight" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InputField label="Overall Length (mm)" name="overallLengthMm" type="number" />
-        <InputField label="Overall Width (mm)" name="overallWidthMm" type="number" />
-        <InputField label="Overall Height (mm)" name="overallHeightMm" type="number" />
-        <InputField label="Wheelbase (mm)" name="wheelbaseMm" type="number" />
-        <InputField label="Ground Clearance (mm)" name="groundClearanceMm" type="number" />
-        <InputField label="Turning Radius (m)" name="turningRadiusM" type="number" />
-        <InputField label="Total Weight (Kg)" name="totalWeightKg" type="number" />
+      <SectionTitle title="Dimensions" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <InputField label="Overall Length (Mm)" name="overallLengthMm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Overall Width (Mm)" name="overallWidthMm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Overall Height (Mm)" name="overallHeightMm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Wheelbase (Mm)" name="wheelbaseMm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Ground Clearance (Mm)" name="groundClearanceMm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Turning Radius (M)" name="turningRadiusM" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Total Weight (Kg)" name="totalWeightKg" type="number" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Tyres" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InputField label="Front Tyre Size" name="frontTyreSize" />
-        <InputField label="Rear Tyre Size" name="rearTyreSize" />
-        <InputField label="Tyre Type" name="tyreType" placeholder="Bias / Radial" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <InputField label="Front Tyre Size" name="frontTyreSize" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Rear Tyre Size" name="rearTyreSize" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Tyre Type" name="tyreType" placeholder="e.g. Bias / Radial" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Fuel & Electrical" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InputField label="Fuel Tank Capacity (L)" name="fuelTankCapacityL" type="number" />
-        <InputField label="Fuel Consumption (Lph)" name="fuelConsumptionLph" type="number" />
-        <InputField label="Battery Voltage" name="batteryVoltage" type="number" />
-        <InputField label="Battery Ah" name="batteryAh" type="number" />
-        <InputField label="Alternator Amps" name="alternatorAmps" type="number" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <InputField label="Fuel Tank Capacity (L)" name="fuelTankCapacityL" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Fuel Consumption (Lph)" name="fuelConsumptionLph" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Battery Voltage" name="batteryVoltage" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Battery Ah" name="batteryAh" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Alternator Amps" name="alternatorAmps" type="number" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Maintenance & Service" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InputField label="Warranty (Years)" name="warrantyYears" type="number" />
-        <InputField label="Warranty (Hours)" name="warrantyHours" type="number" />
-        <InputField label="First Service (Hours)" name="firstServiceHours" type="number" />
-        <InputField label="Regular Service Interval (Hours)" name="regularServiceIntervalH" type="number" />
-        <InputField label="Oil Change Interval (Hours)" name="oilChangeIntervalH" type="number" />
-        <InputField label="Engine Oil Spec" name="engineOilSpec" placeholder="e.g. SAE 15W-40" />
-        <InputField label="Coolant Type" name="coolantType" />
-        <InputField label="Annual Service Cost Est (₹)" name="annualServiceCostEstimate" type="number" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <InputField label="Warranty Years" name="warrantyYears" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Warranty Hours" name="warrantyHours" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="First Service Hours" name="firstServiceHours" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Regular Service Interval (H)" name="regularServiceIntervalH" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Oil Change Interval (H)" name="oilChangeIntervalH" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Engine Oil Spec" name="engineOilSpec" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Coolant Type" name="coolantType" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Annual Service Cost Estimate" name="annualServiceCostEstimate" type="number" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Electric Tractor (If Applicable)" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InputField label="Battery Capacity (kWh)" name="batteryCapacityKwh" type="number" />
-        <InputField label="Motor (kW)" name="motorKw" type="number" />
-        <InputField label="Charging Time (Hours)" name="chargingTimeHours" type="number" />
-        <InputField label="Range Per Charge (km)" name="rangePerChargeKm" type="number" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <InputField label="Battery Capacity (Kwh)" name="batteryCapacityKwh" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Motor Kw" name="motorKw" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Charging Time (Hours)" name="chargingTimeHours" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Range Per Charge (Km)" name="rangePerChargeKm" type="number" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Optional Features" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <CheckboxField label="AC Cabin" name="hasAcCabin" />
-        <CheckboxField label="GPS" name="hasGps" />
-        <CheckboxField label="TPMS" name="hasTpms" />
+        <CheckboxField label="AC Cabin" name="hasAcCabin" spec={spec} handleChange={handleChange} />
+        <CheckboxField label="GPS Enabled" name="hasGps" spec={spec} handleChange={handleChange} />
+        <CheckboxField label="TPMS" name="hasTpms" spec={spec} handleChange={handleChange} />
       </div>
     </div>
   );

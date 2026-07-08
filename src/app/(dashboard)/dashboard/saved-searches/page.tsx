@@ -16,7 +16,7 @@ export default function SavedSearchesPage() {
 
       <div className="space-y-4">
         {dummySearches.map((search) => (
-          <div key={search.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-foreground/5 hover:border-[var(--color-brand-green)]/30 transition-colors">
+          <div key={search.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/30 transition-colors">
             <div className="flex items-start gap-4 flex-1">
               <div className="h-10 w-10 rounded-full bg-[var(--color-brand-green)]/10 flex items-center justify-center flex-shrink-0 text-[var(--color-brand-green)] mt-1">
                 <Search size={20} />
@@ -25,10 +25,10 @@ export default function SavedSearchesPage() {
                 <h3 className="font-bold text-foreground text-lg mb-1">{search.query}</h3>
                 <p className="text-muted font-medium text-sm mb-3">Filters: {search.filters}</p>
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1 text-xs font-bold bg-foreground/5 px-2 py-1 rounded-md text-muted">
+                  <span className="flex items-center gap-1 text-xs font-bold bg-[var(--border-subtle)] px-2 py-1 rounded-md text-muted">
                     <Bell size={12} /> Alerts: {search.frequency}
                   </span>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-md ${search.active ? 'bg-lime-500/10 text-lime-500' : 'bg-red-500/10 text-red-500'}`}>
+                  <span className={`text-xs font-bold px-2 py-1 rounded-md ${search.active ? 'bg-lime-500/[var(--border-subtle)] text-lime-500' : 'bg-red-500/[var(--border-subtle)] text-red-500'}`}>
                     {search.active ? 'Active' : 'Paused'}
                   </span>
                 </div>

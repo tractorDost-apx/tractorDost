@@ -100,7 +100,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
         <div className="lg:col-span-8 space-y-8">
           
           {/* Main Media Gallery */}
-          <div className="bg-foreground/5 rounded-3xl overflow-hidden border border-foreground/10">
+          <div className="bg-foreground/5 rounded-3xl overflow-hidden border border-[var(--border-subtle)]">
             <div className="relative aspect-video bg-black flex items-center justify-center group">
               {tractor.isCertified && (
                 <div className="absolute top-4 left-4 z-10 px-3 py-1.5 bg-[var(--color-brand-green)] text-white text-xs font-black uppercase tracking-widest rounded-full shadow-lg flex items-center gap-1.5">
@@ -136,7 +136,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
           </div>
 
           {/* Overview Stats Card */}
-          <div className="bg-foreground/5 rounded-3xl p-8 border border-foreground/10">
+          <div className="bg-foreground/5 rounded-3xl p-8 border border-[var(--border-subtle)]">
             <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">
               {tractor.yearOfManufacture} {tractor.tractorBrand} {tractor.tractorModel}
             </h1>
@@ -145,22 +145,22 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="bg-background rounded-2xl p-4 border border-foreground/5 shadow-sm text-center">
+              <div className="bg-background rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm text-center">
                 <Calendar className="text-[var(--color-brand-green)] mx-auto mb-2" size={24} />
                 <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Mfg Year</p>
                 <p className="text-lg font-black">{tractor.yearOfManufacture}</p>
               </div>
-              <div className="bg-background rounded-2xl p-4 border border-foreground/5 shadow-sm text-center">
+              <div className="bg-background rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm text-center">
                 <Clock className="text-[var(--color-brand-green)] mx-auto mb-2" size={24} />
                 <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Hours Used</p>
                 <p className="text-lg font-black">{tractor.hoursUsed ? `${tractor.hoursUsed} hrs` : 'N/A'}</p>
               </div>
-              <div className="bg-background rounded-2xl p-4 border border-foreground/5 shadow-sm text-center">
+              <div className="bg-background rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm text-center">
                 <UserIcon className="text-[var(--color-brand-green)] mx-auto mb-2" size={24} />
                 <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Ownership</p>
                 <p className="text-lg font-black">{tractor.ownership}{tractor.ownership === 1 ? 'st' : tractor.ownership === 2 ? 'nd' : 'rd'} Owner</p>
               </div>
-              <div className="bg-background rounded-2xl p-4 border border-foreground/5 shadow-sm text-center">
+              <div className="bg-background rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm text-center">
                 <Wrench className="text-[var(--color-brand-green)] mx-auto mb-2" size={24} />
                 <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Condition</p>
                 <p className="text-lg font-black">{tractor.conditionGrade}</p>
@@ -170,7 +170,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
 
           {/* Inspection Report (If Certified) */}
           {tractor.isCertified && tractor.inspection && (
-            <div className="bg-gradient-to-br from-foreground/5 to-transparent rounded-3xl p-8 border border-foreground/10 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-foreground/5 to-transparent rounded-3xl p-8 border border-[var(--border-subtle)] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)] opacity-5 blur-[100px] rounded-full pointer-events-none"></div>
               
               <div className="flex items-center justify-between mb-6">
@@ -205,7 +205,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
               </div>
 
               {tractor.inspection.inspectorNotes && (
-                <div className="mt-6 p-4 bg-background rounded-2xl border border-foreground/5 flex gap-3">
+                <div className="mt-6 p-4 bg-background rounded-2xl border border-[var(--border-subtle)] flex gap-3">
                   <AlertCircle className="text-muted flex-shrink-0 mt-0.5" size={20} />
                   <p className="text-sm text-muted font-medium italic">
                     "{tractor.inspection.inspectorNotes}" - Expert Inspector
@@ -216,14 +216,14 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
           )}
 
           {/* Documents & Verification */}
-          <div className="bg-foreground/5 rounded-3xl p-8 border border-foreground/10">
+          <div className="bg-foreground/5 rounded-3xl p-8 border border-[var(--border-subtle)]">
             <h3 className="text-2xl font-black mb-6 flex items-center gap-3">
               <FileText className="text-[var(--color-brand-green)]" size={28} />
               Documents & Status
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {tractor.documents.map((doc: any, i: number) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-background rounded-2xl border border-foreground/5">
+                <div key={i} className="flex items-center justify-between p-4 bg-background rounded-2xl border border-[var(--border-subtle)]">
                   <span className="font-bold uppercase tracking-wider text-sm">{doc.docType.replace('_', ' ')}</span>
                   {doc.verifiedAt ? (
                     <span className="flex items-center gap-1 text-sm font-black text-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 px-3 py-1 rounded-full">
@@ -236,7 +236,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
                   )}
                 </div>
               ))}
-              <div className="flex items-center justify-between p-4 bg-background rounded-2xl border border-foreground/5">
+              <div className="flex items-center justify-between p-4 bg-background rounded-2xl border border-[var(--border-subtle)]">
                 <span className="font-bold uppercase tracking-wider text-sm">Finance Status</span>
                 {tractor.financeAvailable ? (
                   <span className="flex items-center gap-1 text-sm font-black text-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 px-3 py-1 rounded-full">
@@ -253,7 +253,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
 
           {/* Description */}
           {tractor.description && (
-            <div className="bg-foreground/5 rounded-3xl p-8 border border-foreground/10">
+            <div className="bg-foreground/5 rounded-3xl p-8 border border-[var(--border-subtle)]">
               <h3 className="text-2xl font-black mb-4">Seller Description</h3>
               <p className="text-foreground/80 leading-relaxed font-medium">
                 {tractor.description}
@@ -300,7 +300,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
             </div>
 
             {/* Lead Generation Form (UsedTractorEnquiry) */}
-            <div className="bg-foreground/5 rounded-3xl p-8 border border-foreground/10 shadow-xl">
+            <div className="bg-foreground/5 rounded-3xl p-8 border border-[var(--border-subtle)] shadow-xl">
               <h3 className="text-xl font-black mb-2">Interested in this tractor?</h3>
               <p className="text-sm text-muted font-medium mb-6">Fill out your details to contact the seller directly.</p>
 
@@ -319,7 +319,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
                       placeholder="Your Full Name"
                       value={enquiryForm.name}
                       onChange={e => setEnquiryForm({...enquiryForm, name: e.target.value})}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
                     />
                   </div>
                   <div>
@@ -329,7 +329,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
                       placeholder="Mobile Number"
                       value={enquiryForm.mobile}
                       onChange={e => setEnquiryForm({...enquiryForm, mobile: e.target.value})}
-                      className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
+                      className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
                     />
                   </div>
                   {tractor.negotiable && (
@@ -339,7 +339,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
                         placeholder="Your Offer Price (Optional)"
                         value={enquiryForm.offerPrice}
                         onChange={e => setEnquiryForm({...enquiryForm, offerPrice: e.target.value})}
-                        className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
+                        className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
                       />
                     </div>
                   )}
@@ -363,7 +363,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
             </div>
 
             {/* Safety Tips */}
-            <div className="p-6 bg-background rounded-3xl border border-foreground/10 flex gap-4">
+            <div className="p-6 bg-background rounded-3xl border border-[var(--border-subtle)] flex gap-4">
               <ShieldCheck className="text-orange-500 flex-shrink-0" size={24} />
               <div>
                 <h4 className="font-bold text-sm mb-1">Safety Tips</h4>

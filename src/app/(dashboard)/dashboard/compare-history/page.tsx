@@ -38,7 +38,7 @@ export default function CompareHistoryPage() {
               <span className="text-xs font-bold text-muted flex items-center gap-1">
                 <History size={14} /> {item.date}
               </span>
-              <button className="bg-[var(--color-brand-green)] text-black font-bold py-2 px-4 rounded-xl text-sm hover:bg-[var(--color-brand-green)]/90 transition-colors">
+              <button className="bg-[var(--color-brand-green)] text-white font-bold py-2 px-4 rounded-xl text-sm hover:bg-[var(--color-brand-green)]/90 transition-colors">
                 Compare Again
               </button>
             </div>

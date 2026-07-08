@@ -118,7 +118,7 @@ export default function UsedTractorValuationPage() {
             </p>
           </div>
 
-          <div className="bg-foreground/5 p-8 rounded-[2rem] border border-foreground/10 shadow-2xl relative overflow-hidden">
+          <div className="bg-foreground/5 p-8 rounded-[2rem] border border-[var(--border-subtle)] shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)] opacity-5 blur-[100px] rounded-full pointer-events-none"></div>
             
             <form onSubmit={calculateValuation} className="relative z-10 space-y-6">
@@ -130,7 +130,7 @@ export default function UsedTractorValuationPage() {
                   required
                   value={formData.brand}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
+                  className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
                 >
                   <option value="">Select Brand</option>
                   {brands.map(b => (
@@ -149,7 +149,7 @@ export default function UsedTractorValuationPage() {
                   placeholder="e.g. 575 DI"
                   value={formData.model}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                  className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                 />
               </div>
 
@@ -164,7 +164,7 @@ export default function UsedTractorValuationPage() {
                     max={new Date().getFullYear()}
                     value={formData.year}
                     onChange={handleChange}
-                    className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                    className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -177,7 +177,7 @@ export default function UsedTractorValuationPage() {
                     placeholder="e.g. 2500"
                     value={formData.hours || ''}
                     onChange={handleChange}
-                    className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                    className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
                   />
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default function UsedTractorValuationPage() {
                   required
                   value={formData.condition}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 bg-background border border-foreground/10 rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
+                  className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
                 >
                   <option value={ConditionGrade.EXCELLENT}>Excellent (Like New)</option>
                   <option value={ConditionGrade.GOOD}>Good (Well Maintained)</option>
@@ -221,7 +221,7 @@ export default function UsedTractorValuationPage() {
         <div className="lg:col-span-7 flex flex-col justify-center h-full">
           
           {!valuationResult && !isCalculating && (
-            <div className="bg-foreground/5 rounded-[3rem] p-12 text-center border-2 border-dashed border-foreground/10">
+            <div className="bg-foreground/5 rounded-[3rem] p-12 text-center border-2 border-dashed border-[var(--border-subtle)]">
               <div className="w-24 h-24 bg-foreground/10 text-muted rounded-full flex items-center justify-center mx-auto mb-6">
                 <Calculator size={48} />
               </div>
@@ -230,7 +230,7 @@ export default function UsedTractorValuationPage() {
                 Fill out the form on the left to receive a highly accurate, data-backed estimate of your tractor's current market value.
               </p>
               
-              <div className="grid grid-cols-3 gap-4 mt-12 pt-12 border-t border-foreground/10 text-left">
+              <div className="grid grid-cols-3 gap-4 mt-12 pt-12 border-t border-[var(--border-subtle)] text-left">
                 <div>
                   <TrendingUp className="text-[var(--color-brand-green)] mb-3" size={24} />
                   <h4 className="font-bold text-sm mb-1">Live Data</h4>
@@ -251,9 +251,9 @@ export default function UsedTractorValuationPage() {
           )}
 
           {isCalculating && (
-            <div className="bg-foreground/5 rounded-[3rem] p-12 text-center border border-foreground/10 flex flex-col items-center justify-center min-h-[400px]">
+            <div className="bg-foreground/5 rounded-[3rem] p-12 text-center border border-[var(--border-subtle)] flex flex-col items-center justify-center min-h-[400px]">
               <div className="relative mb-8">
-                <div className="w-32 h-32 border-4 border-foreground/10 border-t-[var(--color-brand-green)] rounded-full animate-spin"></div>
+                <div className="w-32 h-32 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[var(--color-brand-green)]">
                   <Tractor size={40} />
                 </div>
@@ -284,7 +284,7 @@ export default function UsedTractorValuationPage() {
                 </div>
               </div>
               
-              <div className="bg-foreground/5 rounded-b-[3rem] p-10 border border-t-0 border-foreground/10 text-center shadow-2xl">
+              <div className="bg-foreground/5 rounded-b-[3rem] p-10 border border-t-0 border-[var(--border-subtle)] text-center shadow-2xl">
                 <h3 className="text-xl font-black mb-4">Happy with this price?</h3>
                 <p className="text-muted font-medium mb-8 max-w-md mx-auto">
                   Thousands of verified buyers are looking for {formData.brand} tractors right now. List it for free on Tractor Dost and sell within 15 days.

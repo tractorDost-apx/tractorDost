@@ -39,7 +39,7 @@ export default function AdminDashboardPage() {
         {metrics.map((m, idx) => {
           const Icon = m.icon;
           return (
-            <div key={idx} className="bg-foreground/5 rounded-2xl p-5 border border-foreground/5 flex items-center justify-between">
+            <div key={idx} className="bg-foreground/5 rounded-2xl p-5 border border-[var(--border-subtle)] flex items-center justify-between">
               <div>
                 <p className="text-muted text-sm font-bold mb-1">{m.label}</p>
                 <div className="flex items-end gap-2">
@@ -70,7 +70,7 @@ export default function AdminDashboardPage() {
         
         <div className="space-y-4">
           {recentActivity.map((activity, idx) => (
-            <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-foreground/5 transition-colors border border-transparent hover:border-foreground/10 cursor-pointer">
+            <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-foreground/5 transition-colors border border-transparent hover:border-[var(--border-subtle)] cursor-pointer">
               <div className="h-10 w-10 rounded-full bg-[var(--color-brand-green)]/20 flex items-center justify-center flex-shrink-0">
                 <div className="h-3 w-3 rounded-full bg-[var(--color-brand-green)]" />
               </div>

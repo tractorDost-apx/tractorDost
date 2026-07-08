@@ -62,16 +62,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(newUser);
   };
 
-  const logout = async () => {
+  const logout = async (explicit = false) => {
     try {
       await authAPI.logout();
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
       setUser(null);
-      // Optional: you can redirect to login page here if desired
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-         window.location.href = '/login';
+      if (typeof window !== 'undefined') {
+        const protectedRoutes = ['/dashboard', '/admin', '/dealer', '/profile', '/wishlist'];
+        const currentPath = window.location.pathname;
+        const isProtected = protectedRoutes.some(route => currentPath.startsWith(route));
+        
+        if (isProtected || explicit) {
+          if (!currentPath.startsWith('/login')) {
+            window.location.href = '/login';
+          }
+        }
       }
     }
   };

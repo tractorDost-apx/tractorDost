@@ -159,7 +159,7 @@ export default function OnRoadPricePage() {
                     <button 
                       key={brand.id}
                       onClick={() => handleBrandSelect(brand)}
-                      className="flex flex-col items-center justify-center p-6 rounded-2xl border border-foreground/5 bg-foreground/5 hover:border-[var(--color-brand-green)]/50 hover:bg-[var(--color-brand-green)]/5 transition-all group"
+                      className="flex flex-col items-center justify-center p-6 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 hover:border-[var(--color-brand-green)]/50 hover:bg-[var(--color-brand-green)]/5 transition-all group"
                     >
                       {brand.logoUrl ? (
                         <img src={brand.logoUrl} alt={brand.name} className="w-16 h-16 object-contain mb-3 group-hover:scale-110 transition-transform mix-blend-multiply dark:mix-blend-normal" />
@@ -190,9 +190,9 @@ export default function OnRoadPricePage() {
                     <button 
                       key={t.id}
                       onClick={() => handleTractorSelect(t)}
-                      className="flex items-center gap-4 p-4 rounded-2xl border border-foreground/5 bg-foreground/5 hover:border-[var(--color-brand-green)]/50 hover:bg-[var(--color-brand-green)]/5 transition-all text-left group"
+                      className="flex items-center gap-4 p-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 hover:border-[var(--color-brand-green)]/50 hover:bg-[var(--color-brand-green)]/5 transition-all text-left group"
                     >
-                      <div className="w-16 h-16 rounded-xl bg-background flex items-center justify-center p-2 shrink-0 border border-foreground/5">
+                      <div className="w-16 h-16 rounded-xl bg-background flex items-center justify-center p-2 shrink-0 border border-[var(--border-subtle)]">
                          {t.media && t.media.length > 0 ? (
                            <img src={t.media.find(m => m.isPrimary)?.url || t.media[0].url} alt={t.modelName} className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform" />
                          ) : (
@@ -258,7 +258,7 @@ export default function OnRoadPricePage() {
 
                   {/* Right Column - Receipt Breakdown */}
                   <div className="w-full lg:w-2/3">
-                    <div className="bg-foreground/[0.03] border border-foreground/10 rounded-[2rem] p-8 md:p-10 relative overflow-hidden">
+                    <div className="bg-foreground/[0.03] border border-[var(--border-subtle)] rounded-[2rem] p-8 md:p-10 relative overflow-hidden">
                       {/* Decorative elements */}
                       <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)]/5 rounded-full blur-[60px] -z-10" />
                       
@@ -357,7 +357,7 @@ function StepIndicator({ currentStep, stepNumber, label }: { currentStep: number
 function Loader() {
   return (
     <div className="w-full flex justify-center py-20">
-      <div className="w-12 h-12 border-4 border-foreground/10 border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+      <div className="w-12 h-12 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
     </div>
   );
 }

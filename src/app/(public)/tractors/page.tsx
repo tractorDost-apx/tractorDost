@@ -114,7 +114,7 @@ export default function TractorsListingPage() {
     <div className="w-full max-w-[1440px] mx-auto min-h-screen flex flex-col pt-8 pb-24 px-4 sm:px-6 lg:px-8 animate-fade-in">
       
       {/* HEADER / HERO COMPACT */}
-      <div className="bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 rounded-[2.5rem] p-8 md:p-12 mb-10 flex flex-col md:flex-row items-center justify-between border border-foreground/5 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 rounded-[2.5rem] p-8 md:p-12 mb-10 flex flex-col md:flex-row items-center justify-between border border-[var(--border-subtle)] relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)]/20 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="z-10 flex flex-col gap-3">
           <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">Explore Tractors</h1>
@@ -122,7 +122,7 @@ export default function TractorsListingPage() {
         </div>
         
         {/* Total Count Badge */}
-        <div className="mt-6 md:mt-0 z-10 bg-background/80 backdrop-blur-md border border-foreground/10 px-6 py-4 rounded-2xl flex flex-col items-center">
+        <div className="mt-6 md:mt-0 z-10 bg-background/80 backdrop-blur-md border border-[var(--border-subtle)] px-6 py-4 rounded-2xl flex flex-col items-center">
           <span className="text-3xl font-black text-[var(--color-brand-green)]">{totalTractors}</span>
           <span className="text-[10px] uppercase font-black tracking-widest text-muted">Tractors Found</span>
         </div>
@@ -132,7 +132,7 @@ export default function TractorsListingPage() {
         
         {/* MOBILE FILTER TOGGLE */}
         <button 
-          className="lg:hidden w-full flex items-center justify-center gap-2 bg-foreground/5 py-4 rounded-2xl font-bold border border-foreground/10"
+          className="lg:hidden w-full flex items-center justify-center gap-2 bg-foreground/5 py-4 rounded-2xl font-bold border border-[var(--border-subtle)]"
           onClick={() => setShowFilters(!showFilters)}
         >
           <Filter size={18} /> {showFilters ? 'Hide Filters' : 'Show Filters'}
@@ -164,7 +164,7 @@ export default function TractorsListingPage() {
                   placeholder="Model name..."
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-                  className="w-full bg-background border border-foreground/10 rounded-xl pl-10 pr-4 py-3 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]/50 transition-colors"
+                  className="w-full bg-background border border-[var(--border-subtle)] rounded-xl pl-10 pr-4 py-3 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]/50 transition-colors"
                 />
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function TractorsListingPage() {
                     setPage(1);
                   }}
                 >
-                  <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedBrand === '' ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-foreground/20 group-hover:border-[var(--color-brand-green)]'}`}>
+                  <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedBrand === '' ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-[var(--border-subtle)] group-hover:border-[var(--color-brand-green)]'}`}>
                     {selectedBrand === '' && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
                   </div>
                   <span className={`text-sm font-bold ${selectedBrand === '' ? 'text-foreground' : 'text-muted group-hover:text-foreground'}`}>All Brands</span>
@@ -197,7 +197,7 @@ export default function TractorsListingPage() {
                       setPage(1);
                     }}
                   >
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedBrand === brand.id ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-foreground/20 group-hover:border-[var(--color-brand-green)]'}`}>
+                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedBrand === brand.id ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-[var(--border-subtle)] group-hover:border-[var(--color-brand-green)]'}`}>
                       {selectedBrand === brand.id && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
                     </div>
                     <span className={`text-sm font-bold ${selectedBrand === brand.id ? 'text-foreground' : 'text-muted group-hover:text-foreground'}`}>{brand.name}</span>
@@ -225,7 +225,7 @@ export default function TractorsListingPage() {
                         setPage(1);
                       }}
                     >
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedHp === hp.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-foreground/20 group-hover:border-[var(--color-brand-green)]'}`}>
+                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedHp === hp.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-[var(--border-subtle)] group-hover:border-[var(--color-brand-green)]'}`}>
                       {selectedHp === hp.value && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
                     </div>
                     <span className={`text-sm font-bold ${selectedHp === hp.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'}`}>{hp.label}</span>
@@ -252,7 +252,7 @@ export default function TractorsListingPage() {
                         setPage(1);
                       }}
                     >
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedDrive === drive.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-foreground/20 group-hover:border-[var(--color-brand-green)]'}`}>
+                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedDrive === drive.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-[var(--border-subtle)] group-hover:border-[var(--color-brand-green)]'}`}>
                       {selectedDrive === drive.value && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
                     </div>
                     <span className={`text-sm font-bold ${selectedDrive === drive.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'}`}>{drive.label}</span>
@@ -280,7 +280,7 @@ export default function TractorsListingPage() {
                         setPage(1);
                       }}
                     >
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedFuel === fuel.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-foreground/20 group-hover:border-[var(--color-brand-green)]'}`}>
+                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedFuel === fuel.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-[var(--border-subtle)] group-hover:border-[var(--color-brand-green)]'}`}>
                       {selectedFuel === fuel.value && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
                     </div>
                     <span className={`text-sm font-bold ${selectedFuel === fuel.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'}`}>{fuel.label}</span>
@@ -308,7 +308,7 @@ export default function TractorsListingPage() {
                         setPage(1);
                       }}
                     >
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedPrice === price.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-foreground/20 group-hover:border-[var(--color-brand-green)]'}`}>
+                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedPrice === price.value ? 'bg-[var(--color-brand-green)] border-[var(--color-brand-green)]' : 'border-[var(--border-subtle)] group-hover:border-[var(--color-brand-green)]'}`}>
                       {selectedPrice === price.value && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
                     </div>
                     <span className={`text-sm font-bold ${selectedPrice === price.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'}`}>{price.label}</span>
@@ -324,7 +324,7 @@ export default function TractorsListingPage() {
         <div className="flex-1 flex flex-col gap-6 w-full min-w-0">
           
           {/* Top Bar Actions */}
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-background/50 backdrop-blur-md p-4 border border-foreground/5 rounded-[1.5rem]">
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-background/50 backdrop-blur-md p-4 border border-[var(--border-subtle)] rounded-[1.5rem]">
             <div className="flex flex-col gap-2">
               <p className="text-sm font-bold text-muted">Showing <span className="text-foreground">{tractors.length}</span> results on this page</p>
               
@@ -391,7 +391,7 @@ export default function TractorsListingPage() {
                ))}
              </div>
           ) : tractors.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-20 text-center bg-foreground/5 rounded-[2.5rem] border border-dashed border-foreground/20">
+            <div className="flex flex-col items-center justify-center p-20 text-center bg-foreground/5 rounded-[2.5rem] border border-dashed border-[var(--border-subtle)]">
               <Tractor size={64} className="text-muted mb-4 opacity-30" strokeWidth={1} />
               <h3 className="text-2xl font-black text-foreground mb-2">No tractors found</h3>
               <p className="text-muted font-medium">Try adjusting your filters or search query.</p>
@@ -460,7 +460,7 @@ export default function TractorsListingPage() {
                       </div>
                     )}
                     
-                    <div className="h-48 w-full rounded-2xl bg-gradient-to-br from-foreground/5 to-transparent border border-foreground/5 flex items-center justify-center relative mb-6 overflow-hidden group/img p-4">
+                    <div className="h-48 w-full rounded-2xl bg-gradient-to-br from-foreground/5 to-transparent border border-[var(--border-subtle)] flex items-center justify-center relative mb-6 overflow-hidden group/img p-4">
                       {primaryImage ? (
                         <img 
                           src={primaryImage} 
@@ -506,7 +506,7 @@ export default function TractorsListingPage() {
               <button 
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${page === 1 ? 'bg-foreground/5 text-muted cursor-not-allowed' : 'bg-background border border-foreground/20 hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)] hover:shadow-lg'}`}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${page === 1 ? 'bg-foreground/5 text-muted cursor-not-allowed' : 'bg-background border border-[var(--border-subtle)] hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)] hover:shadow-lg'}`}
               >
                 <ChevronLeft size={20} strokeWidth={3} />
               </button>
@@ -537,7 +537,7 @@ export default function TractorsListingPage() {
               <button 
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page === totalPages}
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${page === totalPages ? 'bg-foreground/5 text-muted cursor-not-allowed' : 'bg-background border border-foreground/20 hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)] hover:shadow-lg'}`}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${page === totalPages ? 'bg-foreground/5 text-muted cursor-not-allowed' : 'bg-background border border-[var(--border-subtle)] hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)] hover:shadow-lg'}`}
               >
                 <ChevronRight size={20} strokeWidth={3} />
               </button>

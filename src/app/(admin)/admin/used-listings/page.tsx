@@ -50,7 +50,7 @@ export default function AdminUsedListingsPage() {
       case ListingStatus.REJECTED:
         return <span className="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-md text-xs font-black tracking-wider uppercase flex items-center gap-1 w-fit"><XCircle size={12}/> Rejected</span>;
       default:
-        return <span className="px-2.5 py-1 bg-foreground/10 text-foreground border border-foreground/20 rounded-md text-xs font-black tracking-wider uppercase flex items-center gap-1 w-fit">{status}</span>;
+        return <span className="px-2.5 py-1 bg-foreground/10 text-foreground border border-[var(--border-brand)] rounded-md text-xs font-black tracking-wider uppercase flex items-center gap-1 w-fit">{status}</span>;
     }
   };
 
@@ -74,13 +74,13 @@ export default function AdminUsedListingsPage() {
       </div>
 
       {/* Tabs & Search */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-foreground/5 p-2 rounded-2xl border border-foreground/10">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-foreground/5 p-2 rounded-2xl border border-[var(--border-subtle)]">
         <div className="flex w-full md:w-auto overflow-x-auto no-scrollbar gap-1">
           {['ALL', ListingStatus.PENDING_APPROVAL, ListingStatus.ACTIVE, ListingStatus.REJECTED].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab ? 'bg-background text-foreground shadow-sm border border-foreground/10' : 'text-muted hover:text-foreground hover:bg-foreground/5'}`}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab ? 'bg-background text-foreground shadow-sm border border-[var(--border-subtle)]' : 'text-muted hover:text-foreground hover:bg-foreground/5'}`}
             >
               {tab === 'ALL' ? 'All Listings' : tab.replace('_', ' ')}
             </button>
@@ -93,17 +93,17 @@ export default function AdminUsedListingsPage() {
             placeholder="Search listings..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-background border border-foreground/10 rounded-xl text-sm font-medium focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
+            className="w-full pl-10 pr-4 py-2.5 bg-background border border-[var(--border-subtle)] rounded-xl text-sm font-medium focus:ring-2 focus:ring-[var(--color-brand-green)] outline-none"
           />
         </div>
       </div>
 
       {/* Data Table */}
-      <div className="bg-background rounded-3xl border border-foreground/10 shadow-sm overflow-hidden">
+      <div className="bg-background rounded-3xl border border-[var(--border-subtle)] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-foreground/5 border-b border-foreground/10">
+              <tr className="bg-foreground/5 border-b border-[var(--border-subtle)]">
                 <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Tractor</th>
                 <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Price / Location</th>
                 <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Status</th>
@@ -130,7 +130,7 @@ export default function AdminUsedListingsPage() {
                   <tr key={listing.id} className="hover:bg-foreground/[0.02] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-12 rounded-lg overflow-hidden bg-foreground/10 shrink-0 border border-foreground/10">
+                        <div className="w-16 h-12 rounded-lg overflow-hidden bg-foreground/10 shrink-0 border border-[var(--border-subtle)]">
                           {listing.imageUrl ? (
                             <img src={listing.imageUrl} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -162,7 +162,7 @@ export default function AdminUsedListingsPage() {
                     <td className="px-6 py-4 text-right">
                       <Link 
                         href={`/admin/used-listings/${listing.id}`}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-lg text-sm font-bold transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 border border-[var(--border-subtle)] rounded-lg text-sm font-bold transition-colors"
                       >
                         <Eye size={16} /> Review
                       </Link>

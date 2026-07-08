@@ -61,14 +61,14 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
   const availableStates = INDIAN_STATES.filter(state => !prices.some(p => p.state === state));
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in mt-8 pt-8 border-t border-foreground/10">
+    <div className="flex flex-col gap-6 animate-fade-in mt-8 pt-8 border-t border-[var(--border-subtle)]">
       <div>
         <h2 className="text-xl font-black text-foreground mb-1">State-wise Pricing</h2>
         <p className="text-sm font-bold text-muted">Manage exact on-road price estimates per state.</p>
       </div>
 
       {/* Add New State Price */}
-      <div className="flex flex-col sm:flex-row gap-4 items-end p-4 rounded-2xl bg-foreground/5 border border-foreground/10">
+      <div className="flex flex-col sm:flex-row gap-4 items-end p-4 rounded-2xl bg-foreground/5 border border-[var(--border-subtle)]">
         <div className="flex flex-col gap-2 w-full sm:w-1/3">
           <label className="text-xs font-bold text-muted uppercase tracking-wider">Select State</label>
           <select 
@@ -106,7 +106,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
 
       {/* Existing State Prices Table */}
       {prices.length > 0 && (
-        <div className="overflow-x-auto rounded-xl border border-foreground/10">
+        <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-foreground/5 text-muted uppercase text-[10px] font-black tracking-wider">
               <tr>
@@ -118,16 +118,16 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/5 bg-background">
+            <tbody className="divide-y divide-[var(--border-subtle)] bg-background">
               {prices.map((price, idx) => (
-                <tr key={idx} className="hover:bg-foreground/5 transition-colors">
+                <tr key={idx} className="hover:bg-[var(--border-subtle)] transition-colors">
                   <td className="px-4 py-3 font-bold text-foreground">{price.state}</td>
                   <td className="px-4 py-3">
                     <input 
                       type="number" 
                       value={price.exShowroom || ''}
                       onChange={(e) => handleChange(idx, 'exShowroom', e.target.value)}
-                      className="w-full bg-transparent border-b border-dashed border-foreground/20 px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+                      className="w-full bg-transparent border-b border-dashed border-[var(--border-brand)] px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
                     />
                   </td>
                   <td className="px-4 py-3">
@@ -135,7 +135,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                       type="number" 
                       value={price.rtoCharges || ''}
                       onChange={(e) => handleChange(idx, 'rtoCharges', e.target.value)}
-                      className="w-full bg-transparent border-b border-dashed border-foreground/20 px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+                      className="w-full bg-transparent border-b border-dashed border-[var(--border-brand)] px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
                     />
                   </td>
                   <td className="px-4 py-3">
@@ -143,7 +143,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                       type="number" 
                       value={price.insuranceEst || ''}
                       onChange={(e) => handleChange(idx, 'insuranceEst', e.target.value)}
-                      className="w-full bg-transparent border-b border-dashed border-foreground/20 px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+                      className="w-full bg-transparent border-b border-dashed border-[var(--border-brand)] px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
                     />
                   </td>
                   <td className="px-4 py-3">
@@ -151,7 +151,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                       type="number" 
                       value={price.dealerCharges || ''}
                       onChange={(e) => handleChange(idx, 'dealerCharges', e.target.value)}
-                      className="w-full bg-transparent border-b border-dashed border-foreground/20 px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+                      className="w-full bg-transparent border-b border-dashed border-[var(--border-brand)] px-1 py-1 text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
                     />
                   </td>
                   <td className="px-4 py-3 text-right">

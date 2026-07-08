@@ -8,15 +8,15 @@
   --color-brand-orange-light: #d46b3f;
   
   --color-brand-charcoal: #090b0a; /* Velvety deep moss-black */
-  --color-brand-light: #fcfdfb; /* Creamy, pristine off-white */
+  --color-brand-light: #F7F9F6; /* Soft, pristine off-white/cream instead of stark white */
 
   --color-spatial-bg-light: var(--color-brand-light);
   --color-spatial-bg-dark: var(--color-brand-charcoal);
   
-  --color-spatial-text-light: #111827; /* Very sharp, premium dark charcoal */
+  --color-spatial-text-light: #1A221E; /* Rich dark slate for better reading contrast */
   --color-spatial-text-dark: #e8ebe6; /* Warm, soft off-white */
   
-  --color-spatial-muted-light: #6b7280; /* Clean, modern gray */
+  --color-spatial-muted-light: #5A6961; /* Clean, modern gray with slight green tint */
   --color-spatial-muted-dark: #829379;
   
   /* We map the previous spatial variables to the new brand colors so we don't have to rewrite the whole app */
@@ -26,63 +26,74 @@
 }
 
 :root {
+  color-scheme: light;
   --background: var(--color-spatial-bg-light);
   --foreground: var(--color-spatial-text-light);
   --muted: var(--color-spatial-muted-light);
   
+  /* Borders - Soft and invisible for light mode */
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-brand: rgba(74, 118, 53, 0.12);
+  --border-brand-alt: rgba(186, 91, 52, 0.12);
+
   /* Glass panels - Ultra Premium Light (VisionOS Style) */
-  --panel-bg: rgba(255, 255, 255, 0.45);
-  --panel-border: rgba(255, 255, 255, 0.8);
+  --panel-bg: rgba(255, 255, 255, 0.65);
+  --panel-border: var(--border-subtle);
   --panel-shadow: 
-    0 30px 60px -15px rgba(0, 0, 0, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 1),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.4);
+    0 30px 60px -15px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 1);
   
   /* Cards - Soft & floaty */
-  --card-bg: rgba(255, 255, 255, 0.55);
-  --card-border: rgba(255, 255, 255, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: var(--border-subtle);
   --card-shadow: 
-    0 15px 35px -10px rgba(0, 0, 0, 0.06),
+    0 15px 35px -10px rgba(0, 0, 0, 0.03),
     inset 0 1px 1px rgba(255, 255, 255, 1);
   --card-shadow-hover: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.12),
+    0 25px 50px -12px rgba(0, 0, 0, 0.08),
     inset 0 1px 1px rgba(255, 255, 255, 1);
     
   /* Navbar Scrolled */
-  --nav-bg-scrolled: rgba(255, 255, 255, 0.55);
+  --nav-bg-scrolled: rgba(255, 255, 255, 0.85);
   --nav-shadow-scrolled: 
-    0 15px 40px -10px rgba(0, 0, 0, 0.08),
+    0 15px 40px -10px rgba(0, 0, 0, 0.05),
     inset 0 1px 1px rgba(255, 255, 255, 1);
 }
 
 .dark {
+  color-scheme: dark;
   --background: var(--color-spatial-bg-dark);
   --foreground: var(--color-spatial-text-dark);
   --muted: var(--color-spatial-muted-dark);
   
+  /* Borders - Perfectly blended for dark mode */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-brand: rgba(74, 118, 53, 0.25);
+  --border-brand-alt: rgba(186, 91, 52, 0.25);
+
   /* Glass panels - Ultra Premium Dark (Deep & Cinematic) */
   --panel-bg: rgba(20, 26, 22, 0.45);
-  --panel-border: rgba(255, 255, 255, 0.03);
+  --panel-border: var(--border-subtle);
   --panel-shadow: 
     0 30px 80px -20px rgba(0, 0, 0, 1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.03),
     inset 0 -1px 1px rgba(0, 0, 0, 0.4);
   
   /* Cards - Deep & grounded */
   --card-bg: rgba(14, 18, 15, 0.5);
-  --card-border: rgba(255, 255, 255, 0.02);
+  --card-border: var(--border-subtle);
   --card-shadow: 
-    0 15px 40px -10px rgba(0, 0, 0, 0.9),
-    inset 0 1px 1px rgba(255, 255, 255, 0.03);
+    0 15px 40px -10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.02);
   --card-shadow-hover: 
-    0 25px 60px -15px rgba(0, 0, 0, 1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.06);
+    0 25px 60px -15px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(255, 255, 255, 0.04);
     
   /* Navbar Scrolled */
-  --nav-bg-scrolled: rgba(9, 11, 10, 0.65);
+  --nav-bg-scrolled: rgba(9, 11, 10, 0.75);
   --nav-shadow-scrolled: 
-    0 20px 60px -15px rgba(0, 0, 0, 1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.04);
+    0 20px 60px -15px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(255, 255, 255, 0.03);
 }
 
 body {
@@ -142,15 +153,45 @@ body::after {
 }
 
 /* 
-  Spatial Panel: Huge immersive frosted glass 
+  Glass Panel: Immersive Vision Pro style
 */
-@utility spatial-panel {
-  backdrop-filter: blur(40px) saturate(120%);
-  -webkit-backdrop-filter: blur(40px) saturate(120%);
+@utility glass-panel {
+  backdrop-filter: blur(48px);
+  -webkit-backdrop-filter: blur(48px);
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   box-shadow: var(--panel-shadow);
-  border-radius: 2rem;
+  border-radius: 1.5rem; /* 3xl */
+}
+
+@utility glass-inner {
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: 1rem; /* 2xl */
+}
+
+@utility glass-button {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: 9999px; /* full */
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  
+  &:hover {
+    background: var(--panel-bg);
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+}
+
+@utility spatial-background {
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 /* 
@@ -242,3 +283,12 @@ body::after {
 
 .dark .logo-light { display: none; }
 .dark .logo-dark { display: block; }
+
+/* Hide scrollbars globally */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

@@ -87,7 +87,7 @@ export default function TractorPriceByStatePage() {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/5">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted font-bold">Loading pricing data...</td>
@@ -150,7 +150,7 @@ export default function TractorPriceByStatePage() {
                               <h2 className="text-xl font-black text-foreground uppercase tracking-tight">On-Road Price Breakdown</h2>
                             </div>
                             
-                            <div className="bg-background rounded-2xl border border-foreground/10 p-6 shadow-sm">
+                            <div className="bg-background rounded-2xl border border-[var(--border-subtle)] p-6 shadow-sm">
                               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                                 
                                 {/* Base Price */}
@@ -215,7 +215,7 @@ export default function TractorPriceByStatePage() {
                             
                             {item.dealerCharges > 0 && (
                               <div className="flex justify-end mt-2">
-                                <span className="text-xs font-bold text-muted bg-foreground/5 px-3 py-1.5 rounded-lg border border-foreground/10">
+                                <span className="text-xs font-bold text-muted bg-foreground/5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)]">
                                   * Note: Includes Dealer Charges of {formatPrice(item.dealerCharges)}
                                 </span>
                               </div>
@@ -233,7 +233,7 @@ export default function TractorPriceByStatePage() {
         </div>
 
         {/* Simplified pagination area - adjust if API natively supports page mapping later */}
-        <div className="mt-auto p-4 border-t border-foreground/5 flex items-center justify-between z-10 bg-background relative">
+        <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between z-10 bg-background relative">
           <button 
             disabled={page === 1}
             onClick={() => setPage(p => p - 1)}

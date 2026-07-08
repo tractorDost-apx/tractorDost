@@ -16,7 +16,7 @@ export default function MyEnquiriesPage() {
 
       <div className="space-y-4">
         {dummyEnquiries.map((enq) => (
-          <div key={enq.id} className="glass-panel p-6 rounded-2xl border border-foreground/5 hover:border-[var(--color-brand-green)]/30 transition-colors cursor-pointer group">
+          <div key={enq.id} className="glass-panel p-6 rounded-2xl border border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/30 transition-colors cursor-pointer group">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
               <div>
                 <h3 className="font-bold text-foreground text-lg flex items-center gap-2">
@@ -34,7 +34,7 @@ export default function MyEnquiriesPage() {
               </div>
             </div>
             
-            <div className="bg-foreground/5 rounded-xl p-4 flex gap-3">
+            <div className="bg-[var(--border-subtle)] rounded-xl p-4 flex gap-3">
               <MessageSquareText size={20} className="text-muted flex-shrink-0 mt-0.5" />
               <p className="text-foreground text-sm font-medium leading-relaxed">"{enq.message}"</p>
             </div>

@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
+import { LayoutOrchestrator } from '@/components/layout/LayoutOrchestrator';
 import { AuthProvider } from '@/store/AuthContext';
 
 const geistSans = Geist({
@@ -47,11 +46,9 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-screen flex-col relative overflow-x-hidden selection:bg-[var(--color-spatial-accent-blue)] selection:text-white">
         <AuthProvider>
-          <Navbar />
-          <main className="flex-1 pt-28 pb-12 z-10 flex flex-col px-4 sm:px-8 lg:px-12">
+          <LayoutOrchestrator>
             {children}
-          </main>
-          <Footer />
+          </LayoutOrchestrator>
         </AuthProvider>
       </body>
     </html>
