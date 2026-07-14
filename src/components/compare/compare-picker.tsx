@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Plus, Tractor as TractorIcon, ArrowRightLeft } from 'lucide-react';
 import { tractorAPI, Tractor } from '@/lib/api/tractors';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface ComparePickerProps {
   onCompare: (tractorIds: number[]) => void;
@@ -147,8 +148,8 @@ export default function ComparePicker({ onCompare, initialIds = [] }: ComparePic
               className="w-full h-14 pl-12 pr-4 bg-background border-2 border-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] rounded-2xl text-lg font-bold shadow-[0_0_20px_rgba(var(--color-brand-green-rgb),0.1)] outline-none"
             />
             {isSearching && (
-              <div className="absolute inset-y-0 right-4 flex items-center text-muted">
-                <div className="w-4 h-4 border-2 border-muted border-t-transparent rounded-full animate-spin" />
+              <div className="absolute inset-y-0 right-4 flex items-center text-[var(--color-brand-green)]">
+                <TractorLoader size={20} />
               </div>
             )}
           </div>

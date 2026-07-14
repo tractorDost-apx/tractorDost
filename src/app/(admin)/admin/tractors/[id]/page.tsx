@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import TractorForm from '../components/TractorForm';
 import { tractorAPI, Tractor } from '@/lib/api/tractors';
-import { Loader2 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export default function EditTractorPage() {
   const params = useParams();
@@ -39,8 +39,8 @@ export default function EditTractorPage() {
   if (loading) {
     return (
       <div className="w-full h-[60vh] flex flex-col items-center justify-center gap-4 text-muted">
-        <Loader2 size={32} className="animate-spin text-[var(--color-brand-green)]" />
-        <p className="font-bold">Loading Tractor Details...</p>
+        <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
+        <p className="font-bold mt-2">Loading Tractor Details...</p>
       </div>
     );
   }

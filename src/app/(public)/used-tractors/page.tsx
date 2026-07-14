@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usedTractorAPI, UsedTractorListing, ConditionGrade } from '@/lib/api/usedTractors';
+import { usedTractorListingAPI } from '@/lib/api/used-listings';
+import { UsedTractorListing, ConditionGrade } from '@/lib/api/usedTractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { Search, MapPin, Filter, LayoutList, Calendar, Gauge, User, CheckCircle2, CircleDollarSign, X, MessageCircle, Info, Phone, ShieldCheck, ChevronRight } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 
 export default function UsedTractorsPage() {
@@ -63,32 +65,49 @@ export default function UsedTractorsPage() {
     const fetchTractors = async () => {
       setLoading(true);
       try {
-        const res = await usedTractorAPI.getAllListings({
-          search: searchQuery,
-          brand: selectedBrand || undefined,
+        const res = await usedTractorListingAPI.getAllListings({
+          tractorBrand: selectedBrand || undefined,
           state: selectedState || undefined,
-          maxPrice: maxPrice,
-          isCertified: isCertified,
-          financeAvailable: financeAvailable,
-          rcAvailable: rcAvailable,
-          maxHoursUsed: maxHours,
-          minYear: minYear,
-          ownership: ownership
+          priceMax: maxPrice || undefined,
+          isCertified: isCertified ? true : undefined,
+          financeAvailable: financeAvailable ? true : undefined,
+          yearMin: minYear || undefined
         });
         
-        if (res.success && Array.isArray(res.data)) {
-          let data = res.data;
+        if (res.success) {
+          // The backend wraps the array in a paginated object: res.data = { data: [...], total: ... }
+          const dataArray = Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
+          let data = [...dataArray];
           
+          // Apply Frontend Filters (For fields not supported by backend schema)
+          if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            data = data.filter(t => 
+              (t.tractorBrand || '').toLowerCase().includes(query) || 
+              (t.tractorModel || '').toLowerCase().includes(query) ||
+              (t.villageCity || '').toLowerCase().includes(query)
+            );
+          }
+          if (rcAvailable) {
+            data = data.filter(t => t.rcAvailable === true);
+          }
+          if (maxHours) {
+            data = data.filter(t => (t.hoursUsed || 0) <= maxHours);
+          }
+          if (ownership) {
+            data = data.filter(t => t.ownership === ownership);
+          }
+
           // Apply Frontend Sort
           if (sortBy === 'price_low') {
-            data = data.sort((a, b) => a.askingPrice - b.askingPrice);
+            data = data.sort((a: UsedTractorListing, b: UsedTractorListing) => (a.askingPrice || 0) - (b.askingPrice || 0));
           } else if (sortBy === 'price_high') {
-            data = data.sort((a, b) => b.askingPrice - a.askingPrice);
+            data = data.sort((a: UsedTractorListing, b: UsedTractorListing) => (b.askingPrice || 0) - (a.askingPrice || 0));
           } else if (sortBy === 'hours_low') {
-            data = data.sort((a, b) => (a.hoursUsed || 99999) - (b.hoursUsed || 99999));
+            data = data.sort((a: UsedTractorListing, b: UsedTractorListing) => (a.hoursUsed || 99999) - (b.hoursUsed || 99999));
           } else {
             // Recent (Mock sorting by ID descending)
-            data = data.sort((a, b) => b.id - a.id);
+            data = data.sort((a: UsedTractorListing, b: UsedTractorListing) => b.id - a.id);
           }
 
           setTractors(data);
@@ -130,7 +149,7 @@ export default function UsedTractorsPage() {
         
         {/* Left Column: Filters */}
         <div className="w-full lg:w-1/4 flex flex-col gap-6 animate-slide-in">
-          <div className="spatial-panel rounded-3xl p-6 sticky top-24 border border-[var(--border-subtle)] bg-background/50 backdrop-blur-xl shadow-xl shadow-[var(--color-brand-green)]/5">
+          <div className="bg-[var(--card-bg)] rounded-3xl p-6 sticky top-24 border border-[var(--border-subtle)] backdrop-blur-3xl shadow-[var(--card-shadow)]">
             <div className="flex items-center justify-between mb-6 text-foreground font-black">
               <div className="flex items-center gap-2">
                 <Filter size={18} className="text-[var(--color-brand-green)]" />
@@ -260,7 +279,7 @@ export default function UsedTractorsPage() {
               <div className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                 <button 
                   onClick={() => setSelectedBrand(null)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${!selectedBrand ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' : 'border-transparent bg-foreground/5 text-foreground hover:bg-foreground/10'}`}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 text-left ${!selectedBrand ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' : 'border-transparent bg-foreground/5 text-foreground hover:bg-background/80 hover:shadow-sm'}`}
                 >
                   <span className="font-bold text-sm">All Brands</span>
                 </button>
@@ -268,7 +287,7 @@ export default function UsedTractorsPage() {
                   <button 
                     key={brand.id}
                     onClick={() => setSelectedBrand(brand.name)}
-                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${selectedBrand === brand.name ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' : 'border-transparent bg-foreground/5 text-foreground hover:bg-foreground/10'}`}
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 text-left ${selectedBrand === brand.name ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' : 'border-transparent bg-foreground/5 text-foreground hover:bg-background/80 hover:shadow-sm'}`}
                   >
                     {brand.logoUrl ? (
                        <img src={brand.logoUrl} alt={brand.name} className="w-6 h-6 object-contain mix-blend-multiply dark:mix-blend-normal bg-white rounded-sm p-0.5" />
@@ -287,7 +306,7 @@ export default function UsedTractorsPage() {
         <div className="w-full lg:w-3/4">
           
           {/* Top Control Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 animate-fade-in bg-foreground/5 p-2 rounded-2xl">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 animate-fade-in bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--border-subtle)] shadow-[var(--card-shadow)] p-3 rounded-[1.5rem]">
             <div className="flex items-center gap-2 w-full sm:w-auto px-4">
               <span className="text-sm font-black text-muted uppercase tracking-widest">
                 <span className="text-foreground text-lg">{tractors.length}</span> Tractors Found
@@ -316,10 +335,10 @@ export default function UsedTractorsPage() {
 
           {loading ? (
             <div className="w-full flex justify-center py-32">
-              <div className="w-12 h-12 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+              <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
             </div>
           ) : tractors.length === 0 ? (
-            <div className="spatial-panel rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in border border-[var(--border-subtle)] bg-background/50 backdrop-blur-xl">
+            <div className="bg-[var(--card-bg)] backdrop-blur-3xl shadow-[var(--card-shadow)] rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in border border-[var(--border-subtle)]">
                <Search size={64} className="text-muted mb-6 opacity-40" />
                <h3 className="text-2xl font-black text-foreground mb-3">No Tractors Found</h3>
                <p className="text-muted font-bold text-base max-w-md mb-8">We couldn't find any used tractors matching your specific criteria. Try broadening your search.</p>
@@ -338,7 +357,7 @@ export default function UsedTractorsPage() {
             // LISTINGS VIEW
             <div className="flex flex-col gap-6 animate-fade-in">
               {tractors.map((tractor) => (
-                <div key={tractor.id} className="spatial-panel rounded-[2rem] p-4 sm:p-6 flex flex-col md:flex-row gap-6 border border-[var(--border-subtle)] bg-background/50 hover:bg-foreground/[0.02] hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5 backdrop-blur-xl transition-all duration-300 group overflow-hidden relative">
+                <div key={tractor.id} className="bg-[var(--card-bg)] backdrop-blur-3xl rounded-[2rem] p-4 sm:p-6 flex flex-col md:flex-row gap-6 border border-[var(--border-subtle)] shadow-[var(--card-shadow)] hover:-translate-y-1 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/10 transition-all duration-400 group overflow-hidden relative">
                   
                   {tractor.isCertified && (
                      <div className="absolute top-0 right-0 bg-[var(--color-brand-green)] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-2xl z-10 shadow-md">
@@ -400,7 +419,7 @@ export default function UsedTractorsPage() {
                         </div>
                         <div className="bg-foreground/5 rounded-xl p-3 flex flex-col justify-center">
                           <span className="text-[10px] uppercase font-black tracking-widest text-muted flex items-center gap-1.5 mb-1"><Info size={12}/> Condition</span>
-                          <span className="font-black text-sm capitalize">{tractor.conditionGrade.toLowerCase()}</span>
+                          <span className="font-black text-sm capitalize">{(tractor.conditionGrade || 'N/A').toLowerCase()}</span>
                         </div>
                         <div className="bg-foreground/5 rounded-xl p-3 flex flex-col justify-center">
                           <span className="text-[10px] uppercase font-black tracking-widest text-muted flex items-center gap-1.5 mb-1">Engine</span>

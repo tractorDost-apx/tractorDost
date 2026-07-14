@@ -3,7 +3,6 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
   withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
 });
 
 // Add a request interceptor to attach the Bearer token from cookies

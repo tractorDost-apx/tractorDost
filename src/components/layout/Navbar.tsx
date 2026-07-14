@@ -30,7 +30,7 @@ export function Navbar() {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  const isDashboardRoute = pathname?.startsWith('/dashboard') || pathname?.startsWith('/admin') || pathname?.startsWith('/dealer');
+  const isDashboardRoute = pathname?.startsWith('/dashboard') || pathname?.startsWith('/admin') || pathname?.startsWith('/dealer') || pathname?.startsWith('/agent');
 
   if (isDashboardRoute) {
     return <DashboardNavbar />;
@@ -40,7 +40,7 @@ export function Navbar() {
     <>
       <div className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4 md:px-6 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'top-2' : 'top-6'}`}>
         <nav
-          className={`spatial-panel !rounded-2xl flex items-center justify-between px-6 py-2.5 w-full max-w-[1380px] pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'shadow-[var(--nav-shadow-scrolled)] border-[var(--border-subtle)]' : 'shadow-none border-[var(--border-subtle)] bg-background/40 backdrop-blur-md'}`}
+          className={`spatial-panel !rounded-2xl flex items-center justify-between px-6 py-2.5 w-full max-w-[1380px] pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'shadow-[var(--nav-shadow-scrolled)] border-[var(--border-subtle)] bg-[var(--panel-bg)] backdrop-blur-2xl' : 'shadow-none border-[var(--border-subtle)] bg-background/40 backdrop-blur-md'}`}
         >
 
           {/* Logo */}

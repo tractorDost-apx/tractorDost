@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronRight, ChevronLeft, MapPin, CheckCircle2, Shield, Calendar, Wrench, CircleDollarSign, Share2, Flame, Star, Tractor as TractorIcon, ArrowLeft, Download, Play, Percent } from 'lucide-react';
 import { tractorAPI, Tractor as TractorModel } from '@/lib/api/tractors';
 import { compareAPI, CompareFrequencyRecord } from '@/lib/api/compare';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export default function TractorDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -86,7 +87,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center pt-20 pb-20">
-        <div className="w-16 h-16 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+        <TractorLoader size={64} className="text-[var(--color-brand-green)]" />
       </div>
     );
   }
@@ -215,159 +216,104 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                  <div className="flex flex-col gap-6">
                     <h3 className="text-xl font-black text-foreground">Detailed Specifications</h3>
                     
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-[var(--color-brand-green)]">Engine & Performance</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Fuel Type" value={tractor.fuelType} />
-                         <SpecRow label="Engine CC" value={tractor.spec?.engineCc ? `${tractor.spec?.engineCc} CC` : undefined} />
-                         <SpecRow label="Cylinders" value={tractor.spec?.cylinders} />
-                         <SpecRow label="Rated RPM" value={tractor.spec?.ratedRpm} />
-                         <SpecRow label="Max Torque (Nm)" value={tractor.spec?.maxTorqueNm} />
-                         <SpecRow label="Cooling Type" value={tractor.spec?.coolingType?.replace(/_/g, ' ')} />
-                         <SpecRow label="Aspiration" value={tractor.spec?.aspiration} />
-                         <SpecRow label="Air Filter Type" value={tractor.spec?.airFilterType} />
-                         <SpecRow label="Fuel Injection Type" value={tractor.spec?.fuelInjectionType} />
-                         <SpecRow label="Governor Type" value={tractor.spec?.governorType} />
-                         <SpecRow label="Engine Oil Capacity (L)" value={tractor.spec?.engineOilCapacityL} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Engine & Performance" titleColorClass="text-[var(--color-brand-green)]" defaultOpen={true}>
+                        <SpecRow label="Fuel Type" value={tractor.fuelType} />
+                        <SpecRow label="Engine CC" value={tractor.spec?.engineCc ? `${tractor.spec?.engineCc} CC` : undefined} />
+                        <SpecRow label="Cylinders" value={tractor.spec?.cylinders} />
+                        <SpecRow label="Rated RPM" value={tractor.spec?.ratedRpm} />
+                        <SpecRow label="Max Torque (Nm)" value={tractor.spec?.maxTorqueNm} />
+                        <SpecRow label="Cooling Type" value={tractor.spec?.coolingType?.replace(/_/g, ' ')} />
+                        <SpecRow label="Aspiration" value={tractor.spec?.aspiration} />
+                        <SpecRow label="Air Filter Type" value={tractor.spec?.airFilterType} />
+                        <SpecRow label="Fuel Injection Type" value={tractor.spec?.fuelInjectionType} />
+                        <SpecRow label="Governor Type" value={tractor.spec?.governorType} />
+                        <SpecRow label="Engine Oil Capacity (L)" value={tractor.spec?.engineOilCapacityL} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-[var(--color-brand-orange)]">Transmission</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Drive Type" value={tractor.driveType?.replace('_', ' ')} />
-                         <SpecRow label="Gearbox Type" value={tractor.spec?.gearboxType?.replace(/_/g, ' ')} />
-                         <SpecRow label="Clutch Type" value={tractor.spec?.clutchType?.replace(/_/g, ' ')} />
-                         <SpecRow label="Forward Gears" value={tractor.spec?.forwardGears} />
-                         <SpecRow label="Reverse Gears" value={tractor.spec?.reverseGears} />
-                         <SpecRow label="Max Speed Fwd (Kmph)" value={tractor.spec?.maxSpeedFwdKmph} />
-                         <SpecRow label="Max Speed Rev (Kmph)" value={tractor.spec?.maxSpeedRevKmph} />
-                         <SpecRow label="Has Creeper" value={tractor.spec?.hasCreeper} />
-                         <SpecRow label="Has Shuttle" value={tractor.spec?.hasShuttle} />
-                         <SpecRow label="Differential Lock" value={tractor.spec?.differentialLock} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Transmission" titleColorClass="text-[var(--color-brand-orange)]">
+                        <SpecRow label="Drive Type" value={tractor.driveType?.replace('_', ' ')} />
+                        <SpecRow label="Gearbox Type" value={tractor.spec?.gearboxType?.replace(/_/g, ' ')} />
+                        <SpecRow label="Clutch Type" value={tractor.spec?.clutchType?.replace(/_/g, ' ')} />
+                        <SpecRow label="Forward Gears" value={tractor.spec?.forwardGears} />
+                        <SpecRow label="Reverse Gears" value={tractor.spec?.reverseGears} />
+                        <SpecRow label="Max Speed Fwd (Kmph)" value={tractor.spec?.maxSpeedFwdKmph} />
+                        <SpecRow label="Max Speed Rev (Kmph)" value={tractor.spec?.maxSpeedRevKmph} />
+                        <SpecRow label="Has Creeper" value={tractor.spec?.hasCreeper} />
+                        <SpecRow label="Has Shuttle" value={tractor.spec?.hasShuttle} />
+                        <SpecRow label="Differential Lock" value={tractor.spec?.differentialLock} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-blue-500">Power Take Off (PTO)</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="PTO Type" value={tractor.spec?.ptoType?.replace(/_/g, ' ')} />
-                         <SpecRow label="PTO HP" value={tractor.spec?.ptoHp ? `${tractor.spec?.ptoHp} HP` : undefined} />
-                         <SpecRow label="PTO RPM" value={tractor.spec?.ptoRpm} />
-                         <SpecRow label="PTO RPM Options" value={tractor.spec?.ptoRpmOptions} />
-                         <SpecRow label="PTO Shaft Type" value={tractor.spec?.ptoShaftType} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Power Take Off (PTO)" titleColorClass="text-blue-500">
+                        <SpecRow label="PTO Type" value={tractor.spec?.ptoType?.replace(/_/g, ' ')} />
+                        <SpecRow label="PTO HP" value={tractor.spec?.ptoHp ? `${tractor.spec?.ptoHp} HP` : undefined} />
+                        <SpecRow label="PTO RPM" value={tractor.spec?.ptoRpm} />
+                        <SpecRow label="PTO RPM Options" value={tractor.spec?.ptoRpmOptions} />
+                        <SpecRow label="PTO Shaft Type" value={tractor.spec?.ptoShaftType} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-purple-500">Hydraulics</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Hydraulics Type" value={tractor.spec?.hydraulicsType?.replace(/_/g, ' ')} />
-                         <SpecRow label="Lifting Capacity (Kg)" value={tractor.spec?.liftingCapacityKg ? `${tractor.spec?.liftingCapacityKg} Kg` : undefined} />
-                         <SpecRow label="Pump Flow Rate (LPM)" value={tractor.spec?.pumpFlowRateLpm} />
-                         <SpecRow label="Linkage Category" value={tractor.spec?.linkageCategory} />
-                         <SpecRow label="Aux Hydraulic Ports" value={tractor.spec?.auxHydraulicPorts} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Hydraulics" titleColorClass="text-purple-500">
+                        <SpecRow label="Hydraulics Type" value={tractor.spec?.hydraulicsType?.replace(/_/g, ' ')} />
+                        <SpecRow label="Lifting Capacity (Kg)" value={tractor.spec?.liftingCapacityKg ? `${tractor.spec?.liftingCapacityKg} Kg` : undefined} />
+                        <SpecRow label="Pump Flow Rate (LPM)" value={tractor.spec?.pumpFlowRateLpm} />
+                        <SpecRow label="Linkage Category" value={tractor.spec?.linkageCategory} />
+                        <SpecRow label="Aux Hydraulic Ports" value={tractor.spec?.auxHydraulicPorts} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-rose-500">Steering & Brakes</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Steering Type" value={tractor.spec?.steeringType?.replace(/_/g, ' ')} />
-                         <SpecRow label="Brake Type" value={tractor.spec?.brakeType?.replace(/_/g, ' ')} />
-                         <SpecRow label="Parking Brake" value={tractor.spec?.parkingBrake} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Steering & Brakes" titleColorClass="text-rose-500">
+                        <SpecRow label="Steering Type" value={tractor.spec?.steeringType?.replace(/_/g, ' ')} />
+                        <SpecRow label="Brake Type" value={tractor.spec?.brakeType?.replace(/_/g, ' ')} />
+                        <SpecRow label="Parking Brake" value={tractor.spec?.parkingBrake} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-amber-500">Dimensions & Weight</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Overall Length (mm)" value={tractor.spec?.overallLengthMm} />
-                         <SpecRow label="Overall Width (mm)" value={tractor.spec?.overallWidthMm} />
-                         <SpecRow label="Overall Height (mm)" value={tractor.spec?.overallHeightMm} />
-                         <SpecRow label="Wheelbase (mm)" value={tractor.spec?.wheelbaseMm} />
-                         <SpecRow label="Ground Clearance (mm)" value={tractor.spec?.groundClearanceMm} />
-                         <SpecRow label="Turning Radius (m)" value={tractor.spec?.turningRadiusM} />
-                         <SpecRow label="Total Weight (Kg)" value={tractor.spec?.totalWeightKg} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Dimensions & Weight" titleColorClass="text-amber-500">
+                        <SpecRow label="Overall Length (mm)" value={tractor.spec?.overallLengthMm} />
+                        <SpecRow label="Overall Width (mm)" value={tractor.spec?.overallWidthMm} />
+                        <SpecRow label="Overall Height (mm)" value={tractor.spec?.overallHeightMm} />
+                        <SpecRow label="Wheelbase (mm)" value={tractor.spec?.wheelbaseMm} />
+                        <SpecRow label="Ground Clearance (mm)" value={tractor.spec?.groundClearanceMm} />
+                        <SpecRow label="Turning Radius (m)" value={tractor.spec?.turningRadiusM} />
+                        <SpecRow label="Total Weight (Kg)" value={tractor.spec?.totalWeightKg} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-teal-500">Tyres</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Front Tyre Size" value={tractor.spec?.frontTyreSize} />
-                         <SpecRow label="Rear Tyre Size" value={tractor.spec?.rearTyreSize} />
-                         <SpecRow label="Tyre Type" value={tractor.spec?.tyreType} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Tyres" titleColorClass="text-teal-500">
+                        <SpecRow label="Front Tyre Size" value={tractor.spec?.frontTyreSize} />
+                        <SpecRow label="Rear Tyre Size" value={tractor.spec?.rearTyreSize} />
+                        <SpecRow label="Tyre Type" value={tractor.spec?.tyreType} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-indigo-500">Fuel & Electrical</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Fuel Tank Capacity (L)" value={tractor.spec?.fuelTankCapacityL} />
-                         <SpecRow label="Fuel Consumption (Lph)" value={tractor.spec?.fuelConsumptionLph} />
-                         <SpecRow label="Battery Voltage" value={tractor.spec?.batteryVoltage} />
-                         <SpecRow label="Battery Ah" value={tractor.spec?.batteryAh} />
-                         <SpecRow label="Alternator Amps" value={tractor.spec?.alternatorAmps} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Fuel & Electrical" titleColorClass="text-indigo-500">
+                        <SpecRow label="Fuel Tank Capacity (L)" value={tractor.spec?.fuelTankCapacityL} />
+                        <SpecRow label="Fuel Consumption (Lph)" value={tractor.spec?.fuelConsumptionLph} />
+                        <SpecRow label="Battery Voltage" value={tractor.spec?.batteryVoltage} />
+                        <SpecRow label="Battery Ah" value={tractor.spec?.batteryAh} />
+                        <SpecRow label="Alternator Amps" value={tractor.spec?.alternatorAmps} />
+                    </AccordionSection>
 
                     {tractor.spec?.batteryCapacityKwh && (
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-lime-500">Electric Tractor</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Battery Capacity (kWh)" value={tractor.spec?.batteryCapacityKwh} />
-                         <SpecRow label="Motor kW" value={tractor.spec?.motorKw} />
-                         <SpecRow label="Charging Time (Hours)" value={tractor.spec?.chargingTimeHours} />
-                         <SpecRow label="Range per Charge (km)" value={tractor.spec?.rangePerChargeKm} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Electric Tractor" titleColorClass="text-lime-500">
+                        <SpecRow label="Battery Capacity (kWh)" value={tractor.spec?.batteryCapacityKwh} />
+                        <SpecRow label="Motor kW" value={tractor.spec?.motorKw} />
+                        <SpecRow label="Charging Time (Hours)" value={tractor.spec?.chargingTimeHours} />
+                        <SpecRow label="Range per Charge (km)" value={tractor.spec?.rangePerChargeKm} />
+                    </AccordionSection>
                     )}
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Maintenance & Service</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="Warranty Years" value={tractor.spec?.warrantyYears} />
-                         <SpecRow label="Warranty Hours" value={tractor.spec?.warrantyHours} />
-                         <SpecRow label="First Service Hours" value={tractor.spec?.firstServiceHours} />
-                         <SpecRow label="Regular Service Interval (H)" value={tractor.spec?.regularServiceIntervalH} />
-                         <SpecRow label="Oil Change Interval (H)" value={tractor.spec?.oilChangeIntervalH} />
-                         <SpecRow label="Engine Oil Spec" value={tractor.spec?.engineOilSpec} />
-                         <SpecRow label="Coolant Type" value={tractor.spec?.coolantType} />
-                         <SpecRow label="Annual Service Cost Estimate" value={tractor.spec?.annualServiceCostEstimate ? `₹${tractor.spec?.annualServiceCostEstimate}` : undefined} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Maintenance & Service" titleColorClass="text-slate-500">
+                        <SpecRow label="Warranty Years" value={tractor.spec?.warrantyYears} />
+                        <SpecRow label="Warranty Hours" value={tractor.spec?.warrantyHours} />
+                        <SpecRow label="First Service Hours" value={tractor.spec?.firstServiceHours} />
+                        <SpecRow label="Regular Service Interval (H)" value={tractor.spec?.regularServiceIntervalH} />
+                        <SpecRow label="Oil Change Interval (H)" value={tractor.spec?.oilChangeIntervalH} />
+                        <SpecRow label="Engine Oil Spec" value={tractor.spec?.engineOilSpec} />
+                        <SpecRow label="Coolant Type" value={tractor.spec?.coolantType} />
+                        <SpecRow label="Annual Service Cost Estimate" value={tractor.spec?.annualServiceCostEstimate ? `₹${tractor.spec?.annualServiceCostEstimate}` : undefined} />
+                    </AccordionSection>
 
-                    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-                       <div className="bg-foreground/5 px-6 py-3 border-b border-[var(--border-subtle)]">
-                         <h4 className="text-xs font-black uppercase tracking-widest text-fuchsia-500">Optional Features</h4>
-                       </div>
-                       <div className="flex flex-col divide-y divide-foreground/5 bg-background">
-                         <SpecRow label="AC Cabin" value={tractor.spec?.hasAcCabin} />
-                         <SpecRow label="GPS" value={tractor.spec?.hasGps} />
-                         <SpecRow label="TPMS" value={tractor.spec?.hasTpms} />
-                       </div>
-                    </div>
+                    <AccordionSection title="Optional Features" titleColorClass="text-fuchsia-500">
+                        <SpecRow label="AC Cabin" value={tractor.spec?.hasAcCabin} />
+                        <SpecRow label="GPS" value={tractor.spec?.hasGps} />
+                        <SpecRow label="TPMS" value={tractor.spec?.hasTpms} />
+                    </AccordionSection>
                  </div>
                </div>
              )}
@@ -625,6 +571,29 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
         <button className="bg-[var(--color-brand-green)] hover:bg-[var(--color-brand-orange)] text-white font-black px-6 py-3 rounded-xl shadow-lg transition-colors flex items-center gap-2">
           Get Best Deal <ChevronRight size={16} strokeWidth={3} />
         </button>
+      </div>
+    </div>
+  );
+}
+
+function AccordionSection({ title, children, titleColorClass, defaultOpen = false }: { title: string; children: React.ReactNode; titleColorClass: string; defaultOpen?: boolean }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <div className="border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+      <button 
+        type="button"
+        onClick={() => setIsOpen(!isOpen)} 
+        className="w-full bg-foreground/5 px-6 py-4 flex items-center justify-between hover:bg-foreground/10 transition-colors"
+      >
+        <h4 className={`text-xs font-black uppercase tracking-widest ${titleColorClass}`}>{title}</h4>
+        <ChevronRight size={16} className={`text-muted transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`} />
+      </button>
+      <div 
+        className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+      >
+        <div className="overflow-hidden flex flex-col divide-y divide-foreground/5 bg-background">
+          {children}
+        </div>
       </div>
     </div>
   );

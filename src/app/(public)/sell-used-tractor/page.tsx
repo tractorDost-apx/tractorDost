@@ -2,20 +2,25 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { usedTractorAPI, ConditionGrade, UrgencyLevel, UsedTractorListing } from '@/lib/api/usedTractors';
+import { usedTractorListingAPI } from '@/lib/api/used-listings';
+import { usedTractorDocumentAPI } from '@/lib/api/used-documents';
+import { ConditionGrade, UrgencyLevel, UsedTractorListing } from '@/lib/api/usedTractors';
 import { brandAPI } from '@/lib/api/brands';
-import { 
-  Tractor, 
-  MapPin, 
-  Wrench, 
-  IndianRupee, 
-  FileText, 
+import { useAuth } from '@/store/AuthContext';
+import {
+  Tractor,
+  MapPin,
+  Wrench,
+  IndianRupee,
+  FileText,
   CheckCircle2,
   ChevronRight,
   ChevronLeft,
   UploadCloud,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Image as ImageIcon,
+  XCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -23,17 +28,20 @@ const STEPS = [
   { id: 1, title: 'Basics & Location', icon: <Tractor size={20} /> },
   { id: 2, title: 'Condition Details', icon: <Wrench size={20} /> },
   { id: 3, title: 'Pricing & Docs', icon: <IndianRupee size={20} /> },
-  { id: 4, title: 'Description', icon: <FileText size={20} /> }
+  { id: 4, title: 'Description & Photos', icon: <FileText size={20} /> }
 ];
 
 export default function SellUsedTractorPage() {
   const router = useRouter();
-  
+
   // State
+  const { isAuthenticated } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
+  
+  const [tractorPhotos, setTractorPhotos] = useState<File[]>([]);
 
   // Form Data
   const [formData, setFormData] = useState<Partial<UsedTractorListing>>({
@@ -45,20 +53,20 @@ export default function SellUsedTractorPage() {
     state: '',
     district: '',
     villageCity: '',
-    
+
     conditionGrade: ConditionGrade.GOOD,
     tyreCondition: ConditionGrade.GOOD,
     engineConditionPct: 90,
     hydraulicsCondition: ConditionGrade.GOOD,
     bodyCondition: ConditionGrade.GOOD,
-    
+
     askingPrice: 0,
     negotiable: true,
     financeAvailable: false,
     rcAvailable: true,
     loanClearanceStatus: 'CLEAR',
     urgency: UrgencyLevel.NO_RUSH,
-    
+
     description: '',
     majorRepairs: ''
   });
@@ -75,10 +83,10 @@ export default function SellUsedTractorPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
+
     let parsedValue: any = value;
-    
-    if (type === 'number' || type === 'range') {
+
+    if (type === 'number' || type === 'range' || name === 'ownership') {
       parsedValue = Number(value);
     } else if (type === 'checkbox') {
       parsedValue = (e.target as HTMLInputElement).checked;
@@ -91,27 +99,78 @@ export default function SellUsedTractorPage() {
   };
 
   const handleNext = () => {
+    setError('');
+    
+    // Step 1 Validation
+    if (currentStep === 1) {
+      if (!formData.tractorBrand || !formData.tractorModel || !formData.state || !formData.district || !formData.villageCity) {
+        setError('Please fill in all required fields (Brand, Model, State, District, Village/City).');
+        return;
+      }
+      if (!formData.yearOfManufacture || formData.yearOfManufacture < 1980 || formData.yearOfManufacture > new Date().getFullYear()) {
+        setError('Please enter a valid Year of Manufacture.');
+        return;
+      }
+    }
+
+    // Step 3 Validation
+    if (currentStep === 3) {
+      if (formData.askingPrice === undefined || formData.askingPrice === null || formData.askingPrice <= 0) {
+        setError('Please enter a valid asking price greater than 0.');
+        return;
+      }
+    }
+
     if (currentStep < 4) setCurrentStep(prev => prev + 1);
   };
 
   const handlePrev = () => {
+    setError('');
     if (currentStep > 1) setCurrentStep(prev => prev - 1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (currentStep < 4) {
+      handleNext();
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setError('You must be logged in to submit a listing. Please go to the login page first.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const res = await usedTractorAPI.createListing(formData);
-      if (res.success) {
+      const res = await usedTractorListingAPI.createListing(formData);
+      if (res.success && res.data) {
+        
+        if (tractorPhotos.length > 0) {
+          try {
+            for (let i = 0; i < tractorPhotos.length; i++) {
+              const photoData = new FormData();
+              photoData.append('listingId', String(res.data.id));
+              photoData.append('docType', 'TRACTOR_IMAGE');
+              photoData.append('document', tractorPhotos[i]);
+              await usedTractorDocumentAPI.uploadDocument(photoData);
+            }
+          } catch(err) {
+            console.error("Photo upload failed:", err);
+          }
+        }
+
         setIsSuccess(true);
       } else {
-        setError('Failed to submit listing. Please try again.');
+        console.error("Submission failed:", res);
+        setError(res.message || 'Failed to submit listing. Please try again.');
       }
-    } catch (err) {
-      setError('An unexpected error occurred.');
+    } catch (err: any) {
+      console.error("Unexpected error:", err);
+      setError(err.message || 'An unexpected error occurred.');
     } finally {
       setIsSubmitting(false);
     }
@@ -122,24 +181,24 @@ export default function SellUsedTractorPage() {
       <div className="min-h-screen pt-24 pb-16 px-4 bg-background flex items-center justify-center">
         <div className="max-w-md w-full bg-foreground/5 rounded-3xl p-10 text-center shadow-xl border border-[var(--border-subtle)] relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-[var(--color-brand-green)]"></div>
-          
+
           <div className="w-24 h-24 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={48} />
           </div>
-          
+
           <h1 className="text-3xl font-black mb-4">Listing Submitted!</h1>
           <p className="text-muted font-medium mb-8">
             Your tractor has been successfully submitted for review. Our team will verify the details and activate your listing within 24 hours.
           </p>
-          
+
           <div className="flex flex-col gap-3">
-            <Link 
-              href="/used-tractors" 
+            <Link
+              href="/used-tractors"
               className="px-6 py-4 bg-[var(--color-brand-green)] text-white font-black rounded-xl hover:-translate-y-1 transition-transform shadow-lg shadow-[var(--color-brand-green)]/20"
             >
               View All Used Tractors
             </Link>
-            <button 
+            <button
               onClick={() => {
                 setIsSuccess(false);
                 setCurrentStep(1);
@@ -164,7 +223,7 @@ export default function SellUsedTractorPage() {
   return (
     <div className="min-h-screen pt-24 pb-16 bg-background">
       <div className="max-w-4xl mx-auto px-4">
-        
+
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tight">
@@ -178,20 +237,19 @@ export default function SellUsedTractorPage() {
         {/* Progress Bar */}
         <div className="mb-12 relative">
           <div className="absolute top-1/2 left-0 w-full h-1 bg-foreground/10 -translate-y-1/2 z-0 rounded-full"></div>
-          <div 
+          <div
             className="absolute top-1/2 left-0 h-1 bg-[var(--color-brand-green)] -translate-y-1/2 z-0 transition-all duration-500 ease-out rounded-full"
             style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
           ></div>
-          
+
           <div className="relative z-10 flex justify-between">
             {STEPS.map((step) => (
               <div key={step.id} className="flex flex-col items-center">
-                <div 
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-black shadow-lg transition-colors duration-300 ${
-                    currentStep >= step.id 
-                      ? 'bg-[var(--color-brand-green)] text-white shadow-[var(--color-brand-green)]/20' 
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-black shadow-lg transition-colors duration-300 ${currentStep >= step.id
+                      ? 'bg-[var(--color-brand-green)] text-white shadow-[var(--color-brand-green)]/20'
                       : 'bg-background text-muted border-2 border-[var(--border-subtle)]'
-                  }`}
+                    }`}
                 >
                   {currentStep > step.id ? <CheckCircle2 size={24} /> : step.icon}
                 </div>
@@ -209,9 +267,9 @@ export default function SellUsedTractorPage() {
         <div className="bg-foreground/5 p-6 md:p-10 rounded-[2rem] border border-[var(--border-subtle)] shadow-2xl relative overflow-hidden">
           {/* Decorative element */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)] opacity-5 blur-[100px] rounded-full pointer-events-none"></div>
-          
+
           <form onSubmit={handleSubmit} className="relative z-10">
-            
+
             {/* STEP 1: BASICS */}
             {currentStep === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -219,11 +277,11 @@ export default function SellUsedTractorPage() {
                   <Tractor className="text-[var(--color-brand-green)]" size={28} />
                   <h2 className="text-2xl font-black uppercase">Tractor Details</h2>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Brand *</label>
-                    <select 
+                    <select
                       name="tractorBrand"
                       required
                       value={formData.tractorBrand}
@@ -238,8 +296,8 @@ export default function SellUsedTractorPage() {
                   </div>
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Model *</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       name="tractorModel"
                       required
                       placeholder="e.g. 575 DI XP Plus"
@@ -253,8 +311,8 @@ export default function SellUsedTractorPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Year of Mfg *</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       name="yearOfManufacture"
                       required
                       min={1980}
@@ -266,8 +324,8 @@ export default function SellUsedTractorPage() {
                   </div>
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Hours Used *</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       name="hoursUsed"
                       required
                       min={0}
@@ -279,7 +337,7 @@ export default function SellUsedTractorPage() {
                   </div>
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Ownership *</label>
-                    <select 
+                    <select
                       name="ownership"
                       required
                       value={formData.ownership}
@@ -299,12 +357,12 @@ export default function SellUsedTractorPage() {
                     <MapPin className="text-[var(--color-brand-green)]" size={28} />
                     <h2 className="text-2xl font-black uppercase">Location</h2>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">State *</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         name="state"
                         required
                         placeholder="e.g. Maharashtra"
@@ -315,8 +373,8 @@ export default function SellUsedTractorPage() {
                     </div>
                     <div>
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">District *</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         name="district"
                         required
                         placeholder="e.g. Pune"
@@ -327,8 +385,8 @@ export default function SellUsedTractorPage() {
                     </div>
                     <div>
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Village/City *</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         name="villageCity"
                         required
                         placeholder="e.g. Baramati"
@@ -355,10 +413,10 @@ export default function SellUsedTractorPage() {
                     <span>Engine Condition</span>
                     <span className="text-2xl text-[var(--color-brand-green)]">{formData.engineConditionPct}%</span>
                   </label>
-                  <input 
-                    type="range" 
+                  <input
+                    type="range"
                     name="engineConditionPct"
-                    min="10" 
+                    min="10"
                     max="100"
                     step="5"
                     value={formData.engineConditionPct}
@@ -374,7 +432,7 @@ export default function SellUsedTractorPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Overall Condition *</label>
-                    <select 
+                    <select
                       name="conditionGrade"
                       value={formData.conditionGrade}
                       onChange={handleChange}
@@ -387,7 +445,7 @@ export default function SellUsedTractorPage() {
                   </div>
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Tyres Condition</label>
-                    <select 
+                    <select
                       name="tyreCondition"
                       value={formData.tyreCondition}
                       onChange={handleChange}
@@ -400,7 +458,7 @@ export default function SellUsedTractorPage() {
                   </div>
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Hydraulics</label>
-                    <select 
+                    <select
                       name="hydraulicsCondition"
                       value={formData.hydraulicsCondition}
                       onChange={handleChange}
@@ -413,7 +471,7 @@ export default function SellUsedTractorPage() {
                   </div>
                   <div>
                     <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Body / Paint</label>
-                    <select 
+                    <select
                       name="bodyCondition"
                       value={formData.bodyCondition}
                       onChange={handleChange}
@@ -442,8 +500,8 @@ export default function SellUsedTractorPage() {
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Asking Price (₹) *</label>
                       <div className="relative">
                         <IndianRupee className="absolute left-5 top-1/2 -translate-y-1/2 text-muted" size={20} />
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           name="askingPrice"
                           required
                           min={10000}
@@ -457,8 +515,8 @@ export default function SellUsedTractorPage() {
                     <div className="flex flex-col gap-4">
                       <label className="flex items-center gap-4 cursor-pointer group">
                         <div className="relative flex items-center">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             name="negotiable"
                             checked={formData.negotiable}
                             onChange={handleChange}
@@ -474,10 +532,10 @@ export default function SellUsedTractorPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
                     <h3 className="text-sm font-black uppercase tracking-widest text-muted mb-4 border-b border-[var(--border-subtle)] pb-2">Documents</h3>
-                    
+
                     <label className="flex items-center gap-4 cursor-pointer p-4 bg-background border border-[var(--border-subtle)] rounded-2xl hover:border-[var(--color-brand-green)] transition-colors">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         name="rcAvailable"
                         checked={formData.rcAvailable}
                         onChange={handleChange}
@@ -488,7 +546,7 @@ export default function SellUsedTractorPage() {
 
                     <div>
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Loan Clearance</label>
-                      <select 
+                      <select
                         name="loanClearanceStatus"
                         value={formData.loanClearanceStatus}
                         onChange={handleChange}
@@ -503,24 +561,24 @@ export default function SellUsedTractorPage() {
 
                   <div className="space-y-4">
                     <h3 className="text-sm font-black uppercase tracking-widest text-muted mb-4 border-b border-[var(--border-subtle)] pb-2">Sales Info</h3>
-                    
+
                     <label className="flex items-center gap-4 cursor-pointer p-4 bg-background border border-[var(--border-subtle)] rounded-2xl hover:border-[var(--color-brand-green)] transition-colors">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         name="financeAvailable"
                         checked={formData.financeAvailable}
                         onChange={handleChange}
                         className="w-5 h-5 rounded border-gray-300 text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)]"
                       />
                       <span className="font-bold flex items-center gap-2">
-                         <ShieldCheck className="text-blue-500" size={18} />
-                         Can Arrange Finance for Buyer
+                        <ShieldCheck className="text-blue-500" size={18} />
+                        Can Arrange Finance for Buyer
                       </span>
                     </label>
 
                     <div>
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">How Urgently do you want to sell?</label>
-                      <select 
+                      <select
                         name="urgency"
                         value={formData.urgency}
                         onChange={handleChange}
@@ -544,11 +602,11 @@ export default function SellUsedTractorPage() {
                   <h2 className="text-2xl font-black uppercase">Final Details</h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-6">
                     <div>
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Description</label>
-                      <textarea 
+                      <textarea
                         name="description"
                         rows={4}
                         placeholder="Tell buyers why they should buy your tractor... e.g., 'Single hand driven, mostly used for light trolley work. Company serviced.'"
@@ -557,10 +615,10 @@ export default function SellUsedTractorPage() {
                         className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all resize-none"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Major Repairs (If Any)</label>
-                      <textarea 
+                      <textarea
                         name="majorRepairs"
                         rows={2}
                         placeholder="e.g., Engine overhauled at 4000 hours, Clutch plate changed recently."
@@ -570,28 +628,52 @@ export default function SellUsedTractorPage() {
                       />
                     </div>
                   </div>
-
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Upload Photos</label>
-                    <div className="h-full min-h-[200px] border-2 border-dashed border-[var(--border-brand)] rounded-3xl bg-background flex flex-col items-center justify-center p-8 text-center hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 transition-all cursor-pointer group">
-                      <div className="w-16 h-16 bg-foreground/5 rounded-full flex items-center justify-center mb-4 group-hover:bg-[var(--color-brand-green)]/20 transition-colors">
-                         <UploadCloud className="text-muted group-hover:text-[var(--color-brand-green)]" size={32} />
-                      </div>
-                      <h4 className="font-black text-lg mb-2">Drag & Drop photos here</h4>
-                      <p className="text-sm text-muted font-medium mb-4">Or click to browse from your device</p>
-                      <div className="px-6 py-2 bg-foreground/10 rounded-full text-xs font-bold uppercase tracking-wider text-muted">
-                        Simulated Upload
-                      </div>
+                  
+                  {/* Photos Upload Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-muted border-b border-[var(--border-subtle)] pb-2">Photos (Optional)</h3>
+                    <div className="bg-foreground/5 p-6 rounded-2xl border border-[var(--border-subtle)] border-dashed">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            setTractorPhotos(Array.from(e.target.files));
+                          }
+                        }}
+                        className="block w-full text-sm text-muted
+                          file:mr-4 file:py-2.5 file:px-6
+                          file:rounded-xl file:border-0
+                          file:text-sm file:font-black file:uppercase file:tracking-widest
+                          file:bg-[var(--color-brand-green)] file:text-background
+                          hover:file:bg-[var(--color-brand-green)]/90 cursor-pointer"
+                      />
+                      <p className="text-xs text-muted mt-3 font-medium">Tip: Good photos (Front, Back, Dashboard, Tyres) help sell your tractor up to 3x faster.</p>
+                      
+                      {tractorPhotos.length > 0 && (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {tractorPhotos.map((file, idx) => (
+                            <div key={idx} className="bg-background px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] text-xs font-bold flex items-center gap-2">
+                              <span className="truncate max-w-[120px]">{file.name}</span>
+                              <button type="button" onClick={() => setTractorPhotos(prev => prev.filter((_, i) => i !== idx))} className="text-red-500 hover:text-red-600">
+                                <XCircle size={14} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
+                  
                 </div>
+              </div>
+            )}
 
-                {error && (
-                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500 font-bold">
-                    <AlertCircle size={20} />
-                    {error}
-                  </div>
-                )}
+            {error && (
+              <div className="mt-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500 font-bold animate-in fade-in">
+                <AlertCircle size={20} />
+                {error}
               </div>
             )}
 
@@ -600,15 +682,14 @@ export default function SellUsedTractorPage() {
               <button
                 type="button"
                 onClick={handlePrev}
-                className={`flex items-center gap-2 px-6 py-4 rounded-xl font-black uppercase tracking-wider text-sm transition-all ${
-                  currentStep === 1 
-                    ? 'opacity-0 pointer-events-none' 
+                className={`flex items-center gap-2 px-6 py-4 rounded-xl font-black uppercase tracking-wider text-sm transition-all ${currentStep === 1
+                    ? 'opacity-0 pointer-events-none'
                     : 'bg-background hover:bg-foreground/5 border border-[var(--border-subtle)]'
-                }`}
+                  }`}
               >
                 <ChevronLeft size={18} /> Back
               </button>
-              
+
               {currentStep < 4 ? (
                 <button
                   type="button"

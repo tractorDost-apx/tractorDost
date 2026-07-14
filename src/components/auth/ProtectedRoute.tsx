@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '@/store/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -27,6 +27,9 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
           case 'SUPER_ADMIN':
             router.replace('/admin/dashboard');
             break;
+          case 'AGENT':
+            router.replace('/agent/dashboard');
+            break;
           case 'DEALER':
             router.replace('/dealer/dashboard');
             break;
@@ -43,7 +46,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   if (isLoading) {
     return (
       <div className="flex min-h-[50vh] w-full items-center justify-center">
-        <Loader2 className="animate-spin text-lime-400" size={32} />
+        <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
       </div>
     );
   }

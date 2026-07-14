@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Brand, brandAPI } from '@/lib/api/brands';
 import { X, Upload, Check, AlertCircle, FileText, BarChart, Settings2 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface BrandModalProps {
   brand: Brand | null;
@@ -377,7 +378,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <TractorLoader size={16} className="text-white" />
                 Saving...
               </>
             ) : (

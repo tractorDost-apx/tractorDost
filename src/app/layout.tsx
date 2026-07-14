@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { LayoutOrchestrator } from '@/components/layout/LayoutOrchestrator';
 import { AuthProvider } from '@/store/AuthContext';
+import { SplashScreen } from '@/components/ui/SplashScreen';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -45,6 +46,7 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col relative overflow-x-hidden selection:bg-[var(--color-spatial-accent-blue)] selection:text-white">
+        <SplashScreen />
         <AuthProvider>
           <LayoutOrchestrator>
             {children}

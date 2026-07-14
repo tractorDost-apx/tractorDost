@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { tractorAPI, Tractor, TractorPriceByState } from '@/lib/api/tractors';
 import { ChevronRight, ArrowLeft, MapPin, Calculator, ShieldCheck, Tractor as TractorIcon } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 
 export default function OnRoadPricePage() {
@@ -134,7 +135,7 @@ export default function OnRoadPricePage() {
       </div>
 
       {/* Main Card */}
-      <div className="spatial-panel rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden min-h-[400px]">
+      <div className="bg-[var(--card-bg)] backdrop-blur-3xl border border-[var(--border-subtle)] shadow-[var(--card-shadow)] rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden min-h-[400px]">
         
         {/* Back Button */}
         {step > 1 && (
@@ -159,16 +160,16 @@ export default function OnRoadPricePage() {
                     <button 
                       key={brand.id}
                       onClick={() => handleBrandSelect(brand)}
-                      className="flex flex-col items-center justify-center p-6 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 hover:border-[var(--color-brand-green)]/50 hover:bg-[var(--color-brand-green)]/5 transition-all group"
+                      className="flex flex-col items-center justify-center p-6 rounded-[2rem] border border-[var(--border-subtle)] bg-background/50 hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 hover:shadow-[var(--card-shadow)] transition-all duration-300 group"
                     >
                       {brand.logoUrl ? (
-                        <img src={brand.logoUrl} alt={brand.name} className="w-16 h-16 object-contain mb-3 group-hover:scale-110 transition-transform mix-blend-multiply dark:mix-blend-normal" />
+                        <img src={brand.logoUrl} alt={brand.name} className="w-16 h-16 object-contain mb-3 group-hover:scale-110 transition-transform duration-500 mix-blend-multiply dark:mix-blend-normal" />
                       ) : (
-                        <div className="w-16 h-16 bg-foreground/10 rounded-full flex items-center justify-center mb-3 text-2xl font-black">
+                        <div className="w-16 h-16 bg-foreground/5 rounded-full flex items-center justify-center mb-3 text-2xl font-black">
                           {brand.name.charAt(0)}
                         </div>
                       )}
-                      <span className="font-black text-sm text-center">{brand.name}</span>
+                      <span className="font-black text-sm text-center text-foreground group-hover:text-[var(--color-brand-green)] transition-colors">{brand.name}</span>
                     </button>
                   ))}
                 </div>
@@ -190,20 +191,22 @@ export default function OnRoadPricePage() {
                     <button 
                       key={t.id}
                       onClick={() => handleTractorSelect(t)}
-                      className="flex items-center gap-4 p-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 hover:border-[var(--color-brand-green)]/50 hover:bg-[var(--color-brand-green)]/5 transition-all text-left group"
+                      className="flex items-center gap-4 p-4 rounded-[1.5rem] border border-[var(--border-subtle)] bg-background/50 hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 hover:shadow-[var(--card-shadow)] transition-all duration-300 text-left group"
                     >
-                      <div className="w-16 h-16 rounded-xl bg-background flex items-center justify-center p-2 shrink-0 border border-[var(--border-subtle)]">
+                      <div className="w-16 h-16 rounded-[1rem] bg-foreground/5 flex items-center justify-center p-2 shrink-0 border border-[var(--border-subtle)]">
                          {t.media && t.media.length > 0 ? (
-                           <img src={t.media.find(m => m.isPrimary)?.url || t.media[0].url} alt={t.modelName} className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform" />
+                           <img src={t.media.find(m => m.isPrimary)?.url || t.media[0].url} alt={t.modelName} className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-500" />
                          ) : (
                            <TractorIcon size={24} className="text-muted" />
                          )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-black text-foreground truncate">{t.modelName}</h3>
-                        <p className="text-xs font-bold text-muted">{t.hp || '--'} HP • {t.driveType === 'FOUR_WD' ? '4WD' : '2WD'}</p>
+                        <h3 className="font-black text-foreground truncate group-hover:text-[var(--color-brand-green)] transition-colors">{t.modelName}</h3>
+                        <p className="text-[11px] font-bold text-muted uppercase tracking-wider">{t.hp || '--'} HP • {t.driveType === 'FOUR_WD' ? '4WD' : '2WD'}</p>
                       </div>
-                      <ChevronRight size={18} className="text-muted group-hover:text-[var(--color-brand-green)] transition-colors shrink-0" />
+                      <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-[var(--color-brand-green)] group-hover:text-white transition-colors">
+                        <ChevronRight size={16} strokeWidth={3} />
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -223,11 +226,12 @@ export default function OnRoadPricePage() {
                   
                   {/* Left Column - Selection */}
                   <div className="w-full lg:w-1/3 flex flex-col gap-6">
-                    <div className="bg-gradient-to-br from-[var(--color-brand-green)]/10 to-transparent p-6 rounded-[2rem] border border-[var(--color-brand-green)]/20 text-center">
-                       <h3 className="font-black text-lg mb-1">{tractorDetails.brand?.name} {tractorDetails.modelName}</h3>
-                       <p className="text-sm font-bold text-muted">{tractorDetails.hp || '--'} HP</p>
-                       <Link href={`/tractors/${tractorDetails.id}`} className="inline-block mt-4 text-xs font-black text-[var(--color-brand-green)] hover:underline uppercase tracking-widest">
-                         View Details
+                    <div className="bg-background/80 backdrop-blur-md p-6 rounded-[2rem] border border-[var(--border-subtle)] shadow-[var(--card-shadow)] text-center relative overflow-hidden group">
+                       <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-brand-green)]/10 blur-[40px] rounded-full group-hover:bg-[var(--color-brand-green)]/20 transition-all duration-500" />
+                       <h3 className="font-black text-xl mb-1 text-foreground relative z-10">{tractorDetails.brand?.name} {tractorDetails.modelName}</h3>
+                       <p className="text-xs uppercase tracking-widest font-bold text-muted relative z-10">{tractorDetails.hp || '--'} HP</p>
+                       <Link href={`/tractors/${tractorDetails.id}`} className="inline-flex items-center gap-1 mt-6 text-xs font-black text-white bg-[var(--color-brand-green)] hover:bg-[var(--color-brand-green-dark)] px-4 py-2 rounded-full uppercase tracking-widest transition-colors relative z-10 shadow-md">
+                         View Details <ChevronRight size={14} />
                        </Link>
                     </div>
 
@@ -258,15 +262,15 @@ export default function OnRoadPricePage() {
 
                   {/* Right Column - Receipt Breakdown */}
                   <div className="w-full lg:w-2/3">
-                    <div className="bg-foreground/[0.03] border border-[var(--border-subtle)] rounded-[2rem] p-8 md:p-10 relative overflow-hidden">
+                    <div className="bg-[var(--panel-bg)] backdrop-blur-3xl border border-[var(--border-subtle)] shadow-[var(--card-shadow)] rounded-[2rem] p-8 md:p-10 relative overflow-hidden">
                       {/* Decorative elements */}
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)]/5 rounded-full blur-[60px] -z-10" />
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)]/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
                       
-                      <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 rounded-full bg-[var(--color-brand-green)]/20 flex items-center justify-center text-[var(--color-brand-green)]">
-                          <Calculator size={20} />
+                      <div className="flex items-center gap-3 mb-8 border-b border-[var(--border-subtle)] pb-6">
+                        <div className="w-12 h-12 rounded-full bg-[var(--color-brand-green)]/10 border border-[var(--color-brand-green)]/20 flex items-center justify-center text-[var(--color-brand-green)] shadow-inner">
+                          <Calculator size={24} />
                         </div>
-                        <h3 className="text-xl font-black text-foreground">Estimated Price Breakdown</h3>
+                        <h3 className="text-2xl font-black text-foreground tracking-tight">Estimated Price Breakdown</h3>
                       </div>
 
                       {selectedStatePrice ? (
@@ -295,12 +299,12 @@ export default function OnRoadPricePage() {
 
                           <div className="w-full h-px bg-foreground/10 my-4" />
                           
-                          <div className="flex justify-between items-end">
+                          <div className="flex justify-between items-end bg-background/50 p-6 rounded-[1.5rem] border border-[var(--border-subtle)] shadow-sm">
                             <div>
-                              <span className="block text-[10px] font-black uppercase tracking-widest text-[var(--color-brand-green)] mb-1">Total Estimated</span>
-                              <span className="text-3xl font-black text-foreground">On-Road Price</span>
+                              <span className="block text-[10px] font-black uppercase tracking-widest text-muted mb-2">Total Estimated</span>
+                              <span className="text-2xl md:text-3xl font-black text-foreground tracking-tight">On-Road Price</span>
                             </div>
-                            <span className="text-4xl font-black text-[var(--color-brand-orange)] tracking-tight">
+                            <span className="text-3xl md:text-4xl font-black text-[var(--color-brand-orange)] tracking-tight">
                               {formatPrice(selectedStatePrice.onRoadPrice || (
                                 Number(selectedStatePrice.exShowroom) + 
                                 Number(selectedStatePrice.rtoCharges || 0) + 
@@ -357,7 +361,7 @@ function StepIndicator({ currentStep, stepNumber, label }: { currentStep: number
 function Loader() {
   return (
     <div className="w-full flex justify-center py-20">
-      <div className="w-12 h-12 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+      <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
     </div>
   );
 }

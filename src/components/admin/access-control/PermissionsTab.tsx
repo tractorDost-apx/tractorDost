@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { accessControlAPI, Role, Module, RolePermission } from '@/lib/api/accessControl';
-import { Loader2, Key, Save, CheckSquare, Square } from 'lucide-react';
+import { Key, Save, CheckSquare, Square } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export default function PermissionsTab() {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -106,7 +107,7 @@ export default function PermissionsTab() {
     }
   };
 
-  if (loading) return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-[var(--color-brand-green)]" size={32} /></div>;
+  if (loading) return <div className="flex justify-center p-12"><TractorLoader className="text-[var(--color-brand-green)]" size={48} /></div>;
 
   return (
     <div className="space-y-6">
@@ -136,7 +137,7 @@ export default function PermissionsTab() {
           Please select a role from the dropdown above to manage its permissions.
         </div>
       ) : fetchingPermissions ? (
-        <div className="flex justify-center p-12"><Loader2 className="animate-spin text-muted" size={24} /></div>
+        <div className="flex justify-center p-12"><TractorLoader className="text-muted" size={32} /></div>
       ) : (
         <div className="bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl overflow-hidden flex flex-col">
           <div className="overflow-x-auto">
@@ -184,7 +185,7 @@ export default function PermissionsTab() {
               disabled={saving}
               className="spatial-button px-6 py-2.5 rounded-xl font-bold flex items-center gap-2"
             >
-              {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+              {saving ? <TractorLoader size={20} /> : <Save size={18} />}
               Save Permissions Matrix
             </button>
           </div>

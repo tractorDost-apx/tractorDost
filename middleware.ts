@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Define the routes that require authentication
-const protectedRoutes = ['/dashboard', '/admin', '/dealer', '/profile', '/wishlist', '/sell-used-tractor'];
+const protectedRoutes = ['/dashboard', '/admin', '/dealer', '/agent', '/profile', '/wishlist', '/sell-used-tractor'];
 
 // Define the routes that should not be accessed if the user is already authenticated
 const authRoutes = ['/login', '/register', '/verify-otp'];

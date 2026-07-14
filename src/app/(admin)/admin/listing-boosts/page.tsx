@@ -7,7 +7,7 @@ import Link from 'next/link';
 export default function AdminListingBoostsPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -22,7 +22,7 @@ export default function AdminListingBoostsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-background rounded-3xl border border-foreground/10 p-6 shadow-sm flex flex-col items-center text-center">
           <div className="p-4 bg-amber-500/10 text-amber-500 rounded-full mb-4">
-             <Zap size={32} />
+            <Zap size={32} />
           </div>
           <h3 className="text-xl font-black mb-2">Active Boosts</h3>
           <p className="text-muted mb-4 font-medium">Currently boosted listings appearing at the top of search results.</p>
@@ -30,7 +30,7 @@ export default function AdminListingBoostsPage() {
         </div>
         <div className="bg-background rounded-3xl border border-foreground/10 p-6 shadow-sm flex flex-col items-center text-center">
           <div className="p-4 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] rounded-full mb-4">
-             <Layers size={32} />
+            <Layers size={32} />
           </div>
           <h3 className="text-xl font-black mb-2">Total Boost Revenue</h3>
           <p className="text-muted mb-4 font-medium">Revenue generated from sellers boosting their tractors.</p>
@@ -38,7 +38,7 @@ export default function AdminListingBoostsPage() {
         </div>
         <div className="bg-background rounded-3xl border border-foreground/10 p-6 shadow-sm flex flex-col items-center text-center">
           <div className="p-4 bg-blue-500/10 text-blue-500 rounded-full mb-4">
-             <Clock size={32} />
+            <Clock size={32} />
           </div>
           <h3 className="text-xl font-black mb-2">Expiring Soon</h3>
           <p className="text-muted mb-4 font-medium">Boosts that will expire in the next 24 hours.</p>

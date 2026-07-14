@@ -10,6 +10,7 @@ import MediaUploader from '@/components/shared/MediaUploader';
 import TractorSpecForm from './TractorSpecForm';
 import TractorStatePrices from './TractorStatePrices';
 import { Save, X, Info, Settings, IndianRupee, Image as ImageIcon, ChevronRight } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface TractorFormProps {
   initialData?: Tractor;
@@ -346,7 +347,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
             disabled={loading}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-foreground text-background font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
           >
-            {loading ? <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" /> : <Save size={18} />}
+            {loading ? <TractorLoader size={16} /> : <Save size={18} />}
             {isEdit ? 'Save Changes' : 'Create Tractor'}
           </button>
 

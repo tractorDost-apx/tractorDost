@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Category, categoryAPI } from '@/lib/api/categories';
 import { X, Upload, Check, AlertCircle, FileText, Layers, Settings2 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface CategoryModalProps {
   category: Category | null;
@@ -327,7 +328,7 @@ export default function CategoryModal({ category, categories, onClose }: Categor
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <TractorLoader size={16} className="text-white" />
                 Saving...
               </>
             ) : (

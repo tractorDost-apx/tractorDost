@@ -6,7 +6,8 @@ import { compareAPI } from '@/lib/api/compare';
 import { Tractor } from '@/lib/api/tractors';
 import ComparePicker from '@/components/compare/compare-picker';
 import CompareTable from '@/components/compare/compare-table';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 function CompareContent() {
   const searchParams = useSearchParams();
@@ -57,7 +58,7 @@ function CompareContent() {
   if (loading) {
     return (
       <div className="flex flex-col min-h-[80vh] items-center justify-center p-6 text-center gap-4 animate-pulse">
-        <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={48} />
+        <TractorLoader className="text-[var(--color-brand-green)]" size={64} />
         <h2 className="text-xl font-black uppercase tracking-widest text-muted">Analyzing Tractors...</h2>
       </div>
     );
@@ -97,7 +98,7 @@ export default function ComparePage() {
       {/* Decorative background element */}
       <div className="fixed top-0 inset-x-0 h-[50vh] bg-gradient-to-b from-[var(--color-brand-green)]/5 to-transparent pointer-events-none -z-10" />
       
-      <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center"><Loader2 className="animate-spin text-muted" /></div>}>
+      <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center"><TractorLoader size={48} className="text-muted" /></div>}>
         <CompareContent />
       </Suspense>
     </div>

@@ -15,6 +15,7 @@ import {
   RefreshCcw,
   Sparkles
 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -205,7 +206,7 @@ export default function UsedTractorValuationPage() {
               >
                 {isCalculating ? (
                   <>
-                    <RefreshCcw className="animate-spin" size={20} /> Calculating...
+                    <TractorLoader size={20} /> Calculating...
                   </>
                 ) : (
                   <>
@@ -252,12 +253,7 @@ export default function UsedTractorValuationPage() {
 
           {isCalculating && (
             <div className="bg-foreground/5 rounded-[3rem] p-12 text-center border border-[var(--border-subtle)] flex flex-col items-center justify-center min-h-[400px]">
-              <div className="relative mb-8">
-                <div className="w-32 h-32 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[var(--color-brand-green)]">
-                  <Tractor size={40} />
-                </div>
-              </div>
+                <TractorLoader size={100} className="text-[var(--color-brand-green)]" />
               <h3 className="text-2xl font-black animate-pulse">Analyzing Market Data...</h3>
               <p className="text-muted mt-2">Comparing with recent {formData.brand} sales in your region.</p>
             </div>

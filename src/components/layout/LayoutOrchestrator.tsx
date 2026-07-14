@@ -8,7 +8,7 @@ import { DashboardFooter } from './DashboardFooter';
 
 export function LayoutOrchestrator({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isDashboardRoute = pathname?.startsWith('/dashboard') || pathname?.startsWith('/admin') || pathname?.startsWith('/dealer');
+  const isDashboardRoute = pathname?.startsWith('/dashboard') || pathname?.startsWith('/admin') || pathname?.startsWith('/dealer') || pathname?.startsWith('/agent');
 
   return (
     <div className={`w-full flex-1 flex flex-col ${isDashboardRoute ? 'spatial-background' : ''}`}>

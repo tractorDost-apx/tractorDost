@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { showroomAPI, Showroom } from '@/lib/api/showrooms';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { Search, MapPin, Map, Phone, Navigation, Star, Filter, Store, LayoutList, Car, SquareParking, X, CalendarCheck } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export default function ShowroomsPage() {
   const [showrooms, setShowrooms] = useState<Showroom[]>([]);
@@ -237,7 +238,7 @@ export default function ShowroomsPage() {
 
           {loading ? (
             <div className="w-full flex justify-center py-32">
-              <div className="w-12 h-12 border-4 border-[var(--border-subtle)] border-t-[var(--color-brand-green)] rounded-full animate-spin" />
+              <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
             </div>
           ) : showrooms.length === 0 ? (
             <div className="spatial-panel rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in border border-[var(--border-subtle)] bg-background/50 backdrop-blur-xl">

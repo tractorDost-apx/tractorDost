@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usedTractorAPI } from '@/lib/api/usedTractors';
+import { usedTractorListingAPI } from '@/lib/api/used-listings';
+import { usedTractorEnquiryAPI } from '@/lib/api/used-enquiries';
 import { 
   MapPin, 
   Calendar, 
   Clock, 
   User as UserIcon, 
+  Phone,
   ShieldCheck, 
   CheckCircle2, 
   FileText, 
@@ -16,9 +18,9 @@ import {
   Heart,
   ChevronRight,
   TrendingUp,
-  Image as ImageIcon,
-  Loader2
+  Image as ImageIcon
 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 
 export default function UsedTractorDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -31,9 +33,10 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
   const [enquiryForm, setEnquiryForm] = useState({ name: '', mobile: '', offerPrice: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [enquiryError, setEnquiryError] = useState<string | null>(null);
 
   useEffect(() => {
-    usedTractorAPI.getListingById(Number(unwrappedParams.id)).then(res => {
+    usedTractorListingAPI.getListingById(Number(unwrappedParams.id)).then(res => {
       if (res.success) {
         setTractor(res.data);
       }
@@ -44,13 +47,26 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
   const handleEnquiry = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    usedTractorAPI.submitEnquiry(tractor.id, {
+    setEnquiryError(null);
+
+    let finalMessage = 'I am interested in this tractor.';
+    if (enquiryForm.offerPrice) {
+      finalMessage = `I would like to offer ₹${enquiryForm.offerPrice} for this tractor.`;
+    }
+
+    usedTractorEnquiryAPI.createEnquiry({
+      listingId: tractor.id,
+      enquiryType: 'USED_TRACTOR', // Keeping for legacy safety
       name: enquiryForm.name,
       mobile: enquiryForm.mobile,
-      offerPrice: enquiryForm.offerPrice ? Number(enquiryForm.offerPrice) : undefined
+      message: finalMessage
     }).then(res => {
       setIsSubmitting(false);
-      setSubmitted(true);
+      if (res.success) {
+        setSubmitted(true);
+      } else {
+        setEnquiryError(res.message || 'Failed to submit enquiry.');
+      }
     });
   };
 
@@ -65,7 +81,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
   if (loading) {
     return (
       <div className="min-h-screen pt-24 flex items-center justify-center bg-background">
-        <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={48} />
+        <TractorLoader className="text-[var(--color-brand-green)]" size={64} />
       </div>
     );
   }
@@ -116,14 +132,14 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
                 </button>
               </div>
               <img 
-                src={tractor.media[activeImage]?.url} 
+                src={tractor.media?.[activeImage]?.url} 
                 alt={`${tractor.tractorBrand} ${tractor.tractorModel}`}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
             {/* Thumbnail Strip */}
             <div className="flex gap-2 p-4 overflow-x-auto">
-              {tractor.media.map((img: any, idx: number) => (
+              {(tractor.media || []).map((img: any, idx: number) => (
                 <button 
                   key={idx}
                   onClick={() => setActiveImage(idx)}
@@ -222,7 +238,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
               Documents & Status
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tractor.documents.map((doc: any, i: number) => (
+              {(tractor.documents || []).map((doc: any, i: number) => (
                 <div key={i} className="flex items-center justify-between p-4 bg-background rounded-2xl border border-[var(--border-subtle)]">
                   <span className="font-bold uppercase tracking-wider text-sm">{doc.docType.replace('_', ' ')}</span>
                   {doc.verifiedAt ? (
@@ -299,6 +315,23 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
               )}
             </div>
 
+            {/* Seller Details (Masked) */}
+            {tractor.seller && (
+              <div className="bg-background rounded-3xl p-6 border border-[var(--border-subtle)] shadow-sm flex items-center gap-4">
+                <div className="w-12 h-12 bg-foreground/5 rounded-full flex items-center justify-center shrink-0">
+                  <UserIcon size={24} className="text-muted" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted font-bold uppercase tracking-widest mb-0.5">Seller</p>
+                  <p className="font-black text-lg">{tractor.seller.fullName}</p>
+                  <div className="flex items-center gap-2 text-[var(--color-brand-green)] font-bold mt-0.5">
+                    <Phone size={14} />
+                    <span>{tractor.seller.mobile ? 'xxxxxxx' + tractor.seller.mobile.slice(-3) : 'Not provided'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Lead Generation Form (UsedTractorEnquiry) */}
             <div className="bg-foreground/5 rounded-3xl p-8 border border-[var(--border-subtle)] shadow-xl">
               <h3 className="text-xl font-black mb-2">Interested in this tractor?</h3>
@@ -312,6 +345,12 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
                 </div>
               ) : (
                 <form onSubmit={handleEnquiry} className="space-y-4">
+                  {enquiryError && (
+                    <div className="bg-red-500/10 text-red-500 p-3 rounded-xl text-sm font-bold flex items-start gap-2">
+                      <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
+                      <span>{enquiryError}</span>
+                    </div>
+                  )}
                   <div>
                     <input 
                       type="text"
@@ -350,7 +389,7 @@ export default function UsedTractorDetailPage({ params }: { params: Promise<{ id
                     className="w-full py-4 bg-[var(--color-brand-green)] text-white font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-[var(--color-brand-green)]/20 hover:bg-[var(--color-brand-green)]/90 transition-all flex justify-center items-center gap-2 mt-2"
                   >
                     {isSubmitting ? (
-                      <><Loader2 className="animate-spin" size={18} /> Sending...</>
+                      <><TractorLoader size={20} /> Sending...</>
                     ) : (
                       'Contact Seller'
                     )}

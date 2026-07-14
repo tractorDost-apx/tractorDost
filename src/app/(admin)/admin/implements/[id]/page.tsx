@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import ImplementForm from '../components/ImplementForm';
 import { implementAPI, Implement } from '@/lib/api/implements';
-import { Loader2 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export default function EditImplementPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -31,7 +31,7 @@ export default function EditImplementPage({ params }: { params: Promise<{ id: st
     return (
       <div className="w-full h-full flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center gap-4 text-muted">
-          <Loader2 size={32} className="animate-spin text-[var(--color-brand-green)]" />
+          <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
           <p className="text-sm font-bold animate-pulse">Loading implement details...</p>
         </div>
       </div>

@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { accessControlAPI, ModuleTreeNode, Module } from '@/lib/api/accessControl';
-import { Loader2, Plus, Edit, Trash2, LayoutGrid, ChevronRight, ChevronDown } from 'lucide-react';
+import { Plus, Edit, Trash2, LayoutGrid, ChevronRight, ChevronDown } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 const ModuleRow = ({ node, level = 0, onEdit, onDelete }: { node: ModuleTreeNode, level?: number, onEdit: (m: Module) => void, onDelete: (id: number) => void }) => {
   const [expanded, setExpanded] = useState(true);
@@ -126,7 +127,7 @@ export default function ModulesTab() {
     }
   };
 
-  if (loading) return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-[var(--color-brand-green)]" size={32} /></div>;
+  if (loading) return <div className="flex justify-center p-12"><TractorLoader className="text-[var(--color-brand-green)]" size={48} /></div>;
 
   return (
     <div className="space-y-6">
@@ -205,7 +206,7 @@ export default function ModulesTab() {
               <div className="flex justify-end gap-3 mt-6 border-t border-[var(--border-subtle)] pt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-xl text-sm font-bold hover:bg-foreground/10 transition-colors">Cancel</button>
                 <button type="submit" disabled={submitting} className="spatial-button px-6 py-2 rounded-xl text-sm font-bold flex items-center justify-center">
-                  {submitting ? <Loader2 className="animate-spin" size={16} /> : 'Save Module'}
+                  {submitting ? <TractorLoader size={20} /> : 'Save Module'}
                 </button>
               </div>
             </form>

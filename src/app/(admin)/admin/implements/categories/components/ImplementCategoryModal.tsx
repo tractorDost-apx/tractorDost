@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { implementCategoryAPI, ImplementCategory } from '@/lib/api/implementCategories';
-import { X, Upload, Loader2, Layers, ChevronDown } from 'lucide-react';
+import { X, Upload, Layers, ChevronDown } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface ImplementCategoryModalProps {
   category: ImplementCategory | null;
@@ -285,7 +286,7 @@ export default function ImplementCategoryModal({ category, categories, onClose }
             disabled={loading}
             className="px-8 py-2.5 bg-[var(--color-brand-green)] text-white font-black text-sm uppercase tracking-wider rounded-full hover:bg-[var(--color-brand-orange)] transition-colors shadow-lg shadow-[var(--color-brand-green)]/20 flex items-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {loading && <Loader2 size={16} className="animate-spin" />}
+            {loading && <TractorLoader size={20} />}
             {category ? 'Save Changes' : 'Create Category'}
           </button>
         </div>

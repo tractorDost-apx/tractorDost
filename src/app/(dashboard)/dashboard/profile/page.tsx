@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/store/AuthContext';
-import { User, Mail, Phone, Globe, Camera, Loader2, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Phone, Globe, Camera, CheckCircle2 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -110,7 +111,7 @@ export default function ProfilePage() {
             disabled={isLoading}
             className="spatial-button h-12 px-8 rounded-xl font-bold flex items-center gap-2"
           >
-            {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Save Changes'}
+            {isLoading ? <TractorLoader size={20} /> : 'Save Changes'}
           </button>
         </div>
       </form>

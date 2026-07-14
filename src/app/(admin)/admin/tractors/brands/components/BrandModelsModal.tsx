@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Tractor as TractorIcon, Loader2 } from 'lucide-react';
+import { X, Tractor as TractorIcon } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import { tractorAPI, Tractor } from '@/lib/api/tractors';
 import { Brand } from '@/lib/api/brands';
 import Link from 'next/link';
@@ -61,7 +62,7 @@ export default function BrandModelsModal({ brand, onClose }: BrandModelsModalPro
         <div className="overflow-y-auto p-6 md:p-8 flex-1 bg-foreground/[0.02]">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted gap-3">
-              <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={32} />
+              <TractorLoader className="text-[var(--color-brand-green)]" size={48} />
               <span className="font-bold">Loading models...</span>
             </div>
           ) : tractors.length === 0 ? (

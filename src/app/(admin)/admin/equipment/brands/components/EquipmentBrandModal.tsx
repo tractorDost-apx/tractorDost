@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { equipmentBrandAPI, EquipmentBrand } from '@/lib/api/equipmentBrands';
-import { X, Upload, Loader2 } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface EquipmentBrandModalProps {
   brand: EquipmentBrand | null;
@@ -216,7 +217,7 @@ export default function EquipmentBrandModal({ brand, onClose }: EquipmentBrandMo
             disabled={loading}
             className="px-8 py-2.5 bg-[var(--color-brand-green)] text-white font-black text-sm uppercase tracking-wider rounded-full hover:bg-[var(--color-brand-orange)] transition-colors shadow-lg shadow-[var(--color-brand-green)]/20 flex items-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {loading && <Loader2 size={16} className="animate-spin" />}
+            {loading && <TractorLoader size={20} />}
             {brand ? 'Save Changes' : 'Create Brand'}
           </button>
         </div>

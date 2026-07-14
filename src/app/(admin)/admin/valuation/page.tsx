@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usedTractorAPI, UsedTractorListing, ListingStatus } from '@/lib/api/usedTractors';
-import { 
-  ClipboardCheck, 
-  Search, 
-  Clock, 
-  CheckCircle2, 
+import { usedTractorListingAPI } from '@/lib/api/used-listings';
+import { UsedTractorListing, ListingStatus } from '@/lib/api/usedTractors';
+import {
+  ClipboardCheck,
+  Search,
+  Clock,
+  CheckCircle2,
   AlertCircle,
   Wrench,
-  Loader2,
   FileText
 } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 
 export default function AdminValuationPage() {
@@ -25,9 +26,11 @@ export default function AdminValuationPage() {
 
   const fetchListings = () => {
     setLoading(true);
-    usedTractorAPI.getAllListings().then(res => {
+    usedTractorListingAPI.getAllListings().then(res => {
       if (res.success && res.data) {
-        setListings(res.data);
+        // The backend wraps the array in a paginated object: res.data = { listings: [...], total: ... }
+        const listingsArray = Array.isArray(res.data.listings) ? res.data.listings : (Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []));
+        setListings(listingsArray);
       }
       setLoading(false);
     });
@@ -41,7 +44,7 @@ export default function AdminValuationPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -55,53 +58,54 @@ export default function AdminValuationPage() {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-background rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm">
-           <div className="flex justify-between items-start mb-4">
-              <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-500">
-                <Clock size={20} />
-              </div>
-           </div>
-           <p className="text-sm font-bold text-muted uppercase tracking-widest">Pending Inspections</p>
-           <p className="text-3xl font-black mt-1">{pendingInspections.length}</p>
+        <div className="bg-[var(--card-bg)] backdrop-blur-2xl rounded-2xl border border-[var(--border-subtle)] shadow-[var(--card-shadow)] p-5">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-500">
+              <Clock size={20} />
+            </div>
+          </div>
+          <p className="text-sm font-bold text-muted uppercase tracking-widest">Pending Inspections</p>
+          <p className="text-3xl font-black mt-1">{pendingInspections.length}</p>
         </div>
-        <div className="bg-[var(--color-brand-green)]/10 rounded-2xl border border-[var(--color-brand-green)]/20 p-5 shadow-sm">
-           <div className="flex justify-between items-start mb-4">
-              <div className="p-2.5 bg-[var(--color-brand-green)] rounded-xl text-white">
-                <CheckCircle2 size={20} />
-              </div>
-           </div>
-           <p className="text-sm font-bold text-[var(--color-brand-green)] uppercase tracking-widest">Certified Tractors</p>
-           <p className="text-3xl font-black text-[var(--color-brand-green)] mt-1">{completedInspections.length}</p>
+        <div className="bg-[var(--card-bg)] backdrop-blur-2xl rounded-2xl border border-[var(--color-brand-green)]/30 shadow-lg shadow-[var(--color-brand-green)]/10 p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-brand-green)] opacity-10 blur-3xl pointer-events-none rounded-full" />
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2.5 bg-[var(--color-brand-green)] rounded-xl text-white">
+              <CheckCircle2 size={20} />
+            </div>
+          </div>
+          <p className="text-sm font-bold text-[var(--color-brand-green)] uppercase tracking-widest">Certified Tractors</p>
+          <p className="text-3xl font-black text-[var(--color-brand-green)] mt-1">{completedInspections.length}</p>
         </div>
-        <div className="bg-background rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm">
-           <div className="flex justify-between items-start mb-4">
-              <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-500">
-                <FileText size={20} />
-              </div>
-           </div>
-           <p className="text-sm font-bold text-muted uppercase tracking-widest">Valuation Requests</p>
-           <p className="text-3xl font-black mt-1">0</p>
+        <div className="bg-[var(--card-bg)] backdrop-blur-2xl rounded-2xl border border-[var(--border-subtle)] shadow-[var(--card-shadow)] p-5">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-500">
+              <FileText size={20} />
+            </div>
+          </div>
+          <p className="text-sm font-bold text-muted uppercase tracking-widest">Valuation Requests</p>
+          <p className="text-3xl font-black mt-1">0</p>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[var(--border-subtle)]">
-         <button 
-           onClick={() => setActiveTab('PENDING')}
-           className={`px-6 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'PENDING' ? 'border-[var(--color-brand-green)] text-[var(--color-brand-green)]' : 'border-transparent text-muted hover:text-foreground'}`}
-         >
-           Pending Inspections
-         </button>
-         <button 
-           onClick={() => setActiveTab('COMPLETED')}
-           className={`px-6 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'COMPLETED' ? 'border-[var(--color-brand-green)] text-[var(--color-brand-green)]' : 'border-transparent text-muted hover:text-foreground'}`}
-         >
-           Completed & Certified
-         </button>
+        <button
+          onClick={() => setActiveTab('PENDING')}
+          className={`px-6 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'PENDING' ? 'border-[var(--color-brand-green)] text-[var(--color-brand-green)]' : 'border-transparent text-muted hover:text-foreground'}`}
+        >
+          Pending Inspections
+        </button>
+        <button
+          onClick={() => setActiveTab('COMPLETED')}
+          className={`px-6 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'COMPLETED' ? 'border-[var(--color-brand-green)] text-[var(--color-brand-green)]' : 'border-transparent text-muted hover:text-foreground'}`}
+        >
+          Completed & Certified
+        </button>
       </div>
 
       {/* Inspection List */}
-      <div className="bg-background rounded-3xl border border-[var(--border-subtle)] shadow-sm overflow-hidden">
+      <div className="bg-[var(--card-bg)] backdrop-blur-3xl rounded-[2rem] border border-[var(--border-subtle)] shadow-[var(--card-shadow)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -116,8 +120,8 @@ export default function AdminValuationPage() {
               {loading ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center">
-                    <Loader2 className="animate-spin text-[var(--color-brand-green)] mx-auto mb-2" size={32} />
-                    <p className="text-sm font-medium text-muted">Loading inspection queue...</p>
+                    <TractorLoader className="text-[var(--color-brand-green)] mx-auto mb-2" size={48} />
+                    <p className="text-sm font-medium text-muted mt-2">Loading inspection queue...</p>
                   </td>
                 </tr>
               ) : displayListings.length === 0 ? (
@@ -154,19 +158,19 @@ export default function AdminValuationPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-bold text-foreground">₹{listing.askingPrice.toLocaleString('en-IN')}</div>
+                      <div className="font-bold text-foreground">₹{(listing.askingPrice || 0).toLocaleString('en-IN')}</div>
                       <div className="text-xs font-bold text-muted mt-0.5">ID: {listing.id}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-bold flex items-center gap-1">
-                        <Wrench size={14} className="text-muted"/> {listing.conditionGrade}
+                      <div className="text-sm font-bold flex items-center gap-1 capitalize">
+                        <Wrench size={14} className="text-muted" /> {(listing.conditionGrade || 'N/A').toLowerCase()}
                       </div>
-                      <div className="text-xs font-bold text-muted mt-0.5">{listing.hoursUsed} Hours</div>
+                      <div className="text-xs font-bold text-muted mt-0.5">{listing.hoursUsed || '0'} Hours</div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Link 
+                      <Link
                         href={`/admin/used-listings/${listing.id}`}
-                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-colors ${activeTab === 'PENDING' ? 'bg-[var(--color-brand-green)] text-white hover:bg-[var(--color-brand-green)]/90 shadow-sm' : 'bg-foreground/5 hover:bg-foreground/10 border border-[var(--border-subtle)]'}`}
+                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-black transition-all hover:-translate-y-0.5 ${activeTab === 'PENDING' ? 'bg-[var(--color-brand-green)] text-white hover:bg-[var(--color-brand-green)]/90 shadow-lg shadow-[var(--color-brand-green)]/20' : 'bg-foreground/5 hover:bg-foreground/10 border border-[var(--border-subtle)] shadow-sm'}`}
                       >
                         {activeTab === 'PENDING' ? (
                           <>Start Inspection</>

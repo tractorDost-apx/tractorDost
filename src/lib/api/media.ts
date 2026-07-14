@@ -33,7 +33,7 @@ export const mediaAPI = {
    * Upload and create new media item(s)
    */
   createMedia: async (data: FormData) => {
-    const response = await apiClient.postForm<{ success: boolean; data: Media[] }>('/media/create', data);
+    const response = await apiClient.post<{ success: boolean; data: Media[] }>('/media/create', data);
     return response.data;
   },
 

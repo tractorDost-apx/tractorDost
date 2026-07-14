@@ -27,7 +27,7 @@ export interface UsedTractorListing {
   id: number;
   sellerId: number;
   tractorId?: number;
-  
+
   tractorBrand: string;
   tractorModel: string;
   yearOfManufacture: number;
@@ -44,29 +44,29 @@ export interface UsedTractorListing {
   urgency: UrgencyLevel;
   isCertified: boolean;
   certifiedAt: string | null;
-  
+
   // Advanced Condition Details from Backend
   tyreCondition?: ConditionGrade;
   engineConditionPct?: number;
   hydraulicsCondition?: ConditionGrade;
   bodyCondition?: ConditionGrade;
-  
+
   // Documents & Status
   rcAvailable: boolean;
   loanClearanceStatus?: string;
-  
+
   state: string;
   district: string;
   villageCity: string | null;
-  
+
   viewsCount: number;
   leadCount: number;
 
   description: string | null;
   majorRepairs?: string | null;
-  
+
   createdAt: string;
-  
+
   // UI ONLY Mock Data (Usually handled by relations to UsedTractorDocument/Media)
   imageUrl?: string;
 }
@@ -227,11 +227,11 @@ const MOCK_USED_TRACTORS: UsedTractorListing[] = [
 ];
 
 export const usedTractorAPI = {
-  getAllListings: async (params?: { 
-    brand?: string; 
-    state?: string; 
-    minPrice?: number; 
-    maxPrice?: number; 
+  getAllListings: async (params?: {
+    brand?: string;
+    state?: string;
+    minPrice?: number;
+    maxPrice?: number;
     isCertified?: boolean;
     financeAvailable?: boolean;
     rcAvailable?: boolean;
@@ -242,7 +242,7 @@ export const usedTractorAPI = {
   }) => {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 600));
-    
+
     let filtered = [...MOCK_USED_TRACTORS];
 
     if (params) {
@@ -278,8 +278,8 @@ export const usedTractorAPI = {
       }
       if (params.search) {
         const q = params.search.toLowerCase();
-        filtered = filtered.filter(t => 
-          t.tractorModel.toLowerCase().includes(q) || 
+        filtered = filtered.filter(t =>
+          t.tractorModel.toLowerCase().includes(q) ||
           t.tractorBrand.toLowerCase().includes(q) ||
           t.district.toLowerCase().includes(q)
         );
@@ -292,11 +292,11 @@ export const usedTractorAPI = {
       total: filtered.length
     };
   },
-  
+
   createListing: async (data: Partial<UsedTractorListing>) => {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     const newId = Math.max(...MOCK_USED_TRACTORS.map(t => t.id)) + 1;
     const newListing: UsedTractorListing = {
       ...data,
@@ -311,9 +311,9 @@ export const usedTractorAPI = {
       estimatedMarketPrice: data.askingPrice ? data.askingPrice * 0.95 : null,
       imageUrl: "https://images.pexels.com/photos/10800366/pexels-photo-10800366.jpeg?auto=compress&cs=tinysrgb&w=800"
     } as UsedTractorListing;
-    
+
     MOCK_USED_TRACTORS.unshift(newListing);
-    
+
     return {
       success: true,
       data: newListing,
@@ -323,9 +323,9 @@ export const usedTractorAPI = {
 
   getListingById: async (id: number) => {
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     const tractor = MOCK_USED_TRACTORS.find(t => t.id === id);
-    
+
     if (!tractor) {
       return { success: false, message: "Tractor not found" };
     }

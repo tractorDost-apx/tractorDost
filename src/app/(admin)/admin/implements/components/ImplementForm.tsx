@@ -5,7 +5,8 @@ import { implementAPI, Implement, ImplementCategory, EquipmentBrand } from '@/li
 import { implementCategoryAPI } from '@/lib/api/implementCategories';
 import { equipmentBrandAPI } from '@/lib/api/equipmentBrands';
 import { useRouter } from 'next/navigation';
-import { Save, Loader2, ArrowLeft, Upload, FileText, Video, Image as ImageIcon } from 'lucide-react';
+import { Save, ArrowLeft, Upload, FileText, Video, Image as ImageIcon } from 'lucide-react';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 
 interface ImplementFormProps {
@@ -378,7 +379,7 @@ export default function ImplementForm({ initialData, isEditing = false }: Implem
             disabled={loading}
             className="spatial-button px-8 py-3 rounded-full text-sm font-black shadow-lg flex items-center gap-2 disabled:opacity-50"
           >
-            {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+            {loading ? <TractorLoader size={20} /> : <Save size={18} />}
             {isEditing ? 'Save Changes' : 'Create Implement'}
           </button>
         </div>
