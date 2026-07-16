@@ -13,7 +13,9 @@ import {
   FileText,
   MapPin,
   Calendar,
-  Phone
+  Phone,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { TractorLoader } from '@/components/ui/TractorLoader';
@@ -24,6 +26,25 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
   const [inspection, setInspection] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleCancel = () => {
+    if (inspection) {
+      setScores({
+        engineScore: inspection.engineScore || 0,
+        tyreScore: inspection.tyreScore || 0,
+        hydraulicsScore: inspection.hydraulicsScore || 0,
+        bodyScore: inspection.bodyScore || 0,
+        clutchScore: inspection.clutchScore || 0,
+      });
+      setInspectorNotes(inspection.inspectorNotes || '');
+      setReportFile(null);
+      setImageFiles([]);
+      setDocFiles({});
+    }
+    setIsEditing(false);
+  };
 
   // Form State
   const [scores, setScores] = useState({
@@ -124,8 +145,14 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
 
       const res = await usedTractorInspectionAPI.submitInspectionReport(unwrappedParams.id, formData);
       if (res.success) {
-        alert('Inspection report submitted successfully!');
-        router.push('/agent/inspections');
+        if (inspection?.status === 'REPORT_UPLOADED') {
+          alert('Inspection report updated successfully!');
+          setIsEditing(false);
+          fetchInspection();
+        } else {
+          alert('Inspection report submitted successfully!');
+          router.push('/agent/inspections');
+        }
       } else {
         alert('Failed to submit report: ' + res.message);
       }
@@ -152,7 +179,9 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
   }
 
   const isSubmitted = inspection.status !== 'ASSIGNED';
+  const isFormEditable = inspection.status === 'ASSIGNED' || (inspection.status === 'REPORT_UPLOADED' && isEditing);
   const listing = inspection.listing;
+  const images = listing.media?.filter((m: any) => m.mediaType !== 'pdf') || [];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
@@ -163,25 +192,85 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
         <h1 className="text-3xl font-black flex items-center gap-3">
           <Wrench className="text-[var(--color-brand-green)]" size={32} />
-          {isSubmitted ? 'Inspection Report' : 'Submit Inspection'}
+          {isSubmitted && !isEditing ? 'Inspection Report' : 'Submit/Edit Inspection'}
         </h1>
-        <span className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest ${
-          isSubmitted ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-orange-500/10 text-orange-500'
-        }`}>
-          {inspection.status.replace('_', ' ')}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest ${
+            isSubmitted ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-orange-500/10 text-orange-500'
+          }`}>
+            {inspection.status.replace('_', ' ')}
+          </span>
+          {inspection.status === 'REPORT_UPLOADED' && !isEditing && (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-2 bg-[var(--color-brand-green)] text-white text-sm font-black uppercase tracking-widest rounded-xl hover:bg-[var(--color-brand-green)]/90 transition-all active:scale-95 shadow-md flex items-center gap-1.5"
+            >
+              <Save size={16} /> Edit Report
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Listing Details Card */}
       <div className="bg-background rounded-3xl p-8 border border-[var(--border-subtle)] shadow-sm">
         <div className="flex flex-col md:flex-row gap-8">
-          {listing.media?.[0] ? (
-            <div className="w-full md:w-48 h-48 rounded-2xl overflow-hidden shrink-0">
-              <img src={listing.media[0].url} alt="Tractor" className="w-full h-full object-cover" />
+          {images.length > 0 ? (
+            <div className="relative w-full md:w-48 h-48 rounded-2xl overflow-hidden shrink-0 group border border-[var(--border-subtle)] bg-foreground/5 shadow-sm">
+              <img 
+                src={images[currentImageIndex]?.url} 
+                alt={`Tractor Image ${currentImageIndex + 1}`} 
+                className="w-full h-full object-cover transition-all duration-300 animate-in fade-in"
+              />
+              
+              {images.length > 1 && (
+                <>
+                  {/* Left Arrow */}
+                  <button 
+                    type="button" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                    }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  {/* Right Arrow */}
+                  <button 
+                    type="button" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+
+                  {/* Indicators / Dots */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 bg-black/30 px-2 py-1 rounded-full">
+                    {images.map((_: any, idx: number) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentImageIndex(idx);
+                        }}
+                        className={`w-1.5 h-1.5 rounded-full transition-all ${
+                          idx === currentImageIndex ? 'bg-white w-3' : 'bg-white/50'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           ) : (
-            <div className="w-full md:w-48 h-48 rounded-2xl bg-foreground/5 flex items-center justify-center shrink-0">
-              <span className="text-muted font-bold">No Image</span>
+            <div className="w-full md:w-48 h-48 rounded-2xl bg-foreground/5 flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+              <span className="text-muted font-bold text-sm">No Image</span>
             </div>
           )}
           
@@ -229,7 +318,7 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
                   type="range"
                   min="0" max="100" step="1"
                   value={(scores as any)[field]}
-                  disabled={isSubmitted}
+                  disabled={!isFormEditable}
                   onChange={(e) => setScores({ ...scores, [field]: Number(e.target.value) })}
                   className="w-full accent-[var(--color-brand-green)] disabled:opacity-50"
                 />
@@ -244,20 +333,20 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
             <textarea
               rows={4}
               value={inspectorNotes}
-              disabled={isSubmitted}
+              disabled={!isFormEditable}
               onChange={(e) => setInspectorNotes(e.target.value)}
               placeholder="Enter detailed observations here..."
               className="w-full bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl p-4 font-medium focus:outline-none focus:border-[var(--color-brand-green)] disabled:opacity-50"
             />
           </div>
 
-          {!isSubmitted && (
+          {isFormEditable && (
             <div>
-              <label className="block text-sm font-bold uppercase tracking-widest mb-3">Upload PDF Report <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-bold uppercase tracking-widest mb-3">Upload PDF Report {inspection.status === 'ASSIGNED' && <span className="text-red-500">*</span>}</label>
               <input
                 type="file"
                 accept=".pdf"
-                required={!isSubmitted}
+                required={inspection.status === 'ASSIGNED'}
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
                     setReportFile(e.target.files[0]);
@@ -273,7 +362,7 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
             </div>
           )}
 
-          {!isSubmitted && (
+          {isFormEditable && (
             <div>
               <label className="block text-sm font-bold uppercase tracking-widest mb-3">Official Documents (RC, Insurance, Loan NOC)</label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -354,7 +443,7 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
             </div>
           )}
 
-          {!isSubmitted && (
+          {isFormEditable && (
             <div>
               <label className="block text-sm font-bold uppercase tracking-widest mb-3">Upload Tractor Images (Optional)</label>
               
@@ -412,34 +501,165 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
             </div>
           )}
 
-          {isSubmitted && inspection.reportUrl && (
-            <div>
-              <label className="block text-sm font-bold uppercase tracking-widest mb-3">Attached Report</label>
-              <a 
-                href={inspection.reportUrl} 
-                target="_blank" 
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-black text-sm hover:opacity-90 transition-opacity"
-              >
-                <FileText size={18} /> View PDF Report
-              </a>
+          {isSubmitted && (
+            <div className="space-y-6">
+              {/* Attached Report */}
+              {inspection.reportUrl && (
+                <div>
+                  <label className="block text-sm font-bold uppercase tracking-widest mb-3">Attached Report</label>
+                  <a 
+                    href={inspection.reportUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-black text-sm hover:opacity-90 transition-opacity animate-in fade-in"
+                  >
+                    <FileText size={18} /> View PDF Report
+                  </a>
+                </div>
+              )}
+
+              {/* Official Documents */}
+              {listing.documents && listing.documents.length > 0 && (
+                <div>
+                  <label className="block text-sm font-bold uppercase tracking-widest mb-3">Uploaded Official Documents</label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in">
+                    {listing.documents.map((doc: any) => (
+                      <div key={doc.id} className="bg-foreground/5 p-4 rounded-2xl border border-[var(--border-subtle)] flex items-center justify-between">
+                        <div className="min-w-0 flex-1 mr-2">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted truncate">{doc.docType.replace('_', ' ')}</p>
+                          <a href={doc.url} target="_blank" rel="noreferrer" className="text-sm font-bold text-[var(--color-brand-green)] hover:underline truncate block">
+                            View Document
+                          </a>
+                        </div>
+                        <CheckCircle2 size={20} className="text-[var(--color-brand-green)] shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tractor Images */}
+              {listing.media && listing.media.length > 0 && (
+                <div>
+                  <label className="block text-sm font-bold uppercase tracking-widest mb-3">Uploaded Tractor Images</label>
+                  <div className="flex gap-3 flex-wrap animate-in fade-in">
+                    {listing.media.map((mediaItem: any, idx: number) => (
+                      <a key={mediaItem.id || idx} href={mediaItem.url} target="_blank" rel="noreferrer" className="relative w-24 h-24 rounded-xl overflow-hidden border border-[var(--border-subtle)] group shadow-sm hover:opacity-90 transition-opacity shrink-0">
+                        <img src={mediaItem.url} alt={`Tractor ${idx + 1}`} className="w-full h-full object-cover" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        {!isSubmitted && (
-          <div className="p-8 bg-foreground/5">
+        {isFormEditable && (
+          <div className="p-8 bg-foreground/5 flex flex-col md:flex-row gap-4">
             <button
               type="submit"
               disabled={submitting}
               className="w-full md:w-auto px-10 py-4 bg-[var(--color-brand-green)] text-white font-black text-lg rounded-2xl hover:bg-[var(--color-brand-green)]/90 transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-[var(--color-brand-green)]/30 flex items-center justify-center gap-3"
             >
               {submitting ? <TractorLoader size={24} /> : <CheckCircle2 size={24} />}
-              Submit Inspection Report
+              {inspection.status === 'REPORT_UPLOADED' ? 'Save Changes' : 'Submit Inspection Report'}
             </button>
+            {inspection.status === 'REPORT_UPLOADED' && (
+              <button
+                type="button"
+                onClick={handleCancel}
+                disabled={submitting}
+                className="w-full md:w-auto px-10 py-4 border border-[var(--border-subtle)] text-foreground font-black text-lg rounded-2xl hover:bg-foreground/5 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center"
+              >
+                Cancel
+              </button>
+            )}
           </div>
         )}
       </form>
+
+      {/* Associated Media Table */}
+      {listing.media && listing.media.length > 0 && (
+        <div className="bg-background rounded-3xl border border-[var(--border-subtle)] shadow-sm overflow-hidden p-8 mt-6 animate-in fade-in duration-500">
+          <h3 className="text-xl font-black mb-6 flex items-center gap-2">
+            <FileText className="text-[var(--color-brand-green)]" size={24} />
+            Associated Media Table Data
+          </h3>
+          <div className="overflow-x-auto rounded-2xl border border-[var(--border-subtle)]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-foreground/5 text-muted text-xs font-bold uppercase tracking-widest border-b border-[var(--border-subtle)]">
+                  <th className="p-4">Preview</th>
+                  <th className="p-4">ID</th>
+                  <th className="p-4">Type</th>
+                  <th className="p-4">Target Type</th>
+                  <th className="p-4">File Size</th>
+                  <th className="p-4">Primary</th>
+                  <th className="p-4">Created At</th>
+                  <th className="p-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
+                {listing.media.map((mediaItem: any) => {
+                  const fileSizeFriendly = mediaItem.fileSize 
+                    ? `${(mediaItem.fileSize / (1024 * 1024)).toFixed(2)} MB`
+                    : 'N/A';
+                  const dateFriendly = new Date(mediaItem.createdAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  });
+
+                  return (
+                    <tr key={mediaItem.id} className="hover:bg-foreground/5 transition-colors">
+                      <td className="p-4">
+                        <a href={mediaItem.url} target="_blank" rel="noreferrer" className="block w-12 h-12 rounded-lg overflow-hidden border border-[var(--border-subtle)] shrink-0 bg-foreground/5">
+                          {mediaItem.mediaType === 'pdf' ? (
+                            <div className="w-full h-full flex items-center justify-center text-red-500 font-bold text-[10px]">PDF</div>
+                          ) : (
+                            <img src={mediaItem.url} alt="media preview" className="w-full h-full object-cover" />
+                          )}
+                        </a>
+                      </td>
+                      <td className="p-4 font-mono text-xs text-muted">#{mediaItem.id}</td>
+                      <td className="p-4">
+                        <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-foreground/5">
+                          {mediaItem.mediaType}
+                        </span>
+                      </td>
+                      <td className="p-4 text-xs font-semibold text-muted">
+                        {mediaItem.targetType} (ID: {mediaItem.targetId})
+                      </td>
+                      <td className="p-4 text-xs text-muted">{fileSizeFriendly}</td>
+                      <td className="p-4">
+                        {mediaItem.isPrimary ? (
+                          <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                            Yes
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted">No</span>
+                        )}
+                      </td>
+                      <td className="p-4 text-xs text-muted">{dateFriendly}</td>
+                      <td className="p-4 text-right">
+                        <a 
+                          href={mediaItem.url} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-xs font-bold text-[var(--color-brand-green)] hover:underline"
+                        >
+                          View
+                        </a>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

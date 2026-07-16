@@ -8,7 +8,9 @@ import {
   Calendar,
   MapPin,
   Search,
-  Filter
+  Filter,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
@@ -95,53 +97,111 @@ export default function AgentInspectionsPage() {
               <div className="p-12 text-center text-muted font-bold text-lg">No inspections found matching your criteria.</div>
             ) : (
               filteredInspections.map((inspection) => (
-                <div key={inspection.id} className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:bg-foreground/5 transition-colors">
-                  
-                  <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-6 w-full">
-                    {inspection.listing?.documents?.[0]?.url ? (
-                      <div className="w-full md:w-32 h-48 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-md">
-                        <img src={inspection.listing.documents[0].url} alt="Tractor" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                      </div>
-                    ) : (
-                      <div className="w-full md:w-32 h-48 md:h-24 rounded-2xl bg-foreground/5 flex flex-col items-center justify-center shrink-0 border border-[var(--border-subtle)] text-muted">
-                        <span className="font-bold text-xs uppercase tracking-widest mt-2">No Image</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex-1 flex flex-col gap-3">
-                      <div className="flex items-center gap-4 flex-wrap">
-                        <h3 className="font-black text-2xl group-hover:text-[var(--color-brand-green)] transition-colors">
-                          {inspection.listing?.tractorBrand} {inspection.listing?.tractorModel}
-                        </h3>
-                      <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
-                        inspection.status === 'ASSIGNED' ? 'bg-orange-500/10 text-orange-500' : 
-                        inspection.status === 'CERTIFIED' ? 'bg-[var(--color-brand-green)] text-white' :
-                        'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
-                      }`}>
-                        {inspection.status.replace('_', ' ')}
-                      </span>
-                    </div>
-                    
-                    <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-muted">
-                      <span className="flex items-center gap-2"><Calendar size={18} /> Assigned: {new Date(inspection.createdAt).toLocaleDateString()}</span>
-                      <span className="flex items-center gap-2"><MapPin size={18} /> Location: {inspection.listing?.villageCity || 'Unknown'}, {inspection.listing?.district}</span>
-                    </div>
-                  </div>
-                </div>
-
-                  <Link
-                    href={`/agent/inspections/${inspection.id}`}
-                    className="px-8 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all w-full md:w-auto text-center shrink-0
-                      bg-foreground text-background hover:scale-105 active:scale-95 shadow-lg"
-                  >
-                    {inspection.status === 'ASSIGNED' ? 'Start Inspection' : 'View Report'}
-                  </Link>
-                </div>
+                <InspectionRow key={inspection.id} inspection={inspection} />
               ))
             )}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function InspectionRow({ inspection }: { inspection: any }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const listing = inspection.listing || {};
+  const images = listing.media?.filter((m: any) => m.mediaType !== 'pdf') || [];
+
+  return (
+    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:bg-foreground/5 transition-colors">
+      <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-6 w-full">
+        {images.length > 0 ? (
+          <div className="relative w-full md:w-32 h-48 md:h-24 rounded-2xl overflow-hidden shrink-0 group border border-[var(--border-subtle)] bg-foreground/5 shadow-sm">
+            <img 
+              src={images[currentImageIndex]?.url} 
+              alt={`Tractor Image ${currentImageIndex + 1}`} 
+              className="w-full h-full object-cover transition-all duration-300 animate-in fade-in"
+            />
+            
+            {images.length > 1 && (
+              <>
+                {/* Left Arrow */}
+                <button 
+                  type="button" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                  }}
+                  className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <ChevronLeft size={12} />
+                </button>
+
+                {/* Right Arrow */}
+                <button 
+                  type="button" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                  }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <ChevronRight size={12} />
+                </button>
+
+                {/* Indicators / Dots */}
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5 bg-black/30 px-1 py-0.5 rounded-full">
+                  {images.map((_: any, idx: number) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentImageIndex(idx);
+                      }}
+                      className={`w-1 h-1 rounded-full transition-all ${
+                        idx === currentImageIndex ? 'bg-white w-2' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="w-full md:w-32 h-48 md:h-24 rounded-2xl bg-foreground/5 flex flex-col items-center justify-center shrink-0 border border-[var(--border-subtle)] text-muted">
+            <span className="font-bold text-xs uppercase tracking-widest">No Image</span>
+          </div>
+        )}
+        
+        <div className="flex-1 flex flex-col gap-3">
+          <div className="flex items-center gap-4 flex-wrap">
+            <h3 className="font-black text-2xl group-hover:text-[var(--color-brand-green)] transition-colors">
+              {listing.tractorBrand} {listing.tractorModel}
+            </h3>
+            <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
+              inspection.status === 'ASSIGNED' ? 'bg-orange-500/10 text-orange-500' : 
+              inspection.status === 'CERTIFIED' ? 'bg-[var(--color-brand-green)] text-white' :
+              'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+            }`}>
+              {inspection.status.replace('_', ' ')}
+            </span>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-muted">
+            <span className="flex items-center gap-2"><Calendar size={18} /> Assigned: {new Date(inspection.createdAt).toLocaleDateString()}</span>
+            <span className="flex items-center gap-2"><MapPin size={18} /> Location: {listing.villageCity || 'Unknown'}, {listing.district}</span>
+          </div>
+        </div>
+      </div>
+
+      <Link
+        href={`/agent/inspections/${inspection.id}`}
+        className="px-8 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all w-full md:w-auto text-center shrink-0
+          bg-foreground text-background hover:scale-105 active:scale-95 shadow-lg"
+      >
+        {inspection.status === 'ASSIGNED' ? 'Start Inspection' : 'View Report'}
+      </Link>
     </div>
   );
 }

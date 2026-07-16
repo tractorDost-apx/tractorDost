@@ -8,7 +8,10 @@ export const usedTractorListingAPI = {
       const response = await apiClient.get('/used-listings/getAll', { params });
       return response.data;
     } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch used listings' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch used listings',
+      };
     }
   },
 
@@ -17,7 +20,10 @@ export const usedTractorListingAPI = {
       const response = await apiClient.get(`/used-listings/get/${id}`);
       return response.data;
     } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch listing details' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch listing details',
+      };
     }
   },
 
@@ -26,7 +32,10 @@ export const usedTractorListingAPI = {
       const response = await apiClient.post('/used-listings/create', data);
       return response.data;
     } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to create listing' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to create listing',
+      };
     }
   },
 
@@ -35,7 +44,10 @@ export const usedTractorListingAPI = {
       const response = await apiClient.patch(`/used-listings/update/${id}`, data);
       return response.data;
     } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to update listing' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update listing',
+      };
     }
   },
 
@@ -44,39 +56,59 @@ export const usedTractorListingAPI = {
       const response = await apiClient.delete(`/used-listings/delete/${id}`);
       return response.data;
     } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to delete listing' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to delete listing',
+      };
     }
   },
 
   // Admin Endpoints
-  adminUpdateListingStatus: async (id: number | string, data: { listingStatus?: ListingStatus; isCertified?: boolean; boostType?: string; featuredUntil?: string; rejectionReason?: string }) => {
+  adminUpdateListingStatus: async (
+    id: number | string,
+    data: {
+      listingStatus?: ListingStatus;
+      isCertified?: boolean;
+      boostType?: string;
+      featuredUntil?: string;
+      rejectionReason?: string;
+    }
+  ) => {
     try {
       const response = await apiClient.patch(`/used-listings/${id}/admin`, data);
       return response.data;
     } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to update listing status' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update listing status',
+      };
     }
   },
 
   // Enquiry (Leads) Endpoints
   getListingEnquiries: async (listingId: number | string) => {
     try {
-      const response = await apiClient.get(`/used-tractor-enquiries/getAllEnquiries`, { params: { listingId } });
+      const response = await apiClient.get(`/used-tractor-enquiries/getAllEnquiries`, {
+        params: { listingId },
+      });
       return response.data;
     } catch (error: any) {
       return { success: false, message: error.response?.data?.message || 'Failed to fetch leads' };
     }
   },
 
-
-
   // Documents Endpoints
   getListingDocuments: async (listingId: number | string) => {
     try {
-      const response = await apiClient.get(`/used-tractor-documents/getAllDocuments`, { params: { listingId } });
+      const response = await apiClient.get(`/used-tractor-documents/getAllDocuments`, {
+        params: { listingId },
+      });
       return response.data;
     } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch documents' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch documents',
+      };
     }
   },
 };

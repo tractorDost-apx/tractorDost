@@ -98,27 +98,84 @@ export default function SellUsedTractorPage() {
     }));
   };
 
-  const handleNext = () => {
-    setError('');
-    
-    // Step 1 Validation
-    if (currentStep === 1) {
-      if (!formData.tractorBrand || !formData.tractorModel || !formData.state || !formData.district || !formData.villageCity) {
-        setError('Please fill in all required fields (Brand, Model, State, District, Village/City).');
-        return;
+  const validateStep = (step: number): string | null => {
+    if (step === 1) {
+      if (!formData.tractorBrand?.trim()) {
+        return 'Please select a tractor brand.';
       }
-      if (!formData.yearOfManufacture || formData.yearOfManufacture < 1980 || formData.yearOfManufacture > new Date().getFullYear()) {
-        setError('Please enter a valid Year of Manufacture.');
-        return;
+      if (!formData.tractorModel?.trim()) {
+        return 'Please enter the tractor model.';
+      }
+      const currentYear = new Date().getFullYear();
+      if (!formData.yearOfManufacture || formData.yearOfManufacture < 1980 || formData.yearOfManufacture > currentYear) {
+        return `Please enter a valid Year of Manufacture (1980 - ${currentYear}).`;
+      }
+      if (formData.hoursUsed === undefined || formData.hoursUsed === null || isNaN(Number(formData.hoursUsed)) || Number(formData.hoursUsed) < 0) {
+        return 'Please enter a valid number of hours used (0 or more).';
+      }
+      if (formData.ownership === undefined || formData.ownership === null || formData.ownership < 1) {
+        return 'Please select ownership details.';
+      }
+      if (!formData.state?.trim()) {
+        return 'Please enter the state.';
+      }
+      if (!formData.district?.trim()) {
+        return 'Please enter the district.';
+      }
+      if (!formData.villageCity?.trim()) {
+        return 'Please enter the village/city.';
       }
     }
 
-    // Step 3 Validation
-    if (currentStep === 3) {
-      if (formData.askingPrice === undefined || formData.askingPrice === null || formData.askingPrice <= 0) {
-        setError('Please enter a valid asking price greater than 0.');
-        return;
+    if (step === 2) {
+      if (!formData.conditionGrade) {
+        return 'Please select the overall condition grade.';
       }
+      if (formData.engineConditionPct === undefined || formData.engineConditionPct === null || isNaN(Number(formData.engineConditionPct)) || Number(formData.engineConditionPct) < 10 || Number(formData.engineConditionPct) > 100) {
+        return 'Please select a valid engine condition percentage (10% - 100%).';
+      }
+      if (!formData.tyreCondition) {
+        return 'Please select the tyre condition.';
+      }
+      if (!formData.hydraulicsCondition) {
+        return 'Please select the hydraulics condition.';
+      }
+      if (!formData.bodyCondition) {
+        return 'Please select the body/paint condition.';
+      }
+    }
+
+    if (step === 3) {
+      if (formData.askingPrice === undefined || formData.askingPrice === null || isNaN(Number(formData.askingPrice)) || Number(formData.askingPrice) < 10000) {
+        return 'Please enter a valid asking price (minimum ₹10,000).';
+      }
+      if (!formData.loanClearanceStatus) {
+        return 'Please select the loan clearance status.';
+      }
+      if (!formData.urgency) {
+        return 'Please select the selling urgency level.';
+      }
+    }
+
+    if (step === 4) {
+      if (!formData.description?.trim()) {
+        return 'Please enter a description for your tractor.';
+      }
+      if (tractorPhotos.length === 0) {
+        return 'Please upload at least one photo of your tractor.';
+      }
+    }
+
+    return null;
+  };
+
+  const handleNext = () => {
+    setError('');
+    
+    const validationError = validateStep(currentStep);
+    if (validationError) {
+      setError(validationError);
+      return;
     }
 
     if (currentStep < 4) setCurrentStep(prev => prev + 1);
@@ -136,6 +193,16 @@ export default function SellUsedTractorPage() {
     if (currentStep < 4) {
       handleNext();
       return;
+    }
+
+    // Strict validation across all steps before final submission
+    for (let step = 1; step <= 4; step++) {
+      const validationError = validateStep(step);
+      if (validationError) {
+        setError(validationError);
+        setCurrentStep(step);
+        return;
+      }
     }
 
     if (!isAuthenticated) {
@@ -605,7 +672,7 @@ export default function SellUsedTractorPage() {
                 <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-6">
                     <div>
-                      <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Description</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Description *</label>
                       <textarea
                         name="description"
                         rows={4}
@@ -631,7 +698,7 @@ export default function SellUsedTractorPage() {
                   
                   {/* Photos Upload Section */}
                   <div className="space-y-4">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-muted border-b border-[var(--border-subtle)] pb-2">Photos (Optional)</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-muted border-b border-[var(--border-subtle)] pb-2">Photos *</h3>
                     <div className="bg-foreground/5 p-6 rounded-2xl border border-[var(--border-subtle)] border-dashed">
                       <input
                         type="file"

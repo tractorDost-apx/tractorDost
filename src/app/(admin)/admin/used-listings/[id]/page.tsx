@@ -23,7 +23,9 @@ import {
   Save,
   MessageCircle,
   FileCheck,
-  Eye
+  Eye,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
@@ -34,6 +36,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'INSPECTION' | 'LEADS'>('OVERVIEW');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Inspection form state
   const [inspectionScores, setInspectionScores] = useState<any>({});
@@ -354,8 +357,59 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
                 <div className="flex flex-col md:flex-row gap-8 mb-8">
                   <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-foreground/5 border border-[var(--border-subtle)] shrink-0 relative group">
-                    {(documents.find(d => d.docType === 'FRONT_VIEW' || d.docType === 'TRACTOR_IMAGE' || d.docType?.includes('VIEW'))?.fileUrl || documents[0]?.fileUrl) ? (
-                      <img src={documents.find(d => d.docType === 'FRONT_VIEW' || d.docType === 'TRACTOR_IMAGE' || d.docType?.includes('VIEW'))?.fileUrl || documents[0]?.fileUrl} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    {listing?.media?.filter((m: any) => m.mediaType !== 'pdf').length > 0 ? (
+                      <>
+                        <img 
+                          src={listing.media.filter((m: any) => m.mediaType !== 'pdf')[currentImageIndex]?.url} 
+                          alt="" 
+                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" 
+                        />
+                        
+                        {listing.media.filter((m: any) => m.mediaType !== 'pdf').length > 1 && (
+                          <>
+                            {/* Left Arrow */}
+                            <button 
+                              type="button" 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentImageIndex((prev) => (prev === 0 ? listing.media.filter((m: any) => m.mediaType !== 'pdf').length - 1 : prev - 1));
+                              }}
+                              className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg"
+                            >
+                              <ChevronLeft size={20} />
+                            </button>
+
+                            {/* Right Arrow */}
+                            <button 
+                              type="button" 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentImageIndex((prev) => (prev === listing.media.filter((m: any) => m.mediaType !== 'pdf').length - 1 ? 0 : prev + 1));
+                              }}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg"
+                            >
+                              <ChevronRight size={20} />
+                            </button>
+
+                            {/* Indicators */}
+                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/40 px-2.5 py-1.5 rounded-full backdrop-blur-sm">
+                              {listing.media.filter((m: any) => m.mediaType !== 'pdf').map((_: any, idx: number) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setCurrentImageIndex(idx);
+                                  }}
+                                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                                    idx === currentImageIndex ? 'bg-white w-3.5' : 'bg-white/50'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </>
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-muted gap-2">
                         <ImageIcon size={32} />
