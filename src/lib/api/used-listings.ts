@@ -69,7 +69,7 @@ export const usedTractorListingAPI = {
     data: {
       listingStatus?: ListingStatus;
       isCertified?: boolean;
-      boostType?: string;
+      boostType?: string | null;
       featuredUntil?: string;
       rejectionReason?: string;
     }

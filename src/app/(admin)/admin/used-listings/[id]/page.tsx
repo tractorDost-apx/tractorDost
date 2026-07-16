@@ -139,7 +139,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
   const updateBoost = () => {
     setIsUpdating(true);
     usedTractorListingAPI.adminUpdateListingStatus(listing.id, { 
-      boostType: boostType,
+      boostType: boostType === 'NONE' ? null : boostType,
       featuredUntil: featuredUntil ? new Date(featuredUntil).toISOString() : undefined 
     }).then(res => {
       if (res.success) {
@@ -857,7 +857,9 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                 >
                   <option value="NONE">None</option>
                   <option value="FEATURED">Featured</option>
-                  <option value="PREMIUM">Premium</option>
+                  <option value="HOMEPAGE_BOOST">Homepage Boost</option>
+                  <option value="URGENT_BADGE">Urgent Badge</option>
+                  <option value="TOP_OF_SEARCH">Top of Search</option>
                 </select>
               </div>
               
