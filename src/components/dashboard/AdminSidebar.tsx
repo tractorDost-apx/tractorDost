@@ -71,6 +71,7 @@ const NAV_GROUPS = [
     title: 'Marketplace',
     items: [
       { label: 'Used Listings', href: '/admin/used-listings', icon: Search },
+      { label: 'Used Enquiries', href: '/admin/used-listings/enquiries', icon: MessageSquareText },
       { label: 'Inspections & Valuations', href: '/admin/valuation', icon: FileCheck },
       { label: 'Listing Boosts', href: '/admin/listing-boosts', icon: Layers },
     ]

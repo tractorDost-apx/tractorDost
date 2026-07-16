@@ -2,64 +2,148 @@
 
 import React, { useState, useEffect } from 'react';
 import { usedTractorEnquiryAPI } from '@/lib/api/used-enquiries';
-import {
-  Search,
-  MessageCircle,
-  Clock,
-  CheckCircle2,
-  Phone,
-  User as UserIcon,
-  Filter,
-  XCircle,
-  MoreVertical,
-} from 'lucide-react';
-import { TractorLoader } from '@/components/ui/TractorLoader';
+import { EnquiryFilters } from '@/components/admin/used-enquiries/EnquiryFilters';
+import { EnquiryTable } from '@/components/admin/used-enquiries/EnquiryTable';
+import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function AdminUsedEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [sortOption, setSortOption] = useState('createdAt-desc');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const limit = 15;
+
+  // Banner messages
+  const [alertMsg, setAlertMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Fetch enquiries when page, tab, search, or sorting changes
   useEffect(() => {
     fetchEnquiries();
-  }, []);
+  }, [currentPage, activeTab, debouncedSearch, sortOption]);
 
   const fetchEnquiries = () => {
     setLoading(true);
-    usedTractorEnquiryAPI.getAllEnquiries().then((res: any) => {
-      if (res.success && res.data) {
-        setEnquiries(res.data);
-      }
-      setLoading(false);
-    });
+    const [sortBy, sortOrder] = sortOption.split('-');
+    const params: any = {
+      page: currentPage,
+      limit,
+      sortBy,
+      sortOrder,
+    };
+
+    if (activeTab !== 'ALL') {
+      params.status = activeTab;
+    }
+
+    if (debouncedSearch.trim() !== '') {
+      params.mobile = debouncedSearch.trim();
+    }
+
+    usedTractorEnquiryAPI
+      .getAllEnquiries(params)
+      .then((res: any) => {
+        if (res.success && res.data) {
+          // Backend wraps results in { data: Enquiry[], meta: { total, page, limit, totalPages } }
+          const resData = res.data;
+          const enquiriesArray = Array.isArray(resData.data)
+            ? resData.data
+            : Array.isArray(resData)
+            ? resData
+            : [];
+          setEnquiries(enquiriesArray);
+
+          if (resData.meta) {
+            setTotalPages(resData.meta.totalPages || 1);
+            setTotalCount(resData.meta.total || enquiriesArray.length);
+          } else {
+            setTotalPages(1);
+            setTotalCount(enquiriesArray.length);
+          }
+        } else {
+          setEnquiries([]);
+          setTotalPages(1);
+          setTotalCount(0);
+          showAlert('error', res.message || 'Failed to fetch enquiries.');
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setEnquiries([]);
+        setLoading(false);
+        showAlert('error', 'An unexpected error occurred while fetching enquiries.');
+      });
+  };
+
+  const showAlert = (type: 'success' | 'error', text: string) => {
+    setAlertMsg({ type, text });
+    setTimeout(() => setAlertMsg(null), 5000);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (option: string) => {
+    setSortOption(option);
+    setCurrentPage(1);
   };
 
   const updateStatus = (id: number, status: string) => {
     setUpdatingId(id);
-    usedTractorEnquiryAPI.updateEnquiryStatus(id, status).then((res: any) => {
-      if (res.success) {
-        setEnquiries(enquiries.map(e => e.id === id ? { ...e, status } : e));
-      }
-      setUpdatingId(null);
-    });
+    usedTractorEnquiryAPI
+      .updateEnquiryStatus(id, status)
+      .then((res: any) => {
+        if (res.success) {
+          setEnquiries(enquiries.map((e) => (e.id === id ? { ...e, status } : e)));
+          showAlert('success', 'Enquiry status updated successfully.');
+        } else {
+          showAlert('error', res.message || 'Failed to update status.');
+        }
+        setUpdatingId(null);
+      })
+      .catch(() => {
+        showAlert('error', 'Failed to update status due to a server error.');
+        setUpdatingId(null);
+      });
   };
 
-  const filteredEnquiries = enquiries.filter(e =>
-    (activeTab === 'ALL' || e.status === activeTab) &&
-    (e.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      e.mobile?.includes(searchQuery))
-  );
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'NEW': return <span className="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-xs font-bold uppercase">New</span>;
-      case 'CONTACTED': return <span className="px-2 py-1 bg-amber-500/10 text-amber-500 rounded text-xs font-bold uppercase">Contacted</span>;
-      case 'QUALIFIED': return <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded text-xs font-bold uppercase">Qualified</span>;
-      case 'LOST': return <span className="px-2 py-1 bg-red-500/10 text-red-500 rounded text-xs font-bold uppercase">Lost</span>;
-      default: return <span className="px-2 py-1 bg-foreground/10 text-foreground rounded text-xs font-bold uppercase">{status}</span>;
-    }
+  const handleDelete = (id: number) => {
+    usedTractorEnquiryAPI
+      .deleteEnquiry(id)
+      .then((res: any) => {
+        if (res && res.success === false) {
+          showAlert('error', res.message || 'Failed to delete enquiry.');
+        } else {
+          setEnquiries(enquiries.filter((e) => e.id !== id));
+          setTotalCount((prev) => Math.max(0, prev - 1));
+          showAlert('success', 'Enquiry deleted successfully.');
+        }
+      })
+      .catch(() => {
+        showAlert('error', 'Failed to delete enquiry.');
+      });
   };
 
   return (
@@ -67,99 +151,64 @@ export default function AdminUsedEnquiriesPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-black text-foreground tracking-tight">Used Tractor Enquiries</h1>
-          <p className="text-muted font-medium mt-1">Manage buyer leads for used tractor listings.</p>
+          <p className="text-muted font-medium mt-1">
+            Manage and advance status leads for used tractor enquiries ({totalCount} total).
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-foreground/5 p-2 rounded-2xl border border-[var(--border-subtle)]">
-        <div className="flex w-full md:w-auto overflow-x-auto no-scrollbar gap-1">
-          {['ALL', 'NEW', 'CONTACTED', 'QUALIFIED', 'LOST'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab ? 'bg-background text-foreground shadow-sm border border-[var(--border-subtle)]' : 'text-muted hover:text-foreground hover:bg-foreground/5'}`}
-            >
-              {tab === 'ALL' ? 'All Leads' : tab}
-            </button>
-          ))}
+      {alertMsg && (
+        <div
+          className={`flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300 ${
+            alertMsg.type === 'success'
+              ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
+              : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
+          }`}
+        >
+          {alertMsg.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          <span className="text-sm font-bold">{alertMsg.text}</span>
         </div>
-        <div className="relative w-full md:w-72 shrink-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-          <input
-            type="text"
-            placeholder="Search by name or mobile..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-background border border-[var(--border-subtle)] rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
-          />
-        </div>
-      </div>
+      )}
 
-      <div className="bg-background rounded-3xl border border-[var(--border-subtle)] shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-foreground/5 border-b border-[var(--border-subtle)]">
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Buyer Detail</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Listing Ref</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Message/Offer</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-foreground/10">
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center">
-                    <TractorLoader className="text-[var(--color-brand-green)] mx-auto mb-2" size={48} />
-                  </td>
-                </tr>
-              ) : filteredEnquiries.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted font-medium">
-                    No enquiries found.
-                  </td>
-                </tr>
-              ) : (
-                filteredEnquiries.map((enquiry: any) => (
-                  <tr key={enquiry.id} className="hover:bg-foreground/[0.02] transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-black text-foreground flex items-center gap-2"><UserIcon size={14}/> {enquiry.name}</div>
-                      <div className="text-xs font-bold text-muted mt-1 flex items-center gap-1"><Phone size={12}/> {enquiry.mobile}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-foreground">Listing #{enquiry.listingId || enquiry.tractorId}</div>
-                    </td>
-                    <td className="px-6 py-4 max-w-xs">
-                      <div className="text-sm font-medium truncate">{enquiry.message || '-'}</div>
-                      {enquiry.offerPrice && <div className="text-xs font-black text-[var(--color-brand-green)] mt-1">Offer: ₹{enquiry.offerPrice.toLocaleString('en-IN')}</div>}
-                    </td>
-                    <td className="px-6 py-4">
-                      {getStatusBadge(enquiry.status)}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      {updatingId === enquiry.id ? (
-                        <TractorLoader size={20} />
-                      ) : (
-                        <select 
-                          className="bg-foreground/5 border border-[var(--border-subtle)] text-xs font-bold rounded-lg px-2 py-1.5 outline-none"
-                          value={enquiry.status}
-                          onChange={(e) => updateStatus(enquiry.id, e.target.value)}
-                        >
-                          <option value="NEW">New</option>
-                          <option value="CONTACTED">Contacted</option>
-                          <option value="QUALIFIED">Qualified</option>
-                          <option value="LOST">Lost</option>
-                        </select>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      <EnquiryFilters
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+        searchQuery={searchQuery}
+        setSearchQuery={handleSearchChange}
+        sortOption={sortOption}
+        setSortOption={handleSortChange}
+      />
+
+      <EnquiryTable
+        enquiries={enquiries}
+        loading={loading}
+        updatingId={updatingId}
+        onUpdateStatus={updateStatus}
+        onDelete={handleDelete}
+      />
+
+      {/* Pagination Controls */}
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center justify-between bg-foreground/5 p-4 rounded-2xl border border-[var(--border-subtle)]">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-background border border-[var(--border-subtle)] hover:bg-foreground/5 transition-all disabled:opacity-50 disabled:pointer-events-none"
+          >
+            <ChevronLeft size={16} /> Previous
+          </button>
+          <span className="text-sm font-bold text-muted">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-background border border-[var(--border-subtle)] hover:bg-foreground/5 transition-all disabled:opacity-50 disabled:pointer-events-none"
+          >
+            Next <ChevronRight size={16} />
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
