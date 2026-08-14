@@ -36,7 +36,13 @@ export const brandAPI = {
   /**
    * Fetch all brands with pagination and search
    */
-  getAllBrands: async (params?: { page?: number; limit?: number; search?: string }) => {
+  getAllBrands: async (params?: { 
+    page?: number; 
+    limit?: number; 
+    search?: string;
+    isActive?: string;
+    isFeatured?: string;
+  }) => {
     const response = await apiClient.get<PaginatedResponse<Brand>>('/brand/get-all-brand', { params });
     return response.data;
   },

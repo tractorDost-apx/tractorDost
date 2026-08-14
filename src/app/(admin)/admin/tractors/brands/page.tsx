@@ -2,14 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { brandAPI, Brand } from '@/lib/api/brands';
-import { Plus, Search, Edit2, Trash2, ShieldCheck, ChevronDown, ChevronUp, Globe, FileText, BarChart, Tag, Activity } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, ShieldCheck, ChevronDown, ChevronUp, Globe, FileText, BarChart, Tag, Activity, Filter, X } from 'lucide-react';
 import BrandModal from './components/BrandModal';
 import BrandModelsModal from './components/BrandModelsModal';
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [search, setSearch] = useState('');
+  const [isActiveFilter, setIsActiveFilter] = useState('');
+  const [isFeaturedFilter, setIsFeaturedFilter] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -23,7 +27,13 @@ export default function BrandsPage() {
   const fetchBrands = async () => {
     setLoading(true);
     try {
-      const response = await brandAPI.getAllBrands({ page, limit: 10, search });
+      const response = await brandAPI.getAllBrands({ 
+        page, 
+        limit: 10, 
+        search,
+        isActive: isActiveFilter || undefined,
+        isFeatured: isFeaturedFilter || undefined
+      });
       if (response.success) {
         setBrands(response.data.data);
         setTotalPages(response.data.totalPages);
@@ -36,14 +46,26 @@ export default function BrandsPage() {
     }
   };
 
+  // Debounce search slightly
   useEffect(() => {
-    // Debounce search slightly
     const delayDebounceFn = setTimeout(() => {
-      fetchBrands();
+      setSearch(searchTerm);
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search, page]);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchBrands();
+  }, [search, page, isActiveFilter, isFeaturedFilter]);
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setSearch('');
+    setIsActiveFilter('');
+    setIsFeaturedFilter('');
+    setPage(1);
+  };
 
   const handleEdit = (brand: Brand, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -89,34 +111,93 @@ export default function BrandsPage() {
         </button>
       </div>
 
-      {/* Stats and Search */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between glass-panel p-4 rounded-2xl">
-        <div className="flex items-center gap-4 text-sm font-bold w-full md:w-auto">
-          <div className="flex items-center gap-2 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] px-4 py-2 rounded-xl">
-            <ShieldCheck size={18} />
-            Total Brands: {totalCount}
+      {/* Stats, Filters & Search */}
+      <div className="flex flex-col gap-4 glass-panel p-4 rounded-2xl">
+        {/* Main container */}
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between w-full">
+          {/* Left: Stats */}
+          <div className="flex items-center gap-4 text-sm font-bold w-full lg:w-auto shrink-0">
+            <div className="flex items-center gap-2 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] px-4 py-2 rounded-xl">
+              <ShieldCheck size={18} />
+              Total Brands: {totalCount}
+            </div>
           </div>
-        </div>
 
-        <div className="relative w-full md:w-80 group">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted group-focus-within:text-[var(--color-brand-green)] transition-colors">
-            <Search size={16} />
+          {/* Right: Search, Filters, Reset */}
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-center w-full lg:w-auto justify-end">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64 md:w-72 group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted group-focus-within:text-[var(--color-brand-green)] transition-colors">
+                <Search size={16} />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search brands by name or year..." 
+                value={searchTerm}
+                onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+                className="w-full bg-foreground/5 border border-transparent rounded-full py-2.5 pl-10 pr-4 text-sm font-medium text-foreground placeholder:text-muted focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+              />
+            </div>
+
+            {/* Mobile Filter Toggle */}
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className="md:hidden w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold text-sm rounded-full transition-colors"
+            >
+              <Filter size={16} /> Filters
+            </button>
+
+            {/* Desktop Filters (Always visible on md and above) */}
+            <div className={`${showFilters ? 'flex' : 'hidden'} md:flex flex-col sm:flex-row gap-3 items-center w-full sm:w-auto`}>
+              {/* Status Filter */}
+              <div className="relative w-full sm:w-44">
+                <Activity className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                <select
+                  value={isActiveFilter}
+                  onChange={(e) => { setIsActiveFilter(e.target.value); setPage(1); }}
+                  className="w-full pl-9 pr-8 py-2 bg-background border border-[var(--border-subtle)] rounded-xl text-xs font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="true">Active Only</option>
+                  <option value="false">Inactive Only</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+              </div>
+
+              {/* Featured Filter */}
+              <div className="relative w-full sm:w-44">
+                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                <select
+                  value={isFeaturedFilter}
+                  onChange={(e) => { setIsFeaturedFilter(e.target.value); setPage(1); }}
+                  className="w-full pl-9 pr-8 py-2 bg-background border border-[var(--border-subtle)] rounded-xl text-xs font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none"
+                >
+                  <option value="">All Types</option>
+                  <option value="true">Featured Only</option>
+                  <option value="false">Standard Only</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+              </div>
+            </div>
+
+            {/* Reset Button */}
+            {(searchTerm || isActiveFilter || isFeaturedFilter) && (
+              <button
+                onClick={handleResetFilters}
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold text-xs rounded-full transition-colors"
+              >
+                <X size={14} /> Reset Filters
+              </button>
+            )}
           </div>
-          <input 
-            type="text" 
-            placeholder="Search brands by name or year..." 
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full bg-foreground/5 border border-transparent rounded-full py-2.5 pl-10 pr-4 text-sm font-medium text-foreground placeholder:text-muted focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
-          />
         </div>
       </div>
 
       {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-foreground/5 text-muted uppercase text-[11px] font-black tracking-wider">
+      <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col min-h-[420px] md:min-h-[530px]">
+        <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[350px] md:min-h-[460px]">
+          <table className="w-full text-left text-sm whitespace-nowrap relative">
+            <thead className="sticky top-0 bg-background/95 backdrop-blur-md z-10 text-muted uppercase text-[11px] font-black tracking-wider border-b border-[var(--border-subtle)]">
               <tr>
                 <th className="px-6 py-4 w-10"></th>
                 <th className="px-6 py-4">Brand</th>
@@ -288,7 +369,7 @@ export default function BrandsPage() {
 
         {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between">
+          <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between bg-background z-10 relative">
             <button 
               disabled={page === 1}
               onClick={() => setPage(p => p - 1)}
