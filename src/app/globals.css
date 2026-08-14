@@ -292,3 +292,23 @@ body::after {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Custom brand list scrollbar */
+.brand-scrollbar::-webkit-scrollbar {
+  display: block !important;
+  width: 4px !important;
+}
+.brand-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.brand-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15) !important;
+  border-radius: 9999px !important;
+}
+.dark .brand-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+.brand-scrollbar {
+  -ms-overflow-style: auto !important;  /* IE and Edge */
+  scrollbar-width: thin !important;  /* Firefox */
+}

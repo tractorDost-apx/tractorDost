@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { User as UserIcon, LogOut, Heart, LayoutDashboard, Menu, X, Search, Bell } from 'lucide-react';
 import { DashboardNavbar } from './DashboardNavbar';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { brandAPI, Brand } from '@/lib/api/brands';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -57,10 +58,13 @@ export function Navbar() {
               label="Tractors" 
               pathname={pathname}
               items={[
-                { title: 'New Tractors', desc: 'Explore latest models', href: '/tractors' },
-                { title: 'On-Road Price', desc: 'Check accurate pricing', href: '/on-road-price' },
-                { title: 'Tractor Dealers', desc: 'Find trusted dealers', href: '/dealers' },
-                { title: 'Showrooms', desc: 'Find authorized showrooms', href: '/showrooms' }
+                { title: 'BRANDS', desc: '', href: '#brands' },
+                { title: 'ALL TRACTORS', desc: '', href: '/tractors' },
+                { title: 'POPULAR TRACTORS', desc: '', href: '/tractors/popular' },
+                { title: 'UPCOMING TRACTORS', desc: '', href: '/tractors/upcoming' },
+                { title: 'LATEST TRACTORS', desc: '', href: '/tractors/latest' },
+                { title: 'ELECTRIC TRACTORS', desc: '', href: '/tractors/electric' },
+                { title: 'CNG TRACTORS', desc: '', href: '/tractors/cng' }
               ]}
             />
             
@@ -259,6 +263,24 @@ function DropdownLink({ href, icon, label }: { href: string, icon: React.ReactNo
 
 function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: string, items: { title: string, desc: string, href: string }[], pathname: string, align?: 'left' | 'center' | 'right' }) {
   const isActive = items.some(item => pathname === item.href);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [isBrandOpen, setIsBrandOpen] = useState(true);
+
+  useEffect(() => {
+    if (label === 'Tractors') {
+      const fetchActiveBrands = async () => {
+        try {
+          const res = await brandAPI.getAllBrands({ isActive: 'true', limit: 100 });
+          if (res.success) {
+            setBrands(res.data.data);
+          }
+        } catch (err) {
+          console.error('Failed to load active brands', err);
+        }
+      };
+      fetchActiveBrands();
+    }
+  }, [label]);
 
   const alignmentClasses = {
     left: 'left-0',
@@ -287,12 +309,76 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
         className={`absolute ${alignmentClasses[align]} top-[calc(100%+1rem)] w-[280px] rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 backdrop-blur-3xl`}
         style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
       >
-        {items.map((item, i) => (
-          <Link key={i} href={item.href} className="flex flex-col px-4 py-3 rounded-xl hover:bg-foreground/10 transition-colors group/item">
-            <span className="text-sm font-black text-foreground group-hover/item:text-[var(--color-brand-green)] transition-colors tracking-tight">{item.title}</span>
-            <span className="text-[11px] font-bold text-muted mt-0.5 leading-tight">{item.desc}</span>
-          </Link>
-        ))}
+        {items.map((item, i) => {
+          if (item.title === 'BRANDS') {
+            return (
+              <div 
+                key={i} 
+                className="relative group/submenu flex flex-col"
+              >
+                {/* Trigger Row */}
+                <div className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-foreground/10 text-foreground hover:text-[var(--color-brand-green)] cursor-pointer transition-all">
+                  <span className="text-sm font-black tracking-tight uppercase">Brands</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5 transition-transform duration-300">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </div>
+
+                {/* Submenu Content */}
+                <div 
+                  className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
+                >
+                  <div 
+                    className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                    style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                  >
+                    {/* Scrollable Brands List (displays exactly 3 complete items) */}
+                    <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                      {brands.length === 0 ? (
+                        <span className="text-xs text-muted/60 px-3 py-2.5 italic font-bold block shrink-0">No active brands</span>
+                      ) : (
+                        brands.map((brand) => {
+                          const displayName = brand.name.toLowerCase().includes('tractor')
+                            ? brand.name
+                            : `${brand.name} Tractors`;
+                          return (
+                            <Link 
+                              key={brand.id} 
+                              href={`/tractors?brand=${brand.id}`}
+                              className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
+                            >
+                              {displayName}
+                            </Link>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {/* Separator / Divider */}
+                    <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+
+                    {/* ALL BRANDS (outside scroll) */}
+                    <Link 
+                      href="/brands"
+                      className="block w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                    >
+                      All Brands
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <Link key={i} href={item.href} className="flex flex-col px-4 py-3 rounded-xl hover:bg-foreground/10 transition-colors group/item">
+              <span className="text-sm font-black text-foreground group-hover/item:text-[var(--color-brand-green)] transition-colors tracking-tight">{item.title}</span>
+              {item.desc && (
+                <span className="text-[11px] font-bold text-muted mt-0.5 leading-tight">{item.desc}</span>
+              )}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
