@@ -2,11 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Search, ChevronRight, Star, Tractor, Filter, X, Grid3X3, List, ChevronLeft } from 'lucide-react';
 import { tractorAPI, Tractor as TractorModel } from '@/lib/api/tractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
 
 export default function TractorsListingPage() {
+  const searchParams = useSearchParams();
+  const brandQuery = searchParams.get('brand');
+  const familyQuery = searchParams.get('family');
+
   const [tractors, setTractors] = useState<TractorModel[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +19,7 @@ export default function TractorsListingPage() {
   // Filtering & Pagination State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<number | ''>('');
+  const [selectedFamily, setSelectedFamily] = useState<number | ''>('');
   const [selectedHp, setSelectedHp] = useState<string>('');
   const [selectedDrive, setSelectedDrive] = useState<string>('');
   const [selectedFuel, setSelectedFuel] = useState<string>('');
@@ -26,6 +32,21 @@ export default function TractorsListingPage() {
 
   // Mobile filters toggle
   const [showFilters, setShowFilters] = useState(false);
+
+  // Synchronize state with URL query parameters
+  useEffect(() => {
+    if (brandQuery !== null) {
+      setSelectedBrand(brandQuery ? parseInt(brandQuery) : '');
+    } else {
+      setSelectedBrand('');
+    }
+    if (familyQuery !== null) {
+      setSelectedFamily(familyQuery ? parseInt(familyQuery) : '');
+    } else {
+      setSelectedFamily('');
+    }
+    setPage(1);
+  }, [brandQuery, familyQuery]);
 
   // 1. Fetch Brands for Sidebar
   useEffect(() => {
@@ -55,6 +76,7 @@ export default function TractorsListingPage() {
         };
         
         if (selectedBrand !== '') params.brandId = selectedBrand;
+        if (selectedFamily !== '') params.familyId = selectedFamily;
         
         if (selectedHp === 'under30') {
           params.hpMax = 30;
@@ -95,7 +117,7 @@ export default function TractorsListingPage() {
       fetchTractors();
     }, 400); // 400ms debounce
     return () => clearTimeout(debounce);
-  }, [page, searchQuery, selectedBrand, selectedHp, selectedDrive, selectedFuel, selectedPrice]);
+  }, [page, searchQuery, selectedBrand, selectedFamily, selectedHp, selectedDrive, selectedFuel, selectedPrice]);
 
   const formatPrice = (price: number | null | undefined) => {
     if (!price) return 'Price on Request';
@@ -144,9 +166,9 @@ export default function TractorsListingPage() {
             
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black tracking-tight">Filters</h3>
-              {(selectedBrand !== '' || selectedHp !== '' || selectedDrive !== '' || selectedFuel !== '' || selectedPrice !== '' || searchQuery !== '') && (
+              {(selectedBrand !== '' || selectedFamily !== '' || selectedHp !== '' || selectedDrive !== '' || selectedFuel !== '' || selectedPrice !== '' || searchQuery !== '') && (
                 <button 
-                  onClick={() => { setSelectedBrand(''); setSelectedHp(''); setSelectedDrive(''); setSelectedFuel(''); setSelectedPrice(''); setSearchQuery(''); setPage(1); }}
+                  onClick={() => { setSelectedBrand(''); setSelectedFamily(''); setSelectedHp(''); setSelectedDrive(''); setSelectedFuel(''); setSelectedPrice(''); setSearchQuery(''); setPage(1); }}
                   className="text-xs font-bold text-[var(--color-brand-orange)] hover:underline"
                 >
                   Clear All
@@ -178,6 +200,7 @@ export default function TractorsListingPage() {
                   onClick={(e) => {
                     e.preventDefault();
                     setSelectedBrand('');
+                    setSelectedFamily('');
                     setPage(1);
                   }}
                 >
@@ -194,6 +217,7 @@ export default function TractorsListingPage() {
                     onClick={(e) => {
                       e.preventDefault();
                       setSelectedBrand(brand.id);
+                      setSelectedFamily('');
                       setPage(1);
                     }}
                   >

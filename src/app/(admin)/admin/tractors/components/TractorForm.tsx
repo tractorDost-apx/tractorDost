@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { tractorAPI, Tractor, LaunchStatus, FuelType, DriveType } from '@/lib/api/tractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { categoryAPI, Category } from '@/lib/api/categories';
+import { tractorFamilyAPI, TractorFamily } from '@/lib/api/tractorFamilies';
 import { mediaAPI } from '@/lib/api/media';
 import MediaUploader from '@/components/shared/MediaUploader';
 import TractorSpecForm from './TractorSpecForm';
@@ -32,11 +33,13 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
   const [loading, setLoading] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [families, setFamilies] = useState<TractorFamily[]>([]);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   // State for Form Data
   const [formData, setFormData] = useState<Partial<Tractor> & { categoryIds?: number[] }>({
     brandId: 0,
+    familyId: null,
     modelName: '',
     slug: '',
     launchStatus: LaunchStatus.LATEST,
@@ -95,6 +98,26 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
       console.error("Failed to load dependencies");
     }
   };
+
+  const fetchFamilies = async (brandId: number) => {
+    try {
+      const res = await tractorFamilyAPI.getFamiliesByBrand(brandId, { limit: 100 });
+      if (res.success) {
+        setFamilies(res.data.items || []);
+      }
+    } catch (error) {
+      console.error("Failed to load tractor families for brand", error);
+    }
+  };
+
+  // Fetch families when brandId changes
+  useEffect(() => {
+    if (formData.brandId && formData.brandId !== 0) {
+      fetchFamilies(formData.brandId);
+    } else {
+      setFamilies([]);
+    }
+  }, [formData.brandId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -218,12 +241,14 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
       // Strip nulls, empty strings, and relations that backend Zod schema doesn't accept
       Object.keys(sanitizedData).forEach(key => {
         const k = key as keyof typeof sanitizedData;
+        if (k === 'familyId') return;
         if (sanitizedData[k] === null || sanitizedData[k] === '') {
           delete sanitizedData[k];
         }
       });
       
       delete sanitizedData.brand;
+      delete sanitizedData.family;
       delete sanitizedData.categories;
       delete sanitizedData.media;
       delete sanitizedData.primaryMedia;
@@ -378,7 +403,15 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                   <select
                     name="brandId"
                     value={formData.brandId || 0}
-                    onChange={(e) => { markTouched('brandId'); setFormData(prev => ({ ...prev, brandId: parseInt(e.target.value) || 0 })); }}
+                    onChange={(e) => {
+                      markTouched('brandId');
+                      const newBrandId = parseInt(e.target.value) || 0;
+                      setFormData(prev => ({
+                        ...prev,
+                        brandId: newBrandId,
+                        familyId: null // Reset family selection when brand changes
+                      }));
+                    }}
                     onBlur={() => markTouched('brandId')}
                     required
                     className={`${baseInputClass} ${fieldClass('brandId')} appearance-none`}
@@ -389,6 +422,25 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     ))}
                   </select>
                   {validationErrors.brandId && <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{validationErrors.brandId}</p>}
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Tractor Family</label>
+                  <select
+                    name="familyId"
+                    value={formData.familyId || ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFormData(prev => ({ ...prev, familyId: val ? parseInt(val) : null }));
+                    }}
+                    className={`${baseInputClass} appearance-none`}
+                    disabled={!formData.brandId || formData.brandId === 0}
+                  >
+                    <option value="">Select a family (Optional)</option>
+                    {families.map(f => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">

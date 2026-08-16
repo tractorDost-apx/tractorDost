@@ -168,6 +168,7 @@ export interface TractorSpec {
 export interface Tractor {
   id: number;
   brandId: number;
+  familyId?: number | null;
   modelName: string;
   slug: string;
   modelCode?: string | null;
@@ -202,6 +203,7 @@ export interface Tractor {
   updatedAt: string;
   
   brand?: Brand;
+  family?: any;
   spec?: TractorSpec | null;
   priceByState?: TractorPriceByState[] | null;
   media?: any[] | null;
@@ -231,6 +233,7 @@ export const tractorAPI = {
     limit?: number; 
     search?: string;
     brandId?: number;
+    familyId?: number;
     launchStatus?: string;
   }) => {
     const response = await apiClient.get<PaginatedResponse<Tractor>>('/tractor/getAll', { params });

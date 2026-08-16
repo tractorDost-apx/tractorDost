@@ -28,7 +28,8 @@ import {
   IndianRupee,
   Image as ImageIcon,
   BarChart2,
-  ShieldCheck
+  ShieldCheck,
+  FolderOpen
 } from 'lucide-react';
 
 const NAV_GROUPS = [
@@ -51,6 +52,7 @@ const NAV_GROUPS = [
     title: 'Catalogs',
     items: [
       { label: 'Brands', href: '/admin/tractors/brands', icon: Tag },
+      { label: 'Tractor Families', href: '/admin/tractors/families', icon: FolderOpen },
       { label: 'Tractor Categories', href: '/admin/tractors/categories', icon: Layers },
       { label: 'Tractors', href: '/admin/tractors', icon: Tractor },
       { label: 'Tractor Specs', href: '/admin/tractors/specs', icon: FileSpreadsheet },

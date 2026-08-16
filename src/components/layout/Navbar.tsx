@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/store/AuthContext';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { User as UserIcon, LogOut, Heart, LayoutDashboard, Menu, X, Search, Bell } from 'lucide-react';
 import { DashboardNavbar } from './DashboardNavbar';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { brandAPI, Brand } from '@/lib/api/brands';
+import { tractorFamilyAPI, TractorFamily } from '@/lib/api/tractorFamilies';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -266,6 +267,42 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
   const [brands, setBrands] = useState<Brand[]>([]);
   const [isBrandOpen, setIsBrandOpen] = useState(true);
 
+  // Tractor Family dropdown states
+  const [activeBrandId, setActiveBrandId] = useState<number | null>(null);
+  const [familiesByBrand, setFamiliesByBrand] = useState<Record<number, TractorFamily[]>>({});
+  const [loadingBrandId, setLoadingBrandId] = useState<number | null>(null);
+  const [positionRight, setPositionRight] = useState(true);
+  const brandsPanelRef = useRef<HTMLDivElement>(null);
+
+  const handleBrandHover = async (brandId: number) => {
+    setActiveBrandId(brandId);
+    if (familiesByBrand[brandId] === undefined && loadingBrandId !== brandId) {
+      setLoadingBrandId(brandId);
+      try {
+        const res = await tractorFamilyAPI.getFamiliesByBrand(brandId, { isActive: 'true', limit: 100 });
+        if (res.success) {
+          setFamiliesByBrand(prev => ({ ...prev, [brandId]: res.data.items }));
+        }
+      } catch (err) {
+        console.error('Failed to load families for brand', brandId, err);
+      } finally {
+        setLoadingBrandId(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (activeBrandId && brandsPanelRef.current) {
+      const rect = brandsPanelRef.current.getBoundingClientRect();
+      const spaceOnRight = window.innerWidth - rect.right;
+      if (spaceOnRight < 348) { // 328px panel width + 20px padding
+        setPositionRight(false);
+      } else {
+        setPositionRight(true);
+      }
+    }
+  }, [activeBrandId]);
+
   useEffect(() => {
     if (label === 'Tractors') {
       const fetchActiveBrands = async () => {
@@ -326,11 +363,13 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
 
                 {/* Submenu Content */}
                 <div 
+                  ref={brandsPanelRef}
                   className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
                 >
                   <div 
-                    className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                    className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
                     style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                    onMouseLeave={() => setActiveBrandId(null)}
                   >
                     {/* Scrollable Brands List (displays exactly 3 complete items) */}
                     <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
@@ -341,11 +380,17 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                           const displayName = brand.name.toLowerCase().includes('tractor')
                             ? brand.name
                             : `${brand.name} Tractors`;
+                          const isBrandActive = activeBrandId === brand.id;
                           return (
                             <Link 
                               key={brand.id} 
                               href={`/tractors?brand=${brand.id}`}
-                              className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
+                              onMouseEnter={() => handleBrandHover(brand.id)}
+                              className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
+                                isBrandActive 
+                                  ? 'text-[var(--color-brand-green)] bg-foreground/5' 
+                                  : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                              }`}
                             >
                               {displayName}
                             </Link>
@@ -364,6 +409,57 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                     >
                       All Brands
                     </Link>
+
+                    {/* Family Dropdown Panel (renders nested next to Brands panel) */}
+                    <div 
+                      className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[70] ${
+                        activeBrandId 
+                          ? 'opacity-100 scale-100 pointer-events-auto' 
+                          : 'opacity-0 scale-95 pointer-events-none'
+                      }`}
+                    >
+                      <div 
+                        className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                        style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                      >
+                        {loadingBrandId === activeBrandId ? (
+                          <div className="flex items-center justify-center py-6 shrink-0">
+                            <span className="text-xs font-bold text-muted animate-pulse">Loading families...</span>
+                          </div>
+                        ) : activeBrandId && familiesByBrand[activeBrandId]?.length > 0 ? (
+                          <>
+                            {/* Scrollable Families List */}
+                            <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                              {familiesByBrand[activeBrandId].map((family) => (
+                                <Link 
+                                  key={family.id} 
+                                  href={`/tractors?brand=${activeBrandId}&family=${family.id}`}
+                                  className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
+                                >
+                                  {family.name}
+                                </Link>
+                              ))}
+                            </div>
+                            
+                            {/* Separator / Divider */}
+                            <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+
+                            {/* ALL FAMILIES button */}
+                            <Link 
+                              href={`/tractors?brand=${activeBrandId}`}
+                              className="flex items-center justify-between w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                            >
+                              <span>All Families</span>
+                              <span className="text-xs leading-none">→</span>
+                            </Link>
+                          </>
+                        ) : (
+                          <div className="flex items-center justify-center py-6 px-3 shrink-0">
+                            <span className="text-xs font-bold text-muted/60 italic">No families available</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
