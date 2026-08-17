@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authAPI } from '@/lib/api/auth';
 import { useAuth } from '@/store/AuthContext';
-import { Phone, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 
@@ -18,6 +18,18 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [success, setSuccess] = useState('');
+  const [isResending, setIsResending] = useState(false);
+
+  React.useEffect(() => {
+    if (step === 2 && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [step, timeLeft]);
 
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
@@ -30,12 +42,15 @@ export default function LoginPage() {
     
     setIsLoading(true);
     setError('');
+    setSuccess('');
     
     try {
       await authAPI.requestOtp(mobile);
       setStep(2);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
+      setTimeLeft(60);
+    } catch (err: unknown) {
+      const errorResponse = err as { response?: { data?: { message?: string } } };
+      setError(errorResponse.response?.data?.message || 'Failed to send OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -50,6 +65,7 @@ export default function LoginPage() {
     
     setIsLoading(true);
     setError('');
+    setSuccess('');
     
     try {
       await authAPI.verifyOtp(otp);
@@ -75,10 +91,28 @@ export default function LoginPage() {
       }
       
       router.push(targetPath || '/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid OTP. Please try again.');
+    } catch (err: unknown) {
+      const errorResponse = err as { response?: { data?: { message?: string } } };
+      setError(errorResponse.response?.data?.message || 'Invalid OTP. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setIsResending(true);
+    setError('');
+    setSuccess('');
+    
+    try {
+      await authAPI.requestOtp(mobile);
+      setSuccess('OTP resent successfully!');
+      setTimeLeft(60);
+    } catch (err: unknown) {
+      const errorResponse = err as { response?: { data?: { message?: string } } };
+      setError(errorResponse.response?.data?.message || 'Failed to resend OTP. Please try again.');
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -113,6 +147,12 @@ export default function LoginPage() {
         {error && (
           <div className="w-full p-4 mb-6 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-2xl font-bold text-center flex items-center justify-center gap-2 animate-in fade-in slide-in-from-bottom-2">
             <ShieldCheck size={16} /> {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="w-full p-4 mb-6 bg-[var(--color-brand-green)]/10 border border-[var(--color-brand-green)]/20 text-[var(--color-brand-green)] text-sm rounded-2xl font-bold text-center flex items-center justify-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+            <ShieldCheck size={16} /> {success}
           </div>
         )}
 
@@ -159,13 +199,13 @@ export default function LoginPage() {
                 onChange={(e) => setOtp(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                 className="w-full h-14 bg-background/50 border border-[var(--border-subtle)] rounded-xl px-5 text-center text-2xl tracking-[0.5em] font-black text-foreground placeholder:text-muted/40 placeholder:tracking-widest focus:outline-none focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 transition-all hover:border-foreground/20"
                 required
-                disabled={isLoading}
+                disabled={isLoading || isResending}
               />
             </div>
             
             <button
               type="submit"
-              disabled={isLoading || otp.length !== 6}
+              disabled={isLoading || isResending || otp.length !== 6}
               className="w-full h-14 rounded-xl text-base font-black mt-2 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--color-brand-green)] text-white shadow-lg shadow-[var(--color-brand-green)]/20 hover:shadow-[var(--color-brand-green)]/40 transition-all hover:-translate-y-0.5 active:translate-y-0"
             >
               {isLoading ? (
@@ -174,6 +214,21 @@ export default function LoginPage() {
                 'Secure Login'
               )}
             </button>
+
+            {timeLeft > 0 ? (
+              <div className="text-center text-sm text-muted font-bold mt-2 py-2">
+                Resend OTP in <span className="text-[var(--color-brand-green)] font-black">{timeLeft}s</span>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={isLoading || isResending}
+                className="mt-2 text-sm text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 font-black flex items-center justify-center gap-2 transition-colors py-2 mx-auto disabled:opacity-50"
+              >
+                {isResending ? 'Resending OTP...' : 'Resend OTP'}
+              </button>
+            )}
             
             <button
               type="button"
@@ -181,8 +236,9 @@ export default function LoginPage() {
                 setStep(1);
                 setOtp('');
                 setError('');
+                setSuccess('');
               }}
-              disabled={isLoading}
+              disabled={isLoading || isResending}
               className="mt-4 text-sm text-muted hover:text-[var(--color-brand-green)] font-bold flex items-center justify-center gap-2 transition-colors py-2"
             >
               <ArrowLeft size={16} /> Use a different number
@@ -191,7 +247,7 @@ export default function LoginPage() {
         )}
         
         <div className="mt-10 text-xs text-muted/80 font-bold text-center z-10 leading-relaxed max-w-[280px]">
-          By proceeding, you agree to TractorDost's<br />
+          By proceeding, you agree to TractorDost&apos;s<br />
           <Link href="/terms" className="text-foreground hover:text-[var(--color-brand-green)] transition-colors underline decoration-muted hover:decoration-[var(--color-brand-green)] underline-offset-4 mx-1">Terms</Link> & 
           <Link href="/privacy" className="text-foreground hover:text-[var(--color-brand-green)] transition-colors underline decoration-muted hover:decoration-[var(--color-brand-green)] underline-offset-4 mx-1">Privacy Policy</Link>
         </div>
