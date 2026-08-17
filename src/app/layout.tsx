@@ -40,6 +40,10 @@ export default function RootLayout({
                 } else {
                   document.documentElement.classList.remove('dark')
                 }
+                
+                if (localStorage.getItem('tractorDost_splash_shown')) {
+                  document.documentElement.classList.add('hide-splash')
+                }
               } catch (_) {}
             `,
           }}

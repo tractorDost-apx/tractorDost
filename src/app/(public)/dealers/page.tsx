@@ -6,6 +6,7 @@ import { brandAPI, Brand } from '@/lib/api/brands';
 import { Search, MapPin, Map, Phone, MessageSquare, Navigation, Star, ShieldCheck, Filter, Wrench, Store, LayoutList, CheckCircle, Clock, X, Send } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
+import Pagination from '@/components/shared/Pagination';
 
 export default function DealersPage() {
   const [dealers, setDealers] = useState<Dealer[]>([]);
@@ -16,6 +17,10 @@ export default function DealersPage() {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [sortBy, setSortBy] = useState<'rating' | 'reviews'>('rating');
   const [inquiryModalOpen, setInquiryModalOpen] = useState<Dealer | null>(null);
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -254,7 +259,7 @@ export default function DealersPage() {
           ) : (
             // LIST VIEW
             <div className="flex flex-col gap-6 animate-fade-in">
-              {dealers.map((dealer) => (
+              {dealers.slice((page - 1) * limit, page * limit).map((dealer) => (
                 <div key={dealer.id} className="spatial-panel rounded-[2rem] p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:gap-8 border border-[var(--border-subtle)] bg-background/50 hover:bg-foreground/[0.02] hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5 backdrop-blur-xl transition-all duration-300 group">
                   
                   {/* Info Section */}
@@ -339,6 +344,20 @@ export default function DealersPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          
+          {/* Pagination */}
+          {!loading && dealers.length > 0 && viewMode === 'list' && (
+            <div className="mt-6">
+              <Pagination
+                page={page}
+                limit={limit}
+                totalCount={dealers.length}
+                totalPages={Math.ceil(dealers.length / limit)}
+                onPageChange={setPage}
+                onLimitChange={(l) => { setLimit(l); setPage(1); }}
+              />
             </div>
           )}
         </div>

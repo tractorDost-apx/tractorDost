@@ -7,6 +7,7 @@ import { brandAPI, Brand } from '@/lib/api/brands';
 import { Search, MapPin, Filter, LayoutList, Calendar, Gauge, User, CheckCircle2, CircleDollarSign, X, MessageCircle, Info, Phone, ShieldCheck, ChevronRight } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
+import Pagination from '@/components/shared/Pagination';
 
 export default function UsedTractorsPage() {
   const [tractors, setTractors] = useState<UsedTractorListing[]>([]);
@@ -16,6 +17,10 @@ export default function UsedTractorsPage() {
   // Advanced UI States
   const [sortBy, setSortBy] = useState<'recent' | 'price_low' | 'price_high' | 'hours_low'>('recent');
   const [enquiryModalOpen, setEnquiryModalOpen] = useState<UsedTractorListing | null>(null);
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -356,7 +361,7 @@ export default function UsedTractorsPage() {
           ) : (
             // LISTINGS VIEW
             <div className="flex flex-col gap-6 animate-fade-in">
-              {tractors.map((tractor) => (
+              {tractors.slice((page - 1) * limit, page * limit).map((tractor) => (
                 <div key={tractor.id} className="bg-[var(--card-bg)] backdrop-blur-3xl rounded-[2rem] p-4 sm:p-6 flex flex-col md:flex-row gap-6 border border-[var(--border-subtle)] shadow-[var(--card-shadow)] hover:-translate-y-1 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/10 transition-all duration-400 group overflow-hidden relative">
                   
                   {tractor.isCertified && (
@@ -465,6 +470,20 @@ export default function UsedTractorsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          
+          {/* Pagination */}
+          {!loading && tractors.length > 0 && (
+            <div className="mt-6">
+              <Pagination
+                page={page}
+                limit={limit}
+                totalCount={tractors.length}
+                totalPages={Math.ceil(tractors.length / limit)}
+                onPageChange={setPage}
+                onLimitChange={(l) => { setLimit(l); setPage(1); }}
+              />
             </div>
           )}
         </div>

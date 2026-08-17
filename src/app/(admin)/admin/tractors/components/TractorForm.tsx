@@ -313,6 +313,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
         if (mediaFiles.length > 0) {
           const mediaData = new FormData();
           mediaData.append('targetId', String(tractorId));
+          mediaData.append('targetType', 'TRACTOR');
           mediaData.append('isPrimary', 'true'); // Automatically marks the first image as primary in the backend
           mediaData.append('mediaType', 'image');
           mediaFiles.forEach(file => mediaData.append('file', file));
@@ -323,6 +324,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
         if (brochureFile.length > 0) {
           const brochureData = new FormData();
           brochureData.append('targetId', String(tractorId));
+          brochureData.append('targetType', 'TRACTOR');
           brochureData.append('mediaType', 'pdf');
           brochureData.append('file', brochureFile[0]);
           await mediaAPI.createMedia(brochureData);
@@ -416,9 +418,9 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     required
                     className={`${baseInputClass} ${fieldClass('brandId')} appearance-none`}
                   >
-                    <option value={0}>Select a brand</option>
+                    <option value={0} className="bg-background text-foreground">Select a brand</option>
                     {brands.map(b => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
+                      <option key={b.id} value={b.id} className="bg-background text-foreground">{b.name}</option>
                     ))}
                   </select>
                   {validationErrors.brandId && <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{validationErrors.brandId}</p>}
@@ -436,9 +438,9 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     className={`${baseInputClass} appearance-none`}
                     disabled={!formData.brandId || formData.brandId === 0}
                   >
-                    <option value="">Select a family (Optional)</option>
+                    <option value="" className="bg-background text-foreground">Select a family (Optional)</option>
                     {families.map(f => (
-                      <option key={f.id} value={f.id}>{f.name}</option>
+                      <option key={f.id} value={f.id} className="bg-background text-foreground">{f.name}</option>
                     ))}
                   </select>
                 </div>
@@ -529,7 +531,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
                   >
                     {Object.values(FuelType).map(f => (
-                      <option key={f} value={f}>{f}</option>
+                      <option key={f} value={f} className="bg-background text-foreground">{f}</option>
                     ))}
                   </select>
                 </div>
@@ -543,7 +545,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
                   >
                     {Object.values(DriveType).map(d => (
-                      <option key={d} value={d}>{d.replace('_', ' ')}</option>
+                      <option key={d} value={d} className="bg-background text-foreground">{d.replace('_', ' ')}</option>
                     ))}
                   </select>
                 </div>
@@ -625,7 +627,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
                   >
                     {Object.values(LaunchStatus).map(s => (
-                      <option key={s} value={s}>{s}</option>
+                      <option key={s} value={s} className="bg-background text-foreground">{s}</option>
                     ))}
                   </select>
                 </div>

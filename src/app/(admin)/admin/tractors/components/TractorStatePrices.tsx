@@ -107,7 +107,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
       {/* Existing State Prices Table */}
       {prices.length > 0 && (
         <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+          <table className="w-full text-left text-sm">
             <thead className="bg-foreground/5 text-muted uppercase text-[10px] font-black tracking-wider">
               <tr>
                 <th className="px-4 py-3">State</th>

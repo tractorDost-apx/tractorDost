@@ -4,12 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { equipmentBrandAPI, EquipmentBrand } from '@/lib/api/equipmentBrands';
 import { Plus, Search, Edit2, Trash2, ShieldCheck, ChevronDown, ChevronUp, Globe, Activity } from 'lucide-react';
 import EquipmentBrandModal from './components/EquipmentBrandModal';
+import Pagination from '@/components/shared/Pagination';
+
 
 export default function EquipmentBrandsPage() {
   const [brands, setBrands] = useState<EquipmentBrand[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -122,7 +125,7 @@ export default function EquipmentBrandsPage() {
       {/* Table */}
       <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+          <table className="w-full text-left text-sm">
             <thead className="bg-foreground/5 text-muted uppercase text-[11px] font-black tracking-wider">
               <tr>
                 <th className="px-6 py-4 w-10"></th>
@@ -166,7 +169,7 @@ export default function EquipmentBrandsPage() {
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <div className="font-black text-foreground text-base tracking-tight">{brand.name}</div>
-                            <div className="text-[10px] font-bold text-muted/70 uppercase tracking-wider">{brand.slug}</div>
+                            <div className="text-[10px] font-bold text-muted/70 uppercase tracking-wider truncate max-w-[150px] sm:max-w-[200px]" title={brand.slug}>{brand.slug}</div>
                           </div>
                         </div>
                       </td>
@@ -229,25 +232,14 @@ export default function EquipmentBrandsPage() {
         </div>
 
         {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between">
-            <button 
-              disabled={page === 1}
-              onClick={() => setPage(p => p - 1)}
-              className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-            >
-              Previous
-            </button>
-            <span className="text-sm font-bold text-muted">Page {page} of {totalPages}</span>
-            <button 
-              disabled={page === totalPages}
-              onClick={() => setPage(p => p + 1)}
-              className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        )}
+        <Pagination
+          page={page}
+          limit={limit}
+          totalCount={totalCount}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
       </div>
 
       {isModalOpen && (

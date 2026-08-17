@@ -4,10 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { implementCategoryAPI, ImplementCategory } from '@/lib/api/implementCategories';
 import { Plus, Edit2, Trash2, Layers, ChevronRight, ChevronDown, AlignLeft, Info, Hash } from 'lucide-react';
 import ImplementCategoryModal from './components/ImplementCategoryModal';
+import Pagination from '@/components/shared/Pagination';
 
 export default function ImplementCategoriesPage() {
   const [categories, setCategories] = useState<ImplementCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   
   // Track which categories are expanded in the tree view
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
@@ -131,7 +136,7 @@ export default function ImplementCategoriesPage() {
                     {category.name}
                     {level > 0 && <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-foreground/10 text-muted tracking-wider">Sub</span>}
                   </div>
-                  <div className="text-xs text-muted/80 font-bold">{category.slug}</div>
+                  <div className="text-xs text-muted/80 font-bold truncate max-w-[150px] sm:max-w-[200px]" title={category.slug}>{category.slug}</div>
                 </div>
               </div>
             </td>
@@ -231,6 +236,8 @@ export default function ImplementCategoriesPage() {
     return rows;
   };
 
+  const paginatedCategories = categories.slice((page - 1) * limit, page * limit);
+
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-fade-in pb-12">
       {/* Header section */}
@@ -259,7 +266,7 @@ export default function ImplementCategoriesPage() {
       {/* Table */}
       <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+          <table className="w-full text-left text-sm">
             <thead className="bg-foreground/5 text-muted uppercase text-[11px] font-black tracking-wider">
               <tr>
                 <th className="px-6 py-4">Category Tree</th>
@@ -282,11 +289,21 @@ export default function ImplementCategoriesPage() {
                   </td>
                 </tr>
               ) : (
-                renderCategoryRows(categories)
+                renderCategoryRows(paginatedCategories)
               )}
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        <Pagination
+          page={page}
+          limit={limit}
+          totalCount={categories.length}
+          totalPages={Math.ceil(categories.length / limit)}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
       </div>
 
       {isModalOpen && (

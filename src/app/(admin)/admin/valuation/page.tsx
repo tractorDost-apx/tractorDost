@@ -14,11 +14,16 @@ import {
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
+import Pagination from '@/components/shared/Pagination';
 
 export default function AdminValuationPage() {
   const [listings, setListings] = useState<UsedTractorListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'COMPLETED'>('PENDING');
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
     fetchListings();
@@ -131,7 +136,7 @@ export default function AdminValuationPage() {
                   </td>
                 </tr>
               ) : (
-                displayListings.map(listing => (
+                displayListings.slice((page - 1) * limit, page * limit).map(listing => (
                   <tr key={listing.id} className="hover:bg-foreground/[0.02] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
@@ -185,6 +190,18 @@ export default function AdminValuationPage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        {!loading && displayListings.length > 0 && (
+          <Pagination
+            page={page}
+            limit={limit}
+            totalCount={displayListings.length}
+            totalPages={Math.ceil(displayListings.length / limit)}
+            onPageChange={setPage}
+            onLimitChange={(l) => { setLimit(l); setPage(1); }}
+          />
+        )}
       </div>
 
     </div>

@@ -4,12 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { tractorAPI, TractorSpec } from '@/lib/api/tractors';
 import { FileSpreadsheet, Search, Edit2, ChevronDown, ChevronUp, Cog, Settings, Wrench, Thermometer, Battery, Ruler, CheckCircle2, ShieldCheck, Sparkles, Check, X as XIcon } from 'lucide-react';
 import Link from 'next/link';
+import Pagination from '@/components/shared/Pagination';
+
 
 export default function TractorSpecsPage() {
   const [specs, setSpecs] = useState<TractorSpec[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -112,7 +115,7 @@ export default function TractorSpecsPage() {
 
       <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+          <table className="w-full text-left text-sm">
             <thead className="bg-foreground/5 text-muted uppercase text-[11px] font-black tracking-wider">
               <tr>
                 <th className="px-6 py-4 w-10"></th>

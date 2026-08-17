@@ -4,12 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { tractorAPI, TractorPriceByState } from '@/lib/api/tractors';
 import { IndianRupee, Search, Edit2, MapPin, ChevronDown, ChevronUp, Calculator, Shield, Receipt, Landmark } from 'lucide-react';
 import Link from 'next/link';
+import Pagination from '@/components/shared/Pagination';
 
 export default function TractorPriceByStatePage() {
   const [prices, setPrices] = useState<TractorPriceByState[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  
+  // Pagination State
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const fetchPrices = async () => {
@@ -76,7 +80,7 @@ export default function TractorPriceByStatePage() {
 
       <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+          <table className="w-full text-left text-sm">
             <thead className="bg-foreground/5 text-muted uppercase text-[11px] font-black tracking-wider">
               <tr>
                 <th className="px-6 py-4 w-10"></th>
@@ -232,23 +236,15 @@ export default function TractorPriceByStatePage() {
           </table>
         </div>
 
-        {/* Simplified pagination area - adjust if API natively supports page mapping later */}
-        <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between z-10 bg-background relative">
-          <button 
-            disabled={page === 1}
-            onClick={() => setPage(p => p - 1)}
-            className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-          >
-            Previous
-          </button>
-          <span className="text-sm font-bold text-muted">Page {page}</span>
-          <button 
-            onClick={() => setPage(p => p + 1)}
-            className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 transition-colors"
-          >
-            Next
-          </button>
-        </div>
+        {/* Pagination */}
+        <Pagination
+          page={page}
+          limit={limit}
+          totalCount={prices.length > 0 ? (page * limit) + (prices.length === limit ? 1 : 0) : (page - 1) * limit}
+          totalPages={prices.length === limit ? page + 1 : page}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
       </div>
     </div>
   );

@@ -12,11 +12,16 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import Pagination from '@/components/shared/Pagination';
 
 export default function AdminUsedInspectionsPage() {
   const [inspections, setInspections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ALL');
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
     fetchInspections();
@@ -91,7 +96,7 @@ export default function AdminUsedInspectionsPage() {
                   </td>
                 </tr>
               ) : (
-                filteredInspections.map((insp: any) => (
+                filteredInspections.slice((page - 1) * limit, page * limit).map((insp: any) => (
                   <tr key={insp.id} className="hover:bg-foreground/[0.02] transition-colors">
                     <td className="px-6 py-4 font-bold">#{insp.listingId}</td>
                     <td className="px-6 py-4">
@@ -116,6 +121,18 @@ export default function AdminUsedInspectionsPage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        {!loading && filteredInspections.length > 0 && (
+          <Pagination
+            page={page}
+            limit={limit}
+            totalCount={filteredInspections.length}
+            totalPages={Math.ceil(filteredInspections.length / limit)}
+            onPageChange={setPage}
+            onLimitChange={(l) => { setLimit(l); setPage(1); }}
+          />
+        )}
       </div>
     </div>
   );

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { brandAPI, Brand } from '@/lib/api/brands';
-import { Plus, Search, Edit2, Trash2, ShieldCheck, ChevronDown, ChevronUp, Globe, FileText, BarChart, Tag, Activity, Filter, X } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, ShieldCheck, ChevronDown, ChevronUp, Globe, FileText, BarChart, Tag, Activity, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import BrandModal from './components/BrandModal';
 import BrandModelsModal from './components/BrandModelsModal';
+import Pagination from '@/components/shared/Pagination';
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -15,6 +16,7 @@ export default function BrandsPage() {
   const [isFeaturedFilter, setIsFeaturedFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -29,7 +31,7 @@ export default function BrandsPage() {
     try {
       const response = await brandAPI.getAllBrands({ 
         page, 
-        limit: 10, 
+        limit, 
         search,
         isActive: isActiveFilter || undefined,
         isFeatured: isFeaturedFilter || undefined
@@ -57,7 +59,7 @@ export default function BrandsPage() {
 
   useEffect(() => {
     fetchBrands();
-  }, [search, page, isActiveFilter, isFeaturedFilter]);
+  }, [search, page, limit, isActiveFilter, isFeaturedFilter]);
 
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -65,6 +67,7 @@ export default function BrandsPage() {
     setIsActiveFilter('');
     setIsFeaturedFilter('');
     setPage(1);
+    setLimit(10);
   };
 
   const handleEdit = (brand: Brand, e: React.MouseEvent) => {
@@ -196,7 +199,7 @@ export default function BrandsPage() {
       {/* Table */}
       <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col min-h-[420px] md:min-h-[530px]">
         <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[350px] md:min-h-[460px]">
-          <table className="w-full text-left text-sm whitespace-nowrap relative">
+          <table className="w-full text-left text-sm relative">
             <thead className="sticky top-0 bg-background/95 backdrop-blur-md z-10 text-muted uppercase text-[11px] font-black tracking-wider border-b border-[var(--border-subtle)]">
               <tr>
                 <th className="px-6 py-4 w-10"></th>
@@ -241,7 +244,7 @@ export default function BrandsPage() {
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <div className="font-black text-foreground text-base tracking-tight">{brand.name}</div>
-                            <div className="text-[10px] font-bold text-muted/70 uppercase tracking-wider">{brand.slug}</div>
+                            <div className="text-[10px] font-bold text-muted/70 uppercase tracking-wider truncate max-w-[150px] sm:max-w-[200px]" title={brand.slug}>{brand.slug}</div>
                           </div>
                         </div>
                       </td>
@@ -368,25 +371,14 @@ export default function BrandsPage() {
         </div>
 
         {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between bg-background z-10 relative">
-            <button 
-              disabled={page === 1}
-              onClick={() => setPage(p => p - 1)}
-              className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-            >
-              Previous
-            </button>
-            <span className="text-sm font-bold text-muted">Page {page} of {totalPages}</span>
-            <button 
-              disabled={page === totalPages}
-              onClick={() => setPage(p => p + 1)}
-              className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        )}
+        <Pagination
+          page={page}
+          limit={limit}
+          totalCount={totalCount}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
       </div>
 
       {isModalOpen && (

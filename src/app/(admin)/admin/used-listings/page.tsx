@@ -15,12 +15,17 @@ import {
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
+import Pagination from '@/components/shared/Pagination';
 
 export default function AdminUsedListingsPage() {
   const [listings, setListings] = useState<UsedTractorListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'ALL' | ListingStatus>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
     fetchListings();
@@ -68,6 +73,8 @@ export default function AdminUsedListingsPage() {
       maximumFractionDigits: 0
     }).format(amount);
   };
+
+  const paginatedListings = filteredListings.slice((page - 1) * limit, page * limit);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8 animate-fade-in">
@@ -133,7 +140,7 @@ export default function AdminUsedListingsPage() {
                   </td>
                 </tr>
               ) : (
-                filteredListings.map(listing => (
+                paginatedListings.map(listing => (
                   <tr key={listing.id} className="hover:bg-background/60 transition-colors duration-300 group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
@@ -180,6 +187,16 @@ export default function AdminUsedListingsPage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        <Pagination
+          page={page}
+          limit={limit}
+          totalCount={filteredListings.length}
+          totalPages={Math.ceil(filteredListings.length / limit)}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
       </div>
 
     </div>

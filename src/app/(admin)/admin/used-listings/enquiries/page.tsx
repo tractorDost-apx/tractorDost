@@ -5,6 +5,8 @@ import { usedTractorEnquiryAPI } from '@/lib/api/used-enquiries';
 import { EnquiryFilters } from '@/components/admin/used-enquiries/EnquiryFilters';
 import { EnquiryTable } from '@/components/admin/used-enquiries/EnquiryTable';
 import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import Pagination from '@/components/shared/Pagination';
+
 
 export default function AdminUsedEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<any[]>([]);

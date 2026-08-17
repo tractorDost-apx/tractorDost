@@ -1,19 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Search, ChevronRight, Star, Tractor, Filter, X, Grid3X3, List, ChevronLeft } from 'lucide-react';
 import { tractorAPI, Tractor as TractorModel } from '@/lib/api/tractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
+import Pagination from '@/components/shared/Pagination';
 
-export default function TractorsListingPage() {
+
+function TractorsListingContent() {
   const searchParams = useSearchParams();
   const brandQuery = searchParams.get('brand');
   const familyQuery = searchParams.get('family');
 
   const [tractors, setTractors] = useState<TractorModel[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [activeBrandDetails, setActiveBrandDetails] = useState<Brand | null>(null);
   const [loading, setLoading] = useState(true);
   
   // Filtering & Pagination State
@@ -27,6 +30,7 @@ export default function TractorsListingPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalTractors, setTotalTractors] = useState(0);
 
@@ -63,6 +67,25 @@ export default function TractorsListingPage() {
     };
     fetchBrands();
   }, []);
+
+  // 1.5 Fetch selected Brand Details for the Hero Section
+  useEffect(() => {
+    const fetchBrandDetails = async () => {
+      if (!selectedBrand) {
+        setActiveBrandDetails(null);
+        return;
+      }
+      try {
+        const res = await brandAPI.getBrandById(selectedBrand as number);
+        if (res.success && res.data) {
+          setActiveBrandDetails(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch brand details", err);
+      }
+    };
+    fetchBrandDetails();
+  }, [selectedBrand]);
 
   // 2. Fetch Tractors based on filters
   useEffect(() => {
@@ -136,19 +159,76 @@ export default function TractorsListingPage() {
     <div className="w-full max-w-[1440px] mx-auto min-h-screen flex flex-col pt-8 pb-24 px-4 sm:px-6 lg:px-8 animate-fade-in">
       
       {/* HEADER / HERO COMPACT */}
-      <div className="bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 rounded-[2.5rem] p-8 md:p-12 mb-10 flex flex-col md:flex-row items-center justify-between border border-[var(--border-subtle)] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)]/20 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="z-10 flex flex-col gap-3">
-          <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">Explore Tractors</h1>
-          <p className="text-muted font-bold text-lg max-w-2xl">Find the most reliable and powerful machines for your farm. Browse through our premium catalog of tractors.</p>
+      {activeBrandDetails ? (
+        <div className="bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 rounded-[2.5rem] p-8 md:p-12 mb-10 flex flex-col items-start border border-[var(--border-subtle)] relative overflow-hidden gap-8">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)]/20 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
+          
+          <div className="z-10 flex flex-col md:flex-row items-center md:items-start gap-8 w-full">
+            {/* Brand Logo */}
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] bg-background border border-[var(--border-subtle)] shadow-sm flex items-center justify-center p-6 shrink-0 relative overflow-hidden group">
+              {activeBrandDetails.logoUrl ? (
+                <img 
+                  src={activeBrandDetails.logoUrl} 
+                  alt={activeBrandDetails.name} 
+                  className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <span className="font-black text-5xl text-foreground/30">{activeBrandDetails.name.charAt(0)}</span>
+              )}
+            </div>
+
+            {/* Brand Details */}
+            <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+              <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight mb-2">
+                {activeBrandDetails.name} Tractors
+              </h1>
+              
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4">
+                {activeBrandDetails.isFeatured && (
+                  <span className="px-3 py-1 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/20 uppercase tracking-wider flex items-center gap-1">
+                    <Star size={12} className="fill-current" /> Featured
+                  </span>
+                )}
+                {activeBrandDetails.foundedYear && (
+                  <span className="px-3 py-1 bg-background/60 backdrop-blur-md rounded-full text-xs font-bold text-muted border border-[var(--border-subtle)] uppercase tracking-wider">
+                    Est. {activeBrandDetails.foundedYear}
+                  </span>
+                )}
+                {activeBrandDetails.country && (
+                  <span className="px-3 py-1 bg-background/60 backdrop-blur-md rounded-full text-xs font-bold text-muted border border-[var(--border-subtle)] uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[var(--color-brand-orange)]"></span>
+                    {activeBrandDetails.country}
+                  </span>
+                )}
+                <span className="px-3 py-1 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] rounded-full text-xs font-bold border border-[var(--color-brand-green)]/20 uppercase tracking-wider">
+                  {totalTractors} Tractors Found
+                </span>
+              </div>
+
+              {activeBrandDetails.aboutBrand && (
+                <div 
+                  className="text-muted font-medium text-sm md:text-base leading-relaxed max-w-4xl max-h-24 overflow-y-auto custom-scrollbar pr-2"
+                  dangerouslySetInnerHTML={{ __html: activeBrandDetails.aboutBrand }}
+                />
+              )}
+            </div>
+          </div>
         </div>
-        
-        {/* Total Count Badge */}
-        <div className="mt-6 md:mt-0 z-10 bg-background/80 backdrop-blur-md border border-[var(--border-subtle)] px-6 py-4 rounded-2xl flex flex-col items-center">
-          <span className="text-3xl font-black text-[var(--color-brand-green)]">{totalTractors}</span>
-          <span className="text-[10px] uppercase font-black tracking-widest text-muted">Tractors Found</span>
+      ) : (
+        <div className="bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 rounded-[2.5rem] p-8 md:p-12 mb-10 flex flex-col md:flex-row items-center justify-between border border-[var(--border-subtle)] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)]/20 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="z-10 flex flex-col gap-3">
+            <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">Explore Tractors</h1>
+            <p className="text-muted font-bold text-lg max-w-2xl">Find the most reliable and powerful machines for your farm. Browse through our premium catalog of tractors.</p>
+          </div>
+          
+          {/* Total Count Badge */}
+          <div className="mt-6 md:mt-0 z-10 bg-background/80 backdrop-blur-md border border-[var(--border-subtle)] px-6 py-4 rounded-2xl flex flex-col items-center">
+            <span className="text-3xl font-black text-[var(--color-brand-green)]">{totalTractors}</span>
+            <span className="text-[10px] uppercase font-black tracking-widest text-muted">Tractors Found</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         
@@ -571,5 +651,13 @@ export default function TractorsListingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TractorsListingPage() {
+  return (
+    <Suspense fallback={<div className="w-full min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-[var(--color-brand-green)] border-t-transparent rounded-full animate-spin"></div></div>}>
+      <TractorsListingContent />
+    </Suspense>
   );
 }

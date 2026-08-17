@@ -4,12 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { compareAPI, CompareFrequencyRecord } from '@/lib/api/compare';
 import { BarChart2, Search, ArrowRightLeft, Flame, Eye, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
+import Pagination from '@/components/shared/Pagination';
+
 
 export default function CompareAnalyticsPage() {
   const [records, setRecords] = useState<CompareFrequencyRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -186,25 +189,14 @@ export default function CompareAnalyticsPage() {
       )}
 
       {/* Pagination */}
-      {!loading && totalPages > 1 && (
-        <div className="mt-4 p-4 glass-panel rounded-2xl flex items-center justify-between">
-          <button 
-            disabled={page === 1}
-            onClick={() => setPage(p => p - 1)}
-            className="px-6 py-2.5 text-sm font-black uppercase tracking-wider rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-          >
-            Previous
-          </button>
-          <span className="text-sm font-black text-muted uppercase tracking-wider">Page {page} of {totalPages}</span>
-          <button 
-            disabled={page === totalPages}
-            onClick={() => setPage(p => p + 1)}
-            className="px-6 py-2.5 text-sm font-black uppercase tracking-wider rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)] hover:text-white disabled:opacity-50 disabled:pointer-events-none transition-colors"
-          >
-            Next
-          </button>
-        </div>
-      )}
+        <Pagination
+          page={page}
+          limit={limit}
+          totalCount={totalCount}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
     </div>
   );
 }

@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import FamilyModal from './components/FamilyModal';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import Pagination from '@/components/shared/Pagination';
+
 
 export default function TractorFamiliesPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -32,6 +34,7 @@ export default function TractorFamiliesPage() {
   const [search, setSearch] = useState('');
   const [isActiveFilter, setIsActiveFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -205,7 +208,7 @@ export default function TractorFamiliesPage() {
                     className="w-full pl-4 pr-10 py-3 bg-background border border-[var(--border-subtle)] rounded-xl text-sm font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none shadow-sm"
                   >
                     {brands.map((brand) => (
-                      <option key={brand.id} value={brand.id}>
+                      <option key={brand.id} value={brand.id} className="bg-background text-foreground">
                         {brand.name}
                       </option>
                     ))}
@@ -258,9 +261,9 @@ export default function TractorFamiliesPage() {
                     }}
                     className="w-full pl-9 pr-8 py-2 bg-background border border-[var(--border-subtle)] rounded-xl text-xs font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none shadow-sm"
                   >
-                    <option value="">All Statuses</option>
-                    <option value="true">Active Only</option>
-                    <option value="false">Inactive Only</option>
+                    <option value="" className="bg-background text-foreground">All Statuses</option>
+                    <option value="true" className="bg-background text-foreground">Active Only</option>
+                    <option value="false" className="bg-background text-foreground">Inactive Only</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
                 </div>
@@ -280,7 +283,7 @@ export default function TractorFamiliesPage() {
           {/* Families Table */}
           <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col min-h-[420px] md:min-h-[530px]">
             <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[350px] md:min-h-[460px]">
-              <table className="w-full text-left text-sm whitespace-nowrap relative">
+              <table className="w-full text-left text-sm relative">
                 <thead className="sticky top-0 bg-background/95 backdrop-blur-md z-10 text-muted uppercase text-[11px] font-black tracking-wider border-b border-[var(--border-subtle)]">
                   <tr>
                     <th className="px-6 py-4 w-10"></th>
@@ -336,7 +339,7 @@ export default function TractorFamiliesPage() {
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-foreground/80">{family.slug}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-foreground/80 max-w-[200px] truncate" title={family.slug}>{family.slug}</td>
                           <td className="px-6 py-4">
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-foreground/5 text-foreground/80">
                               <Tractor size={12} className="text-muted" />

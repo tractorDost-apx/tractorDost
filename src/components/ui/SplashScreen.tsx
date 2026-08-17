@@ -9,12 +9,12 @@ export function SplashScreen() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasSeenSplash = sessionStorage.getItem('tractorDost_splash_shown');
+      const hasSeenSplash = localStorage.getItem('tractorDost_splash_shown');
       if (hasSeenSplash) {
         setLoading(false);
         return;
       }
-      sessionStorage.setItem('tractorDost_splash_shown', 'true');
+      localStorage.setItem('tractorDost_splash_shown', 'true');
     }
 
     // Stage 1: The Assembly Animation (0 - 2500ms)
@@ -41,6 +41,7 @@ export function SplashScreen() {
 
   return (
     <div 
+      id="splash-screen"
       className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[var(--background)] transition-opacity duration-500 ease-in-out ${fading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
       <style>

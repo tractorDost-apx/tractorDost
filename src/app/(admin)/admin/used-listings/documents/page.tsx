@@ -8,10 +8,15 @@ import {
   XCircle,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import Pagination from '@/components/shared/Pagination';
 
 export default function AdminUsedDocumentsPage() {
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
     fetchDocs();
@@ -70,7 +75,7 @@ export default function AdminUsedDocumentsPage() {
                   </td>
                 </tr>
               ) : (
-                documents.map((doc: any) => (
+                documents.slice((page - 1) * limit, page * limit).map((doc: any) => (
                   <tr key={doc.id} className="hover:bg-foreground/[0.02] transition-colors">
                     <td className="px-6 py-4 font-bold">#{doc.listingId}</td>
                     <td className="px-6 py-4 font-bold uppercase">{doc.docType}</td>
@@ -96,6 +101,18 @@ export default function AdminUsedDocumentsPage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        {!loading && documents.length > 0 && (
+          <Pagination
+            page={page}
+            limit={limit}
+            totalCount={documents.length}
+            totalPages={Math.ceil(documents.length / limit)}
+            onPageChange={setPage}
+            onLimitChange={(l) => { setLimit(l); setPage(1); }}
+          />
+        )}
       </div>
     </div>
   );

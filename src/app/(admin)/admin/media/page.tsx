@@ -3,12 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { mediaAPI, Media } from '@/lib/api/media';
 import { Image as ImageIcon, Search, Trash2, FileText, CheckCircle } from 'lucide-react';
+import Pagination from '@/components/shared/Pagination';
+
 
 export default function MediaGalleryPage() {
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
