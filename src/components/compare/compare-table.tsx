@@ -54,7 +54,7 @@ export default function CompareTable({ tractors, onAddMore }: CompareTableProps)
           <div className="hidden md:flex md:w-1/4 p-6 flex-col justify-center gap-2 border-r border-[var(--border-subtle)]">
             <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Compare<br/>Tractors</h2>
             <p className="text-sm font-medium text-muted">Side-by-side technical specification analysis.</p>
-            {tractors.length < 3 && onAddMore && (
+            {tractors.length < 4 && onAddMore && (
               <button 
                 onClick={onAddMore}
                 className="mt-4 px-4 py-2 border-2 border-dashed border-[var(--color-brand-green)]/50 text-[var(--color-brand-green)] rounded-xl font-bold hover:bg-[var(--color-brand-green)]/10 transition-colors"

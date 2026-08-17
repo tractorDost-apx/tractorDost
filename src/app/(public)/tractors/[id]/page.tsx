@@ -485,7 +485,7 @@ export default function TractorDetailsPage({ params }: { params: Promise<{ id: s
                     const compImage = competitor.media?.find((m: any) => m.isPrimary)?.url || competitor.media?.[0]?.url;
 
                     return (
-                      <Link key={i} href={`/compare?left=${tractor.id}&right=${competitor.id}`} className="flex items-center gap-4 bg-background border border-[var(--border-subtle)] p-4 rounded-[1.5rem] hover:border-[var(--color-brand-orange)]/30 hover:shadow-lg transition-all group">
+                      <Link key={i} href={`/compare?ids=${tractor.id},${competitor.id}`} className="flex items-center gap-4 bg-background border border-[var(--border-subtle)] p-4 rounded-[1.5rem] hover:border-[var(--color-brand-orange)]/30 hover:shadow-lg transition-all group">
                          <div className="w-16 h-16 bg-gradient-to-br from-foreground/5 to-transparent rounded-xl flex items-center justify-center p-2 border border-[var(--border-subtle)] shrink-0 overflow-hidden">
                            {compImage ? (
                              <img src={compImage} alt={competitor.modelName} className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform" />

@@ -59,7 +59,7 @@ export default function ComparePicker({ onCompare, initialIds = [] }: ComparePic
   }, [search]);
 
   const addTractor = (tractor: Tractor) => {
-    if (selectedTractors.length < 3 && !selectedTractors.find(t => t.id === tractor.id)) {
+    if (selectedTractors.length < 4 && !selectedTractors.find(t => t.id === tractor.id)) {
       setSelectedTractors([...selectedTractors, tractor]);
       setSearch('');
       setIsOpen(false);
@@ -71,16 +71,16 @@ export default function ComparePicker({ onCompare, initialIds = [] }: ComparePic
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col gap-8 p-6 glass-panel rounded-3xl relative overflow-hidden">
+    <div className="w-full max-w-5xl mx-auto flex flex-col gap-8 p-6 glass-panel rounded-3xl relative overflow-hidden">
       <div className="absolute top-[-20%] right-[-10%] h-[150px] w-[150px] rounded-full bg-[var(--color-brand-green)]/10 blur-[60px] pointer-events-none" />
       
       <div className="text-center space-y-2 relative z-10">
         <h2 className="text-3xl font-black text-foreground">Compare Tractors</h2>
-        <p className="text-muted font-medium">Select up to 3 tractors to compare their specifications side-by-side.</p>
+        <p className="text-muted font-medium">Select up to 4 tractors to compare their specifications side-by-side.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-        {[0, 1, 2].map((index) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+        {[0, 1, 2, 3].map((index) => {
           const tractor = selectedTractors[index];
           
           return (

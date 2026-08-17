@@ -299,7 +299,7 @@ export default function HomePage() {
                 ) : comparisons.map((comp, idx) => {
                   const hotness = (comp.frequency / maxFreq) * 100;
                   return (
-                    <Link key={idx} href={`/compare?left=${comp.tractorLeft?.id}&right=${comp.tractorRight?.id}`} className="bg-background rounded-2xl p-5 border border-[var(--border-subtle)] hover:border-[var(--border-brand-alt)] hover:shadow-md hover:-translate-y-1 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col gap-4 group cursor-pointer">
+                    <Link key={idx} href={`/compare?ids=${comp.tractorLeft?.id},${comp.tractorRight?.id}`} className="bg-background rounded-2xl p-5 border border-[var(--border-subtle)] hover:border-[var(--border-brand-alt)] hover:shadow-md hover:-translate-y-1 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col gap-4 group cursor-pointer">
                       
                       <div className="flex items-center justify-between">
                         <div className="flex flex-col items-center text-center w-5/12">
