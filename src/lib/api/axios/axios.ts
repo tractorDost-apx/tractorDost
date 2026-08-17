@@ -24,12 +24,45 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+let refreshPromise: Promise<boolean> | null = null;
+
+// Bypasses apiClient (and its own interceptors) so a failed refresh can never recurse.
+export const refreshAccessToken = async (): Promise<boolean> => {
+  try {
+    await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 apiClient.interceptors.response.use(
   (res: AxiosResponse) => res,
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
-    
-    // If 401 Unauthorized, dispatch logout event
+    const originalRequest = error.config as (typeof error.config & { _retry?: boolean });
+    const url = originalRequest?.url || '';
+    // These endpoints 401 for reasons unrelated to an expired access token
+    // (bad credentials, or the refresh endpoint itself) — never retry them.
+    const skipRefresh = url.includes('/auth/login') || url.includes('/auth/verify-otp') || url.includes('/auth/refresh');
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !skipRefresh) {
+      originalRequest._retry = true;
+
+      // Coalesce concurrent 401s into a single refresh call
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+
+      const refreshed = await refreshPromise;
+
+      if (refreshed) {
+        return apiClient(originalRequest);
+      }
+    }
+
+    // No refresh possible (or already retried once) — session is genuinely gone.
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('auth:logout'));

@@ -24,11 +24,12 @@ export default function EquipmentBrandsPage() {
   const fetchBrands = async () => {
     setLoading(true);
     try {
-      const response = await equipmentBrandAPI.getAllEquipmentBrands({ page, limit: 10, search });
+      const response = await equipmentBrandAPI.getAllEquipmentBrands({ page, limit, search });
       if (response.success) {
-        setBrands(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setTotalCount(response.data.totalCount);
+        const payload = response.data as any;
+        setBrands(payload.data);
+        setTotalPages(payload.pagination?.totalPages || 1);
+        setTotalCount(payload.pagination?.total || 0);
       }
     } catch (error) {
       console.error('Failed to fetch equipment brands', error);
@@ -43,7 +44,7 @@ export default function EquipmentBrandsPage() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search, page]);
+  }, [search, page, limit]);
 
   const handleEdit = (brand: EquipmentBrand, e: React.MouseEvent) => {
     e.stopPropagation();

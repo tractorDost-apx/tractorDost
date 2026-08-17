@@ -19,11 +19,12 @@ export default function ImplementsPage() {
   const fetchImplements = async () => {
     setLoading(true);
     try {
-      const response = await implementAPI.getAllImplements({ page, limit: 10, search });
+      const response = await implementAPI.getAllImplements({ page, limit, search });
       if (response.success) {
-        setImplementsList(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setTotalCount(response.data.totalCount);
+        const payload = response.data as any;
+        setImplementsList(payload.data);
+        setTotalPages(payload.pagination?.totalPages || 1);
+        setTotalCount(payload.pagination?.total || 0);
       }
     } catch (error) {
       console.error('Failed to fetch implements', error);
@@ -38,7 +39,7 @@ export default function ImplementsPage() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search, page]);
+  }, [search, page, limit]);
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this implement?')) {

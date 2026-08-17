@@ -22,7 +22,7 @@ export default function TractorsPage() {
   const fetchTractors = async () => {
     setLoading(true);
     try {
-      const response = await tractorAPI.getAllTractors({ page, limit: 10, search });
+      const response = await tractorAPI.getAllTractors({ page, limit, search });
       if (response.success) {
         const payload = response.data as any;
         setTractors(payload.tractors || payload.data || []);
@@ -42,7 +42,7 @@ export default function TractorsPage() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search, page]);
+  }, [search, page, limit]);
 
   const toggleDeepExpand = (id: number) => {
     setDeepExpandedId(deepExpandedId === id ? null : id);

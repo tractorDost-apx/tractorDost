@@ -3,7 +3,11 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from '@/types/models/user';
 import { authAPI } from '@/lib/api/auth';
-import { apiClient } from '@/lib/api/axios/axios';
+import { apiClient, refreshAccessToken } from '@/lib/api/axios/axios';
+
+// Access token lives 15 minutes (BACKEND ACCESS_TOKEN_EXPIRES_IN); refresh a
+// couple minutes early so users never hit a 401 mid-interaction.
+const SILENT_REFRESH_INTERVAL_MS = 12 * 60 * 1000;
 
 interface AuthContextType {
   user: User | null;
@@ -57,6 +61,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
     }
   }, []);
+
+  // Proactively renew the access token while a session is active, so it
+  // never expires mid-interaction (falls back to the axios 401 handler otherwise).
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(() => {
+      refreshAccessToken();
+    }, SILENT_REFRESH_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const login = (newUser: User) => {
     setUser(newUser);

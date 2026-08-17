@@ -13,6 +13,11 @@ export const authAPI = {
     return response.data;
   },
 
+  refresh: async () => {
+    const response = await apiClient.post('/auth/refresh');
+    return response.data;
+  },
+
   getMe: async (): Promise<{ success: boolean; data: User | null }> => {
     try {
       const response = await apiClient.get('/users/me');

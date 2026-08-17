@@ -20,11 +20,12 @@ export default function TractorSpecsPage() {
   const fetchSpecs = async () => {
     setLoading(true);
     try {
-      const response = await tractorAPI.getAllTractorSpecs({ page, limit: 10, search });
+      const response = await tractorAPI.getAllTractorSpecs({ page, limit, search });
       if (response.success) {
-        setSpecs(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setTotalCount(response.data.totalCount);
+        const payload = response.data as any;
+        setSpecs(payload.data);
+        setTotalPages(payload.pagination?.totalPages || 1);
+        setTotalCount(payload.pagination?.total || 0);
       }
     } catch (error) {
       console.error('Failed to fetch specs', error);
@@ -38,7 +39,7 @@ export default function TractorSpecsPage() {
       fetchSpecs();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [search, page]);
+  }, [search, page, limit]);
 
   const toggleExpand = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
