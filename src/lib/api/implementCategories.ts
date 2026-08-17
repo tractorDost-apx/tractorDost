@@ -39,8 +39,8 @@ export const implementCategoryAPI = {
   /**
    * Fetch all active categories (flat)
    */
-  getAllActiveCategoriesFlat: async () => {
-    const response = await apiClient.get<{ success: boolean; data: ImplementCategory[] }>('/implement-categories/all-active');
+  getAllActiveCategoriesFlat: async (params?: { brandId?: number }) => {
+    const response = await apiClient.get<{ success: boolean; data: ImplementCategory[] }>('/implement-categories/all-active', { params });
     return response.data;
   },
 

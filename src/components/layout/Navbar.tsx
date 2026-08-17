@@ -10,6 +10,9 @@ import { DashboardNavbar } from './DashboardNavbar';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { tractorFamilyAPI, TractorFamily } from '@/lib/api/tractorFamilies';
+import { equipmentBrandAPI, EquipmentBrand } from '@/lib/api/equipmentBrands';
+import { implementCategoryAPI, ImplementCategory } from '@/lib/api/implementCategories';
+import { implementAPI, Implement } from '@/lib/api/implements';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -94,10 +97,12 @@ export function Navbar() {
               label="Implements" 
               pathname={pathname}
               items={[
-                { title: 'Farm Implements', desc: 'Rotavators, Ploughs & more', href: '/implements' },
-                { title: 'Harvesters', desc: 'Combine harvesters', href: '/harvesters' },
-                { title: 'Tractor Tyres', desc: 'MRF, Apollo, BKT tyres', href: '/tyres' },
-                { title: 'Service Centers', desc: 'Authorized repair & service', href: '/service-centers' }
+                { title: 'BRANDS', desc: '', href: '#brands' },
+                { title: 'ALL IMPLEMENTS', desc: '', href: '/implements' },
+                { title: 'POPULAR IMPLEMENTS', desc: '', href: '/implements/popular' },
+                { title: 'LATEST IMPLEMENTS', desc: '', href: '/implements/latest' },
+                { title: 'ELECTRIC IMPLEMENTS', desc: '', href: '/implements/electric' },
+                { title: 'CNG IMPLEMENTS', desc: '', href: '/implements/cng' }
               ]}
             />
 
@@ -274,6 +279,22 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
   const [positionRight, setPositionRight] = useState(true);
   const brandsPanelRef = useRef<HTMLDivElement>(null);
 
+  // Equipment Brand & Categories dropdown states (for Implements)
+  const [eqBrands, setEqBrands] = useState<EquipmentBrand[]>([]);
+  const [activeEqBrandId, setActiveEqBrandId] = useState<number | null>(null);
+  const [categoriesByBrand, setCategoriesByBrand] = useState<Record<number, ImplementCategory[]>>({});
+  const [loadingEqBrandId, setLoadingEqBrandId] = useState<number | null>(null);
+
+  const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
+  const [implementsByBrandAndCategory, setImplementsByBrandAndCategory] = useState<Record<string, Implement[]>>({});
+  const [loadingCategoryId, setLoadingCategoryId] = useState<number | null>(null);
+
+  const [positionRightCategory, setPositionRightCategory] = useState(true);
+  const [positionRightImplement, setPositionRightImplement] = useState(true);
+
+  const categoryPanelRef = useRef<HTMLDivElement>(null);
+  const implementsPanelRef = useRef<HTMLDivElement>(null);
+
   const handleBrandHover = async (brandId: number) => {
     setActiveBrandId(brandId);
     if (familiesByBrand[brandId] === undefined && loadingBrandId !== brandId) {
@@ -291,6 +312,42 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
     }
   };
 
+  const handleEqBrandHover = async (brandId: number) => {
+    setActiveEqBrandId(brandId);
+    setActiveCategoryId(null); // Reset category selection when changing brand
+    if (categoriesByBrand[brandId] === undefined && loadingEqBrandId !== brandId) {
+      setLoadingEqBrandId(brandId);
+      try {
+        const res = await implementCategoryAPI.getAllActiveCategoriesFlat({ brandId });
+        if (res.success) {
+          setCategoriesByBrand(prev => ({ ...prev, [brandId]: res.data }));
+        }
+      } catch (err) {
+        console.error('Failed to load categories for brand', brandId, err);
+      } finally {
+        setLoadingEqBrandId(null);
+      }
+    }
+  };
+
+  const handleCategoryHover = async (brandId: number, categoryId: number) => {
+    setActiveCategoryId(categoryId);
+    const key = `${brandId}_${categoryId}`;
+    if (implementsByBrandAndCategory[key] === undefined && loadingCategoryId !== categoryId) {
+      setLoadingCategoryId(categoryId);
+      try {
+        const res = await implementAPI.getAllImplements({ brandId, categoryId, isActive: 'true', limit: 100 });
+        if (res.success) {
+          setImplementsByBrandAndCategory(prev => ({ ...prev, [key]: res.data.data }));
+        }
+      } catch (err) {
+        console.error('Failed to load implements for brand/category', brandId, categoryId, err);
+      } finally {
+        setLoadingCategoryId(null);
+      }
+    }
+  };
+
   useEffect(() => {
     if (activeBrandId && brandsPanelRef.current) {
       const rect = brandsPanelRef.current.getBoundingClientRect();
@@ -302,6 +359,30 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
       }
     }
   }, [activeBrandId]);
+
+  useEffect(() => {
+    if (activeEqBrandId && categoryPanelRef.current) {
+      const rect = categoryPanelRef.current.getBoundingClientRect();
+      const spaceOnRight = window.innerWidth - rect.right;
+      if (spaceOnRight < 348) {
+        setPositionRightCategory(false);
+      } else {
+        setPositionRightCategory(true);
+      }
+    }
+  }, [activeEqBrandId]);
+
+  useEffect(() => {
+    if (activeCategoryId && implementsPanelRef.current) {
+      const rect = implementsPanelRef.current.getBoundingClientRect();
+      const spaceOnRight = window.innerWidth - rect.right;
+      if (spaceOnRight < 348) {
+        setPositionRightImplement(false);
+      } else {
+        setPositionRightImplement(true);
+      }
+    }
+  }, [activeCategoryId]);
 
   useEffect(() => {
     if (label === 'Tractors') {
@@ -316,6 +397,22 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
         }
       };
       fetchActiveBrands();
+    }
+  }, [label]);
+
+  useEffect(() => {
+    if (label === 'Implements') {
+      const fetchEqBrands = async () => {
+        try {
+          const res = await equipmentBrandAPI.getAllEquipmentBrands({ isActive: 'true', limit: 100 });
+          if (res.success) {
+            setEqBrands(res.data.data);
+          }
+        } catch (err) {
+          console.error('Failed to load equipment brands', err);
+        }
+      };
+      fetchEqBrands();
     }
   }, [label]);
 
@@ -348,122 +445,341 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
       >
         {items.map((item, i) => {
           if (item.title === 'BRANDS') {
-            return (
-              <div 
-                key={i} 
-                className="relative group/submenu flex flex-col"
-              >
-                {/* Trigger Row */}
-                <div className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-foreground/10 text-foreground hover:text-[var(--color-brand-green)] cursor-pointer transition-all">
-                  <span className="text-sm font-black tracking-tight uppercase">Brands</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5 transition-transform duration-300">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                  </svg>
-                </div>
-
-                {/* Submenu Content */}
+            if (label === 'Tractors') {
+              return (
                 <div 
-                  ref={brandsPanelRef}
-                  className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
+                  key={i} 
+                  className="relative group/submenu flex flex-col"
                 >
+                  {/* Trigger Row */}
+                  <div className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-foreground/10 text-foreground hover:text-[var(--color-brand-green)] cursor-pointer transition-all">
+                    <span className="text-sm font-black tracking-tight uppercase">Brands</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5 transition-transform duration-300">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+
+                  {/* Submenu Content */}
                   <div 
-                    className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
-                    style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
-                    onMouseLeave={() => setActiveBrandId(null)}
+                    ref={brandsPanelRef}
+                    className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
                   >
-                    {/* Scrollable Brands List (displays exactly 3 complete items) */}
-                    <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
-                      {brands.length === 0 ? (
-                        <span className="text-xs text-muted/60 px-3 py-2.5 italic font-bold block shrink-0">No active brands</span>
-                      ) : (
-                        brands.map((brand) => {
-                          const displayName = brand.name.toLowerCase().includes('tractor')
-                            ? brand.name
-                            : `${brand.name} Tractors`;
-                          const isBrandActive = activeBrandId === brand.id;
-                          return (
-                            <Link 
-                              key={brand.id} 
-                              href={`/tractors?brand=${brand.id}`}
-                              onMouseEnter={() => handleBrandHover(brand.id)}
-                              className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
-                                isBrandActive 
-                                  ? 'text-[var(--color-brand-green)] bg-foreground/5' 
-                                  : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
-                              }`}
-                            >
-                              {displayName}
-                            </Link>
-                          );
-                        })
-                      )}
-                    </div>
-
-                    {/* Separator / Divider */}
-                    <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
-
-                    {/* ALL BRANDS (outside scroll) */}
-                    <Link 
-                      href="/brands"
-                      className="block w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
-                    >
-                      All Brands
-                    </Link>
-
-                    {/* Family Dropdown Panel (renders nested next to Brands panel) */}
                     <div 
-                      className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[70] ${
-                        activeBrandId 
-                          ? 'opacity-100 scale-100 pointer-events-auto' 
-                          : 'opacity-0 scale-95 pointer-events-none'
-                      }`}
+                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                      style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                      onMouseLeave={() => setActiveBrandId(null)}
                     >
-                      <div 
-                        className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
-                        style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
-                      >
-                        {loadingBrandId === activeBrandId ? (
-                          <div className="flex items-center justify-center py-6 shrink-0">
-                            <span className="text-xs font-bold text-muted animate-pulse">Loading families...</span>
-                          </div>
-                        ) : activeBrandId && familiesByBrand[activeBrandId]?.length > 0 ? (
-                          <>
-                            {/* Scrollable Families List */}
-                            <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
-                              {familiesByBrand[activeBrandId].map((family) => (
-                                <Link 
-                                  key={family.id} 
-                                  href={`/tractors?brand=${activeBrandId}&family=${family.id}`}
-                                  className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
-                                >
-                                  {family.name}
-                                </Link>
-                              ))}
-                            </div>
-                            
-                            {/* Separator / Divider */}
-                            <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
-
-                            {/* ALL FAMILIES button */}
-                            <Link 
-                              href={`/tractors?brand=${activeBrandId}`}
-                              className="flex items-center justify-between w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
-                            >
-                              <span>All Families</span>
-                              <span className="text-xs leading-none">→</span>
-                            </Link>
-                          </>
+                      {/* Scrollable Brands List (displays exactly 3 complete items) */}
+                      <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                        {brands.length === 0 ? (
+                          <span className="text-xs text-muted/60 px-3 py-2.5 italic font-bold block shrink-0">No active brands</span>
                         ) : (
-                          <div className="flex items-center justify-center py-6 px-3 shrink-0">
-                            <span className="text-xs font-bold text-muted/60 italic">No families available</span>
-                          </div>
+                          brands.map((brand) => {
+                            const displayName = brand.name.toLowerCase().includes('tractor')
+                              ? brand.name
+                              : `${brand.name} Tractors`;
+                            const isBrandActive = activeBrandId === brand.id;
+                            return (
+                              <Link 
+                                key={brand.id} 
+                                href={`/tractors?brand=${brand.id}`}
+                                onMouseEnter={() => handleBrandHover(brand.id)}
+                                className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
+                                  isBrandActive 
+                                    ? 'text-[var(--color-brand-green)] bg-foreground/5' 
+                                    : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                }`}
+                              >
+                                {displayName}
+                              </Link>
+                            );
+                          })
                         )}
+                      </div>
+
+                      {/* Separator / Divider */}
+                      <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+
+                      {/* ALL BRANDS (outside scroll) */}
+                      <Link 
+                        href="/brands"
+                        className="block w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                      >
+                        All Brands
+                      </Link>
+
+                      {/* Family Dropdown Panel (renders nested next to Brands panel) */}
+                      <div 
+                        className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[70] ${
+                          activeBrandId 
+                            ? 'opacity-100 scale-100 pointer-events-auto' 
+                            : 'opacity-0 scale-95 pointer-events-none'
+                        }`}
+                      >
+                        <div 
+                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                          style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                        >
+                          {loadingBrandId === activeBrandId ? (
+                            <div className="flex items-center justify-center py-6 shrink-0">
+                              <span className="text-xs font-bold text-muted animate-pulse">Loading families...</span>
+                            </div>
+                          ) : activeBrandId && familiesByBrand[activeBrandId]?.length > 0 ? (
+                            <>
+                              {/* Scrollable Families List */}
+                              <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                                {familiesByBrand[activeBrandId].map((family) => (
+                                  <Link 
+                                    key={family.id} 
+                                    href={`/tractors?brand=${activeBrandId}&family=${family.id}`}
+                                    className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
+                                  >
+                                    {family.name}
+                                  </Link>
+                                ))}
+                              </div>
+                              
+                              {/* Separator / Divider */}
+                              <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+
+                              {/* ALL FAMILIES button */}
+                              <Link 
+                                href={`/tractors?brand=${activeBrandId}`}
+                                className="flex items-center justify-between w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                              >
+                                <span>All Families</span>
+                                <span className="text-xs leading-none">→</span>
+                              </Link>
+                            </>
+                          ) : (
+                            <div className="flex items-center justify-center py-6 px-3 shrink-0">
+                              <span className="text-xs font-bold text-muted/60 italic">No families available</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
+              );
+            }
+
+            if (label === 'Implements') {
+              const activeBrandCategories = activeEqBrandId !== null ? (categoriesByBrand[activeEqBrandId] || []) : [];
+              const activeCategory = activeCategoryId !== null ? activeBrandCategories.find((c: ImplementCategory) => c.id === activeCategoryId) : undefined;
+              const activeCategorySlug = activeCategory?.slug || '';
+              const activeBrandSlug = activeEqBrandId !== null ? (eqBrands.find(b => b.id === activeEqBrandId)?.slug || '') : '';
+
+              return (
+                <div 
+                  key={i} 
+                  className="relative group/submenu flex flex-col"
+                >
+                  {/* Trigger Row */}
+                  <div className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-foreground/10 text-foreground hover:text-[var(--color-brand-green)] cursor-pointer transition-all">
+                    <span className="text-sm font-black tracking-tight uppercase">Brands</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5 transition-transform duration-300">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+
+                  {/* Submenu Content */}
+                  <div 
+                    className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
+                  >
+                    <div 
+                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                      style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                      onMouseLeave={() => setActiveEqBrandId(null)}
+                    >
+                      {/* Scrollable Brands List */}
+                      <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                        {eqBrands.length === 0 ? (
+                          <span className="text-xs text-muted/60 px-3 py-2.5 italic font-bold block shrink-0">No active brands</span>
+                        ) : (
+                          eqBrands.map((brand) => {
+                            const displayName = brand.name.toLowerCase().includes('implement')
+                              ? brand.name
+                              : `${brand.name} Implements`;
+                            const isBrandActive = activeEqBrandId === brand.id;
+                            return (
+                              <Link 
+                                key={brand.id} 
+                                href={`/implements?brand=${brand.slug}`}
+                                onMouseEnter={() => handleEqBrandHover(brand.id)}
+                                className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
+                                  isBrandActive 
+                                    ? 'text-[var(--color-brand-green)] bg-foreground/5' 
+                                    : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                }`}
+                              >
+                                {displayName}
+                              </Link>
+                            );
+                          })
+                        )}
+                      </div>
+
+                      {/* Separator / Divider */}
+                      <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+
+                      {/* ALL BRANDS (outside scroll) */}
+                      <Link 
+                        href="/implements"
+                        className="block w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                      >
+                        All Brands
+                      </Link>
+
+                      {/* Category Dropdown Panel (renders nested next to Brands panel) */}
+                      <div 
+                        ref={categoryPanelRef}
+                        className={`absolute ${positionRightCategory ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[70] ${
+                          activeEqBrandId 
+                            ? 'opacity-100 scale-100 pointer-events-auto' 
+                            : 'opacity-0 scale-95 pointer-events-none'
+                        }`}
+                      >
+                        <div 
+                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                          style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                          onMouseLeave={() => setActiveCategoryId(null)}
+                        >
+                          {loadingEqBrandId === activeEqBrandId ? (
+                            <div className="flex items-center justify-center py-6 shrink-0">
+                              <span className="text-xs font-bold text-muted animate-pulse">Loading categories...</span>
+                            </div>
+                          ) : activeEqBrandId && activeBrandCategories.length > 0 ? (
+                            <>
+                              {/* Scrollable Categories List */}
+                              <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-1 brand-scrollbar">
+                                {(() => {
+                                  const parents = activeBrandCategories.filter((c: ImplementCategory) => c.parentId === null);
+                                  const childrenMap: Record<number, ImplementCategory[]> = {};
+                                  activeBrandCategories.forEach((c: ImplementCategory) => {
+                                    const pId = c.parentId;
+                                    if (pId !== null && pId !== undefined) {
+                                      if (!childrenMap[pId]) {
+                                        childrenMap[pId] = [];
+                                      }
+                                      childrenMap[pId].push(c);
+                                    }
+                                  });
+
+                                  return parents.map((parent) => {
+                                    const children = childrenMap[parent.id] || [];
+                                    if (children.length > 0) {
+                                      return (
+                                        <div key={parent.id} className="flex flex-col gap-0.5 mt-1 shrink-0">
+                                          <div className="text-muted/50 px-3 py-1 font-extrabold tracking-wider text-[10px] uppercase">
+                                            {parent.name}
+                                          </div>
+                                          {children.map((child) => {
+                                            const isChildActive = activeCategoryId === child.id;
+                                            return (
+                                              <Link
+                                                key={child.id}
+                                                href={`/implements/${child.slug}?brand=${activeBrandSlug}`}
+                                                onMouseEnter={() => handleCategoryHover(activeEqBrandId, child.id)}
+                                                className={`block w-full py-2 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 pl-5 ${
+                                                  isChildActive 
+                                                    ? 'text-[var(--color-brand-green)] bg-foreground/5' 
+                                                    : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                                }`}
+                                              >
+                                                {child.name}
+                                              </Link>
+                                            );
+                                          })}
+                                        </div>
+                                      );
+                                    } else {
+                                      const isParentActive = activeCategoryId === parent.id;
+                                      return (
+                                        <Link
+                                          key={parent.id}
+                                          href={`/implements/${parent.slug}?brand=${activeBrandSlug}`}
+                                          onMouseEnter={() => handleCategoryHover(activeEqBrandId, parent.id)}
+                                          className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
+                                            isParentActive 
+                                              ? 'text-[var(--color-brand-green)] bg-foreground/5' 
+                                              : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                          }`}
+                                        >
+                                          {parent.name}
+                                        </Link>
+                                      );
+                                    }
+                                  });
+                                })()}
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex items-center justify-center py-6 px-3 shrink-0">
+                              <span className="text-xs font-bold text-muted/60 italic">No categories available</span>
+                            </div>
+                          )}
+
+                          {/* Implement Models Dropdown Panel (renders nested next to Category panel) */}
+                          <div 
+                            ref={implementsPanelRef}
+                            className={`absolute ${positionRightImplement ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[80] ${
+                              activeCategoryId 
+                                ? 'opacity-100 scale-100 pointer-events-auto' 
+                                : 'opacity-0 scale-95 pointer-events-none'
+                            }`}
+                          >
+                            <div 
+                              className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
+                              style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                            >
+                              {loadingCategoryId === activeCategoryId ? (
+                                <div className="flex items-center justify-center py-6 shrink-0">
+                                  <span className="text-xs font-bold text-muted animate-pulse">Loading implements...</span>
+                                </div>
+                              ) : activeCategoryId && implementsByBrandAndCategory[`${activeEqBrandId}_${activeCategoryId}`]?.length > 0 ? (
+                                <>
+                                  {/* Scrollable Implements List */}
+                                  <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                                    {implementsByBrandAndCategory[`${activeEqBrandId}_${activeCategoryId}`].map((implement) => (
+                                      <Link 
+                                        key={implement.id} 
+                                        href={`/implements/${implement.category?.slug}/${implement.slug}`}
+                                        className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
+                                      >
+                                        {implement.modelName}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                  
+                                  {/* Separator / Divider */}
+                                  <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+
+                                  {/* ALL ITEMS link */}
+                                  <Link 
+                                    href={`/implements/${activeCategorySlug}?brand=${activeBrandSlug}`}
+                                    className="flex items-center justify-between w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                                  >
+                                    <span>All models</span>
+                                    <span className="text-xs leading-none">→</span>
+                                  </Link>
+                                </>
+                              ) : (
+                                <div className="flex items-center justify-center py-6 px-3 shrink-0">
+                                  <span className="text-xs font-bold text-muted/60 italic">No implements available</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              );
+            }
           }
 
           return (
