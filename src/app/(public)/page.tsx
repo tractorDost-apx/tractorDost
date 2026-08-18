@@ -27,8 +27,14 @@ export default function PublicHomePage() {
           compareAPI.getFrequencyOfCompare({ limit: 3, sort: 'desc' })
         ]);
 
-        if (tractorsRes.success) setTractors(tractorsRes.data.data);
-        if (brandsRes.success) setBrands(brandsRes.data.data);
+        if (tractorsRes.success) {
+          const list = (tractorsRes.data as any)?.tractors || (tractorsRes.data as any)?.data || [];
+          setTractors(list);
+        }
+        if (brandsRes.success) {
+          const list = brandsRes.data?.data || (brandsRes.data as any)?.brands || [];
+          setBrands(list);
+        }
         if (compareRes.success) setComparisons(compareRes.data.records);
 
       } catch (error) {

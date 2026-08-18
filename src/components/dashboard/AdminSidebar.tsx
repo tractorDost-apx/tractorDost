@@ -87,6 +87,12 @@ const NAV_GROUPS = [
     ]
   },
   {
+    title: 'Capitalization',
+    items: [
+      { label: 'All EMI Records', href: '/admin/finance/emi-calculations', icon: FileSpreadsheet },
+    ]
+  },
+  {
     title: 'Content & Support',
     items: [
       { label: 'CMS (Blogs/News)', href: '/admin/content', icon: FileText },

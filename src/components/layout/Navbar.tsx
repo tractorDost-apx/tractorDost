@@ -157,8 +157,7 @@ export function Navbar() {
 
                 {/* Dropdown Menu */}
                 <div 
-                  className="absolute right-0 top-[120%] w-64 rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 backdrop-blur-3xl"
-                  style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                  className="absolute right-0 top-[120%] w-64 rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 nav-dropdown-glass"
                 >
                   <div className="px-3 py-3 border-b border-[var(--border-subtle)] mb-1 bg-foreground/5 rounded-xl">
                       <p className="text-sm font-black text-foreground tracking-tight truncate">{user?.fullName || 'TractorDost User'}</p>
@@ -440,8 +439,7 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
 
       {/* Dropdown Content */}
       <div 
-        className={`absolute ${alignmentClasses[align]} top-[calc(100%+1rem)] w-[280px] rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 backdrop-blur-3xl`}
-        style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+        className={`absolute ${alignmentClasses[align]} top-[calc(100%+1rem)] w-[280px] rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 nav-dropdown-glass`}
       >
         {items.map((item, i) => {
           if (item.title === 'BRANDS') {
@@ -465,8 +463,7 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                     className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
                   >
                     <div 
-                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
-                      style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
                       onMouseLeave={() => setActiveBrandId(null)}
                     >
                       {/* Scrollable Brands List (displays exactly 3 complete items) */}
@@ -517,8 +514,7 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                         }`}
                       >
                         <div 
-                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
-                          style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
                         >
                           {loadingBrandId === activeBrandId ? (
                             <div className="flex items-center justify-center py-6 shrink-0">
@@ -588,8 +584,7 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                     className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
                   >
                     <div 
-                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
-                      style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
                       onMouseLeave={() => setActiveEqBrandId(null)}
                     >
                       {/* Scrollable Brands List */}
@@ -641,8 +636,7 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                         }`}
                       >
                         <div 
-                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
-                          style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
                           onMouseLeave={() => setActiveCategoryId(null)}
                         >
                           {loadingEqBrandId === activeEqBrandId ? (
@@ -730,8 +724,7 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                             }`}
                           >
                             <div 
-                              className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 backdrop-blur-3xl"
-                              style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--panel-shadow)' }}
+                              className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
                             >
                               {loadingCategoryId === activeCategoryId ? (
                                 <div className="flex items-center justify-center py-6 shrink-0">
