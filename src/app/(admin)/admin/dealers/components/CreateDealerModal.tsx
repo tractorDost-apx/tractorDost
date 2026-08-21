@@ -1,0 +1,685 @@
+import React, { useState } from 'react';
+import { X, Building2, User, FileText, Phone, MapPin, Wrench, Globe, CheckCircle2, AlertCircle } from 'lucide-react';
+import { dealerAPI } from '@/lib/api/dealers';
+import { DealerType, CreateDealerPayload } from '@/types/models/dealer';
+
+interface CreateDealerModalProps {
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export function CreateDealerModal({ onClose, onSuccess }: CreateDealerModalProps) {
+  // Form State
+  // 1. User Primary
+  const [mobile, setMobile] = useState('');
+  const [fullName, setFullName] = useState('');
+
+  // 2. Business
+  const [businessName, setBusinessName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [dealerType, setDealerType] = useState<DealerType>('BRAND_DEALER');
+  const [aboutDealer, setAboutDealer] = useState('');
+
+  // 3. KYC (Double confirmation)
+  const [panNumber, setPanNumber] = useState('');
+  const [confirmPanNumber, setConfirmPanNumber] = useState('');
+
+  const [gstNumber, setGstNumber] = useState('');
+  const [confirmGstNumber, setConfirmGstNumber] = useState('');
+
+  // 4. Contact
+  const [phone, setPhone] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
+
+  // 5. Location
+  const [address, setAddress] = useState('');
+  const [state, setState] = useState('');
+  const [district, setDistrict] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [serviceRadiusKm, setServiceRadiusKm] = useState('50');
+
+  // 6. Operations
+  const [workingHours, setWorkingHours] = useState('');
+  const [serviceAreas, setServiceAreas] = useState('');
+
+  // 7. SEO
+  const [seoTitle, setSeoTitle] = useState('');
+  const [seoDescription, setSeoDescription] = useState('');
+
+  // UI state
+  const [submitting, setSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // Regex patterns
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+  // Auto-generate slug when businessName changes if user hasn't typed custom slug
+  const handleBusinessNameChange = (val: string) => {
+    setBusinessName(val);
+    const generatedSlug = val
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-');
+    setSlug(generatedSlug);
+  };
+
+  // Normalization handlers
+  const handlePanChange = (val: string) => {
+    setPanNumber(val.toUpperCase().trim());
+  };
+
+  const handleConfirmPanChange = (val: string) => {
+    setConfirmPanNumber(val.toUpperCase().trim());
+  };
+
+  const handleGstChange = (val: string) => {
+    setGstNumber(val.toUpperCase().trim());
+  };
+
+  const handleConfirmGstChange = (val: string) => {
+    setConfirmGstNumber(val.toUpperCase().trim());
+  };
+
+  // Validation checks
+  const isPanValid = !panNumber || panRegex.test(panNumber);
+  const isPanConfirmRequired = !!panNumber;
+  const isPanMatching = !panNumber || panNumber === confirmPanNumber;
+
+  const isGstValid = !gstNumber || gstRegex.test(gstNumber);
+  const isGstConfirmRequired = !!gstNumber;
+  const isGstMatching = !gstNumber || gstNumber === confirmGstNumber;
+
+  const hasKycErrors =
+    (!!panNumber && (!isPanValid || !confirmPanNumber || !isPanMatching)) ||
+    (!!gstNumber && (!isGstValid || !confirmGstNumber || !isGstMatching));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setApiError(null);
+
+    // Front-end validations
+    if (!mobile || mobile.length !== 10 || isNaN(Number(mobile))) {
+      setApiError('Please enter a valid 10-digit mobile number for the owner account');
+      return;
+    }
+
+    if (!businessName || businessName.length < 3) {
+      setApiError('Business name must be at least 3 characters long');
+      return;
+    }
+
+    if (!slug || slug.length < 3) {
+      setApiError('Slug must be at least 3 characters long');
+      return;
+    }
+
+    if (!phone || phone.length < 10) {
+      setApiError('Primary phone number must be at least 10 digits');
+      return;
+    }
+
+    if (!address || address.length < 3) {
+      setApiError('Address must be at least 3 characters long');
+      return;
+    }
+
+    if (!state || state.length < 3) {
+      setApiError('State must be at least 3 characters long');
+      return;
+    }
+
+    if (!district || district.length < 3) {
+      setApiError('District must be at least 3 characters long');
+      return;
+    }
+
+    // Check PAN & GST rules
+    if (panNumber) {
+      if (!panRegex.test(panNumber)) {
+        setApiError('Invalid PAN number format (e.g. ABCDE1234F)');
+        return;
+      }
+      if (!confirmPanNumber) {
+        setApiError('Please confirm the PAN number');
+        return;
+      }
+      if (panNumber !== confirmPanNumber) {
+        setApiError('PAN confirmation does not match original PAN number');
+        return;
+      }
+    }
+
+    if (gstNumber) {
+      if (!gstRegex.test(gstNumber)) {
+        setApiError('Invalid GSTIN number format (e.g. 27ABCDE1234F1Z5)');
+        return;
+      }
+      if (!confirmGstNumber) {
+        setApiError('Please confirm the GSTIN number');
+        return;
+      }
+      if (gstNumber !== confirmGstNumber) {
+        setApiError('GSTIN confirmation does not match original GSTIN number');
+        return;
+      }
+    }
+
+    // Construct Payload (EXCLUDING confirmPanNumber and confirmGstNumber!)
+    const payload: CreateDealerPayload = {
+      mobile: Number(mobile),
+      fullName: fullName || undefined,
+      businessName,
+      slug,
+      dealerType,
+      phone,
+      whatsapp: whatsapp || undefined,
+      email: email || undefined,
+      website: website || undefined,
+      panNumber: panNumber || undefined,
+      gstNumber: gstNumber || undefined,
+      address,
+      state,
+      district,
+      pincode: pincode || undefined,
+      latitude: latitude ? Number(latitude) : undefined,
+      longitude: longitude ? Number(longitude) : undefined,
+      serviceRadiusKm: serviceRadiusKm ? Number(serviceRadiusKm) : 50,
+      aboutDealer: aboutDealer || undefined,
+      seoTitle: seoTitle || undefined,
+      seoDescription: seoDescription || undefined,
+    };
+
+    try {
+      setSubmitting(true);
+      const res = await dealerAPI.createDealer(payload);
+      if (res.success) {
+        onSuccess();
+      }
+    } catch (err: any) {
+      console.error('Error creating dealer:', err);
+      const msg = err?.response?.data?.message || err?.response?.data?.error?.[0]?.message || 'Failed to create dealer';
+      setApiError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+      <div className="w-full max-w-4xl bg-zinc-950 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Modal Header */}
+        <div className="p-6 border-b border-white/10 flex items-center justify-between bg-zinc-900/50 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-lime-400/10 text-lime-400 border border-lime-400/20">
+              <Building2 size={22} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black tracking-tight text-foreground">Add New Dealership</h2>
+              <p className="text-xs font-bold text-muted mt-0.5">
+                Onboard a new dealer partner with double KYC confirmation & sectioned data fields.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-8">
+          {apiError && (
+            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold flex items-center gap-2">
+              <AlertCircle size={16} className="shrink-0" />
+              <p>{apiError}</p>
+            </div>
+          )}
+
+          {/* Section 1: User / Owner Information */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-lime-400">
+              <User size={16} /> 1. Dealer Owner / Primary Account
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  Mobile Number <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength={10}
+                  placeholder="10-digit mobile number (e.g. 9876543210)"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">Owner Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Owner's full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* Section 2: Business Information */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-lime-400">
+              <Building2 size={16} /> 2. Business Information
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  Business Name <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Official dealership name"
+                  value={businessName}
+                  onChange={(e) => handleBusinessNameChange(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  URL Slug <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="dealership-name-city"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-mono text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  Dealer Type <span className="text-rose-400">*</span>
+                </label>
+                <select
+                  value={dealerType}
+                  onChange={(e) => setDealerType(e.target.value as DealerType)}
+                  className="w-full bg-zinc-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-bold text-foreground focus:outline-none focus:border-lime-400/50"
+                >
+                  <option value="BRAND_DEALER">BRAND_DEALER (Brand Authorized)</option>
+                  <option value="MULTI_BRAND">MULTI_BRAND (Multi-Brand Dealer)</option>
+                  <option value="USED_TRACTOR_DEALER">USED_TRACTOR_DEALER (Pre-owned)</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-muted block mb-1.5">About Dealer</label>
+                <textarea
+                  rows={3}
+                  placeholder="Brief description of facilities, services offered, history..."
+                  value={aboutDealer}
+                  onChange={(e) => setAboutDealer(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* Section 3: KYC Verification (WITH MANDATORY DOUBLE CONFIRMATION) */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-lime-400">
+                <FileText size={16} /> 3. Mandatory KYC Double Confirmation
+              </div>
+              <span className="text-[10px] font-bold text-muted uppercase">Double verification check required</span>
+            </div>
+
+            {/* PAN GROUP */}
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
+              <div className="text-xs font-bold text-foreground flex items-center justify-between">
+                <span>Permanent Account Number (PAN)</span>
+                {panNumber && isPanValid && isPanMatching && (
+                  <span className="text-[10px] font-black text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 size={12} /> Matching & Valid Format
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-bold text-muted block mb-1">PAN Number</label>
+                  <input
+                    type="text"
+                    maxLength={10}
+                    placeholder="e.g. ABCDE1234F"
+                    value={panNumber}
+                    onChange={(e) => handlePanChange(e.target.value)}
+                    className={`w-full bg-zinc-900 border rounded-xl px-3.5 py-2 text-sm font-mono tracking-wider uppercase focus:outline-none ${
+                      panNumber && !isPanValid
+                        ? 'border-rose-500 text-rose-400'
+                        : 'border-white/10 text-foreground focus:border-lime-400/50'
+                    }`}
+                  />
+                  {panNumber && !isPanValid && (
+                    <span className="text-[10px] text-rose-400 font-bold block mt-1">
+                      Invalid PAN format (e.g. 5 letters, 4 digits, 1 letter)
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-muted block mb-1">Confirm PAN Number</label>
+                  <input
+                    type="text"
+                    maxLength={10}
+                    placeholder="Re-enter PAN to confirm"
+                    value={confirmPanNumber}
+                    onChange={(e) => handleConfirmPanChange(e.target.value)}
+                    className={`w-full bg-zinc-900 border rounded-xl px-3.5 py-2 text-sm font-mono tracking-wider uppercase focus:outline-none ${
+                      panNumber && !isPanMatching
+                        ? 'border-rose-500 text-rose-400'
+                        : 'border-white/10 text-foreground focus:border-lime-400/50'
+                    }`}
+                  />
+                  {panNumber && confirmPanNumber && !isPanMatching && (
+                    <span className="text-[10px] text-rose-400 font-bold block mt-1">
+                      PAN confirmation does not match original PAN number
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* GST GROUP */}
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
+              <div className="text-xs font-bold text-foreground flex items-center justify-between">
+                <span>Goods & Services Tax Identification (GSTIN)</span>
+                {gstNumber && isGstValid && isGstMatching && (
+                  <span className="text-[10px] font-black text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 size={12} /> Matching & Valid Format
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-bold text-muted block mb-1">GST Number</label>
+                  <input
+                    type="text"
+                    maxLength={15}
+                    placeholder="e.g. 27ABCDE1234F1Z5"
+                    value={gstNumber}
+                    onChange={(e) => handleGstChange(e.target.value)}
+                    className={`w-full bg-zinc-900 border rounded-xl px-3.5 py-2 text-sm font-mono tracking-wider uppercase focus:outline-none ${
+                      gstNumber && !isGstValid
+                        ? 'border-rose-500 text-rose-400'
+                        : 'border-white/10 text-foreground focus:border-lime-400/50'
+                    }`}
+                  />
+                  {gstNumber && !isGstValid && (
+                    <span className="text-[10px] text-rose-400 font-bold block mt-1">
+                      Invalid GSTIN format (15-character alphanumeric GSTIN)
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-muted block mb-1">Confirm GST Number</label>
+                  <input
+                    type="text"
+                    maxLength={15}
+                    placeholder="Re-enter GSTIN to confirm"
+                    value={confirmGstNumber}
+                    onChange={(e) => handleConfirmGstChange(e.target.value)}
+                    className={`w-full bg-zinc-900 border rounded-xl px-3.5 py-2 text-sm font-mono tracking-wider uppercase focus:outline-none ${
+                      gstNumber && !isGstMatching
+                        ? 'border-rose-500 text-rose-400'
+                        : 'border-white/10 text-foreground focus:border-lime-400/50'
+                    }`}
+                  />
+                  {gstNumber && confirmGstNumber && !isGstMatching && (
+                    <span className="text-[10px] text-rose-400 font-bold block mt-1">
+                      GSTIN confirmation does not match original GSTIN number
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* Section 4: Contact Information */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-lime-400">
+              <Phone size={16} /> 4. Contact Details
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  Dealership Phone <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Primary phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">WhatsApp Number</label>
+                <input
+                  type="text"
+                  placeholder="WhatsApp phone number"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="contact@dealership.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">Website</label>
+                <input
+                  type="url"
+                  placeholder="https://dealership.com"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* Section 5: Location */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-lime-400">
+              <MapPin size={16} /> 5. Location & Service Boundary
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-3">
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  Street Address <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Full physical street address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  State <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="State name"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">
+                  District <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="District name"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">Pincode</label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  placeholder="6-digit pincode"
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">Latitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  placeholder="e.g. 18.5204"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-mono text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">Longitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  placeholder="e.g. 73.8567"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-mono text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">Service Radius (Km)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={serviceRadiusKm}
+                  onChange={(e) => setServiceRadiusKm(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* Section 6: SEO Metadata */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-lime-400">
+              <Globe size={16} /> 6. SEO Meta Information
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">SEO Title</label>
+                <input
+                  type="text"
+                  placeholder="Meta title tag"
+                  value={seoTitle}
+                  onChange={(e) => setSeoTitle(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-muted block mb-1.5">SEO Description</label>
+                <input
+                  type="text"
+                  placeholder="Meta description tag"
+                  value={seoDescription}
+                  onChange={(e) => setSeoDescription(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Submit Bar */}
+          <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-xl text-xs font-bold text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={submitting || hasKycErrors}
+              className="px-6 py-2.5 bg-lime-400 text-black font-black text-xs uppercase tracking-wider rounded-xl hover:bg-lime-300 transition-all shadow-lg shadow-lime-400/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {submitting ? 'Creating Dealership...' : 'Create Dealership'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

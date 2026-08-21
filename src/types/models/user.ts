@@ -16,4 +16,5 @@ export interface User {
   isMobileVerified: boolean;
   isActive: boolean;
   preferredLanguage: string;
+  dealer?: any;
 }

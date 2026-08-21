@@ -12,12 +12,14 @@ import {
   Wrench,
   BarChart,
   LogOut,
-  Building2
+  Building2,
+  Layers
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { label: 'Overview', href: '/dealer/dashboard', icon: LayoutDashboard },
   { label: 'My Profile', href: '/dealer/profile', icon: User },
+  { label: 'Brand', href: '/dealer/brands', icon: Layers },
   { label: 'Inventory', href: '/dealer/inventory', icon: Tractor },
   { label: 'Leads & Enquiries', href: '/dealer/leads', icon: MessageSquareText },
   { label: 'Services', href: '/dealer/services', icon: Wrench },

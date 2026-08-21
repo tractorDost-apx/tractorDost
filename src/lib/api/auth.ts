@@ -38,7 +38,7 @@ export const authAPI = {
         console.error('Failed to logout from backend', error.message);
       }
     }
-    
+
     // Clear any client-accessible cookies just in case
     if (typeof document !== 'undefined') {
       document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';

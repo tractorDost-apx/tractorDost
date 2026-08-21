@@ -51,14 +51,14 @@ export default function DealersPage() {
           state: selectedState || undefined,
         });
         
-        if (res.success && Array.isArray(res.data)) {
-          let data = res.data;
+        if (res.success && res.data) {
+          let data: Dealer[] = Array.isArray(res.data) ? [...res.data] : [...(res.data.data || [])];
           
           // Apply Frontend Sort
           if (sortBy === 'rating') {
-            data = data.sort((a, b) => b.rating - a.rating);
+            data = data.sort((a, b) => (b.rating || 0) - (a.rating || 0));
           } else {
-            data = data.sort((a, b) => b.reviewsCount - a.reviewsCount);
+            data = data.sort((a, b) => (b.reviewsCount || 0) - (a.reviewsCount || 0));
           }
 
           // Apply Open Now filter (mocking it randomly based on id for demo)
@@ -284,12 +284,12 @@ export default function DealersPage() {
 
                       {/* Badges */}
                       <div className="flex flex-wrap gap-2 mb-6">
-                        {dealer.hasShowroom && (
+                        {(dealer.hasShowroom || !!dealer.showroom) && (
                           <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 rounded-xl text-xs font-black text-blue-600 border border-blue-500/20">
                             <Store size={14} /> Sales Showroom
                           </span>
                         )}
-                        {dealer.hasServiceCenter && (
+                        {(dealer.hasServiceCenter || !!dealer.serviceCenter) && (
                           <span className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/10 rounded-xl text-xs font-black text-purple-600 border border-purple-500/20">
                             <Wrench size={14} /> Service & Spares
                           </span>
