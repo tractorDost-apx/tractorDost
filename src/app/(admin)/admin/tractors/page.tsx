@@ -5,6 +5,7 @@ import { tractorAPI, Tractor, LaunchStatus, FuelType } from '@/lib/api/tractors'
 import { Plus, Search, Edit2, Trash2, Tractor as TractorIcon, Settings2, AlignLeft, Info, Hash, Image as ImageIcon, CheckCircle, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import Pagination from '@/components/shared/Pagination';
+import TractorBulkImport from '@/components/admin/tractor-bulk-import/tractor-bulk-import';
 
 
 export default function TractorsPage() {
@@ -83,12 +84,15 @@ export default function TractorsPage() {
           <h1 className="text-3xl font-black tracking-tight text-foreground">Tractor Catalog</h1>
           <p className="text-sm font-bold text-muted mt-1">Deep analysis & master view of all tractors in the database.</p>
         </div>
-        <Link 
-          href="/admin/tractors/new"
-          className="spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap shrink-0"
-        >
-          <Plus size={16} /> Add New Tractor
-        </Link>
+        <div className="flex gap-3">
+          <TractorBulkImport onImported={() => fetchTractors()} />
+          <Link 
+            href="/admin/tractors/new"
+            className="spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap shrink-0"
+          >
+            <Plus size={16} /> Add New Tractor
+          </Link>
+        </div>
       </div>
 
       {/* Stats and Search */}

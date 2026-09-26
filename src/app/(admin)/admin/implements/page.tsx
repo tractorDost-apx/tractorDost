@@ -5,6 +5,7 @@ import { implementAPI, Implement } from '@/lib/api/implements';
 import { Plus, Search, Edit2, Trash2, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import Pagination from '@/components/shared/Pagination';
+import ImplementBulkImport from '@/components/admin/implement-bulk-import/implement-bulk-import';
 
 
 export default function ImplementsPage() {
@@ -65,12 +66,15 @@ export default function ImplementsPage() {
           <h1 className="text-3xl font-black tracking-tight text-foreground">Implement Catalog</h1>
           <p className="text-sm font-bold text-muted mt-1">Manage all implements, categories, and pricing details.</p>
         </div>
-        <Link 
-          href="/admin/implements/new"
-          className="spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap shrink-0"
-        >
-          <Plus size={16} /> Add New Implement
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <ImplementBulkImport onImported={() => fetchImplements()} />
+          <Link
+            href="/admin/implements/new"
+            className="spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap shrink-0"
+          >
+            <Plus size={16} /> Add New Implement
+          </Link>
+        </div>
       </div>
 
       {/* Stats and Search */}

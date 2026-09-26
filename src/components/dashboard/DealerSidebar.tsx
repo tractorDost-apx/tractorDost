@@ -31,14 +31,20 @@ export default function DealerSidebar() {
   const { logout } = useAuth();
 
   return (
-    <aside className="w-full md:w-64 flex-shrink-0 flex flex-col gap-2 h-full">
+    <aside className="w-full md:w-64 flex-shrink-0 flex flex-col gap-3 h-full">
       <div className="glass-panel p-4 flex-1 overflow-y-auto hidden-scrollbar">
         <div className="space-y-1 mb-6">
-          <h2 className="text-xl font-black text-foreground px-4 mb-1">Dealer Hub</h2>
-          <p className="text-xs font-bold text-muted px-4 mb-4 uppercase tracking-wider flex items-center gap-1">
-            <Building2 size={12} /> Dealership
-          </p>
-          <nav className="flex flex-col gap-1">
+          <div className="px-3 py-2 mb-3 flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shrink-0">
+              <Building2 size={22} />
+            </div>
+            <div>
+              <h2 className="text-lg font-black tracking-tight text-foreground leading-tight">Dealer Hub</h2>
+              <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Dealership Portal</p>
+            </div>
+          </div>
+
+          <nav className="flex flex-col gap-1.5 pt-2 border-t border-[var(--border-subtle)]">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
@@ -46,13 +52,13 @@ export default function DealerSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
                     isActive 
-                      ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' 
-                      : 'text-muted hover:bg-foreground/5 hover:text-foreground'
+                      ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shadow-sm' 
+                      : 'text-muted hover:bg-foreground/5 hover:text-foreground border border-transparent'
                   }`}
                 >
-                  <Icon size={20} className={isActive ? 'text-[var(--color-brand-green)]' : 'opacity-70'} />
+                  <Icon size={18} className={isActive ? 'text-[var(--color-brand-green)]' : 'text-muted/70'} />
                   {item.label}
                 </Link>
               );
@@ -61,12 +67,12 @@ export default function DealerSidebar() {
         </div>
       </div>
       
-      <div className="glass-panel p-4">
+      <div className="glass-panel p-3">
         <button
           onClick={() => logout()}
-          className="flex w-full items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-500 hover:bg-red-500/10 transition-all"
+          className="flex w-full items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-all"
         >
-          <LogOut size={20} />
+          <LogOut size={18} />
           Sign Out
         </button>
       </div>

@@ -1,5 +1,11 @@
 import { apiClient } from './axios/axios';
 import { Brand } from './brands';
+import type { AxiosProgressEvent } from 'axios';
+import type { BulkImportResponse, ImportProgress } from '@/types/api/tractor-import';
+
+const uploadPercent = (cb?: (percent: number) => void) => (e: AxiosProgressEvent) => {
+  if (cb && e.total) cb(Math.round((e.loaded / e.total) * 100));
+};
 
 // Enums matching the backend Prisma schema
 export enum LaunchStatus {
@@ -73,6 +79,18 @@ export enum GearboxType {
   CVT = 'CVT'
 }
 
+export enum ParkingBrakeType {
+  MECHANICAL = 'MECHANICAL',
+  HYDRAULIC = 'HYDRAULIC',
+  ELECTRONIC = 'ELECTRONIC'
+}
+
+export enum DisplayType {
+  ANALOG = 'ANALOG',
+  DIGITAL = 'DIGITAL',
+  TOUCHSCREEN = 'TOUCHSCREEN'
+}
+
 export interface TractorPriceByState {
   id?: number;
   tractorId?: number;
@@ -123,7 +141,9 @@ export interface TractorSpec {
 
   steeringType?: SteeringType | null;
   brakeType?: BrakeType | null;
-  parkingBrake?: boolean;
+  parkingBrake?: ParkingBrakeType | null;
+  suspendedPedal?: string | null;
+  steeringSeat?: string | null;
 
   overallLengthMm?: number | null;
   overallWidthMm?: number | null;
@@ -153,6 +173,7 @@ export interface TractorSpec {
   firstServiceHours?: number | null;
   regularServiceIntervalH?: number | null;
   oilChangeIntervalH?: number | null;
+  fuelPump?: string | null;
   engineOilSpec?: string | null;
   coolantType?: string | null;
   annualServiceCostEstimate?: number | null;
@@ -161,6 +182,8 @@ export interface TractorSpec {
   hasAcCabin?: boolean;
   hasGps?: boolean;
   hasTpms?: boolean;
+  connectivity?: string | null;
+  digitalDisplay?: DisplayType | null;
   includedAccessories?: any | null;
 }
 
@@ -197,6 +220,7 @@ export interface Tractor {
   seoTitle?: string | null;
   seoDescription?: string | null;
   pros?: any | null;
+  cons?: any | null;
   metaKeywords?: string | null;
   
   createdAt: string;
@@ -215,12 +239,19 @@ export interface PaginatedResponse<T> {
   success: boolean;
   message: string;
   data: {
-    data: T[];
-    totalCount: number;
-    currentPage: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
+    tractors?: T[];
+    data?: T[];
+    totalCount?: number;
+    currentPage?: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
+    hasPrevPage?: boolean;
+    pagination?: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
   };
 }
 
@@ -275,6 +306,55 @@ export const tractorAPI = {
     const response = await apiClient.delete<{ success: boolean; data: Tractor }>(`/tractor/delete/${id}`);
     return response.data;
   },
+
+  /**
+   * Bulk import step 1 — test an Excel/CSV file. Read-only on the server: nothing is saved.
+   * A passed report carries the previewToken that step 2 requires.
+   */
+  previewTractorImport: async (
+    file: File,
+    options: { signal?: AbortSignal; onUploadProgress?: (percent: number) => void } = {},
+  ) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post<BulkImportResponse>('/tractor/bulk-import/preview', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      signal: options.signal,
+      onUploadProgress: uploadPercent(options.onUploadProgress),
+    });
+    return response.data;
+  },
+
+  /**
+   * Bulk import step 2 — insert a file that passed step 1 (all-or-nothing).
+   * The server refuses files without a matching previewToken; importId makes progress pollable.
+   */
+  bulkImportTractor: async (
+    file: File,
+    options: { previewToken: string; importId?: string; onUploadProgress?: (percent: number) => void },
+  ) => {
+    const formData = new FormData();
+    formData.append('previewToken', options.previewToken);
+    if (options.importId) formData.append('importId', options.importId);
+    formData.append('file', file);
+    const response = await apiClient.post<BulkImportResponse>('/tractor/bulk-import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: uploadPercent(options.onUploadProgress),
+    });
+    return response.data;
+  },
+
+  /**
+   * Live progress of an import started with an importId
+   */
+  getBulkImportProgress: async (importId: string, signal?: AbortSignal) => {
+    const response = await apiClient.get<{ success: boolean; data: ImportProgress }>(
+      `/tractor/bulk-import/progress/${importId}`,
+      { signal },
+    );
+    return response.data;
+  },
+
 
   /**
    * Fetch all Tractor Specs

@@ -20,9 +20,9 @@ export default function MediaGalleryPage() {
     try {
       const response = await mediaAPI.getAllMedia({ page, limit: 12, search });
       if (response.success) {
-        setMediaItems(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setTotalCount(response.data.totalCount);
+        setMediaItems(response.data.data || []);
+        setTotalPages(response.data.totalPages || 1);
+        setTotalCount(response.data.totalCount || 0);
       }
     } catch (error) {
       console.error('Failed to fetch media', error);

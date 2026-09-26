@@ -73,7 +73,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
     setError(null);
     setSuccessMessage(null);
 
-    // Basic frontend validations matching backend updateDealerSchema
+    // Basic frontend validations
     if (!formData.businessName || formData.businessName.length < 3) {
       setError('Business name must be at least 3 characters long');
       return;
@@ -110,7 +110,6 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
     try {
       setSaving(true);
 
-      // Parse workingHours & serviceAreas if valid JSON or send string
       let parsedWorkingHours: any = formData.workingHours;
       try {
         if (formData.workingHours.trim().startsWith('{') || formData.workingHours.trim().startsWith('[')) {
@@ -125,8 +124,6 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
         parsedServiceAreas = formData.serviceAreas.split(',').map((s) => s.trim()).filter(Boolean);
       }
 
-      // ONLY EXPOSE AND SEND EDITABLE FIELDS
-      // DO NOT send read-only fields (panNumber, gstNumber, verificationStatus, isCertified, rating, etc.)
       const payload: UpdateDealerPayload = {
         businessName: formData.businessName,
         phone: formData.phone,
@@ -166,7 +163,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
   return (
     <form onSubmit={handleSubmit} className="space-y-8 animate-fade-in pb-12">
       {/* Top Header Card */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-950">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-black text-foreground">Edit Basic Information</h1>
@@ -184,14 +181,14 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
             type="button"
             onClick={onCancel}
             disabled={saving}
-            className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-foreground border border-white/10 transition-colors flex items-center justify-center gap-2"
+            className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-foreground/5 hover:bg-foreground/10 text-foreground border border-[var(--border-subtle)] transition-colors flex items-center justify-center gap-2"
           >
             <X size={16} /> Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider bg-[var(--color-brand-green)] text-black hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+            className="flex-1 sm:flex-none px-6 py-2.5 bg-[var(--color-brand-green)] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2"
           >
             {saving ? (
               <span>Saving Changes...</span>
@@ -206,25 +203,25 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
 
       {/* Error & Success Messages */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bold flex items-center gap-2">
           <AlertTriangle size={18} className="shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {successMessage && (
-        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
           <CheckCircle2 size={18} className="shrink-0" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {/* Read-Only KYC Notice Banner */}
-      <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold flex items-start gap-3">
-        <AlertTriangle size={20} className="shrink-0 text-amber-400 mt-0.5" />
+      <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-start gap-3">
+        <AlertTriangle size={20} className="shrink-0 text-amber-500 mt-0.5" />
         <div className="space-y-1">
-          <div className="font-black text-amber-400 uppercase tracking-wider text-xs">Read-Only Safety Notice</div>
-          <p className="font-medium text-amber-200">
+          <div className="font-black uppercase tracking-wider text-xs">Read-Only Safety Notice</div>
+          <p className="font-medium text-foreground">
             KYC information (PAN & GST), Verification status, Certification status, Ratings, and System IDs are locked and cannot be changed from your profile edit form.
             If KYC correction is required, please contact TractorDost support.
           </p>
@@ -232,8 +229,8 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
       </div>
 
       {/* EDITABLE SECTION 1: Basic Information */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-white/10 pb-4">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
           <Info size={20} className="text-[var(--color-brand-green)]" />
           1. Basic Profile Details
         </h2>
@@ -247,7 +244,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.businessName}
               onChange={handleChange}
               placeholder="Dealership Business Name"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
               required
             />
           </div>
@@ -261,7 +258,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               type="text"
               value={dealer.slug}
               disabled
-              className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-2.5 text-muted font-mono text-xs cursor-not-allowed opacity-60"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 py-2.5 text-muted font-mono text-xs cursor-not-allowed opacity-60"
             />
           </div>
 
@@ -270,7 +267,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               <span>Dealer Type</span>
               <span className="text-[10px] text-muted/70 flex items-center gap-1"><Lock size={10} /> Read-Only</span>
             </label>
-            <div className="p-2.5 bg-white/5 border border-white/5 rounded-xl flex items-center opacity-60">
+            <div className="p-2.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl flex items-center opacity-60">
               <DealerTypeBadge dealerType={dealer.dealerType} />
             </div>
           </div>
@@ -280,7 +277,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               <span>Active Status</span>
               <span className="text-[10px] text-muted/70 flex items-center gap-1"><Lock size={10} /> Read-Only</span>
             </label>
-            <div className="p-2.5 bg-white/5 border border-white/5 rounded-xl flex items-center opacity-60">
+            <div className="p-2.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl flex items-center opacity-60">
               <ActiveBadge isActive={dealer.isActive} />
             </div>
           </div>
@@ -293,15 +290,15 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.aboutDealer}
               onChange={handleChange}
               placeholder="Tell farmers and customers about your dealership history, authorized services, and offerings..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-foreground text-sm font-medium focus:outline-none focus:border-[var(--color-brand-green)] resize-y"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl p-4 text-foreground text-sm font-medium focus:outline-none transition-colors resize-y"
             />
           </div>
         </div>
       </div>
 
       {/* EDITABLE SECTION 2: Contact Information */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-white/10 pb-4">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
           <Phone size={20} className="text-[var(--color-brand-green)]" />
           2. Contact Details
         </h2>
@@ -315,7 +312,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.phone}
               onChange={handleChange}
               placeholder="Primary Phone Number"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
               required
             />
           </div>
@@ -328,7 +325,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.whatsapp}
               onChange={handleChange}
               placeholder="WhatsApp Contact Number"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
             />
           </div>
 
@@ -340,7 +337,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.email}
               onChange={handleChange}
               placeholder="Official Business Email"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
             />
           </div>
 
@@ -352,15 +349,15 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.website}
               onChange={handleChange}
               placeholder="https://www.yourdealership.com"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
             />
           </div>
         </div>
       </div>
 
       {/* EDITABLE SECTION 3: Location & Operational Info */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-white/10 pb-4">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
           <MapPin size={20} className="text-[var(--color-brand-green)]" />
           3. Location & Operational Info
         </h2>
@@ -374,7 +371,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.address}
               onChange={handleChange}
               placeholder="Street address, landmark..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl p-3 text-foreground text-sm font-bold focus:outline-none transition-colors"
               required
             />
           </div>
@@ -387,7 +384,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.state}
               onChange={handleChange}
               placeholder="State"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
               required
             />
           </div>
@@ -400,7 +397,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.district}
               onChange={handleChange}
               placeholder="District"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
               required
             />
           </div>
@@ -413,7 +410,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.pincode}
               onChange={handleChange}
               placeholder="6-digit pincode"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
             />
           </div>
 
@@ -427,7 +424,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               min={1}
               max={500}
               placeholder="e.g. 50"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
             />
           </div>
 
@@ -439,7 +436,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.serviceAreas}
               onChange={handleChange}
               placeholder="e.g. Taluka A, Taluka B, District Center"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
             />
           </div>
 
@@ -451,15 +448,15 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               value={formData.workingHours}
               onChange={handleChange}
               placeholder="e.g. Mon-Sat: 9:00 AM - 7:00 PM, Sun: Closed"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
             />
           </div>
         </div>
       </div>
 
       {/* EDITABLE SECTION 4: SEO Settings */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-white/10 pb-4">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
           <Globe size={20} className="text-[var(--color-brand-green)]" />
           4. SEO & Search Presence
         </h2>
@@ -474,7 +471,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               onChange={handleChange}
               placeholder="Search Title (max 60 chars)"
               maxLength={60}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
             />
           </div>
 
@@ -487,46 +484,46 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               onChange={handleChange}
               placeholder="Search Summary Description (max 160 chars)"
               maxLength={160}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none focus:border-[var(--color-brand-green)]"
+              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
             />
           </div>
         </div>
       </div>
 
       {/* READ-ONLY SECTIONS PREVIEW */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/5 space-y-6 opacity-75 bg-zinc-950/60">
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
           <h2 className="text-lg font-black text-muted flex items-center gap-2">
             <Lock size={18} className="text-muted" />
             Read-Only System & KYC Summary (Non-Editable)
           </h2>
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/20">
             Read-Only Protection
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
-          <div className="p-3.5 bg-white/5 rounded-xl border border-white/5">
+          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
             <span className="text-muted block text-[10px] font-sans font-bold">PAN Number</span>
             <span className="text-foreground font-black tracking-wider uppercase text-sm">{dealer.panNumber || 'NOT PROVIDED'}</span>
-            <span className="text-[10px] text-emerald-400 block font-sans mt-0.5">🔒 Verified KYC</span>
+            <span className="text-[10px] text-emerald-500 block font-sans mt-0.5">🔒 Verified KYC</span>
           </div>
 
-          <div className="p-3.5 bg-white/5 rounded-xl border border-white/5">
+          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
             <span className="text-muted block text-[10px] font-sans font-bold">GSTIN Number</span>
             <span className="text-foreground font-black tracking-wider uppercase text-sm">{dealer.gstNumber || 'NOT PROVIDED'}</span>
-            <span className="text-[10px] text-emerald-400 block font-sans mt-0.5">🔒 Verified KYC</span>
+            <span className="text-[10px] text-emerald-500 block font-sans mt-0.5">🔒 Verified KYC</span>
           </div>
 
-          <div className="p-3.5 bg-white/5 rounded-xl border border-white/5">
+          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
             <span className="text-muted block text-[10px] font-sans font-bold">Verification Status</span>
             <span className="text-foreground font-bold font-sans text-sm block mt-0.5">{dealer.verificationStatus}</span>
             <span className="text-[10px] text-muted block font-sans">🔒 Managed by Admin</span>
           </div>
 
-          <div className="p-3.5 bg-white/5 rounded-xl border border-white/5">
+          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
             <span className="text-muted block text-[10px] font-sans font-bold">Rating & Reviews</span>
-            <span className="text-amber-400 font-bold font-sans text-sm block mt-0.5">{Number(dealer.rating || 0).toFixed(1)} ★ ({dealer.reviewsCount})</span>
+            <span className="text-amber-500 font-bold font-sans text-sm block mt-0.5">{Number(dealer.rating || 0).toFixed(1)} ★ ({dealer.reviewsCount})</span>
             <span className="text-[10px] text-muted block font-sans">🔒 System Metric</span>
           </div>
         </div>
@@ -538,14 +535,14 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="px-6 py-3 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-foreground border border-white/10 transition-colors flex items-center gap-2"
+          className="px-6 py-3 rounded-xl text-xs font-bold bg-foreground/5 hover:bg-foreground/10 text-foreground border border-[var(--border-subtle)] transition-colors flex items-center gap-2"
         >
           <X size={16} /> Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-wider bg-[var(--color-brand-green)] text-black hover:opacity-90 transition-all shadow-xl flex items-center gap-2"
+          className="px-8 py-3 bg-[var(--color-brand-green)] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shadow-md flex items-center gap-2"
         >
           {saving ? (
             <span>Saving Changes...</span>

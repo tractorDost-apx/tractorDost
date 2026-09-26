@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { TractorSpec, CoolingType, SteeringType, BrakeType, ClutchType, HydraulicsType, PtoType, GearboxType } from '@/lib/api/tractors';
+import { TractorSpec, CoolingType, SteeringType, BrakeType, ClutchType, HydraulicsType, PtoType, GearboxType, ParkingBrakeType, DisplayType } from '@/lib/api/tractors';
 
 interface TractorSpecFormProps {
   spec: Partial<TractorSpec>;
@@ -156,7 +156,11 @@ export default function TractorSpecForm({ spec, onChange, touched }: TractorSpec
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SelectField label="Steering Type" name="steeringType" options={Object.values(SteeringType)} spec={spec} handleChange={handleChange} touched={touched} />
         <SelectField label="Brake Type" name="brakeType" options={Object.values(BrakeType)} spec={spec} handleChange={handleChange} touched={touched} />
-        <CheckboxField label="Parking Brake" name="parkingBrake" spec={spec} handleChange={handleChange} />
+        <SelectField label="Parking Brake" name="parkingBrake" options={Object.values(ParkingBrakeType)} spec={spec} handleChange={handleChange} touched={touched} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <InputField label="Suspended Pedal" name="suspendedPedal" placeholder="e.g. Yes" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Steering Seat" name="steeringSeat" placeholder="e.g. Adjustable" spec={spec} handleChange={handleChange} touched={touched} />
       </div>
 
       <SectionTitle title="Dimensions" />
@@ -193,6 +197,7 @@ export default function TractorSpecForm({ spec, onChange, touched }: TractorSpec
         <InputField label="First Service Hours" name="firstServiceHours" type="number" spec={spec} handleChange={handleChange} touched={touched} />
         <InputField label="Regular Service Interval (H)" name="regularServiceIntervalH" type="number" spec={spec} handleChange={handleChange} touched={touched} />
         <InputField label="Oil Change Interval (H)" name="oilChangeIntervalH" type="number" spec={spec} handleChange={handleChange} touched={touched} />
+        <InputField label="Fuel Pump" name="fuelPump" spec={spec} handleChange={handleChange} touched={touched} />
         <InputField label="Engine Oil Spec" name="engineOilSpec" spec={spec} handleChange={handleChange} touched={touched} />
         <InputField label="Coolant Type" name="coolantType" spec={spec} handleChange={handleChange} touched={touched} />
         <InputField label="Annual Service Cost Estimate" name="annualServiceCostEstimate" type="number" spec={spec} handleChange={handleChange} touched={touched} />
@@ -207,10 +212,14 @@ export default function TractorSpecForm({ spec, onChange, touched }: TractorSpec
       </div>
 
       <SectionTitle title="Optional Features" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
         <CheckboxField label="AC Cabin" name="hasAcCabin" spec={spec} handleChange={handleChange} />
         <CheckboxField label="GPS Enabled" name="hasGps" spec={spec} handleChange={handleChange} />
         <CheckboxField label="TPMS" name="hasTpms" spec={spec} handleChange={handleChange} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <InputField label="Connectivity" name="connectivity" placeholder="e.g. Bluetooth, App-connected" spec={spec} handleChange={handleChange} touched={touched} />
+        <SelectField label="Digital Display" name="digitalDisplay" options={Object.values(DisplayType)} spec={spec} handleChange={handleChange} touched={touched} />
       </div>
     </div>
   );

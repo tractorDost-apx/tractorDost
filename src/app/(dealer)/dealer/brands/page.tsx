@@ -70,52 +70,52 @@ export default function DealerBrandsPage() {
   const primaryBrand = brands.find((b) => b.isPrimary);
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8 animate-fade-in pb-12">
-      {/* Header Banner */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] relative overflow-hidden bg-gradient-to-br from-zinc-900/90 via-zinc-900/50 to-zinc-950">
-        <div className="absolute top-[-30%] right-[-10%] h-[200px] w-[200px] rounded-full bg-[var(--color-brand-green)]/10 blur-[80px] pointer-events-none" />
-
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-1.5">
+    <div className="space-y-8 animate-fade-in pb-12">
+      {/* Sleek Admin Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shrink-0">
+            <Layers size={26} />
+          </div>
+          <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-                <Layers size={28} className="text-[var(--color-brand-green)]" />
-                Dealership Brands
+              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+                Authorized Brands
               </h1>
               <span className="px-3 py-1 rounded-full text-xs font-black bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 uppercase tracking-wider">
                 {brands.length} {brands.length === 1 ? 'Brand' : 'Brands'} Assigned
               </span>
             </div>
-            <p className="text-xs sm:text-sm font-medium text-muted">
+            <p className="text-xs sm:text-sm font-bold text-muted mt-0.5">
               Official tractor brands associated with {user?.dealer?.businessName || 'your dealership'}.
             </p>
           </div>
-
-          {primaryBrand && (
-            <div className="px-4 py-3 rounded-2xl bg-amber-400/10 border border-amber-400/20 text-amber-300 text-xs font-bold flex items-center gap-3 shrink-0">
-              <Award size={20} className="text-amber-400 shrink-0" />
-              <div>
-                <span className="text-[10px] uppercase font-black tracking-wider text-amber-400 block">Primary Authorized Brand</span>
-                <span className="text-sm font-black text-foreground">{primaryBrand.name}</span>
-              </div>
-            </div>
-          )}
         </div>
+
+        {primaryBrand && (
+          <div className="px-4 py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center gap-3 shrink-0 self-start sm:self-auto">
+            <Award size={20} className="text-amber-500 shrink-0" />
+            <div>
+              <span className="text-[9px] uppercase font-black tracking-wider text-amber-500 block">Primary Authorized Brand</span>
+              <span className="text-xs sm:text-sm font-black text-foreground">{primaryBrand.name}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Loading Skeletons */}
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="glass-panel p-6 rounded-3xl border border-white/5 space-y-4 animate-pulse">
+            <div key={i} className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] space-y-4 animate-pulse">
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-2xl bg-white/10" />
+                <div className="h-14 w-14 rounded-2xl bg-foreground/10" />
                 <div className="space-y-2 flex-1">
-                  <div className="h-5 bg-white/10 rounded-md w-3/4" />
-                  <div className="h-3 bg-white/10 rounded-md w-1/2" />
+                  <div className="h-5 bg-foreground/10 rounded-md w-3/4" />
+                  <div className="h-3 bg-foreground/10 rounded-md w-1/2" />
                 </div>
               </div>
-              <div className="h-16 bg-white/5 rounded-2xl" />
+              <div className="h-16 bg-foreground/5 rounded-2xl" />
             </div>
           ))}
         </div>
@@ -123,15 +123,15 @@ export default function DealerBrandsPage() {
 
       {/* Error State */}
       {!loading && error && (
-        <div className="glass-panel p-8 rounded-3xl border border-rose-500/20 bg-rose-500/5 text-center space-y-4 max-w-lg mx-auto">
-          <div className="h-12 w-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto">
+        <div className="glass-panel p-8 rounded-3xl border border-rose-500/20 bg-rose-500/10 text-center space-y-4 max-w-lg mx-auto">
+          <div className="h-12 w-12 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto border border-rose-500/20">
             <AlertCircle size={24} />
           </div>
           <h3 className="text-lg font-bold text-foreground">Unable to Load Assigned Brands</h3>
           <p className="text-sm text-muted font-medium">{error}</p>
           <button
             onClick={() => fetchBrands()}
-            className="px-5 py-2.5 rounded-xl text-xs font-bold bg-white/10 text-foreground hover:bg-white/20 transition-colors inline-flex items-center gap-2"
+            className="px-5 py-2.5 rounded-xl text-xs font-bold bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors inline-flex items-center gap-2"
           >
             <RefreshCw size={14} /> Retry Loading
           </button>
@@ -140,8 +140,8 @@ export default function DealerBrandsPage() {
 
       {/* Empty State */}
       {!loading && !error && brands.length === 0 && (
-        <div className="glass-panel p-12 rounded-3xl border border-white/10 text-center max-w-2xl mx-auto space-y-4">
-          <div className="h-16 w-16 rounded-2xl bg-lime-400/10 text-lime-400 border border-lime-400/20 flex items-center justify-center mx-auto">
+        <div className="glass-panel p-12 rounded-3xl border border-[var(--border-subtle)] text-center max-w-2xl mx-auto space-y-4">
+          <div className="h-16 w-16 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 flex items-center justify-center mx-auto">
             <Building2 size={32} />
           </div>
           <h2 className="text-xl font-black text-foreground">
@@ -151,7 +151,7 @@ export default function DealerBrandsPage() {
             Tractor brand partnerships and representations are managed by TractorDost administration. Once your dealership is assigned authorized brand partnerships, they will automatically appear here.
           </p>
           <div className="pt-2">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/5 text-muted border border-white/10">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-foreground/5 text-muted border border-[var(--border-subtle)]">
               <Info size={14} className="text-[var(--color-brand-green)]" /> Contact Support for Brand Onboarding
             </span>
           </div>
@@ -164,12 +164,12 @@ export default function DealerBrandsPage() {
           {brands.map((b) => (
             <div
               key={b.id}
-              className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] space-y-5 hover:border-[var(--color-brand-green)]/30 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden bg-zinc-900/60 hover:bg-zinc-900/90"
+              className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] space-y-5 hover:border-[var(--color-brand-green)]/30 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
             >
               {b.isPrimary && (
                 <div className="absolute top-4 right-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/30 shadow-sm">
-                    <Award size={12} className="text-amber-400" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
+                    <Award size={12} className="text-amber-500" />
                     Primary Brand
                   </span>
                 </div>
@@ -181,7 +181,7 @@ export default function DealerBrandsPage() {
                     <img
                       src={b.logoUrl}
                       alt={b.name}
-                      className="h-16 w-16 rounded-2xl object-contain bg-white/5 p-2 border border-white/10 shrink-0 group-hover:scale-105 transition-transform"
+                      className="h-16 w-16 rounded-2xl object-contain bg-foreground/5 p-2 border border-[var(--border-subtle)] shrink-0 group-hover:scale-105 transition-transform"
                     />
                   ) : (
                     <div className="h-16 w-16 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] flex items-center justify-center font-black text-2xl border border-[var(--color-brand-green)]/20 shrink-0">
@@ -198,7 +198,7 @@ export default function DealerBrandsPage() {
                 </div>
 
                 {/* Metadata Grid */}
-                <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-white/5">
+                <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-[var(--border-subtle)]">
                   {b.country && (
                     <div className="flex items-center gap-2 text-muted">
                       <Globe size={14} className="text-muted/70 shrink-0" />
@@ -220,14 +220,14 @@ export default function DealerBrandsPage() {
                 </div>
 
                 {b.aboutBrand && (
-                  <p className="text-xs text-muted/90 font-medium line-clamp-3 pt-1 border-t border-white/5 leading-relaxed">
+                  <p className="text-xs text-muted/90 font-medium line-clamp-3 pt-1 border-t border-[var(--border-subtle)] leading-relaxed">
                     {b.aboutBrand}
                   </p>
                 )}
               </div>
 
-              <div className="pt-4 border-t border-white/5 flex items-center justify-between text-xs">
-                <span className="inline-flex items-center gap-1.5 font-bold text-emerald-400">
+              <div className="pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
+                <span className="inline-flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full text-[11px]">
                   <CheckCircle2 size={13} /> Active Partnership
                 </span>
                 <span className="text-[10px] font-mono text-muted/60">ID #{b.id}</span>
