@@ -10,7 +10,15 @@ import { mediaAPI } from '@/lib/api/media';
 import MediaUploader from '@/components/shared/MediaUploader';
 import TractorSpecForm from './TractorSpecForm';
 import TractorStatePrices from './TractorStatePrices';
-import { Save, X, Info, Settings, IndianRupee, Image as ImageIcon, ChevronRight } from 'lucide-react';
+import {
+  Save,
+  X,
+  Info,
+  Settings,
+  IndianRupee,
+  Image as ImageIcon,
+  ChevronRight,
+} from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface TractorFormProps {
@@ -27,7 +35,11 @@ const TABS = [
   { id: 'seo', label: 'Content & SEO', icon: Info },
 ];
 
-export default function TractorForm({ initialData, isEdit = false, initialTab = 'basic' }: TractorFormProps) {
+export default function TractorForm({
+  initialData,
+  isEdit = false,
+  initialTab = 'basic',
+}: TractorFormProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [loading, setLoading] = useState(false);
@@ -64,24 +76,28 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
 
   // Live validation errors
   const validationErrors: Record<string, string> = {};
-  if (touched.brandId && (!formData.brandId || formData.brandId === 0)) validationErrors.brandId = 'Brand is required';
-  if (touched.modelName && !formData.modelName?.trim()) validationErrors.modelName = 'Model Name is required';
+  if (touched.brandId && (!formData.brandId || formData.brandId === 0))
+    validationErrors.brandId = 'Brand is required';
+  if (touched.modelName && !formData.modelName?.trim())
+    validationErrors.modelName = 'Model Name is required';
   if (touched.slug && !formData.slug?.trim()) validationErrors.slug = 'Slug is required';
-  if (touched.categoryIds && (!formData.categoryIds || formData.categoryIds.length === 0)) validationErrors.categoryIds = 'Select at least one category';
+  if (touched.categoryIds && (!formData.categoryIds || formData.categoryIds.length === 0))
+    validationErrors.categoryIds = 'Select at least one category';
 
-  const markTouched = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
+  const markTouched = (field: string) => setTouched((prev) => ({ ...prev, [field]: true }));
   const fieldClass = (field: string) =>
     validationErrors[field]
       ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20'
       : 'border-transparent focus:border-[var(--color-brand-green)]/50 focus:ring-[var(--color-brand-green)]/20';
-  const baseInputClass = 'w-full bg-foreground/5 border rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:ring-2 transition-all';
+  const baseInputClass =
+    'w-full bg-foreground/5 border rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:ring-2 transition-all';
 
   useEffect(() => {
     fetchDependencies();
     if (initialData) {
       setFormData({
         ...initialData,
-        categoryIds: initialData.categories?.map((c: any) => c.categoryId) || []
+        categoryIds: initialData.categories?.map((c: any) => c.categoryId) || [],
       });
     }
   }, [initialData]);
@@ -90,12 +106,12 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
     try {
       const [brandRes, catRes] = await Promise.all([
         brandAPI.getAllBrands({ limit: 100 }),
-        categoryAPI.getAllCategories({ limit: 100 })
+        categoryAPI.getAllCategories({ limit: 100 }),
       ]);
       if (brandRes.success) setBrands(brandRes.data.data);
       if (catRes.success) setCategories(catRes.data.data || []);
     } catch (error) {
-      console.error("Failed to load dependencies");
+      console.error('Failed to load dependencies');
     }
   };
 
@@ -106,7 +122,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
         setFamilies(res.data.items || []);
       }
     } catch (error) {
-      console.error("Failed to load tractor families for brand", error);
+      console.error('Failed to load tractor families for brand', error);
     }
   };
 
@@ -119,25 +135,30 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
     }
   }, [formData.brandId]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value, type } = e.target;
     markTouched(name);
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+      setFormData((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   // Auto slugify model name
   useEffect(() => {
     if (!isEdit && formData.modelName) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        slug: formData.modelName!.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        slug: formData
+          .modelName!.toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, ''),
       }));
     }
   }, [formData.modelName, isEdit]);
@@ -149,47 +170,49 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
     setTouched({ brandId: true, modelName: true, slug: true, categoryIds: true });
 
     // Check mandatory fields before proceeding
-    if (!formData.brandId || formData.brandId === 0) { 
+    if (!formData.brandId || formData.brandId === 0) {
       setActiveTab('basic');
-      alert('Please select a valid brand.'); 
-      return; 
+      alert('Please select a valid brand.');
+      return;
     }
-    if (!formData.modelName?.trim()) { 
+    if (!formData.modelName?.trim()) {
       setActiveTab('basic');
-      alert('Please enter a Model Name.'); 
-      return; 
+      alert('Please enter a Model Name.');
+      return;
     }
-    if (!formData.slug?.trim()) { 
+    if (!formData.slug?.trim()) {
       setActiveTab('basic');
-      alert('Please enter a Slug.'); 
-      return; 
+      alert('Please enter a Slug.');
+      return;
     }
-    if (!formData.categoryIds || formData.categoryIds.length === 0) { 
+    if (!formData.categoryIds || formData.categoryIds.length === 0) {
       setActiveTab('basic');
-      alert('Please select at least one category.'); 
-      return; 
+      alert('Please select at least one category.');
+      return;
     }
 
     // Check mandatory spec fields
     const spec = formData.spec || {};
-    const hasSpecData = Object.keys(spec).length > 0 && Object.values(spec).some(v => v !== null && v !== '' && v !== undefined);
-    
+    const hasSpecData =
+      Object.keys(spec).length > 0 &&
+      Object.values(spec).some((v) => v !== null && v !== '' && v !== undefined);
+
     // If the user has entered any spec data (or it's an edit with existing specs), we must validate the mandatory spec fields
     if (hasSpecData) {
       if (!spec.engineCc) {
-        setTouched(prev => ({ ...prev, spec_engineCc: true }));
+        setTouched((prev) => ({ ...prev, spec_engineCc: true }));
         setActiveTab('specs');
         alert('Engine CC is required in Specifications.');
         return;
       }
       if (!spec.cylinders) {
-        setTouched(prev => ({ ...prev, spec_cylinders: true }));
+        setTouched((prev) => ({ ...prev, spec_cylinders: true }));
         setActiveTab('specs');
         alert('Cylinders is required in Specifications.');
         return;
       }
       if (!spec.liftingCapacityKg) {
-        setTouched(prev => ({ ...prev, spec_liftingCapacityKg: true }));
+        setTouched((prev) => ({ ...prev, spec_liftingCapacityKg: true }));
         setActiveTab('specs');
         alert('Lifting Capacity is required in Specifications.');
         return;
@@ -213,15 +236,19 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
         if (typeof val === 'number') {
           const maxAllowed = decimalBounds[key] || 2000000000;
           if (val > maxAllowed) {
-            setTouched(prev => ({ ...prev, [`spec_${key}`]: true }));
+            setTouched((prev) => ({ ...prev, [`spec_${key}`]: true }));
             setActiveTab('specs');
-            alert(`${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} must be less than or equal to ${maxAllowed.toLocaleString()}.`);
+            alert(
+              `${key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} must be less than or equal to ${maxAllowed.toLocaleString()}.`
+            );
             return;
           }
           if (val < 0) {
-            setTouched(prev => ({ ...prev, [`spec_${key}`]: true }));
+            setTouched((prev) => ({ ...prev, [`spec_${key}`]: true }));
             setActiveTab('specs');
-            alert(`${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} must be a positive number.`);
+            alert(
+              `${key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} must be a positive number.`
+            );
             return;
           }
         }
@@ -232,21 +259,21 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
 
     try {
       const sanitizedData = { ...formData };
-      
+
       // Clean up optional numeric fields that default to 0
       if (!sanitizedData.hp) delete sanitizedData.hp;
       if (!sanitizedData.exShowroomPriceMin) delete sanitizedData.exShowroomPriceMin;
       if (!sanitizedData.exShowroomPriceMax) delete sanitizedData.exShowroomPriceMax;
 
       // Strip nulls, empty strings, and relations that backend Zod schema doesn't accept
-      Object.keys(sanitizedData).forEach(key => {
+      Object.keys(sanitizedData).forEach((key) => {
         const k = key as keyof typeof sanitizedData;
         if (k === 'familyId') return;
         if (sanitizedData[k] === null || sanitizedData[k] === '') {
           delete sanitizedData[k];
         }
       });
-      
+
       delete sanitizedData.brand;
       delete sanitizedData.family;
       delete sanitizedData.categories;
@@ -263,18 +290,18 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
       if (typeof sanitizedData.pros === 'string') {
         sanitizedData.pros = (sanitizedData.pros as string)
           .split(',')
-          .map(s => s.trim())
+          .map((s) => s.trim())
           .filter(Boolean);
       }
 
       if (!sanitizedData.brandId) {
-        alert("Please select a valid brand.");
+        alert('Please select a valid brand.');
         setLoading(false);
         return;
       }
-      
+
       if (!sanitizedData.categoryIds || sanitizedData.categoryIds.length === 0) {
-        alert("Please select at least one category.");
+        alert('Please select at least one category.');
         setLoading(false);
         return;
       }
@@ -296,7 +323,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
           const specPayload: any = { ...tractorSpecData, tractorId };
 
           // Scrub null and empty strings perfectly on the frontend
-          Object.keys(specPayload).forEach(key => {
+          Object.keys(specPayload).forEach((key) => {
             if (specPayload[key] === null || specPayload[key] === '') {
               delete specPayload[key];
             }
@@ -316,7 +343,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
           mediaData.append('targetType', 'TRACTOR');
           mediaData.append('isPrimary', 'true'); // Automatically marks the first image as primary in the backend
           mediaData.append('mediaType', 'image');
-          mediaFiles.forEach(file => mediaData.append('file', file));
+          mediaFiles.forEach((file) => mediaData.append('file', file));
           await mediaAPI.createMedia(mediaData);
         }
 
@@ -333,18 +360,17 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
         router.push('/admin/tractors');
       }
     } catch (error) {
-      console.error("Failed to save tractor", error);
-      alert("Error saving tractor. Check console for details.");
+      console.error('Failed to save tractor', error);
+      alert('Error saving tractor. Check console for details.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 items-start h-full pb-12 animate-fade-in">
-
+    <div className="animate-fade-in flex h-full flex-col items-start gap-6 pb-12 md:flex-row">
       {/* Sidebar Tabs */}
-      <div className="w-full md:w-64 shrink-0 glass-panel p-2 rounded-2xl sticky top-6">
+      <div className="glass-panel sticky top-6 w-full shrink-0 rounded-2xl p-2 md:w-64">
         <nav className="flex flex-col gap-1">
           {TABS.map((tab) => {
             const Icon = tab.icon;
@@ -354,10 +380,11 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${isActive
-                  ? 'bg-[var(--color-brand-green)] text-white shadow-md'
-                  : 'text-foreground/70 hover:bg-foreground/5 hover:text-foreground'
-                  }`}
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                  isActive
+                    ? 'bg-[var(--color-brand-green)] text-white shadow-md'
+                    : 'text-foreground/70 hover:bg-foreground/5 hover:text-foreground'
+                }`}
               >
                 <Icon size={18} />
                 {tab.label}
@@ -367,12 +394,12 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
           })}
         </nav>
 
-        <div className="mt-8 pt-4 border-t border-[var(--border-subtle)] px-2 flex flex-col gap-3">
+        <div className="mt-8 flex flex-col gap-3 border-t border-[var(--border-subtle)] px-2 pt-4">
           <button
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-foreground text-background font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
+            className="bg-foreground text-background flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-black shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-50"
           >
             {loading ? <TractorLoader size={16} /> : <Save size={18} />}
             {isEdit ? 'Save Changes' : 'Create Tractor'}
@@ -381,7 +408,7 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
           <button
             type="button"
             onClick={() => router.push('/admin/tractors')}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold transition-all"
+            className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold transition-all"
           >
             <X size={18} />
             Cancel
@@ -390,73 +417,94 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 w-full">
-        <form onSubmit={handleSubmit} className="glass-panel p-6 md:p-8 rounded-2xl">
-
+      <div className="w-full flex-1">
+        <form onSubmit={handleSubmit} className="glass-panel rounded-2xl p-6 md:p-8">
           {/* TAB 1: BASIC INFO */}
           {activeTab === 'basic' && (
-            <div className="flex flex-col gap-6 animate-fade-in">
-              <h2 className="text-2xl font-black text-foreground mb-2">Basic Information</h2>
-              <p className="text-xs text-muted mb-2">Fields marked with <span className="text-red-500 font-bold">*</span> are mandatory.</p>
+            <div className="animate-fade-in flex flex-col gap-6">
+              <h2 className="text-foreground mb-2 text-2xl font-black">Basic Information</h2>
+              <p className="text-muted mb-2 text-xs">
+                Fields marked with <span className="font-bold text-red-500">*</span> are mandatory.
+              </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Brand Name <span className="text-red-500">*</span></label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Brand Name <span className="text-red-500">*</span>
+                  </label>
                   <select
                     name="brandId"
                     value={formData.brandId || 0}
                     onChange={(e) => {
                       markTouched('brandId');
                       const newBrandId = parseInt(e.target.value) || 0;
-                      setFormData(prev => ({
+                      setFormData((prev) => ({
                         ...prev,
                         brandId: newBrandId,
-                        familyId: null // Reset family selection when brand changes
+                        familyId: null, // Reset family selection when brand changes
                       }));
                     }}
                     onBlur={() => markTouched('brandId')}
                     required
                     className={`${baseInputClass} ${fieldClass('brandId')} appearance-none`}
                   >
-                    <option value={0} className="bg-background text-foreground">Select a brand</option>
-                    {brands.map(b => (
-                      <option key={b.id} value={b.id} className="bg-background text-foreground">{b.name}</option>
+                    <option value={0} className="bg-background text-foreground">
+                      Select a brand
+                    </option>
+                    {brands.map((b) => (
+                      <option key={b.id} value={b.id} className="bg-background text-foreground">
+                        {b.name}
+                      </option>
                     ))}
                   </select>
-                  {validationErrors.brandId && <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{validationErrors.brandId}</p>}
+                  {validationErrors.brandId && (
+                    <p className="animate-fade-in text-[11px] font-semibold text-red-500">
+                      {validationErrors.brandId}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Tractor Family</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Tractor Family
+                  </label>
                   <select
                     name="familyId"
                     value={formData.familyId || ''}
                     onChange={(e) => {
                       const val = e.target.value;
-                      setFormData(prev => ({ ...prev, familyId: val ? parseInt(val) : null }));
+                      setFormData((prev) => ({ ...prev, familyId: val ? parseInt(val) : null }));
                     }}
                     className={`${baseInputClass} appearance-none`}
                     disabled={!formData.brandId || formData.brandId === 0}
                   >
-                    <option value="" className="bg-background text-foreground">Select a family (Optional)</option>
-                    {families.map(f => (
-                      <option key={f.id} value={f.id} className="bg-background text-foreground">{f.name}</option>
+                    <option value="" className="bg-background text-foreground">
+                      Select a family (Optional)
+                    </option>
+                    {families.map((f) => (
+                      <option key={f.id} value={f.id} className="bg-background text-foreground">
+                        {f.name}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Categories <span className="text-red-500">*</span></label>
-                  <div className={`flex flex-wrap gap-2 mt-1 p-2 rounded-xl ${validationErrors.categoryIds ? 'ring-1 ring-red-500/50' : ''}`}>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Categories <span className="text-red-500">*</span>
+                  </label>
+                  <div
+                    className={`mt-1 flex flex-wrap gap-2 rounded-xl p-2 ${validationErrors.categoryIds ? 'ring-1 ring-red-500/50' : ''}`}
+                  >
                     {categories.map((c) => {
                       const isSelected = formData.categoryIds?.includes(c.id);
                       return (
                         <label
                           key={c.id}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold cursor-pointer transition-all border ${
+                          className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold transition-all ${
                             isSelected
-                              ? 'bg-[var(--color-brand-green)]/10 border-[var(--color-brand-green)] text-[var(--color-brand-green)]'
-                              : 'bg-foreground/5 border-transparent text-foreground hover:bg-foreground/10'
+                              ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+                              : 'bg-foreground/5 text-foreground hover:bg-foreground/10 border-transparent'
                           }`}
                         >
                           <input
@@ -479,11 +527,17 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                       );
                     })}
                   </div>
-                  {validationErrors.categoryIds && <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{validationErrors.categoryIds}</p>}
+                  {validationErrors.categoryIds && (
+                    <p className="animate-fade-in text-[11px] font-semibold text-red-500">
+                      {validationErrors.categoryIds}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Model Name <span className="text-red-500">*</span></label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Model Name <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     name="modelName"
@@ -494,11 +548,17 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     placeholder="e.g. YUVO TECH+ 575"
                     className={`${baseInputClass} ${fieldClass('modelName')}`}
                   />
-                  {validationErrors.modelName && <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{validationErrors.modelName}</p>}
+                  {validationErrors.modelName && (
+                    <p className="animate-fade-in text-[11px] font-semibold text-red-500">
+                      {validationErrors.modelName}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Slug <span className="text-red-500">*</span></label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Slug <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     name="slug"
@@ -508,58 +568,74 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     required
                     className={`${baseInputClass} ${fieldClass('slug')}`}
                   />
-                  {validationErrors.slug && <p className="text-[11px] font-semibold text-red-500 animate-fade-in">{validationErrors.slug}</p>}
+                  {validationErrors.slug && (
+                    <p className="animate-fade-in text-[11px] font-semibold text-red-500">
+                      {validationErrors.slug}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Horsepower (HP)</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Horsepower (HP)
+                  </label>
                   <input
                     type="number"
                     name="hp"
                     value={formData.hp ?? ''}
                     onChange={handleChange}
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Fuel Type</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Fuel Type
+                  </label>
                   <select
                     name="fuelType"
                     value={formData.fuelType}
                     onChange={handleChange}
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full appearance-none rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   >
-                    {Object.values(FuelType).map(f => (
-                      <option key={f} value={f} className="bg-background text-foreground">{f}</option>
+                    {Object.values(FuelType).map((f) => (
+                      <option key={f} value={f} className="bg-background text-foreground">
+                        {f}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Drive Type</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Drive Type
+                  </label>
                   <select
                     name="driveType"
                     value={formData.driveType}
                     onChange={handleChange}
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full appearance-none rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   >
-                    {Object.values(DriveType).map(d => (
-                      <option key={d} value={d} className="bg-background text-foreground">{d.replace('_', ' ')}</option>
+                    {Object.values(DriveType).map((d) => (
+                      <option key={d} value={d} className="bg-background text-foreground">
+                        {d.replace('_', ' ')}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 mt-4">
-                <label className="text-xs font-bold text-muted uppercase tracking-wider">Overview / Description</label>
+              <div className="mt-4 flex flex-col gap-2">
+                <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                  Overview / Description
+                </label>
                 <textarea
                   name="overview"
                   value={formData.overview || ''}
                   onChange={handleChange}
                   rows={4}
                   placeholder="Detailed description of the tractor..."
-                  className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-medium text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all resize-none"
+                  className="bg-foreground/5 text-foreground focus:bg-background w-full resize-none rounded-xl border border-transparent px-4 py-3 text-sm font-medium transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                 />
               </div>
             </div>
@@ -571,12 +647,12 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
               spec={formData.spec || {}}
               touched={touched}
               onChange={(field, value) => {
-                setFormData(prev => ({
+                setFormData((prev) => ({
                   ...prev,
                   spec: {
                     ...(prev.spec || {}),
-                    [field]: value
-                  }
+                    [field]: value,
+                  },
                 }));
               }}
             />
@@ -584,84 +660,114 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
 
           {/* TAB 3: PRICING */}
           {activeTab === 'pricing' && (
-            <div className="flex flex-col gap-6 animate-fade-in">
-              <h2 className="text-2xl font-black text-foreground mb-2">Pricing & Features</h2>
+            <div className="animate-fade-in flex flex-col gap-6">
+              <h2 className="text-foreground mb-2 text-2xl font-black">Pricing & Features</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Ex-Showroom Price (Min)</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Ex-Showroom Price (Min)
+                  </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-bold">₹</span>
+                    <span className="text-muted absolute top-1/2 left-4 -translate-y-1/2 font-bold">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       name="exShowroomPriceMin"
                       value={formData.exShowroomPriceMin || ''}
                       onChange={handleChange}
                       placeholder="e.g. 500000"
-                      className="w-full bg-foreground/5 border border-transparent rounded-xl pl-8 pr-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                      className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent py-3 pr-4 pl-8 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Ex-Showroom Price (Max)</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Ex-Showroom Price (Max)
+                  </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-bold">₹</span>
+                    <span className="text-muted absolute top-1/2 left-4 -translate-y-1/2 font-bold">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       name="exShowroomPriceMax"
                       value={formData.exShowroomPriceMax || ''}
                       onChange={handleChange}
                       placeholder="e.g. 600000"
-                      className="w-full bg-foreground/5 border border-transparent rounded-xl pl-8 pr-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                      className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent py-3 pr-4 pl-8 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Launch Status</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Launch Status
+                  </label>
                   <select
                     name="launchStatus"
                     value={formData.launchStatus}
                     onChange={handleChange}
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full appearance-none rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   >
-                    {Object.values(LaunchStatus).map(s => (
-                      <option key={s} value={s} className="bg-background text-foreground">{s}</option>
+                    {Object.values(LaunchStatus).map((s) => (
+                      <option key={s} value={s} className="bg-background text-foreground">
+                        {s}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="mt-6 flex gap-8 p-6 rounded-2xl bg-foreground/5 mb-6">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="financeAvailable" checked={formData.financeAvailable} onChange={handleChange} className="w-5 h-5 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)] bg-background border-[var(--border-brand)]" />
+              <div className="bg-foreground/5 mt-6 mb-6 flex gap-8 rounded-2xl p-6">
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="financeAvailable"
+                    checked={formData.financeAvailable}
+                    onChange={handleChange}
+                    className="bg-background h-5 w-5 rounded border-[var(--border-brand)] text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)]"
+                  />
                   <span className="text-sm font-bold">Finance Available</span>
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleChange} className="w-5 h-5 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)] bg-background border-[var(--border-brand)]" />
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    checked={formData.isActive}
+                    onChange={handleChange}
+                    className="bg-background h-5 w-5 rounded border-[var(--border-brand)] text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)]"
+                  />
                   <span className="text-sm font-bold">Is Active</span>
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isFeatured" checked={formData.isFeatured} onChange={handleChange} className="w-5 h-5 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)] bg-background border-[var(--border-brand)]" />
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={formData.isFeatured}
+                    onChange={handleChange}
+                    className="bg-background h-5 w-5 rounded border-[var(--border-brand)] text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)]"
+                  />
                   <span className="text-sm font-bold">Is Featured</span>
                 </label>
               </div>
 
-                  <TractorStatePrices
+              <TractorStatePrices
                 prices={formData.priceByState || []}
-                onChange={(prices) => setFormData(prev => ({ ...prev, priceByState: prices }))}
+                onChange={(prices) => setFormData((prev) => ({ ...prev, priceByState: prices }))}
               />
             </div>
           )}
 
           {/* TAB 4: MEDIA */}
           {activeTab === 'media' && (
-            <div className="flex flex-col gap-8 animate-fade-in">
-              <h2 className="text-2xl font-black text-foreground mb-2">Media & Gallery</h2>
-              
+            <div className="animate-fade-in flex flex-col gap-8">
+              <h2 className="text-foreground mb-2 text-2xl font-black">Media & Gallery</h2>
+
               <div>
-                <MediaUploader 
+                <MediaUploader
                   files={mediaFiles}
                   onFilesChange={setMediaFiles}
                   maxFiles={10}
@@ -671,9 +777,9 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                 />
               </div>
 
-              <div className="pt-8 border-t border-[var(--border-subtle)]">
-                <h2 className="text-xl font-black text-foreground mb-4">Brochure</h2>
-                <MediaUploader 
+              <div className="border-t border-[var(--border-subtle)] pt-8">
+                <h2 className="text-foreground mb-4 text-xl font-black">Brochure</h2>
+                <MediaUploader
                   files={brochureFile}
                   onFilesChange={setBrochureFile}
                   maxFiles={1}
@@ -687,75 +793,89 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
 
           {/* TAB 5: CONTENT & SEO */}
           {activeTab === 'seo' && (
-            <div className="flex flex-col gap-6 animate-fade-in">
-              <h2 className="text-2xl font-black text-foreground mb-2">Content & SEO</h2>
-              
+            <div className="animate-fade-in flex flex-col gap-6">
+              <h2 className="text-foreground mb-2 text-2xl font-black">Content & SEO</h2>
+
               <div className="flex flex-col gap-4 border-b border-[var(--border-subtle)] pb-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Overview HTML</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Overview HTML
+                  </label>
                   <textarea
                     name="overview"
                     value={formData.overview || ''}
                     onChange={handleChange}
                     rows={4}
                     placeholder="<p>Detailed overview of the tractor...</p>"
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Why Buy HTML</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Why Buy HTML
+                  </label>
                   <textarea
                     name="whyBuy"
                     value={formData.whyBuy || ''}
                     onChange={handleChange}
                     rows={4}
                     placeholder="<p>Reasons to buy this tractor...</p>"
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Expert Review HTML</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Expert Review HTML
+                  </label>
                   <textarea
                     name="expertReview"
                     value={formData.expertReview || ''}
                     onChange={handleChange}
                     rows={4}
                     placeholder="<p>Expert review content...</p>"
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Pros (Comma Separated)</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Pros (Comma Separated)
+                  </label>
                   <input
                     type="text"
                     name="pros"
-                    value={Array.isArray(formData.pros) ? formData.pros.join(', ') : formData.pros || ''}
+                    value={
+                      Array.isArray(formData.pros) ? formData.pros.join(', ') : formData.pros || ''
+                    }
                     onChange={handleChange}
                     placeholder="e.g. High fuel efficiency, Great lifting capacity"
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Video URL (YouTube)</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Video URL (YouTube)
+                  </label>
                   <input
                     type="url"
                     name="videoUrl"
                     value={formData.videoUrl || ''}
                     onChange={handleChange}
                     placeholder="https://youtube.com/..."
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-black text-foreground">SEO Metadata</h3>
+                <h3 className="text-foreground text-lg font-black">SEO Metadata</h3>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">SEO Title (Max 60 chars)</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    SEO Title (Max 60 chars)
+                  </label>
                   <input
                     type="text"
                     name="seoTitle"
@@ -763,12 +883,14 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     onChange={handleChange}
                     maxLength={60}
                     placeholder="Best Mahindra Tractor..."
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">SEO Description (Max 160 chars)</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    SEO Description (Max 160 chars)
+                  </label>
                   <textarea
                     name="seoDescription"
                     value={formData.seoDescription || ''}
@@ -776,25 +898,26 @@ export default function TractorForm({ initialData, isEdit = false, initialTab = 
                     maxLength={160}
                     rows={2}
                     placeholder="Discover the best..."
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Meta Keywords</label>
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Meta Keywords
+                  </label>
                   <input
                     type="text"
                     name="metaKeywords"
                     value={formData.metaKeywords || ''}
                     onChange={handleChange}
                     placeholder="tractor, mahindra, 4wd..."
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   />
                 </div>
               </div>
             </div>
           )}
-
         </form>
       </div>
     </div>

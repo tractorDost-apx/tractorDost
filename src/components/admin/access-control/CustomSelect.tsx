@@ -17,7 +17,13 @@ interface CustomSelectProps {
   searchable?: boolean;
 }
 
-export default function CustomSelect({ options, value, onChange, placeholder = 'Select an option', searchable = false }: CustomSelectProps) {
+export default function CustomSelect({
+  options,
+  value,
+  onChange,
+  placeholder = 'Select an option',
+  searchable = false,
+}: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -32,47 +38,54 @@ export default function CustomSelect({ options, value, onChange, placeholder = '
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const selectedOption = options.find(o => o.value === value);
-  const filteredOptions = options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()) || o.subLabel?.toLowerCase().includes(search.toLowerCase()));
+  const selectedOption = options.find((o) => o.value === value);
+  const filteredOptions = options.filter(
+    (o) =>
+      o.label.toLowerCase().includes(search.toLowerCase()) ||
+      o.subLabel?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="relative w-full min-w-[280px]" ref={dropdownRef}>
-      <div 
-        className={`flex items-center justify-between w-full h-12 px-4 bg-background border rounded-xl cursor-pointer transition-all ${isOpen ? 'border-[var(--color-brand-green)] ring-2 ring-[var(--color-brand-green)]/20' : 'border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/50'}`}
+      <div
+        className={`bg-background flex h-12 w-full cursor-pointer items-center justify-between rounded-xl border px-4 transition-all ${isOpen ? 'border-[var(--color-brand-green)] ring-2 ring-[var(--color-brand-green)]/20' : 'border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/50'}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={`font-bold truncate ${selectedOption ? 'text-foreground' : 'text-muted'}`}>
+        <span className={`truncate font-bold ${selectedOption ? 'text-foreground' : 'text-muted'}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown size={18} className={`text-muted transition-transform duration-300 ${isOpen ? 'rotate-180 text-[var(--color-brand-green)]' : ''}`} />
+        <ChevronDown
+          size={18}
+          className={`text-muted transition-transform duration-300 ${isOpen ? 'rotate-180 text-[var(--color-brand-green)]' : ''}`}
+        />
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-background border border-[var(--border-subtle)] rounded-xl shadow-2xl overflow-hidden animate-fade-in-up origin-top">
+        <div className="bg-background animate-fade-in-up absolute z-50 mt-2 w-full origin-top overflow-hidden rounded-xl border border-[var(--border-subtle)] shadow-2xl">
           {searchable && (
-            <div className="p-3 border-b border-[var(--border-subtle)] bg-foreground/5">
+            <div className="bg-foreground/5 border-b border-[var(--border-subtle)] p-3">
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-                <input 
-                  type="text" 
+                <Search size={16} className="text-muted absolute top-1/2 left-3 -translate-y-1/2" />
+                <input
+                  type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search..." 
-                  className="w-full h-10 pl-9 pr-4 bg-background border border-[var(--border-subtle)] rounded-lg text-sm font-bold focus:border-[var(--color-brand-green)] outline-none"
+                  placeholder="Search..."
+                  className="bg-background h-10 w-full rounded-lg border border-[var(--border-subtle)] pr-4 pl-9 text-sm font-bold outline-none focus:border-[var(--color-brand-green)]"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
             </div>
           )}
-          
-          <div className="max-h-[300px] overflow-y-auto hidden-scrollbar py-2">
+
+          <div className="hidden-scrollbar max-h-[300px] overflow-y-auto py-2">
             {filteredOptions.length === 0 ? (
-              <div className="p-4 text-center text-sm font-bold text-muted">No results found.</div>
+              <div className="text-muted p-4 text-center text-sm font-bold">No results found.</div>
             ) : (
               filteredOptions.map((option) => (
-                <div 
+                <div
                   key={option.value}
-                  className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-colors ${value === option.value ? 'bg-[var(--color-brand-green)]/10' : 'hover:bg-foreground/5'}`}
+                  className={`flex cursor-pointer items-center justify-between px-4 py-3 transition-colors ${value === option.value ? 'bg-[var(--color-brand-green)]/10' : 'hover:bg-foreground/5'}`}
                   onClick={() => {
                     onChange(option.value);
                     setIsOpen(false);
@@ -80,10 +93,18 @@ export default function CustomSelect({ options, value, onChange, placeholder = '
                   }}
                 >
                   <div className="flex flex-col">
-                    <span className={`font-bold ${value === option.value ? 'text-[var(--color-brand-green)]' : 'text-foreground'}`}>{option.label}</span>
-                    {option.subLabel && <span className="text-xs font-medium text-muted">{option.subLabel}</span>}
+                    <span
+                      className={`font-bold ${value === option.value ? 'text-[var(--color-brand-green)]' : 'text-foreground'}`}
+                    >
+                      {option.label}
+                    </span>
+                    {option.subLabel && (
+                      <span className="text-muted text-xs font-medium">{option.subLabel}</span>
+                    )}
                   </div>
-                  {value === option.value && <Check size={18} className="text-[var(--color-brand-green)]" />}
+                  {value === option.value && (
+                    <Check size={18} className="text-[var(--color-brand-green)]" />
+                  )}
                 </div>
               ))
             )}

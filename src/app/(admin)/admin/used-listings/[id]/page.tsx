@@ -25,12 +25,16 @@ import {
   FileCheck,
   Eye,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
 
-export default function AdminListingModerationPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AdminListingModerationPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const unwrappedParams = use(params);
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +45,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
   // Inspection form state
   const [inspectionScores, setInspectionScores] = useState<any>({});
   const [inspectionImages, setInspectionImages] = useState<File[]>([]);
-  
+
   // Agent Assignment state
   const [agents, setAgents] = useState<any[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
@@ -58,7 +62,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
   const [newDocFile, setNewDocFile] = useState<File | null>(null);
   const [newDocType, setNewDocType] = useState<string>('RC_COPY');
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
-  
+
   // Boosting state
   const [boostType, setBoostType] = useState<string>('NONE');
   const [featuredUntil, setFeaturedUntil] = useState<string>('');
@@ -83,7 +87,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
             hydraulicsScore: latestInspection.hydraulicsScore ?? 0,
             bodyScore: latestInspection.bodyScore ?? 0,
             clutchScore: latestInspection.clutchScore ?? 0,
-            overallScore: latestInspection.overallScore ?? 0
+            overallScore: latestInspection.overallScore ?? 0,
           });
         } else {
           setInspectionScores({
@@ -92,7 +96,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
             hydraulicsScore: 0,
             bodyScore: 0,
             clutchScore: 0,
-            overallScore: 0
+            overallScore: 0,
           });
         }
       }
@@ -101,13 +105,13 @@ export default function AdminListingModerationPage({ params }: { params: Promise
       const [leadsRes, docsRes, agentsRes] = await Promise.all([
         usedTractorListingAPI.getListingEnquiries(idStr),
         usedTractorListingAPI.getListingDocuments(idStr),
-        usersAPI.getAllUsers({ role: 'AGENT' })
+        usersAPI.getAllUsers({ role: 'AGENT' }),
       ]);
 
-      if (leadsRes?.success && leadsRes?.data) setLeads(leadsRes.data);
-      if (docsRes?.success && docsRes?.data) setDocuments(docsRes.data);
+      // Both endpoints return { data: [...], meta }
+      if (leadsRes?.success && leadsRes?.data) setLeads(leadsRes.data.data);
+      if (docsRes?.success && docsRes?.data) setDocuments(docsRes.data.data);
       if (agentsRes?.success && agentsRes?.data?.data) setAgents(agentsRes.data.data);
-
     } catch (e) {
       console.error(e);
     }
@@ -126,30 +130,34 @@ export default function AdminListingModerationPage({ params }: { params: Promise
     }
 
     setIsUpdating(true);
-    usedTractorListingAPI.adminUpdateListingStatus(listing.id, { listingStatus: status, isCertified, rejectionReason }).then(res => {
-      if (res.success) {
-        fetchListing();
-      } else {
-        alert('Failed to update status: ' + res.message);
-      }
-      setIsUpdating(false);
-    });
+    usedTractorListingAPI
+      .adminUpdateListingStatus(listing.id, { listingStatus: status, isCertified, rejectionReason })
+      .then((res) => {
+        if (res.success) {
+          fetchListing();
+        } else {
+          alert('Failed to update status: ' + res.message);
+        }
+        setIsUpdating(false);
+      });
   };
 
   const updateBoost = () => {
     setIsUpdating(true);
-    usedTractorListingAPI.adminUpdateListingStatus(listing.id, { 
-      boostType: boostType === 'NONE' ? null : boostType,
-      featuredUntil: featuredUntil ? new Date(featuredUntil).toISOString() : undefined 
-    }).then(res => {
-      if (res.success) {
-        alert('Visibility settings updated!');
-        fetchListing();
-      } else {
-        alert('Failed to update visibility: ' + res.message);
-      }
-      setIsUpdating(false);
-    });
+    usedTractorListingAPI
+      .adminUpdateListingStatus(listing.id, {
+        boostType: boostType === 'NONE' ? null : boostType,
+        featuredUntil: featuredUntil ? new Date(featuredUntil).toISOString() : undefined,
+      })
+      .then((res) => {
+        if (res.success) {
+          alert('Visibility settings updated!');
+          fetchListing();
+        } else {
+          alert('Failed to update visibility: ' + res.message);
+        }
+        setIsUpdating(false);
+      });
   };
 
   const handleAssignAgent = async () => {
@@ -159,16 +167,19 @@ export default function AdminListingModerationPage({ params }: { params: Promise
       let res;
       if (inspectionScores.id) {
         // If an inspection already exists, just assign the inspector to it
-        res = await usedTractorInspectionAPI.assignInspector(inspectionScores.id, Number(selectedAgentId));
+        res = await usedTractorInspectionAPI.assignInspector(
+          inspectionScores.id,
+          Number(selectedAgentId)
+        );
       } else {
         // Otherwise, create a new inspection with the inspector assigned
         const payload = {
           listingId: listing.id,
-          inspectorId: Number(selectedAgentId)
+          inspectorId: Number(selectedAgentId),
         };
         res = await usedTractorInspectionAPI.createInspection(payload);
       }
-      
+
       if (res.success) {
         alert('Agent assigned successfully!');
         fetchListing(); // Refresh to show inspection
@@ -189,7 +200,9 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
       if (!inspectionId) {
         // Create an inspection first if it doesn't exist
-        const createRes = await usedTractorInspectionAPI.createInspection({ listingId: Number(unwrappedParams.id) });
+        const createRes = await usedTractorInspectionAPI.createInspection({
+          listingId: Number(unwrappedParams.id),
+        });
         if (createRes.success && createRes.data) {
           inspectionId = createRes.data.id;
         } else {
@@ -208,7 +221,10 @@ export default function AdminListingModerationPage({ params }: { params: Promise
       formData.append('clutchScore', String(inspectionScores.clutchScore));
       formData.append('inspectorNotes', 'Admin updated via dashboard');
 
-      const submitRes = await usedTractorInspectionAPI.submitInspectionReport(inspectionId, formData);
+      const submitRes = await usedTractorInspectionAPI.submitInspectionReport(
+        inspectionId,
+        formData
+      );
 
       if (submitRes.success && submitRes.data) {
         const updated = submitRes.data;
@@ -219,7 +235,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
           hydraulicsScore: updated.hydraulicsScore,
           bodyScore: updated.bodyScore,
           clutchScore: updated.clutchScore,
-          overallScore: updated.overallScore
+          overallScore: updated.overallScore,
         });
 
         // Upload images if any are selected
@@ -231,7 +247,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
             // using TRACTOR_IMAGE as a generic catch-all for inspection images
             mediaFormData.append('docType', 'TRACTOR_IMAGE');
             mediaFormData.append('document', file);
-            
+
             const mediaRes = await usedTractorDocumentAPI.uploadDocument(mediaFormData);
             if (!mediaRes.success) {
               console.error('Failed to upload inspection image:', mediaRes);
@@ -257,10 +273,10 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
   const handleUploadDocument = async () => {
     if (!newDocFile) {
-      alert("Please select a document file first.");
+      alert('Please select a document file first.');
       return;
     }
-    
+
     setIsUploadingDoc(true);
     try {
       const formData = new FormData();
@@ -270,49 +286,72 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
       const res = await usedTractorDocumentAPI.uploadDocument(formData);
       if (res.success && res.data) {
-        alert("Document uploaded successfully!");
-        setDocuments(prev => [...prev, res.data]);
+        alert('Document uploaded successfully!');
+        setDocuments((prev) => [...prev, res.data]);
         setNewDocFile(null);
       } else {
-        alert("Failed to upload document: " + res.message);
+        alert('Failed to upload document: ' + res.message);
       }
     } catch (e) {
       console.error(e);
-      alert("An error occurred while uploading the document.");
+      alert('An error occurred while uploading the document.');
     }
     setIsUploadingDoc(false);
   };
 
   if (loading) {
-    return <div className="p-12 flex justify-center h-[80vh] items-center"><TractorLoader className="text-[var(--color-brand-green)]" size={64} /></div>;
+    return (
+      <div className="flex h-[80vh] items-center justify-center p-12">
+        <TractorLoader className="text-[var(--color-brand-green)]" size={64} />
+      </div>
+    );
   }
 
-  if (!listing) return <div className="p-12 text-center font-bold text-muted text-xl h-[80vh] flex items-center justify-center">Listing not found.</div>;
+  if (!listing)
+    return (
+      <div className="text-muted flex h-[80vh] items-center justify-center p-12 text-center text-xl font-bold">
+        Listing not found.
+      </div>
+    );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
-
+    <div className="mx-auto max-w-7xl space-y-8 p-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <Link href="/admin/used-listings" className="text-muted hover:text-[var(--color-brand-green)] text-sm font-bold flex items-center gap-1 mb-2 transition-colors w-fit">
+          <Link
+            href="/admin/used-listings"
+            className="text-muted mb-2 flex w-fit items-center gap-1 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+          >
             <ArrowLeft size={16} /> Back to Listings
           </Link>
-          <h1 className="text-4xl font-black flex items-center gap-4">
+          <h1 className="flex items-center gap-4 text-4xl font-black">
             Listing #{listing.id}
-            {listing.listingStatus === ListingStatus.ACTIVE && <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs rounded-lg uppercase tracking-wider font-bold">Active</span>}
-            {listing.listingStatus === ListingStatus.PENDING_APPROVAL && <span className="px-3 py-1 bg-amber-500/10 text-amber-500 text-xs rounded-lg uppercase tracking-wider font-bold">Pending</span>}
-            {listing.listingStatus === ListingStatus.REJECTED && <span className="px-3 py-1 bg-red-500/10 text-red-500 text-xs rounded-lg uppercase tracking-wider font-bold">Rejected</span>}
+            {listing.listingStatus === ListingStatus.ACTIVE && (
+              <span className="rounded-lg bg-emerald-500/10 px-3 py-1 text-xs font-bold tracking-wider text-emerald-500 uppercase">
+                Active
+              </span>
+            )}
+            {listing.listingStatus === ListingStatus.PENDING_APPROVAL && (
+              <span className="rounded-lg bg-amber-500/10 px-3 py-1 text-xs font-bold tracking-wider text-amber-500 uppercase">
+                Pending
+              </span>
+            )}
+            {listing.listingStatus === ListingStatus.REJECTED && (
+              <span className="rounded-lg bg-red-500/10 px-3 py-1 text-xs font-bold tracking-wider text-red-500 uppercase">
+                Rejected
+              </span>
+            )}
           </h1>
         </div>
 
         {/* Moderation Controls */}
-        <div className="flex flex-wrap items-center gap-3 bg-foreground/5 p-2 rounded-2xl border border-[var(--border-subtle)] shadow-sm backdrop-blur-xl">
+        <div className="bg-foreground/5 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--border-subtle)] p-2 shadow-sm backdrop-blur-xl">
           {listing.listingStatus !== ListingStatus.ACTIVE && (
             <button
               disabled={isUpdating}
               onClick={() => updateStatus(ListingStatus.ACTIVE)}
-              className="px-6 py-2.5 bg-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/90 text-white text-sm font-black rounded-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+              className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-black text-white transition-all hover:scale-105 hover:bg-[var(--color-brand-green)]/90 active:scale-95"
             >
               <CheckCircle2 size={16} /> Approve Listing
             </button>
@@ -321,7 +360,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
             <button
               disabled={isUpdating}
               onClick={() => updateStatus(ListingStatus.REJECTED)}
-              className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-black rounded-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+              className="flex items-center gap-2 rounded-xl bg-red-500 px-6 py-2.5 text-sm font-black text-white transition-all hover:scale-105 hover:bg-red-600 active:scale-95"
             >
               <XCircle size={16} /> Reject Listing
             </button>
@@ -329,18 +368,16 @@ export default function AdminListingModerationPage({ params }: { params: Promise
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
         {/* MAIN COLUMN */}
-        <div className="lg:col-span-3 space-y-8">
-
+        <div className="space-y-8 lg:col-span-3">
           {/* Tabs */}
-          <div className="flex gap-2 border-b border-[var(--border-subtle)] overflow-x-auto no-scrollbar">
+          <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-[var(--border-subtle)]">
             {['OVERVIEW', 'INSPECTION', 'LEADS', 'DOCUMENTS'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`px-8 py-4 text-sm font-black tracking-widest border-b-2 transition-all whitespace-nowrap ${activeTab === tab ? 'border-[var(--color-brand-green)] text-[var(--color-brand-green)] bg-[var(--color-brand-green)]/5' : 'border-transparent text-muted hover:text-foreground hover:bg-foreground/5'} rounded-t-xl`}
+                className={`border-b-2 px-8 py-4 text-sm font-black tracking-widest whitespace-nowrap transition-all ${activeTab === tab ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/5 text-[var(--color-brand-green)]' : 'text-muted hover:text-foreground hover:bg-foreground/5 border-transparent'} rounded-t-xl`}
               >
                 {tab}
               </button>
@@ -349,147 +386,213 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
           {/* OVERVIEW TAB */}
           {activeTab === 'OVERVIEW' && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm relative overflow-hidden">
-
+            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500">
+              <div className="bg-background relative overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
                 {/* Decorative Background */}
-                <div className="absolute top-[-50%] right-[-10%] w-[400px] h-[400px] bg-[var(--color-brand-green)] opacity-[0.03] blur-[80px] rounded-full pointer-events-none" />
+                <div className="pointer-events-none absolute top-[-50%] right-[-10%] h-[400px] w-[400px] rounded-full bg-[var(--color-brand-green)] opacity-[0.03] blur-[80px]" />
 
-                <div className="flex flex-col md:flex-row gap-8 mb-8">
-                  <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-foreground/5 border border-[var(--border-subtle)] shrink-0 relative group">
+                <div className="mb-8 flex flex-col gap-8 md:flex-row">
+                  <div className="bg-foreground/5 group relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-2xl border border-[var(--border-subtle)] md:w-1/3">
                     {listing?.media?.filter((m: any) => m.mediaType !== 'pdf').length > 0 ? (
                       <>
-                        <img 
-                          src={listing.media.filter((m: any) => m.mediaType !== 'pdf')[currentImageIndex]?.url} 
-                          alt="" 
-                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" 
+                        <img
+                          src={
+                            listing.media.filter((m: any) => m.mediaType !== 'pdf')[
+                              currentImageIndex
+                            ]?.url
+                          }
+                          alt=""
+                          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                         />
-                        
+
                         {listing.media.filter((m: any) => m.mediaType !== 'pdf').length > 1 && (
                           <>
                             {/* Left Arrow */}
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               onClick={(e) => {
                                 e.preventDefault();
-                                setCurrentImageIndex((prev) => (prev === 0 ? listing.media.filter((m: any) => m.mediaType !== 'pdf').length - 1 : prev - 1));
+                                setCurrentImageIndex((prev) =>
+                                  prev === 0
+                                    ? listing.media.filter((m: any) => m.mediaType !== 'pdf')
+                                        .length - 1
+                                    : prev - 1
+                                );
                               }}
-                              className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg"
+                              className="absolute top-1/2 left-3 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/50 p-2 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 hover:bg-black/70"
                             >
                               <ChevronLeft size={20} />
                             </button>
 
                             {/* Right Arrow */}
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               onClick={(e) => {
                                 e.preventDefault();
-                                setCurrentImageIndex((prev) => (prev === listing.media.filter((m: any) => m.mediaType !== 'pdf').length - 1 ? 0 : prev + 1));
+                                setCurrentImageIndex((prev) =>
+                                  prev ===
+                                  listing.media.filter((m: any) => m.mediaType !== 'pdf').length - 1
+                                    ? 0
+                                    : prev + 1
+                                );
                               }}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg"
+                              className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/50 p-2 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 hover:bg-black/70"
                             >
                               <ChevronRight size={20} />
                             </button>
 
                             {/* Indicators */}
-                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/40 px-2.5 py-1.5 rounded-full backdrop-blur-sm">
-                              {listing.media.filter((m: any) => m.mediaType !== 'pdf').map((_: any, idx: number) => (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    setCurrentImageIndex(idx);
-                                  }}
-                                  className={`w-1.5 h-1.5 rounded-full transition-all ${
-                                    idx === currentImageIndex ? 'bg-white w-3.5' : 'bg-white/50'
-                                  }`}
-                                />
-                              ))}
+                            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-black/40 px-2.5 py-1.5 backdrop-blur-sm">
+                              {listing.media
+                                .filter((m: any) => m.mediaType !== 'pdf')
+                                .map((_: any, idx: number) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setCurrentImageIndex(idx);
+                                    }}
+                                    className={`h-1.5 w-1.5 rounded-full transition-all ${
+                                      idx === currentImageIndex ? 'w-3.5 bg-white' : 'bg-white/50'
+                                    }`}
+                                  />
+                                ))}
                             </div>
                           </>
                         )}
                       </>
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-muted gap-2">
+                      <div className="text-muted flex h-full w-full flex-col items-center justify-center gap-2">
                         <ImageIcon size={32} />
                         <span className="text-sm font-bold">No Image</span>
                       </div>
                     )}
                     {listing.isCertified && (
-                      <div className="absolute top-3 right-3 bg-[var(--color-brand-green)] text-white px-3 py-1.5 rounded-lg font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-lg">
+                      <div className="absolute top-3 right-3 flex items-center gap-1 rounded-lg bg-[var(--color-brand-green)] px-3 py-1.5 text-xs font-black tracking-wider text-white uppercase shadow-lg">
                         <ShieldCheck size={14} /> Certified
                       </div>
                     )}
                   </div>
                   <div className="w-full">
-                    <h2 className="text-3xl font-black mb-2">{listing.yearOfManufacture} {listing.tractorBrand} {listing.tractorModel}</h2>
-                    <p className="text-muted font-bold flex items-center gap-2 mb-6">
-                      <MapPin size={16} /> {listing.villageCity ? `${listing.villageCity}, ` : ''}{listing.district}, {listing.state} • {listing.pincode}
+                    <h2 className="mb-2 text-3xl font-black">
+                      {listing.yearOfManufacture} {listing.tractorBrand} {listing.tractorModel}
+                    </h2>
+                    <p className="text-muted mb-6 flex items-center gap-2 font-bold">
+                      <MapPin size={16} /> {listing.villageCity ? `${listing.villageCity}, ` : ''}
+                      {listing.district}, {listing.state} • {listing.pincode}
                     </p>
 
-                    <div className="flex flex-wrap gap-6 p-6 bg-[var(--border-subtle)] rounded-2xl border border-[var(--border-subtle)]">
+                    <div className="flex flex-wrap gap-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--border-subtle)] p-6">
                       <div>
-                        <p className="text-xs text-muted font-bold uppercase tracking-widest">Asking Price</p>
-                        <p className="text-3xl font-black text-[var(--color-brand-green)] mt-1">₹{(listing.askingPrice || 0).toLocaleString('en-IN')}</p>
-                        <span className="inline-block mt-2 px-2 py-0.5 bg-background border border-[var(--border-subtle)] rounded text-xs font-bold text-muted uppercase">Negotiable: {listing.isNegotiable ? 'Yes' : 'No'}</span>
+                        <p className="text-muted text-xs font-bold tracking-widest uppercase">
+                          Asking Price
+                        </p>
+                        <p className="mt-1 text-3xl font-black text-[var(--color-brand-green)]">
+                          ₹{(listing.askingPrice || 0).toLocaleString('en-IN')}
+                        </p>
+                        <span className="bg-background text-muted mt-2 inline-block rounded border border-[var(--border-subtle)] px-2 py-0.5 text-xs font-bold uppercase">
+                          Negotiable: {listing.isNegotiable ? 'Yes' : 'No'}
+                        </span>
                       </div>
-                      <div className="hidden md:block w-px border-[var(--border-subtle)]"></div>
+                      <div className="hidden w-px border-[var(--border-subtle)] md:block"></div>
                       <div>
-                        <p className="text-xs text-muted font-bold uppercase tracking-widest">Market Est.</p>
-                        <p className="text-xl font-black mt-1">₹{listing.estimatedMarketPrice?.toLocaleString('en-IN') || 'N/A'}</p>
+                        <p className="text-muted text-xs font-bold tracking-widest uppercase">
+                          Market Est.
+                        </p>
+                        <p className="mt-1 text-xl font-black">
+                          ₹{listing.estimatedMarketPrice?.toLocaleString('en-IN') || 'N/A'}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-8 border-t border-[var(--border-subtle)]">
-                  <div className="bg-foreground/5 p-4 rounded-xl">
-                    <p className="text-xs text-muted font-bold uppercase tracking-widest flex items-center gap-1.5"><Clock size={14} /> Hours</p>
-                    <p className="text-lg font-black mt-2">{listing.hoursUsed || 'N/A'} Hrs</p>
+                <div className="grid grid-cols-2 gap-4 border-t border-[var(--border-subtle)] pt-8 md:grid-cols-5">
+                  <div className="bg-foreground/5 rounded-xl p-4">
+                    <p className="text-muted flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase">
+                      <Clock size={14} /> Hours
+                    </p>
+                    <p className="mt-2 text-lg font-black">{listing.hoursUsed || 'N/A'} Hrs</p>
                   </div>
-                  <div className="bg-foreground/5 p-4 rounded-xl">
-                    <p className="text-xs text-muted font-bold uppercase tracking-widest flex items-center gap-1.5"><UserIcon size={14} /> Ownership</p>
-                    <p className="text-lg font-black mt-2">{listing.ownership}</p>
+                  <div className="bg-foreground/5 rounded-xl p-4">
+                    <p className="text-muted flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase">
+                      <UserIcon size={14} /> Ownership
+                    </p>
+                    <p className="mt-2 text-lg font-black">{listing.ownership}</p>
                   </div>
-                  <div className="bg-foreground/5 p-4 rounded-xl">
-                    <p className="text-xs text-muted font-bold uppercase tracking-widest flex items-center gap-1.5"><Wrench size={14} /> Condition</p>
-                    <p className="text-lg font-black mt-2">{listing.conditionGrade}</p>
+                  <div className="bg-foreground/5 rounded-xl p-4">
+                    <p className="text-muted flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase">
+                      <Wrench size={14} /> Condition
+                    </p>
+                    <p className="mt-2 text-lg font-black">{listing.conditionGrade}</p>
                   </div>
-                  <div className="bg-foreground/5 p-4 rounded-xl">
-                    <p className="text-xs text-muted font-bold uppercase tracking-widest flex items-center gap-1.5"><FileText size={14} /> Insurance</p>
-                    <p className="text-sm font-black mt-2 text-blue-500 whitespace-nowrap">
-                      {listing.insuranceValidity ? new Date(listing.insuranceValidity).toLocaleDateString() : 'No'}
+                  <div className="bg-foreground/5 rounded-xl p-4">
+                    <p className="text-muted flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase">
+                      <FileText size={14} /> Insurance
+                    </p>
+                    <p className="mt-2 text-sm font-black whitespace-nowrap text-blue-500">
+                      {listing.insuranceValidity
+                        ? new Date(listing.insuranceValidity).toLocaleDateString()
+                        : 'No'}
                     </p>
                   </div>
-                  <div className="bg-foreground/5 p-4 rounded-xl">
-                    <p className="text-xs text-muted font-bold uppercase tracking-widest flex items-center gap-1.5"><UserIcon size={14} /> Seller</p>
-                    <p className="text-sm font-black mt-2">{listing.seller?.fullName || 'Unknown'}</p>
-                    <p className="text-xs font-bold text-muted mt-1">{listing.seller?.maskedMobile || 'N/A'}</p>
+                  <div className="bg-foreground/5 rounded-xl p-4">
+                    <p className="text-muted flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase">
+                      <UserIcon size={14} /> Seller
+                    </p>
+                    <p className="mt-2 text-sm font-black">
+                      {listing.seller?.fullName || 'Unknown'}
+                    </p>
+                    <p className="text-muted mt-1 text-xs font-bold">
+                      {listing.seller?.maskedMobile || 'N/A'}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
-                <h3 className="text-xl font-black mb-4 flex items-center gap-2"><FileText className="text-[var(--color-brand-green)]" /> Seller's Description</h3>
-                <div className="bg-foreground/5 p-6 rounded-2xl border border-[var(--border-subtle)]">
-                  <p className="text-muted font-medium leading-relaxed whitespace-pre-wrap">{listing.description}</p>
+                <h3 className="mb-4 flex items-center gap-2 text-xl font-black">
+                  <FileText className="text-[var(--color-brand-green)]" /> Seller's Description
+                </h3>
+                <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-6">
+                  <p className="text-muted leading-relaxed font-medium whitespace-pre-wrap">
+                    {listing.description}
+                  </p>
                 </div>
               </div>
 
               {/* Documents verification status */}
               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
-                <h3 className="text-xl font-black mb-6 flex items-center gap-2"><FileCheck className="text-[var(--color-brand-green)]" /> Verification & Documents</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-4 bg-foreground/5 rounded-xl">
+                <h3 className="mb-6 flex items-center gap-2 text-xl font-black">
+                  <FileCheck className="text-[var(--color-brand-green)]" /> Verification & Documents
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="bg-foreground/5 flex items-center justify-between rounded-xl p-4">
                     <span className="font-bold">RC Available</span>
-                    {listing.rcAvailable ? <span className="flex items-center gap-1 text-emerald-500 font-black"><CheckCircle2 size={16} /> Yes</span> : <span className="flex items-center gap-1 text-red-500 font-black"><XCircle size={16} /> No</span>}
+                    {listing.rcAvailable ? (
+                      <span className="flex items-center gap-1 font-black text-emerald-500">
+                        <CheckCircle2 size={16} /> Yes
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 font-black text-red-500">
+                        <XCircle size={16} /> No
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-foreground/5 rounded-xl">
+                  <div className="bg-foreground/5 flex items-center justify-between rounded-xl p-4">
                     <span className="font-bold">Finance Available</span>
-                    {listing.financeAvailable ? <span className="flex items-center gap-1 text-emerald-500 font-black"><CheckCircle2 size={16} /> Yes</span> : <span className="flex items-center gap-1 text-red-500 font-black"><XCircle size={16} /> No</span>}
+                    {listing.financeAvailable ? (
+                      <span className="flex items-center gap-1 font-black text-emerald-500">
+                        <CheckCircle2 size={16} /> Yes
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 font-black text-red-500">
+                        <XCircle size={16} /> No
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-foreground/5 rounded-xl">
+                  <div className="bg-foreground/5 flex items-center justify-between rounded-xl p-4">
                     <span className="font-bold">Loan Clearance</span>
                     <span className="font-black text-blue-500">{listing.loanClearanceStatus}</span>
                   </div>
@@ -500,50 +603,73 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
           {/* INSPECTION TAB */}
           {activeTab === 'INSPECTION' && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm relative overflow-hidden">
-
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                  <h3 className="text-2xl font-black flex items-center gap-3">
+            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500">
+              <div className="bg-background relative overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
+                <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                  <h3 className="flex items-center gap-3 text-2xl font-black">
                     <Wrench className="text-[var(--color-brand-green)]" size={28} />
                     Inspection Report
                   </h3>
-                  
+
                   <div className="text-right">
-                    <p className="text-xs text-muted font-bold uppercase tracking-widest mb-1">Overall Score</p>
+                    <p className="text-muted mb-1 text-xs font-bold tracking-widest uppercase">
+                      Overall Score
+                    </p>
                     {listing.inspections?.[0] ? (
-                      <p className="text-4xl font-black text-[var(--color-brand-green)]">{(listing.inspections[0].overallScore ? Number(listing.inspections[0].overallScore) : 0).toFixed(1)}<span className="text-xl text-muted">/10</span></p>
+                      <p className="text-4xl font-black text-[var(--color-brand-green)]">
+                        {(listing.inspections[0].overallScore
+                          ? Number(listing.inspections[0].overallScore)
+                          : 0
+                        ).toFixed(1)}
+                        <span className="text-muted text-xl">/10</span>
+                      </p>
                     ) : (
-                      <p className="text-xl font-black text-muted">N/A</p>
+                      <p className="text-muted text-xl font-black">N/A</p>
                     )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  {['engineScore', 'tyreScore', 'hydraulicsScore', 'bodyScore', 'clutchScore'].map((field) => (
-                    <div key={field} className="bg-foreground/5 p-5 rounded-2xl border border-[var(--border-subtle)]">
-                      <label className="flex justify-between items-center mb-3">
-                        <span className="font-black capitalize">{field.replace('Score', '')} Condition</span>
-                        <span className="text-xl font-black text-[var(--color-brand-green)]">{inspectionScores[field] || 0}/10</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="0" max="10" step="1"
-                        value={inspectionScores[field] || 0}
-                        onChange={(e) => setInspectionScores({ ...inspectionScores, [field]: Number(e.target.value) })}
-                        className="w-full accent-[var(--color-brand-green)]"
-                      />
-                    </div>
-                  ))}
+                <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {['engineScore', 'tyreScore', 'hydraulicsScore', 'bodyScore', 'clutchScore'].map(
+                    (field) => (
+                      <div
+                        key={field}
+                        className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-5"
+                      >
+                        <label className="mb-3 flex items-center justify-between">
+                          <span className="font-black capitalize">
+                            {field.replace('Score', '')} Condition
+                          </span>
+                          <span className="text-xl font-black text-[var(--color-brand-green)]">
+                            {inspectionScores[field] || 0}/10
+                          </span>
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          step="1"
+                          value={inspectionScores[field] || 0}
+                          onChange={(e) =>
+                            setInspectionScores({
+                              ...inspectionScores,
+                              [field]: Number(e.target.value),
+                            })
+                          }
+                          className="w-full accent-[var(--color-brand-green)]"
+                        />
+                      </div>
+                    )
+                  )}
                 </div>
 
                 {/* Upload Tractor Images */}
                 <div className="mb-8 border-t border-[var(--border-subtle)] pt-8">
-                  <h4 className="text-xl font-black flex items-center gap-2 mb-4">
+                  <h4 className="mb-4 flex items-center gap-2 text-xl font-black">
                     <ImageIcon className="text-[var(--color-brand-green)]" size={24} />
                     Upload Inspection Images
                   </h4>
-                  <div className="bg-foreground/5 p-6 rounded-2xl border border-[var(--border-subtle)] border-dashed">
+                  <div className="bg-foreground/5 rounded-2xl border border-dashed border-[var(--border-subtle)] p-6">
                     <input
                       type="file"
                       multiple
@@ -553,19 +679,22 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                           setInspectionImages(Array.from(e.target.files));
                         }
                       }}
-                      className="block w-full text-sm text-muted
-                        file:mr-4 file:py-2.5 file:px-6
-                        file:rounded-xl file:border-0
-                        file:text-sm file:font-black file:uppercase file:tracking-widest
-                        file:bg-[var(--color-brand-green)] file:text-background
-                        hover:file:bg-[var(--color-brand-green)]/90 cursor-pointer"
+                      className="text-muted file:text-background block w-full cursor-pointer text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[var(--color-brand-green)] file:px-6 file:py-2.5 file:text-sm file:font-black file:tracking-widest file:uppercase hover:file:bg-[var(--color-brand-green)]/90"
                     />
                     {inspectionImages.length > 0 && (
                       <div className="mt-4 flex flex-wrap gap-2">
                         {inspectionImages.map((file, idx) => (
-                          <div key={idx} className="bg-background px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] text-xs font-bold flex items-center gap-2">
-                            <span className="truncate max-w-[120px]">{file.name}</span>
-                            <button onClick={() => setInspectionImages(prev => prev.filter((_, i) => i !== idx))} className="text-red-500 hover:text-red-600">
+                          <div
+                            key={idx}
+                            className="bg-background flex items-center gap-2 rounded-lg border border-[var(--border-subtle)] px-3 py-1.5 text-xs font-bold"
+                          >
+                            <span className="max-w-[120px] truncate">{file.name}</span>
+                            <button
+                              onClick={() =>
+                                setInspectionImages((prev) => prev.filter((_, i) => i !== idx))
+                              }
+                              className="text-red-500 hover:text-red-600"
+                            >
                               <XCircle size={14} />
                             </button>
                           </div>
@@ -579,22 +708,21 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                   <button
                     onClick={handleInspectionSave}
                     disabled={isUpdating}
-                    className="px-8 py-3 bg-foreground text-background hover:bg-foreground/90 font-black rounded-xl transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+                    className="bg-foreground text-background hover:bg-foreground/90 flex items-center gap-2 rounded-xl px-8 py-3 font-black transition-all hover:-translate-y-0.5 active:translate-y-0"
                   >
                     {isUpdating ? <TractorLoader size={20} /> : <Save size={18} />}
                     Save Inspection Report
                   </button>
                 </div>
-
               </div>
             </div>
           )}
 
           {/* LEADS TAB */}
           {activeTab === 'LEADS' && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500">
               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
-                <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
+                <h3 className="mb-8 flex items-center gap-3 text-2xl font-black">
                   <MessageCircle className="text-[var(--color-brand-green)]" size={28} />
                   Buyer Enquiries ({listing.leadCount})
                 </h3>
@@ -602,19 +730,28 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                 {leads.length > 0 ? (
                   <div className="space-y-4">
                     {leads.map((lead: any) => (
-                      <div key={lead.id} className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] gap-4">
+                      <div
+                        key={lead.id}
+                        className="bg-foreground/5 flex flex-col items-start justify-between gap-4 rounded-2xl border border-[var(--border-subtle)] p-6 md:flex-row md:items-center"
+                      >
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center text-xl font-black text-[var(--color-brand-green)] border border-[var(--border-subtle)] shadow-sm">
+                          <div className="bg-background flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border-subtle)] text-xl font-black text-[var(--color-brand-green)] shadow-sm">
                             {lead.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <h4 className="font-black text-lg">{lead.name}</h4>
-                            <p className="text-sm font-bold text-muted flex items-center gap-1"><Phone size={12} /> +91 {lead.mobile}</p>
+                            <h4 className="text-lg font-black">{lead.name}</h4>
+                            <p className="text-muted flex items-center gap-1 text-sm font-bold">
+                              <Phone size={12} /> +91 {lead.mobile}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-left md:text-right w-full md:w-auto bg-background md:bg-transparent p-4 md:p-0 rounded-xl">
-                          <p className="text-xs text-muted font-bold uppercase tracking-widest mb-1">Status</p>
-                          <p className={`text-sm font-black px-3 py-1 rounded-full ${lead.status === 'CLOSED_WON' ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-foreground/10 text-foreground'}`}>
+                        <div className="bg-background w-full rounded-xl p-4 text-left md:w-auto md:bg-transparent md:p-0 md:text-right">
+                          <p className="text-muted mb-1 text-xs font-bold tracking-widest uppercase">
+                            Status
+                          </p>
+                          <p
+                            className={`rounded-full px-3 py-1 text-sm font-black ${lead.status === 'CLOSED_WON' ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-foreground/10 text-foreground'}`}
+                          >
                             {lead.status.replace('_', ' ')}
                           </p>
                         </div>
@@ -622,8 +759,10 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                     ))}
                   </div>
                 ) : (
-                  <div className="p-12 text-center bg-foreground/5 rounded-2xl border border-[var(--border-subtle)]">
-                    <p className="text-muted font-bold">No leads have been received for this tractor yet.</p>
+                  <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-12 text-center">
+                    <p className="text-muted font-bold">
+                      No leads have been received for this tractor yet.
+                    </p>
                   </div>
                 )}
               </div>
@@ -631,39 +770,49 @@ export default function AdminListingModerationPage({ params }: { params: Promise
           )}
 
           {/* DOCUMENTS TAB */}
-          {activeTab === 'DOCUMENTS' as any && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {activeTab === ('DOCUMENTS' as any) && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500">
               <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-sm">
-                <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
+                <h3 className="mb-8 flex items-center gap-3 text-2xl font-black">
                   <FileCheck className="text-[var(--color-brand-green)]" size={28} />
                   Listing Documents
                 </h3>
 
                 {documents.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {documents.map((doc: any) => (
-                      <div key={doc.id} className="flex items-center justify-between p-6 bg-foreground/5 rounded-2xl border border-[var(--border-subtle)]">
+                      <div
+                        key={doc.id}
+                        className="bg-foreground/5 flex items-center justify-between rounded-2xl border border-[var(--border-subtle)] p-6"
+                      >
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-background rounded-xl flex items-center justify-center text-[var(--color-brand-green)] border border-[var(--border-subtle)] shadow-sm">
+                          <div className="bg-background flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--border-subtle)] text-[var(--color-brand-green)] shadow-sm">
                             <FileText size={20} />
                           </div>
                           <div>
-                            <span className="font-black uppercase tracking-wider text-sm block mb-1">{doc.docType.replace('_', ' ')}</span>
+                            <span className="mb-1 block text-sm font-black tracking-wider uppercase">
+                              {doc.docType.replace('_', ' ')}
+                            </span>
                             {doc.fileUrl ? (
-                              <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1">
+                              <a
+                                href={doc.fileUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-1 text-xs font-bold text-blue-500 hover:underline"
+                              >
                                 View File <ArrowLeft size={12} className="rotate-135" />
                               </a>
                             ) : (
-                              <span className="text-xs font-bold text-muted">No file attached</span>
+                              <span className="text-muted text-xs font-bold">No file attached</span>
                             )}
                           </div>
                         </div>
                         {doc.isVerified ? (
-                          <span className="flex items-center gap-1 text-sm font-black text-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 px-3 py-1 rounded-full">
+                          <span className="flex items-center gap-1 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-sm font-black text-[var(--color-brand-green)]">
                             <CheckCircle2 size={14} /> Verified
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-sm font-black text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full">
+                          <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-3 py-1 text-sm font-black text-amber-500">
                             Pending Verification
                           </span>
                         )}
@@ -671,21 +820,25 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                     ))}
                   </div>
                 ) : (
-                  <div className="p-12 text-center bg-foreground/5 rounded-2xl border border-[var(--border-subtle)]">
-                    <p className="text-muted font-bold">No documents have been uploaded for this tractor yet.</p>
+                  <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-12 text-center">
+                    <p className="text-muted font-bold">
+                      No documents have been uploaded for this tractor yet.
+                    </p>
                   </div>
                 )}
 
                 {/* Upload Document Form */}
                 <div className="mt-8 border-t border-[var(--border-subtle)] pt-8">
-                  <h4 className="text-xl font-black mb-4">Upload New Document</h4>
-                  <div className="bg-foreground/5 p-6 rounded-2xl border border-[var(--border-subtle)] space-y-4">
+                  <h4 className="mb-4 text-xl font-black">Upload New Document</h4>
+                  <div className="bg-foreground/5 space-y-4 rounded-2xl border border-[var(--border-subtle)] p-6">
                     <div>
-                      <label className="block text-sm font-bold text-muted mb-2 uppercase tracking-widest">Document Type</label>
+                      <label className="text-muted mb-2 block text-sm font-bold tracking-widest uppercase">
+                        Document Type
+                      </label>
                       <select
                         value={newDocType}
                         onChange={(e) => setNewDocType(e.target.value)}
-                        className="w-full bg-background border border-[var(--border-subtle)] rounded-xl px-4 py-3 font-bold"
+                        className="bg-background w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 font-bold"
                       >
                         <option value="RC_COPY">RC Copy</option>
                         <option value="INSURANCE_COPY">Insurance Copy</option>
@@ -694,7 +847,9 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-muted mb-2 uppercase tracking-widest">Select File (PDF, JPG, PNG)</label>
+                      <label className="text-muted mb-2 block text-sm font-bold tracking-widest uppercase">
+                        Select File (PDF, JPG, PNG)
+                      </label>
                       <input
                         type="file"
                         accept=".pdf,image/jpeg,image/png"
@@ -703,18 +858,13 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                             setNewDocFile(e.target.files[0]);
                           }
                         }}
-                        className="block w-full text-sm text-muted
-                          file:mr-4 file:py-2.5 file:px-6
-                          file:rounded-xl file:border-0
-                          file:text-sm file:font-black file:uppercase file:tracking-widest
-                          file:bg-foreground file:text-background
-                          hover:file:bg-foreground/90 cursor-pointer border border-[var(--border-subtle)] rounded-xl bg-background"
+                        className="text-muted file:bg-foreground file:text-background hover:file:bg-foreground/90 bg-background block w-full cursor-pointer rounded-xl border border-[var(--border-subtle)] text-sm file:mr-4 file:rounded-xl file:border-0 file:px-6 file:py-2.5 file:text-sm file:font-black file:tracking-widest file:uppercase"
                       />
                     </div>
                     <button
                       onClick={handleUploadDocument}
                       disabled={isUploadingDoc || !newDocFile}
-                      className="w-full mt-2 py-3 bg-[var(--color-brand-green)] text-white font-black rounded-xl hover:bg-[var(--color-brand-green)]/90 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] py-3 font-black text-white transition-all hover:bg-[var(--color-brand-green)]/90 active:scale-95 disabled:opacity-50"
                     >
                       {isUploadingDoc ? <TractorLoader size={20} /> : <Save size={18} />}
                       Upload Document
@@ -724,27 +874,29 @@ export default function AdminListingModerationPage({ params }: { params: Promise
               </div>
             </div>
           )}
-
         </div>
 
         {/* RIGHT COLUMN: Moderation, Certification & Status Panel */}
         <div className="space-y-6">
-
           {/* Moderation Panel */}
           <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm">
-            <h3 className="text-lg font-black mb-4 flex items-center gap-2">
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-black">
               <ShieldCheck className="text-[var(--color-brand-green)]" size={20} />
               Status & Moderation
             </h3>
-            
-            <div className="mb-6 p-4 rounded-xl bg-foreground/5 flex flex-col gap-1">
-              <span className="text-xs font-bold uppercase tracking-widest text-muted">Current Status</span>
-              <span className={`text-lg font-black ${listing.listingStatus === 'ACTIVE' ? 'text-[var(--color-brand-green)]' : listing.listingStatus === 'REJECTED' ? 'text-red-500' : ''}`}>
+
+            <div className="bg-foreground/5 mb-6 flex flex-col gap-1 rounded-xl p-4">
+              <span className="text-muted text-xs font-bold tracking-widest uppercase">
+                Current Status
+              </span>
+              <span
+                className={`text-lg font-black ${listing.listingStatus === 'ACTIVE' ? 'text-[var(--color-brand-green)]' : listing.listingStatus === 'REJECTED' ? 'text-red-500' : ''}`}
+              >
                 {listing.listingStatus.replace('_', ' ')}
               </span>
               {listing.rejectionReason && (
-                <div className="mt-2 text-sm text-red-500 font-bold bg-red-500/10 p-3 rounded-lg border border-red-500/20">
-                  <span className="block text-xs uppercase mb-1 opacity-70">Reason</span>
+                <div className="mt-2 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm font-bold text-red-500">
+                  <span className="mb-1 block text-xs uppercase opacity-70">Reason</span>
                   {listing.rejectionReason}
                 </div>
               )}
@@ -755,25 +907,25 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                 <button
                   onClick={() => updateStatus(ListingStatus.ACTIVE)}
                   disabled={isUpdating}
-                  className="py-3 bg-[var(--color-brand-green)] text-white font-black rounded-xl hover:bg-[var(--color-brand-green)]/90 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] py-3 font-black text-white transition-all hover:bg-[var(--color-brand-green)]/90 active:scale-95 disabled:opacity-50"
                 >
                   <CheckCircle2 size={18} /> Approve
                 </button>
                 <button
                   onClick={() => updateStatus(ListingStatus.REJECTED)}
                   disabled={isUpdating}
-                  className="py-3 bg-red-500 text-white font-black rounded-xl hover:bg-red-600 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-red-500 py-3 font-black text-white transition-all hover:bg-red-600 active:scale-95 disabled:opacity-50"
                 >
                   <XCircle size={18} /> Reject
                 </button>
               </div>
             )}
-            
+
             {listing.listingStatus === ListingStatus.ACTIVE && (
               <button
                 onClick={() => updateStatus(ListingStatus.PAUSED)}
                 disabled={isUpdating}
-                className="w-full py-3 bg-foreground/10 text-foreground font-black rounded-xl hover:bg-foreground/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="bg-foreground/10 text-foreground hover:bg-foreground/20 flex w-full items-center justify-center gap-2 rounded-xl py-3 font-black transition-all active:scale-95 disabled:opacity-50"
               >
                 <Clock size={18} /> Pause Listing
               </button>
@@ -783,7 +935,7 @@ export default function AdminListingModerationPage({ params }: { params: Promise
               <button
                 onClick={() => updateStatus(ListingStatus.ACTIVE)}
                 disabled={isUpdating}
-                className="w-full py-3 bg-[var(--color-brand-green)] text-white font-black rounded-xl hover:bg-[var(--color-brand-green)]/90 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] py-3 font-black text-white transition-all hover:bg-[var(--color-brand-green)]/90 active:scale-95 disabled:opacity-50"
               >
                 <CheckCircle2 size={18} /> Re-Activate
               </button>
@@ -792,49 +944,56 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
           {/* Agent Assignment Panel */}
           <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm">
-            <h3 className="text-lg font-black mb-4 flex items-center gap-2">
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-black">
               <UserIcon className="text-[var(--color-brand-green)]" size={20} />
               Agent Assignment
             </h3>
-            
+
             <div className="space-y-4">
               {listing.inspections?.[0]?.inspectorId ? (
-                <div className="mb-4 p-4 rounded-xl bg-[var(--color-brand-green)]/10 border border-[var(--color-brand-green)]/20 flex flex-col gap-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-brand-green)]">Currently Assigned</span>
+                <div className="mb-4 flex flex-col gap-1 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-4">
+                  <span className="text-xs font-bold tracking-widest text-[var(--color-brand-green)] uppercase">
+                    Currently Assigned
+                  </span>
                   <span className="text-lg font-black">
-                    {agents.find(a => a.id === listing.inspections[0].inspectorId)?.fullName || `Agent ID: ${listing.inspections[0].inspectorId}`}
+                    {agents.find((a) => a.id === listing.inspections[0].inspectorId)?.fullName ||
+                      `Agent ID: ${listing.inspections[0].inspectorId}`}
                   </span>
                 </div>
               ) : (
-                <div className="mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col gap-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber-500">Currently Assigned</span>
-                  <span className="text-sm font-black text-amber-500">
-                    No Agent Assigned
+                <div className="mb-4 flex flex-col gap-1 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
+                  <span className="text-xs font-bold tracking-widest text-amber-500 uppercase">
+                    Currently Assigned
                   </span>
+                  <span className="text-sm font-black text-amber-500">No Agent Assigned</span>
                 </div>
               )}
-              
+
               <div>
-                <label className="block text-xs font-bold text-muted mb-2 uppercase tracking-widest">
+                <label className="text-muted mb-2 block text-xs font-bold tracking-widest uppercase">
                   {listing.inspections?.[0]?.inspectorId ? 'Re-assign Agent' : 'Assign Agent'}
                 </label>
-                <select 
-                  value={selectedAgentId} 
+                <select
+                  value={selectedAgentId}
                   onChange={(e) => setSelectedAgentId(e.target.value)}
-                  className="w-full bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 py-3 font-bold mb-3"
+                  className="bg-foreground/5 mb-3 w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 font-bold"
                 >
                   <option value="">Select Agent...</option>
-                  {agents.map(agent => (
-                    <option key={agent.id} value={agent.id}>{agent.fullName} ({agent.mobile})</option>
+                  {agents.map((agent) => (
+                    <option key={agent.id} value={agent.id}>
+                      {agent.fullName} ({agent.mobile})
+                    </option>
                   ))}
                 </select>
-                <button 
+                <button
                   onClick={handleAssignAgent}
                   disabled={!selectedAgentId || isAssigning}
-                  className="w-full py-3 bg-[var(--color-brand-green)] text-white font-black rounded-xl hover:bg-[var(--color-brand-green)]/90 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] py-3 font-black text-white transition-all hover:bg-[var(--color-brand-green)]/90 active:scale-95 disabled:opacity-50"
                 >
                   {isAssigning ? <TractorLoader size={20} /> : null}
-                  {listing.inspections?.[0]?.inspectorId ? 'Update Assignment' : 'Assign Inspection'}
+                  {listing.inspections?.[0]?.inspectorId
+                    ? 'Update Assignment'
+                    : 'Assign Inspection'}
                 </button>
               </div>
             </div>
@@ -842,18 +1001,20 @@ export default function AdminListingModerationPage({ params }: { params: Promise
 
           {/* Visibility & Boosts Panel */}
           <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm">
-            <h3 className="text-lg font-black mb-4 flex items-center gap-2">
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-black">
               <Eye className="text-[var(--color-brand-green)]" size={20} />
               Visibility & Boosts
             </h3>
-            
+
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-muted mb-2 uppercase tracking-widest">Boost Type</label>
+                <label className="text-muted mb-2 block text-xs font-bold tracking-widest uppercase">
+                  Boost Type
+                </label>
                 <select
                   value={boostType}
                   onChange={(e) => setBoostType(e.target.value)}
-                  className="w-full bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 py-3 font-bold"
+                  className="bg-foreground/5 w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 font-bold"
                 >
                   <option value="NONE">None</option>
                   <option value="FEATURED">Featured</option>
@@ -862,39 +1023,46 @@ export default function AdminListingModerationPage({ params }: { params: Promise
                   <option value="TOP_OF_SEARCH">Top of Search</option>
                 </select>
               </div>
-              
+
               <div>
-                <label className="block text-xs font-bold text-muted mb-2 uppercase tracking-widest">Featured Until</label>
+                <label className="text-muted mb-2 block text-xs font-bold tracking-widest uppercase">
+                  Featured Until
+                </label>
                 <input
                   type="date"
                   value={featuredUntil}
                   min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setFeaturedUntil(e.target.value)}
-                  className="w-full bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 py-3 font-bold"
+                  className="bg-foreground/5 w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 font-bold"
                 />
               </div>
 
               <button
                 onClick={updateBoost}
                 disabled={isUpdating}
-                className="w-full py-3 bg-foreground text-background font-black rounded-xl hover:opacity-90 transition-all active:scale-95 disabled:opacity-50"
+                className="bg-foreground text-background w-full rounded-xl py-3 font-black transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
               >
                 Apply Boost Settings
               </button>
             </div>
           </div>
 
-          <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm relative overflow-hidden group">
-            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none transition-all duration-700 blur-[50px] ${listing.isCertified ? 'bg-[var(--color-brand-green)] opacity-20 group-hover:opacity-40 group-hover:scale-150' : 'bg-foreground opacity-5'}`}></div>
+          <div className="bg-background group relative overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm">
+            <div
+              className={`pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full blur-[50px] transition-all duration-700 ${listing.isCertified ? 'bg-[var(--color-brand-green)] opacity-20 group-hover:scale-150 group-hover:opacity-40' : 'bg-foreground opacity-5'}`}
+            ></div>
 
-            <div className="flex flex-col items-center text-center gap-4 py-4 relative z-10">
-              <div className={`p-4 rounded-2xl ${listing.isCertified ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-foreground/5 text-muted'}`}>
+            <div className="relative z-10 flex flex-col items-center gap-4 py-4 text-center">
+              <div
+                className={`rounded-2xl p-4 ${listing.isCertified ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-foreground/5 text-muted'}`}
+              >
                 <ShieldCheck size={48} strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-xl font-black mb-1">TractorDost Certified</h3>
-                <p className="text-sm text-muted font-medium px-4">
-                  Certified tractors receive a trust badge, rank higher in search, and get up to 4x more buyer leads.
+                <h3 className="mb-1 text-xl font-black">TractorDost Certified</h3>
+                <p className="text-muted px-4 text-sm font-medium">
+                  Certified tractors receive a trust badge, rank higher in search, and get up to 4x
+                  more buyer leads.
                 </p>
               </div>
             </div>
@@ -902,27 +1070,32 @@ export default function AdminListingModerationPage({ params }: { params: Promise
             <button
               onClick={() => updateStatus(listing.listingStatus, !listing.isCertified)}
               disabled={isUpdating}
-              className={`w-full py-3.5 mt-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all hover:-translate-y-0.5 active:translate-y-0 ${listing.isCertified ? 'bg-[var(--color-brand-green)] text-white shadow-lg shadow-[var(--color-brand-green)]/20' : 'bg-foreground text-background shadow-lg'}`}
+              className={`mt-4 w-full rounded-xl py-3.5 text-sm font-black tracking-wider uppercase transition-all hover:-translate-y-0.5 active:translate-y-0 ${listing.isCertified ? 'bg-[var(--color-brand-green)] text-white shadow-[var(--color-brand-green)]/20 shadow-lg' : 'bg-foreground text-background shadow-lg'}`}
             >
               {listing.isCertified ? 'Revoke Certification' : 'Mark as Certified'}
             </button>
           </div>
 
           <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm">
-            <h3 className="text-lg font-black mb-5">Listing Performance</h3>
+            <h3 className="mb-5 text-lg font-black">Listing Performance</h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center bg-foreground/5 px-4 py-3.5 rounded-xl">
-                <span className="text-sm font-bold text-muted flex items-center gap-2"><Eye size={16} /> Total Views</span>
+              <div className="bg-foreground/5 flex items-center justify-between rounded-xl px-4 py-3.5">
+                <span className="text-muted flex items-center gap-2 text-sm font-bold">
+                  <Eye size={16} /> Total Views
+                </span>
                 <span className="text-lg font-black">{listing.viewsCount}</span>
               </div>
-              <div className="flex justify-between items-center bg-[var(--color-brand-green)]/10 px-4 py-3.5 rounded-xl border border-[var(--color-brand-green)]/20">
-                <span className="text-sm font-bold text-[var(--color-brand-green)] flex items-center gap-2"><MessageCircle size={16} /> Total Leads</span>
-                <span className="text-lg font-black text-[var(--color-brand-green)]">{listing.leadCount}</span>
+              <div className="flex items-center justify-between rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-4 py-3.5">
+                <span className="flex items-center gap-2 text-sm font-bold text-[var(--color-brand-green)]">
+                  <MessageCircle size={16} /> Total Leads
+                </span>
+                <span className="text-lg font-black text-[var(--color-brand-green)]">
+                  {listing.leadCount}
+                </span>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

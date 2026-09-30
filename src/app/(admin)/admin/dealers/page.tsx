@@ -27,7 +27,9 @@ export default function AdminDealersPage() {
   const [stateFilter, setStateFilter] = useState('');
   const [districtFilter, setDistrictFilter] = useState('');
   const [dealerTypeFilter, setDealerTypeFilter] = useState<DealerType | ''>('');
-  const [verificationStatusFilter, setVerificationStatusFilter] = useState<VerificationStatus | ''>('');
+  const [verificationStatusFilter, setVerificationStatusFilter] = useState<VerificationStatus | ''>(
+    ''
+  );
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
   // KPI Quick Counts (Calculated or overall)
@@ -70,8 +72,12 @@ export default function AdminDealersPage() {
         setTotalPages(res.data.totalPages || 1);
 
         // Derive metric counts from returned set or page
-        const verified = (res.data.data || []).filter((d) => d.verificationStatus === 'VERIFIED').length;
-        const pending = (res.data.data || []).filter((d) => d.verificationStatus === 'PENDING').length;
+        const verified = (res.data.data || []).filter(
+          (d) => d.verificationStatus === 'VERIFIED'
+        ).length;
+        const pending = (res.data.data || []).filter(
+          (d) => d.verificationStatus === 'PENDING'
+        ).length;
         const certified = (res.data.data || []).filter((d) => d.isCertified).length;
         setVerifiedCount(verified);
         setPendingCount(pending);
@@ -128,7 +134,7 @@ export default function AdminDealersPage() {
   };
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden h-full flex flex-col gap-6 animate-fade-in pb-12">
+    <div className="animate-fade-in flex h-full w-full max-w-full flex-col gap-6 overflow-x-hidden pb-12">
       {/* Header section with KPIs */}
       <DealerHeader
         totalCount={totalCount}
@@ -142,7 +148,7 @@ export default function AdminDealersPage() {
 
       {/* Error alert banner */}
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-400 text-sm font-bold">
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm font-bold text-rose-400">
           <AlertCircle size={18} className="shrink-0" />
           <p>{error}</p>
         </div>
@@ -184,7 +190,7 @@ export default function AdminDealersPage() {
       />
 
       {/* Main Dealer Data Table */}
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex flex-1 flex-col gap-4">
         <DealerTable
           dealers={dealers}
           loading={loading}
@@ -195,7 +201,7 @@ export default function AdminDealersPage() {
         />
 
         {/* Pagination controls */}
-        <div className="glass-panel rounded-2xl p-2 border border-white/5">
+        <div className="glass-panel rounded-2xl border border-white/5 p-2">
           <Pagination
             page={page}
             limit={limit}

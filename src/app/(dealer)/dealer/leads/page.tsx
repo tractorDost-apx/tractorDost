@@ -117,15 +117,23 @@ export default function LeadsPage() {
   // KPI Metrics
   const totalLeads = leads.length;
   const newLeadsCount = leads.filter((l) => l.status === 'NEW').length;
-  const inProgressCount = leads.filter((l) => l.status === 'IN_PROGRESS' || l.status === 'CONTACTED').length;
+  const inProgressCount = leads.filter(
+    (l) => l.status === 'IN_PROGRESS' || l.status === 'CONTACTED'
+  ).length;
   const convertedCount = leads.filter((l) => l.status === 'CONVERTED').length;
 
   const handleUpdateStatus = (leadId: string, newStatus: DealerLead['status']) => {
     setLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, status: newStatus, lastContactedAt: new Date().toISOString() } : l))
+      prev.map((l) =>
+        l.id === leadId ? { ...l, status: newStatus, lastContactedAt: new Date().toISOString() } : l
+      )
     );
     if (selectedLead && selectedLead.id === leadId) {
-      setSelectedLead({ ...selectedLead, status: newStatus, lastContactedAt: new Date().toISOString() });
+      setSelectedLead({
+        ...selectedLead,
+        status: newStatus,
+        lastContactedAt: new Date().toISOString(),
+      });
     }
   };
 
@@ -145,37 +153,50 @@ export default function LeadsPage() {
   const getStatusBadge = (status: DealerLead['status']) => {
     switch (status) {
       case 'NEW':
-        return { label: 'New Lead', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' };
+        return {
+          label: 'New Lead',
+          color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+        };
       case 'CONTACTED':
-        return { label: 'Contacted', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' };
+        return {
+          label: 'Contacted',
+          color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+        };
       case 'IN_PROGRESS':
-        return { label: 'In Negotiation', color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20' };
+        return {
+          label: 'In Negotiation',
+          color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+        };
       case 'CONVERTED':
-        return { label: 'Converted', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' };
+        return {
+          label: 'Converted',
+          color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        };
       case 'CLOSED':
         return { label: 'Closed / Lost', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' };
     }
   };
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="animate-fade-in space-y-8 pb-12">
       {/* Sleek Admin Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shrink-0">
+          <div className="shrink-0 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
             <MessageSquareText size={26} />
           </div>
           <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
                 Leads & Enquiries
               </h1>
-              <span className="px-3 py-1 rounded-full text-xs font-black bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 uppercase tracking-wider">
+              <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
                 {totalLeads} Total Leads
               </span>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-muted mt-0.5">
-              Manage incoming customer purchase enquiries, test drive requests, and sales follow-ups.
+            <p className="text-muted mt-0.5 text-xs font-bold sm:text-sm">
+              Manage incoming customer purchase enquiries, test drive requests, and sales
+              follow-ups.
             </p>
           </div>
         </div>
@@ -185,7 +206,7 @@ export default function LeadsPage() {
             setSearchQuery('');
             setStatusFilter('ALL');
           }}
-          className="p-2.5 rounded-xl bg-foreground/5 text-muted hover:text-foreground hover:border-[var(--color-brand-green)]/30 border border-[var(--border-subtle)] transition-all flex items-center justify-center shrink-0 self-start sm:self-auto"
+          className="bg-foreground/5 text-muted hover:text-foreground flex shrink-0 items-center justify-center self-start rounded-xl border border-[var(--border-subtle)] p-2.5 transition-all hover:border-[var(--color-brand-green)]/30 sm:self-auto"
           title="Reset Filters"
         >
           <RefreshCw size={18} />
@@ -193,68 +214,82 @@ export default function LeadsPage() {
       </div>
 
       {/* KPI Stat Strip Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shrink-0 border border-[var(--color-brand-green)]/20">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-3 text-[var(--color-brand-green)]">
             <MessageSquareText size={22} />
           </div>
           <div>
-            <div className="text-2xl font-black tracking-tight text-foreground">{totalLeads}</div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">Total Enquiries</div>
+            <div className="text-foreground text-2xl font-black tracking-tight">{totalLeads}</div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              Total Enquiries
+            </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-amber-500/10 text-amber-500 shrink-0 border border-amber-500/20">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-amber-500">
             <Clock size={22} />
           </div>
           <div>
-            <div className="text-2xl font-black tracking-tight text-foreground">{newLeadsCount}</div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">New Enquiries</div>
+            <div className="text-foreground text-2xl font-black tracking-tight">
+              {newLeadsCount}
+            </div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              New Enquiries
+            </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-blue-500/10 text-blue-500 shrink-0 border border-blue-500/20">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 text-blue-500">
             <Phone size={22} />
           </div>
           <div>
-            <div className="text-2xl font-black tracking-tight text-foreground">{inProgressCount}</div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">In Negotiation</div>
+            <div className="text-foreground text-2xl font-black tracking-tight">
+              {inProgressCount}
+            </div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              In Negotiation
+            </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 shrink-0 border border-emerald-500/20">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-emerald-500">
             <CheckCircle2 size={22} />
           </div>
           <div>
-            <div className="text-2xl font-black tracking-tight text-foreground">{convertedCount}</div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">Converted Sales</div>
+            <div className="text-foreground text-2xl font-black tracking-tight">
+              {convertedCount}
+            </div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              Converted Sales
+            </div>
           </div>
         </div>
       </div>
 
       {/* Filter & Search Control Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="flex flex-col items-stretch justify-between gap-4 md:flex-row md:items-center">
         <div className="relative flex-1">
-          <Search size={18} className="absolute left-3.5 top-3 text-muted" />
+          <Search size={18} className="text-muted absolute top-3 left-3.5" />
           <input
             type="text"
             placeholder="Search by farmer name, phone number, model, or city..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-foreground/5 border border-[var(--border-subtle)] rounded-xl pl-10 pr-4 py-2 text-xs font-medium text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-colors"
+            className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] py-2 pr-4 pl-10 text-xs font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
           />
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-3 py-1.5 text-xs">
+          <div className="bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs">
             <Filter size={14} className="text-muted shrink-0" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-transparent text-foreground font-bold focus:outline-none cursor-pointer"
+              className="text-foreground cursor-pointer bg-transparent font-bold focus:outline-none"
             >
               <option value="ALL">All Statuses</option>
               <option value="NEW">New Lead</option>
@@ -268,17 +303,17 @@ export default function LeadsPage() {
       </div>
 
       {/* Lead Table Container */}
-      <div className="bg-foreground/5 p-4 sm:p-6 rounded-3xl border border-[var(--border-subtle)]">
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      <div className="bg-foreground/5 rounded-3xl border border-[var(--border-subtle)] p-4 sm:p-6">
+        <div className="hidden overflow-x-auto md:block">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-[var(--border-subtle)] text-xs font-bold text-muted uppercase tracking-wider">
-                <th className="py-3.5 px-4">Customer Info</th>
-                <th className="py-3.5 px-4">Target Model</th>
-                <th className="py-3.5 px-4">Type</th>
-                <th className="py-3.5 px-4">Lead Status</th>
-                <th className="py-3.5 px-4">Date Logged</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
+              <tr className="text-muted border-b border-[var(--border-subtle)] text-xs font-bold tracking-wider uppercase">
+                <th className="px-4 py-3.5">Customer Info</th>
+                <th className="px-4 py-3.5">Target Model</th>
+                <th className="px-4 py-3.5">Type</th>
+                <th className="px-4 py-3.5">Lead Status</th>
+                <th className="px-4 py-3.5">Date Logged</th>
+                <th className="px-4 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
@@ -288,18 +323,18 @@ export default function LeadsPage() {
                   <tr
                     key={lead.id}
                     onClick={() => setSelectedLead(lead)}
-                    className="hover:bg-foreground/5 transition-colors cursor-pointer group"
+                    className="hover:bg-foreground/5 group cursor-pointer transition-colors"
                   >
-                    <td className="py-4 px-4">
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 flex items-center justify-center font-bold shrink-0">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 font-bold text-[var(--color-brand-green)]">
                           <User size={18} />
                         </div>
                         <div>
-                          <div className="font-black text-foreground text-sm tracking-tight group-hover:text-[var(--color-brand-green)] transition-colors">
+                          <div className="text-foreground text-sm font-black tracking-tight transition-colors group-hover:text-[var(--color-brand-green)]">
                             {lead.customerName}
                           </div>
-                          <div className="text-xs text-muted font-mono flex items-center gap-2 mt-0.5">
+                          <div className="text-muted mt-0.5 flex items-center gap-2 font-mono text-xs">
                             <span>{lead.phone}</span>
                             <span>•</span>
                             <span>{lead.location}</span>
@@ -308,38 +343,40 @@ export default function LeadsPage() {
                       </div>
                     </td>
 
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-foreground text-xs flex items-center gap-1.5">
-                        <Tractor size={14} className="text-[var(--color-brand-green)] shrink-0" />
+                    <td className="px-4 py-4">
+                      <div className="text-foreground flex items-center gap-1.5 text-xs font-bold">
+                        <Tractor size={14} className="shrink-0 text-[var(--color-brand-green)]" />
                         {lead.interestedModel}
                       </div>
                     </td>
 
-                    <td className="py-4 px-4">
-                      <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-foreground/5 text-foreground/80 border border-[var(--border-subtle)]">
+                    <td className="px-4 py-4">
+                      <span className="bg-foreground/5 text-foreground/80 rounded-md border border-[var(--border-subtle)] px-2.5 py-1 text-[10px] font-black tracking-wider uppercase">
                         {lead.enquiryType}
                       </span>
                     </td>
 
-                    <td className="py-4 px-4">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${statusBadge.color}`}>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold ${statusBadge.color}`}
+                      >
                         {statusBadge.label}
                       </span>
                     </td>
 
-                    <td className="py-4 px-4">
-                      <div className="text-xs text-muted font-mono">
+                    <td className="px-4 py-4">
+                      <div className="text-muted font-mono text-xs">
                         {new Date(lead.createdAt).toLocaleDateString()}
                       </div>
                     </td>
 
-                    <td className="py-4 px-4 text-right">
+                    <td className="px-4 py-4 text-right">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedLead(lead);
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-foreground/5 hover:bg-[var(--color-brand-green)]/10 text-muted hover:text-[var(--color-brand-green)] transition-colors border border-[var(--border-subtle)] text-xs font-bold inline-flex items-center gap-1"
+                        className="bg-foreground/5 text-muted inline-flex items-center gap-1 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs font-bold transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)]"
                       >
                         View & Manage <ChevronRight size={14} />
                       </button>
@@ -352,38 +389,45 @@ export default function LeadsPage() {
         </div>
 
         {/* Mobile View */}
-        <div className="md:hidden space-y-4">
+        <div className="space-y-4 md:hidden">
           {filteredLeads.map((lead) => {
             const statusBadge = getStatusBadge(lead.status);
             return (
               <div
                 key={lead.id}
                 onClick={() => setSelectedLead(lead)}
-                className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 space-y-3 hover:border-[var(--color-brand-green)]/30 transition-all cursor-pointer"
+                className="bg-foreground/5 cursor-pointer space-y-3 rounded-2xl border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-green)]/30"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 flex items-center justify-center font-bold shrink-0">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 font-bold text-[var(--color-brand-green)]">
                       <User size={18} />
                     </div>
                     <div>
-                      <h4 className="font-black text-foreground text-sm leading-tight">
+                      <h4 className="text-foreground text-sm leading-tight font-black">
                         {lead.customerName}
                       </h4>
-                      <p className="text-xs text-muted mt-0.5">{lead.phone} • {lead.location}</p>
+                      <p className="text-muted mt-0.5 text-xs">
+                        {lead.phone} • {lead.location}
+                      </p>
                     </div>
                   </div>
 
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${statusBadge.color}`}>
+                  <span
+                    className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusBadge.color}`}
+                  >
                     {statusBadge.label}
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-[var(--border-subtle)] text-xs flex items-center justify-between">
-                  <span className="font-bold text-foreground flex items-center gap-1">
-                    <Tractor size={12} className="text-[var(--color-brand-green)]" /> {lead.interestedModel}
+                <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-2 text-xs">
+                  <span className="text-foreground flex items-center gap-1 font-bold">
+                    <Tractor size={12} className="text-[var(--color-brand-green)]" />{' '}
+                    {lead.interestedModel}
                   </span>
-                  <span className="text-[10px] font-mono text-muted">{new Date(lead.createdAt).toLocaleDateString()}</span>
+                  <span className="text-muted font-mono text-[10px]">
+                    {new Date(lead.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             );
@@ -393,85 +437,96 @@ export default function LeadsPage() {
 
       {/* Lead Detail & Disposition Modal */}
       {selectedLead && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/25 dark:bg-black/60 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-xl bg-[var(--background)] text-foreground border border-[var(--border-subtle)] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-8 relative [backdrop-filter:none]">
-            <div className="p-6 border-b border-[var(--border-subtle)] flex items-center justify-between bg-foreground/5">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/25 p-4 dark:bg-black/60">
+          <div className="text-foreground relative my-8 flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl [backdrop-filter:none]">
+            <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20">
+                <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
                   <User size={22} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-foreground tracking-tight">
+                  <h3 className="text-foreground text-xl font-black tracking-tight">
                     {selectedLead.customerName}
                   </h3>
-                  <p className="text-xs font-mono text-muted">Lead ID #{selectedLead.id}</p>
+                  <p className="text-muted font-mono text-xs">Lead ID #{selectedLead.id}</p>
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedLead(null)}
-                className="p-2 rounded-xl text-muted hover:text-foreground hover:bg-foreground/10 transition-colors"
+                className="text-muted hover:text-foreground hover:bg-foreground/10 rounded-xl p-2 transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="space-y-6 p-6">
               {/* Contact Details Grid */}
-              <div className="grid grid-cols-2 gap-4 text-xs bg-foreground/5 p-4 rounded-2xl border border-[var(--border-subtle)]">
+              <div className="bg-foreground/5 grid grid-cols-2 gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 text-xs">
                 <div>
-                  <span className="text-muted font-bold block">Phone Number</span>
-                  <a href={`tel:${selectedLead.phone}`} className="font-black text-[var(--color-brand-green)] text-sm hover:underline flex items-center gap-1.5 mt-0.5">
+                  <span className="text-muted block font-bold">Phone Number</span>
+                  <a
+                    href={`tel:${selectedLead.phone}`}
+                    className="mt-0.5 flex items-center gap-1.5 text-sm font-black text-[var(--color-brand-green)] hover:underline"
+                  >
                     <Phone size={14} /> {selectedLead.phone}
                   </a>
                 </div>
                 <div>
-                  <span className="text-muted font-bold block">Location</span>
-                  <span className="font-bold text-foreground text-sm block mt-0.5">{selectedLead.location}</span>
+                  <span className="text-muted block font-bold">Location</span>
+                  <span className="text-foreground mt-0.5 block text-sm font-bold">
+                    {selectedLead.location}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-muted font-bold block">Interested Model</span>
-                  <span className="font-bold text-foreground block mt-0.5">{selectedLead.interestedModel}</span>
+                  <span className="text-muted block font-bold">Interested Model</span>
+                  <span className="text-foreground mt-0.5 block font-bold">
+                    {selectedLead.interestedModel}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-muted font-bold block">Enquiry Type</span>
-                  <span className="font-bold text-foreground block mt-0.5">{selectedLead.enquiryType}</span>
+                  <span className="text-muted block font-bold">Enquiry Type</span>
+                  <span className="text-foreground mt-0.5 block font-bold">
+                    {selectedLead.enquiryType}
+                  </span>
                 </div>
               </div>
 
               {/* Update Lead Status */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-muted uppercase tracking-wider block">
+                <label className="text-muted block text-xs font-bold tracking-wider uppercase">
                   Update Lead Status
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {(['NEW', 'CONTACTED', 'IN_PROGRESS', 'CONVERTED', 'CLOSED'] as const).map((st) => {
-                    const active = selectedLead.status === st;
-                    return (
-                      <button
-                        key={st}
-                        onClick={() => handleUpdateStatus(selectedLead.id, st)}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
-                          active
-                            ? 'bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)] border-[var(--color-brand-green)]/40 shadow-sm'
-                            : 'bg-foreground/5 text-muted border-[var(--border-subtle)] hover:text-foreground hover:bg-foreground/10'
-                        }`}
-                      >
-                        {st.replace('_', ' ')}
-                      </button>
-                    );
-                  })}
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {(['NEW', 'CONTACTED', 'IN_PROGRESS', 'CONVERTED', 'CLOSED'] as const).map(
+                    (st) => {
+                      const active = selectedLead.status === st;
+                      return (
+                        <button
+                          key={st}
+                          onClick={() => handleUpdateStatus(selectedLead.id, st)}
+                          className={`rounded-xl border px-3 py-2 text-xs font-bold transition-all ${
+                            active
+                              ? 'border-[var(--color-brand-green)]/40 bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)] shadow-sm'
+                              : 'bg-foreground/5 text-muted hover:text-foreground hover:bg-foreground/10 border-[var(--border-subtle)]'
+                          }`}
+                        >
+                          {st.replace('_', ' ')}
+                        </button>
+                      );
+                    }
+                  )}
                 </div>
               </div>
 
               {/* Call Notes & History */}
               <div className="space-y-3">
-                <label className="text-xs font-bold text-muted uppercase tracking-wider block">
+                <label className="text-muted block text-xs font-bold tracking-wider uppercase">
                   Conversation & Call Notes
                 </label>
 
                 {selectedLead.notes && (
-                  <div className="bg-foreground/5 p-4 rounded-2xl border border-[var(--border-subtle)] text-xs text-foreground/90 font-medium whitespace-pre-line leading-relaxed">
+                  <div className="bg-foreground/5 text-foreground/90 rounded-2xl border border-[var(--border-subtle)] p-4 text-xs leading-relaxed font-medium whitespace-pre-line">
                     {selectedLead.notes}
                   </div>
                 )}
@@ -483,11 +538,11 @@ export default function LeadsPage() {
                     value={noteInput}
                     onChange={(e) => setNoteInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddNote()}
-                    className="flex-1 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 py-2 text-xs text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-colors"
+                    className="bg-foreground/5 text-foreground flex-1 rounded-xl border border-[var(--border-subtle)] px-4 py-2 text-xs transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
                   />
                   <button
                     onClick={handleAddNote}
-                    className="px-4 py-2 bg-[var(--color-brand-green)] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shrink-0 flex items-center gap-1.5 shadow-md"
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-4 py-2 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90"
                   >
                     <Send size={14} /> Log Note
                   </button>

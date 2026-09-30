@@ -48,11 +48,11 @@ export function DealerFilters({
     activeFilter !== 'all';
 
   return (
-    <div className="glass-panel p-4 rounded-2xl flex flex-col gap-4 border border-white/5">
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+    <div className="glass-panel flex flex-col gap-4 rounded-2xl border border-white/5 p-4">
+      <div className="flex flex-col items-center justify-between gap-4 lg:flex-row">
         {/* Search input */}
-        <div className="relative w-full lg:w-96 group">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted group-focus-within:text-lime-400 transition-colors">
+        <div className="group relative w-full lg:w-96">
+          <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 transition-colors group-focus-within:text-lime-400">
             <Search size={16} />
           </div>
           <input
@@ -60,13 +60,13 @@ export function DealerFilters({
             placeholder="Search business name, address, district..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full bg-foreground/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium text-foreground placeholder:text-muted focus:outline-none focus:bg-background focus:border-lime-400/50 focus:ring-2 focus:ring-lime-400/20 transition-all"
+            className="bg-foreground/5 text-foreground placeholder:text-muted focus:bg-background w-full rounded-xl border border-white/10 py-2.5 pr-4 pl-10 text-sm font-medium transition-all focus:border-lime-400/50 focus:ring-2 focus:ring-lime-400/20 focus:outline-none"
           />
         </div>
 
         {/* Filters dropdown row */}
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-          <div className="flex items-center gap-2 text-xs font-bold text-muted uppercase tracking-wider">
+        <div className="flex w-full flex-wrap items-center gap-3 lg:w-auto">
+          <div className="text-muted flex items-center gap-2 text-xs font-bold tracking-wider uppercase">
             <Filter size={14} className="text-lime-400" />
             Filters:
           </div>
@@ -75,35 +75,57 @@ export function DealerFilters({
           <select
             value={dealerTypeFilter}
             onChange={(e) => onDealerTypeChange(e.target.value as DealerType | '')}
-            className="bg-foreground/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-foreground focus:outline-none focus:border-lime-400/50"
+            className="bg-foreground/5 text-foreground rounded-xl border border-white/10 px-3 py-2 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
           >
-            <option value="" className="bg-zinc-900 text-zinc-300">All Dealer Types</option>
-            <option value="BRAND_DEALER" className="bg-zinc-900 text-zinc-300">Brand Authorized</option>
-            <option value="MULTI_BRAND" className="bg-zinc-900 text-zinc-300">Multi-Brand</option>
-            <option value="USED_TRACTOR_DEALER" className="bg-zinc-900 text-zinc-300">Used Tractors</option>
+            <option value="" className="bg-zinc-900 text-zinc-300">
+              All Dealer Types
+            </option>
+            <option value="BRAND_DEALER" className="bg-zinc-900 text-zinc-300">
+              Brand Authorized
+            </option>
+            <option value="MULTI_BRAND" className="bg-zinc-900 text-zinc-300">
+              Multi-Brand
+            </option>
+            <option value="USED_TRACTOR_DEALER" className="bg-zinc-900 text-zinc-300">
+              Used Tractors
+            </option>
           </select>
 
           {/* Verification Status Filter */}
           <select
             value={verificationStatusFilter}
             onChange={(e) => onVerificationStatusChange(e.target.value as VerificationStatus | '')}
-            className="bg-foreground/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-foreground focus:outline-none focus:border-lime-400/50"
+            className="bg-foreground/5 text-foreground rounded-xl border border-white/10 px-3 py-2 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
           >
-            <option value="" className="bg-zinc-900 text-zinc-300">All Verification Statuses</option>
-            <option value="VERIFIED" className="bg-zinc-900 text-zinc-300">VERIFIED</option>
-            <option value="PENDING" className="bg-zinc-900 text-zinc-300">PENDING</option>
-            <option value="REJECTED" className="bg-zinc-900 text-zinc-300">REJECTED</option>
+            <option value="" className="bg-zinc-900 text-zinc-300">
+              All Verification Statuses
+            </option>
+            <option value="VERIFIED" className="bg-zinc-900 text-zinc-300">
+              VERIFIED
+            </option>
+            <option value="PENDING" className="bg-zinc-900 text-zinc-300">
+              PENDING
+            </option>
+            <option value="REJECTED" className="bg-zinc-900 text-zinc-300">
+              REJECTED
+            </option>
           </select>
 
           {/* Active Status Filter */}
           <select
             value={activeFilter}
             onChange={(e) => onActiveFilterChange(e.target.value as 'all' | 'active' | 'inactive')}
-            className="bg-foreground/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-foreground focus:outline-none focus:border-lime-400/50"
+            className="bg-foreground/5 text-foreground rounded-xl border border-white/10 px-3 py-2 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
           >
-            <option value="all" className="bg-zinc-900 text-zinc-300">All Operational Statuses</option>
-            <option value="active" className="bg-zinc-900 text-zinc-300">Active Only</option>
-            <option value="inactive" className="bg-zinc-900 text-zinc-300">Inactive Only</option>
+            <option value="all" className="bg-zinc-900 text-zinc-300">
+              All Operational Statuses
+            </option>
+            <option value="active" className="bg-zinc-900 text-zinc-300">
+              Active Only
+            </option>
+            <option value="inactive" className="bg-zinc-900 text-zinc-300">
+              Inactive Only
+            </option>
           </select>
 
           {/* State Input Filter */}
@@ -112,7 +134,7 @@ export function DealerFilters({
             placeholder="Filter State..."
             value={stateFilter}
             onChange={(e) => onStateChange(e.target.value)}
-            className="w-32 bg-foreground/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-foreground placeholder:text-muted focus:outline-none focus:border-lime-400/50"
+            className="bg-foreground/5 text-foreground placeholder:text-muted w-32 rounded-xl border border-white/10 px-3 py-2 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
           />
 
           {/* District Input Filter */}
@@ -121,14 +143,14 @@ export function DealerFilters({
             placeholder="Filter District..."
             value={districtFilter}
             onChange={(e) => onDistrictChange(e.target.value)}
-            className="w-32 bg-foreground/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-foreground placeholder:text-muted focus:outline-none focus:border-lime-400/50"
+            className="bg-foreground/5 text-foreground placeholder:text-muted w-32 rounded-xl border border-white/10 px-3 py-2 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
           />
 
           {/* Reset Filters button */}
           {isFiltered && (
             <button
               onClick={onResetFilters}
-              className="px-3 py-2 rounded-xl text-xs font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all flex items-center gap-1.5"
+              className="flex items-center gap-1.5 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-400 transition-all hover:bg-rose-500/20"
             >
               <RotateCcw size={13} />
               Reset

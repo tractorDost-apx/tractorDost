@@ -52,7 +52,7 @@ export interface Implement {
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
-  
+
   category?: ImplementCategory;
   brand?: EquipmentBrand;
   compatibleTractors?: any[];
@@ -95,44 +95,49 @@ export const implementAPI = {
     sortBy?: 'newest' | 'priceLowHigh' | 'priceHighLow' | 'modelName';
     isActive?: string;
   }) => {
-    const response = await apiClient.get<PaginatedResponse<Implement>>('/implements/getAllImplement', { params });
+    const response = await apiClient.get<PaginatedResponse<Implement>>(
+      '/implements/getAllImplement',
+      { params }
+    );
     return response.data;
   },
-  
+
   /**
    * Fetch a single implement by ID or slug
    */
   getImplementById: async (id: number | string) => {
-    const response = await apiClient.get<{ success: boolean; data: Implement }>(`/implements/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: Implement }>(
+      `/implements/${id}`
+    );
     return response.data;
   },
-  
+
   /**
    * Create a new implement
    * Uses FormData because it handles file uploads (brochure, video, videoThumbnail)
    */
   createImplement: async (data: FormData) => {
     const response = await apiClient.postForm<{ success: boolean; data: Implement }>(
-      '/implements', 
+      '/implements',
       data,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
     return response.data;
   },
-  
+
   /**
    * Update an existing implement
    * Uses FormData because it handles file uploads
    */
   updateImplement: async (id: number, data: FormData) => {
     const response = await apiClient.patchForm<{ success: boolean; data: Implement }>(
-      `/implements/${id}`, 
+      `/implements/${id}`,
       data,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
     return response.data;
   },
-  
+
   /**
    * Delete an implement
    */
@@ -145,7 +150,10 @@ export const implementAPI = {
    * Update compatible tractors
    */
   updateCompatibleTractors: async (id: number, tractorIds: number[]) => {
-    const response = await apiClient.put<{ success: boolean; data: any }>(`/implements/${id}/compatible-tractors`, { tractorIds });
+    const response = await apiClient.put<{ success: boolean; data: any }>(
+      `/implements/${id}/compatible-tractors`,
+      { tractorIds }
+    );
     return response.data;
   },
 

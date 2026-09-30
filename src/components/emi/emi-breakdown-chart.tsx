@@ -33,17 +33,17 @@ export const EmiBreakdownChart: React.FC<EmiBreakdownChartProps> = ({
   const interestOffset = circumference - (safePrincipalPercent / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-foreground/5 rounded-3xl border border-[var(--border-subtle)] relative overflow-hidden h-full">
+    <div className="bg-foreground/5 relative flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl border border-[var(--border-subtle)] p-4">
       {/* Background decoration */}
-      <div className="absolute top-[-10%] right-[-10%] w-16 h-16 bg-[var(--color-brand-orange)]/5 rounded-full blur-xl pointer-events-none" />
+      <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-16 w-16 rounded-full bg-[var(--color-brand-orange)]/5 blur-xl" />
 
-      <h3 className="text-sm font-black uppercase tracking-wider text-muted mb-6">
+      <h3 className="text-muted mb-6 text-sm font-black tracking-wider uppercase">
         Payment Breakdown
       </h3>
 
-      <div className="relative w-48 h-48 flex items-center justify-center">
+      <div className="relative flex h-48 w-48 items-center justify-center">
         {/* SVG Donut Chart */}
-        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+        <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 200 200">
           {/* Base track */}
           <circle
             cx="100"
@@ -53,7 +53,7 @@ export const EmiBreakdownChart: React.FC<EmiBreakdownChartProps> = ({
             stroke="var(--border-subtle)"
             strokeWidth={strokeWidth}
           />
-          
+
           {/* Principal segment (Green) */}
           {loanAmount > 0 && (
             <circle
@@ -89,39 +89,43 @@ export const EmiBreakdownChart: React.FC<EmiBreakdownChartProps> = ({
 
         {/* Center label inside Donut */}
         <div className="absolute flex flex-col items-center justify-center text-center">
-          <span className="text-[10px] font-black uppercase text-muted tracking-wider">Total Payable</span>
-          <span className="text-base font-black text-foreground mt-0.5">
+          <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+            Total Payable
+          </span>
+          <span className="text-foreground mt-0.5 text-base font-black">
             {formatIndianCurrency(total, 'short')}
           </span>
         </div>
       </div>
 
       {/* Legend & Breakdown values */}
-      <div className="grid grid-cols-2 gap-4 w-full mt-6 border-t border-[var(--border-subtle)] pt-4">
+      <div className="mt-6 grid w-full grid-cols-2 gap-4 border-t border-[var(--border-subtle)] pt-4">
         {/* Principal Legend */}
-        <div className="flex flex-col gap-1 items-center text-center">
+        <div className="flex flex-col items-center gap-1 text-center">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-[var(--color-brand-green)] shrink-0" />
-            <span className="text-xs font-black uppercase tracking-wider text-muted">Principal</span>
+            <span className="h-3 w-3 shrink-0 rounded-full bg-[var(--color-brand-green)]" />
+            <span className="text-muted text-xs font-black tracking-wider uppercase">
+              Principal
+            </span>
           </div>
-          <span className="text-sm font-black text-foreground">
+          <span className="text-foreground text-sm font-black">
             {formatIndianCurrency(loanAmount)}
           </span>
-          <span className="text-[10px] font-black text-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 px-2 py-0.5 rounded-full">
+          <span className="rounded-full bg-[var(--color-brand-green)]/10 px-2 py-0.5 text-[10px] font-black text-[var(--color-brand-green)]">
             {principalPercent.toFixed(1)}%
           </span>
         </div>
 
         {/* Interest Legend */}
-        <div className="flex flex-col gap-1 items-center text-center">
+        <div className="flex flex-col items-center gap-1 text-center">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-[var(--color-brand-orange)] shrink-0" />
-            <span className="text-xs font-black uppercase tracking-wider text-muted">Interest</span>
+            <span className="h-3 w-3 shrink-0 rounded-full bg-[var(--color-brand-orange)]" />
+            <span className="text-muted text-xs font-black tracking-wider uppercase">Interest</span>
           </div>
-          <span className="text-sm font-black text-foreground">
+          <span className="text-foreground text-sm font-black">
             {formatIndianCurrency(totalInterest)}
           </span>
-          <span className="text-[10px] font-black text-[var(--color-brand-orange)] bg-[var(--color-brand-orange)]/10 px-2 py-0.5 rounded-full">
+          <span className="rounded-full bg-[var(--color-brand-orange)]/10 px-2 py-0.5 text-[10px] font-black text-[var(--color-brand-orange)]">
             {interestPercent.toFixed(1)}%
           </span>
         </div>

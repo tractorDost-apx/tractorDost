@@ -70,34 +70,39 @@ export default function DealerBrandsPage() {
   const primaryBrand = brands.find((b) => b.isPrimary);
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="animate-fade-in space-y-8 pb-12">
       {/* Sleek Admin Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shrink-0">
+          <div className="shrink-0 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
             <Layers size={26} />
           </div>
           <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
                 Authorized Brands
               </h1>
-              <span className="px-3 py-1 rounded-full text-xs font-black bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 uppercase tracking-wider">
+              <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
                 {brands.length} {brands.length === 1 ? 'Brand' : 'Brands'} Assigned
               </span>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-muted mt-0.5">
-              Official tractor brands associated with {user?.dealer?.businessName || 'your dealership'}.
+            <p className="text-muted mt-0.5 text-xs font-bold sm:text-sm">
+              Official tractor brands associated with{' '}
+              {user?.dealer?.businessName || 'your dealership'}.
             </p>
           </div>
         </div>
 
         {primaryBrand && (
-          <div className="px-4 py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center gap-3 shrink-0 self-start sm:self-auto">
-            <Award size={20} className="text-amber-500 shrink-0" />
+          <div className="flex shrink-0 items-center gap-3 self-start rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-xs font-bold text-amber-600 sm:self-auto dark:text-amber-400">
+            <Award size={20} className="shrink-0 text-amber-500" />
             <div>
-              <span className="text-[9px] uppercase font-black tracking-wider text-amber-500 block">Primary Authorized Brand</span>
-              <span className="text-xs sm:text-sm font-black text-foreground">{primaryBrand.name}</span>
+              <span className="block text-[9px] font-black tracking-wider text-amber-500 uppercase">
+                Primary Authorized Brand
+              </span>
+              <span className="text-foreground text-xs font-black sm:text-sm">
+                {primaryBrand.name}
+              </span>
             </div>
           </div>
         )}
@@ -105,17 +110,20 @@ export default function DealerBrandsPage() {
 
       {/* Loading Skeletons */}
       {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] space-y-4 animate-pulse">
+            <div
+              key={i}
+              className="glass-panel animate-pulse space-y-4 rounded-3xl border border-[var(--border-subtle)] p-6"
+            >
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-2xl bg-foreground/10" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-5 bg-foreground/10 rounded-md w-3/4" />
-                  <div className="h-3 bg-foreground/10 rounded-md w-1/2" />
+                <div className="bg-foreground/10 h-14 w-14 rounded-2xl" />
+                <div className="flex-1 space-y-2">
+                  <div className="bg-foreground/10 h-5 w-3/4 rounded-md" />
+                  <div className="bg-foreground/10 h-3 w-1/2 rounded-md" />
                 </div>
               </div>
-              <div className="h-16 bg-foreground/5 rounded-2xl" />
+              <div className="bg-foreground/5 h-16 rounded-2xl" />
             </div>
           ))}
         </div>
@@ -123,15 +131,15 @@ export default function DealerBrandsPage() {
 
       {/* Error State */}
       {!loading && error && (
-        <div className="glass-panel p-8 rounded-3xl border border-rose-500/20 bg-rose-500/10 text-center space-y-4 max-w-lg mx-auto">
-          <div className="h-12 w-12 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto border border-rose-500/20">
+        <div className="glass-panel mx-auto max-w-lg space-y-4 rounded-3xl border border-rose-500/20 bg-rose-500/10 p-8 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-500/10 text-rose-500">
             <AlertCircle size={24} />
           </div>
-          <h3 className="text-lg font-bold text-foreground">Unable to Load Assigned Brands</h3>
-          <p className="text-sm text-muted font-medium">{error}</p>
+          <h3 className="text-foreground text-lg font-bold">Unable to Load Assigned Brands</h3>
+          <p className="text-muted text-sm font-medium">{error}</p>
           <button
             onClick={() => fetchBrands()}
-            className="px-5 py-2.5 rounded-xl text-xs font-bold bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors inline-flex items-center gap-2"
+            className="bg-foreground/10 text-foreground hover:bg-foreground/20 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-colors"
           >
             <RefreshCw size={14} /> Retry Loading
           </button>
@@ -140,19 +148,22 @@ export default function DealerBrandsPage() {
 
       {/* Empty State */}
       {!loading && !error && brands.length === 0 && (
-        <div className="glass-panel p-12 rounded-3xl border border-[var(--border-subtle)] text-center max-w-2xl mx-auto space-y-4">
-          <div className="h-16 w-16 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 flex items-center justify-center mx-auto">
+        <div className="glass-panel mx-auto max-w-2xl space-y-4 rounded-3xl border border-[var(--border-subtle)] p-12 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
             <Building2 size={32} />
           </div>
-          <h2 className="text-xl font-black text-foreground">
+          <h2 className="text-foreground text-xl font-black">
             No brands have been assigned to this dealer yet.
           </h2>
-          <p className="text-sm text-muted font-medium leading-relaxed max-w-md mx-auto">
-            Tractor brand partnerships and representations are managed by TractorDost administration. Once your dealership is assigned authorized brand partnerships, they will automatically appear here.
+          <p className="text-muted mx-auto max-w-md text-sm leading-relaxed font-medium">
+            Tractor brand partnerships and representations are managed by TractorDost
+            administration. Once your dealership is assigned authorized brand partnerships, they
+            will automatically appear here.
           </p>
           <div className="pt-2">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-foreground/5 text-muted border border-[var(--border-subtle)]">
-              <Info size={14} className="text-[var(--color-brand-green)]" /> Contact Support for Brand Onboarding
+            <span className="bg-foreground/5 text-muted inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] px-3.5 py-1.5 text-xs font-bold">
+              <Info size={14} className="text-[var(--color-brand-green)]" /> Contact Support for
+              Brand Onboarding
             </span>
           </div>
         </div>
@@ -160,15 +171,15 @@ export default function DealerBrandsPage() {
 
       {/* Brands Card Grid */}
       {!loading && !error && brands.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {brands.map((b) => (
             <div
               key={b.id}
-              className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] space-y-5 hover:border-[var(--color-brand-green)]/30 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
+              className="glass-panel group relative flex flex-col justify-between space-y-5 overflow-hidden rounded-3xl border border-[var(--border-subtle)] p-6 transition-all duration-300 hover:border-[var(--color-brand-green)]/30"
             >
               {b.isPrimary && (
                 <div className="absolute top-4 right-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[10px] font-black tracking-wider text-amber-600 uppercase shadow-sm dark:text-amber-400">
                     <Award size={12} className="text-amber-500" />
                     Primary Brand
                   </span>
@@ -181,38 +192,38 @@ export default function DealerBrandsPage() {
                     <img
                       src={b.logoUrl}
                       alt={b.name}
-                      className="h-16 w-16 rounded-2xl object-contain bg-foreground/5 p-2 border border-[var(--border-subtle)] shrink-0 group-hover:scale-105 transition-transform"
+                      className="bg-foreground/5 h-16 w-16 shrink-0 rounded-2xl border border-[var(--border-subtle)] object-contain p-2 transition-transform group-hover:scale-105"
                     />
                   ) : (
-                    <div className="h-16 w-16 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] flex items-center justify-center font-black text-2xl border border-[var(--color-brand-green)]/20 shrink-0">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 text-2xl font-black text-[var(--color-brand-green)]">
                       {b.name.charAt(0).toUpperCase()}
                     </div>
                   )}
 
                   <div className="pr-16">
-                    <h3 className="text-xl font-black text-foreground tracking-tight group-hover:text-[var(--color-brand-green)] transition-colors">
+                    <h3 className="text-foreground text-xl font-black tracking-tight transition-colors group-hover:text-[var(--color-brand-green)]">
                       {b.name}
                     </h3>
-                    <span className="text-xs font-mono text-muted">/{b.slug}</span>
+                    <span className="text-muted font-mono text-xs">/{b.slug}</span>
                   </div>
                 </div>
 
                 {/* Metadata Grid */}
-                <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-[var(--border-subtle)]">
+                <div className="grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-2 text-xs">
                   {b.country && (
-                    <div className="flex items-center gap-2 text-muted">
+                    <div className="text-muted flex items-center gap-2">
                       <Globe size={14} className="text-muted/70 shrink-0" />
                       <span className="truncate">{b.country}</span>
                     </div>
                   )}
                   {b.foundedYear && (
-                    <div className="flex items-center gap-2 text-muted">
+                    <div className="text-muted flex items-center gap-2">
                       <Calendar size={14} className="text-muted/70 shrink-0" />
                       <span>Founded {b.foundedYear}</span>
                     </div>
                   )}
                   {b.totalModels !== undefined && (
-                    <div className="flex items-center gap-2 text-muted col-span-2">
+                    <div className="text-muted col-span-2 flex items-center gap-2">
                       <Tractor size={14} className="text-muted/70 shrink-0" />
                       <span>{b.totalModels} Tractor Models in Catalog</span>
                     </div>
@@ -220,17 +231,17 @@ export default function DealerBrandsPage() {
                 </div>
 
                 {b.aboutBrand && (
-                  <p className="text-xs text-muted/90 font-medium line-clamp-3 pt-1 border-t border-[var(--border-subtle)] leading-relaxed">
+                  <p className="text-muted/90 line-clamp-3 border-t border-[var(--border-subtle)] pt-1 text-xs leading-relaxed font-medium">
                     {b.aboutBrand}
                   </p>
                 )}
               </div>
 
-              <div className="pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
-                <span className="inline-flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full text-[11px]">
+              <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-4 text-xs">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
                   <CheckCircle2 size={13} /> Active Partnership
                 </span>
-                <span className="text-[10px] font-mono text-muted/60">ID #{b.id}</span>
+                <span className="text-muted/60 font-mono text-[10px]">ID #{b.id}</span>
               </div>
             </div>
           ))}

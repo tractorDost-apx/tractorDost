@@ -16,14 +16,17 @@ function CompareContent() {
   const router = useRouter();
   const idsParam = searchParams.get('ids');
   const { user } = useAuth();
-  
+
   const [tractors, setTractors] = useState<Tractor[]>([]);
   const [comparisons, setComparisons] = useState<CompareFrequencyRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const ids = idsParam 
-    ? idsParam.split(',').map(id => Number(id.trim())).filter(id => !isNaN(id)) 
+  const ids = idsParam
+    ? idsParam
+        .split(',')
+        .map((id) => Number(id.trim()))
+        .filter((id) => !isNaN(id))
     : [];
 
   useEffect(() => {
@@ -47,7 +50,7 @@ function CompareContent() {
         setTractors([]);
       }
     };
-    
+
     fetchComparison();
   }, [idsParam, user]);
 
@@ -77,107 +80,146 @@ function CompareContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-[80vh] items-center justify-center p-6 text-center gap-4 animate-pulse">
+      <div className="flex min-h-[80vh] animate-pulse flex-col items-center justify-center gap-4 p-6 text-center">
         <TractorLoader className="text-[var(--color-brand-green)]" size={64} />
-        <h2 className="text-xl font-black uppercase tracking-widest text-muted">Analyzing Tractors...</h2>
+        <h2 className="text-muted text-xl font-black tracking-widest uppercase">
+          Analyzing Tractors...
+        </h2>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-[80vh] items-center justify-center p-6 text-center gap-4">
-        <div className="p-8 bg-red-500/10 border-2 border-red-500/50 rounded-3xl max-w-lg">
-          <h2 className="text-xl font-black text-red-500 mb-2">Comparison Failed</h2>
-          <p className="text-sm font-medium text-red-400/80 mb-6">{error}</p>
-          <button onClick={handleClear} className="px-6 py-2 bg-red-500 text-white rounded-xl font-bold uppercase tracking-wider">Start Over</button>
+      <div className="flex min-h-[80vh] flex-col items-center justify-center gap-4 p-6 text-center">
+        <div className="max-w-lg rounded-3xl border-2 border-red-500/50 bg-red-500/10 p-8">
+          <h2 className="mb-2 text-xl font-black text-red-500">Comparison Failed</h2>
+          <p className="mb-6 text-sm font-medium text-red-400/80">{error}</p>
+          <button
+            onClick={handleClear}
+            className="rounded-xl bg-red-500 px-6 py-2 font-bold tracking-wider text-white uppercase"
+          >
+            Start Over
+          </button>
         </div>
       </div>
     );
   }
 
-  const maxFreq = comparisons.length > 0 ? Math.max(...comparisons.map(c => c.frequency)) : 1;
+  const maxFreq = comparisons.length > 0 ? Math.max(...comparisons.map((c) => c.frequency)) : 1;
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+    <div className="animate-fade-in mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
       {tractors.length >= 2 ? (
         <div className="space-y-6">
-          <button onClick={handleClear} className="flex items-center gap-2 text-muted hover:text-foreground transition-colors font-bold text-sm">
+          <button
+            onClick={handleClear}
+            className="text-muted hover:text-foreground flex items-center gap-2 text-sm font-bold transition-colors"
+          >
             <ArrowLeft size={16} /> Back to Selection
           </button>
-          <CompareTable tractors={tractors} onAddMore={() => router.push(`/compare?ids=${ids.join(',')},`)} />
+          <CompareTable
+            tractors={tractors}
+            onAddMore={() => router.push(`/compare?ids=${ids.join(',')},`)}
+          />
         </div>
       ) : (
         <div className="space-y-16">
           <ComparePicker onCompare={handleCompare} initialIds={ids} />
-          
+
           {comparisons.length > 0 && (
-            <section className="flex flex-col gap-8 bg-gradient-to-br from-foreground/5 to-transparent p-8 md:p-12 rounded-[3rem] border border-[var(--border-subtle)] relative overflow-hidden max-w-4xl mx-auto w-full">
-              <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[var(--color-brand-orange)]/5 rounded-full blur-[60px] -z-10 translate-x-1/2 -translate-y-1/2" />
-              
-              <div className="flex items-center gap-4 mb-2">
-                <div className="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center">
-                  <Flame size={24} className="text-red-500 animate-pulse" />
+            <section className="from-foreground/5 relative mx-auto flex w-full max-w-4xl flex-col gap-8 overflow-hidden rounded-[3rem] border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-8 md:p-12">
+              <div className="absolute top-0 right-0 -z-10 h-[300px] w-[300px] translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-orange)]/5 blur-[60px]" />
+
+              <div className="mb-2 flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10">
+                  <Flame size={24} className="animate-pulse text-red-500" />
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Popular Comparisons</h2>
-                  <p className="text-muted text-sm font-bold">Trending side-by-side reviews among other farmers.</p>
+                  <h2 className="text-foreground text-2xl font-black tracking-tight uppercase">
+                    Popular Comparisons
+                  </h2>
+                  <p className="text-muted text-sm font-bold">
+                    Trending side-by-side reviews among other farmers.
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 z-10">
+              <div className="z-10 grid grid-cols-1 gap-6 md:grid-cols-3">
                 {comparisons.map((comp, idx) => {
                   const hotness = (comp.frequency / maxFreq) * 100;
                   return (
-                    <Link key={idx} href={`/compare?ids=${comp.tractorLeft?.id},${comp.tractorRight?.id}`} className="bg-background rounded-3xl p-6 shadow-sm hover:shadow-xl border border-[var(--border-subtle)] hover:border-[var(--color-brand-orange)]/50 transition-all flex flex-col gap-4 group cursor-pointer">
-                      
+                    <Link
+                      key={idx}
+                      href={`/compare?ids=${comp.tractorLeft?.id},${comp.tractorRight?.id}`}
+                      className="bg-background group flex cursor-pointer flex-col gap-4 rounded-3xl border border-[var(--border-subtle)] p-6 shadow-sm transition-all hover:border-[var(--color-brand-orange)]/50 hover:shadow-xl"
+                    >
                       <div className="flex items-center justify-between">
                         {/* Left Tractor */}
-                        <div className="flex flex-col items-center text-center w-5/12">
-                           <div className="w-14 h-14 rounded-full bg-foreground/5 p-1.5 mb-2 flex items-center justify-center overflow-hidden border border-transparent group-hover:border-[var(--border-subtle)] transition-colors">
-                              {comp.tractorLeft?.primaryMedia?.url ? (
-                                <img src={comp.tractorLeft.primaryMedia.url} alt="L" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
-                              ) : (
-                                <TractorIcon size={16} className="text-muted/50" />
-                              )}
-                           </div>
-                           <span className="text-[9px] font-black text-[var(--color-brand-green)] uppercase truncate w-full">{comp.tractorLeft?.brand?.name}</span>
-                           <span className="text-xs font-black text-foreground leading-tight truncate w-full">{comp.tractorLeft?.modelName}</span>
+                        <div className="flex w-5/12 flex-col items-center text-center">
+                          <div className="bg-foreground/5 mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-transparent p-1.5 transition-colors group-hover:border-[var(--border-subtle)]">
+                            {comp.tractorLeft?.primaryMedia?.url ? (
+                              <img
+                                src={comp.tractorLeft.primaryMedia.url}
+                                alt="L"
+                                className="h-full w-full object-contain transition-transform group-hover:scale-110"
+                              />
+                            ) : (
+                              <TractorIcon size={16} className="text-muted/50" />
+                            )}
+                          </div>
+                          <span className="w-full truncate text-[9px] font-black text-[var(--color-brand-green)] uppercase">
+                            {comp.tractorLeft?.brand?.name}
+                          </span>
+                          <span className="text-foreground w-full truncate text-xs leading-tight font-black">
+                            {comp.tractorLeft?.modelName}
+                          </span>
                         </div>
 
                         {/* VS Icon */}
-                        <div className="flex flex-col items-center justify-center w-2/12 relative">
-                          <div className="w-8 h-8 rounded-full bg-background border border-[var(--border-subtle)] flex items-center justify-center z-10 text-[var(--color-brand-orange)] font-black text-[10px] italic">
+                        <div className="relative flex w-2/12 flex-col items-center justify-center">
+                          <div className="bg-background z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[10px] font-black text-[var(--color-brand-orange)] italic">
                             VS
                           </div>
-                          <div className="h-[1px] w-full bg-foreground/10 absolute z-0" />
+                          <div className="bg-foreground/10 absolute z-0 h-[1px] w-full" />
                         </div>
 
                         {/* Right Tractor */}
-                        <div className="flex flex-col items-center text-center w-5/12">
-                           <div className="w-14 h-14 rounded-full bg-foreground/5 p-1.5 mb-2 flex items-center justify-center overflow-hidden border border-transparent group-hover:border-[var(--border-subtle)] transition-colors">
-                              {comp.tractorRight?.primaryMedia?.url ? (
-                                <img src={comp.tractorRight.primaryMedia.url} alt="R" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
-                              ) : (
-                                <TractorIcon size={16} className="text-muted/50" />
-                              )}
-                           </div>
-                           <span className="text-[9px] font-black text-[var(--color-brand-green)] uppercase truncate w-full">{comp.tractorRight?.brand?.name}</span>
-                           <span className="text-xs font-black text-foreground leading-tight truncate w-full">{comp.tractorRight?.modelName}</span>
+                        <div className="flex w-5/12 flex-col items-center text-center">
+                          <div className="bg-foreground/5 mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-transparent p-1.5 transition-colors group-hover:border-[var(--border-subtle)]">
+                            {comp.tractorRight?.primaryMedia?.url ? (
+                              <img
+                                src={comp.tractorRight.primaryMedia.url}
+                                alt="R"
+                                className="h-full w-full object-contain transition-transform group-hover:scale-110"
+                              />
+                            ) : (
+                              <TractorIcon size={16} className="text-muted/50" />
+                            )}
+                          </div>
+                          <span className="w-full truncate text-[9px] font-black text-[var(--color-brand-green)] uppercase">
+                            {comp.tractorRight?.brand?.name}
+                          </span>
+                          <span className="text-foreground w-full truncate text-xs leading-tight font-black">
+                            {comp.tractorRight?.modelName}
+                          </span>
                         </div>
                       </div>
 
                       <div className="mt-4 flex flex-col gap-1">
-                        <div className="flex justify-between text-[9px] font-black uppercase text-muted tracking-widest">
+                        <div className="text-muted flex justify-between text-[9px] font-black tracking-widest uppercase">
                           <span>Popularity Match</span>
                           <span>{Math.max(20, Math.round(hotness))}%</span>
                         </div>
-                        <div className="w-full h-1 bg-foreground/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-[var(--color-brand-green)] to-[var(--color-brand-orange)] rounded-full transition-all duration-1000" style={{ width: `${Math.max(20, hotness)}%` }} />
+                        <div className="bg-foreground/5 h-1 w-full overflow-hidden rounded-full">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-[var(--color-brand-green)] to-[var(--color-brand-orange)] transition-all duration-1000"
+                            style={{ width: `${Math.max(20, hotness)}%` }}
+                          />
                         </div>
                       </div>
                     </Link>
-                  )
+                  );
                 })}
               </div>
             </section>
@@ -190,11 +232,17 @@ function CompareContent() {
 
 export default function ComparePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       {/* Decorative background element */}
-      <div className="fixed top-0 inset-x-0 h-[50vh] bg-gradient-to-b from-[var(--color-brand-green)]/5 to-transparent pointer-events-none -z-10" />
-      
-      <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center"><TractorLoader size={48} className="text-muted" /></div>}>
+      <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[50vh] bg-gradient-to-b from-[var(--color-brand-green)]/5 to-transparent" />
+
+      <Suspense
+        fallback={
+          <div className="flex min-h-[80vh] items-center justify-center">
+            <TractorLoader size={48} className="text-muted" />
+          </div>
+        }
+      >
         <CompareContent />
       </Suspense>
     </div>

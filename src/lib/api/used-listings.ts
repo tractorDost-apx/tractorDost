@@ -1,114 +1,125 @@
 import { apiClient } from './axios/axios';
-import { ConditionGrade, ListingStatus, UrgencyLevel, UsedTractorListing } from './usedTractors';
+import { toErrorResult, toResult } from './axios/result';
+import type { ApiResult } from '@/types/api/responses';
+import type {
+  AdminListingUpdate,
+  CreateListingInput,
+  ListingFilters,
+  ListingPage,
+  ListingStatus,
+  MetaPage,
+  UsedDocument,
+  UsedEnquiry,
+  UsedTractorListing,
+} from '@/types/models/used-listing';
 
 export const usedTractorListingAPI = {
-  // Public & Authenticated Endpoints
-  getAllListings: async (params?: any) => {
+  /** Public browse; staff also see non-ACTIVE listings */
+  getAllListings: async (
+    params?: ListingFilters
+  ): Promise<ApiResult<ListingPage<UsedTractorListing>>> => {
     try {
       const response = await apiClient.get('/used-listings/getAll', { params });
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to fetch used listings',
-      };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch used listings');
     }
   },
 
-  getListingById: async (id: number | string) => {
+  getListingById: async (id: number | string): Promise<ApiResult<UsedTractorListing>> => {
     try {
       const response = await apiClient.get(`/used-listings/get/${id}`);
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to fetch listing details',
-      };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch listing details');
     }
   },
 
-  createListing: async (data: Partial<UsedTractorListing>) => {
+  /** Logged-in seller's own listings, every status */
+  getMyListings: async (params?: {
+    listingStatus?: ListingStatus;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResult<ListingPage<UsedTractorListing>>> => {
+    try {
+      const response = await apiClient.get('/used-listings/my', { params });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch your listings');
+    }
+  },
+
+  /** Listing details cannot be edited after this call; photos go through the documents API */
+  createListing: async (data: CreateListingInput): Promise<ApiResult<UsedTractorListing>> => {
     try {
       const response = await apiClient.post('/used-listings/create', data);
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to create listing',
-      };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to create listing');
     }
   },
 
-  updateListing: async (id: number | string, data: Partial<UsedTractorListing>) => {
+  /** Owner/admin visibility switch: false hides a live listing, true re-publishes it */
+  setListingActive: async (
+    id: number | string,
+    isActive: boolean
+  ): Promise<ApiResult<UsedTractorListing>> => {
     try {
-      const response = await apiClient.patch(`/used-listings/update/${id}`, data);
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to update listing',
-      };
+      const response = await apiClient.patch(`/used-listings/${id}/active`, { isActive });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to update listing visibility');
     }
   },
 
-  deleteListing: async (id: number | string) => {
+  /** Soft delete: the listing moves to EXPIRED */
+  deleteListing: async (id: number | string): Promise<ApiResult<null>> => {
     try {
       const response = await apiClient.delete(`/used-listings/delete/${id}`);
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to delete listing',
-      };
+      return toResult(response, 'Listing deleted');
+    } catch (error) {
+      return toErrorResult(error, 'Failed to delete listing');
     }
   },
 
   // Admin Endpoints
   adminUpdateListingStatus: async (
     id: number | string,
-    data: {
-      listingStatus?: ListingStatus;
-      isCertified?: boolean;
-      boostType?: string | null;
-      featuredUntil?: string;
-      rejectionReason?: string;
-    }
-  ) => {
+    data: AdminListingUpdate
+  ): Promise<ApiResult<UsedTractorListing>> => {
     try {
       const response = await apiClient.patch(`/used-listings/${id}/admin`, data);
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to update listing status',
-      };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to update listing status');
     }
   },
 
-  // Enquiry (Leads) Endpoints
-  getListingEnquiries: async (listingId: number | string) => {
+  // Enquiry (Leads) Endpoints — staff view of one listing's enquiries
+  getListingEnquiries: async (
+    listingId: number | string
+  ): Promise<ApiResult<MetaPage<UsedEnquiry>>> => {
     try {
-      const response = await apiClient.get(`/used-tractor-enquiries/getAllEnquiries`, {
+      const response = await apiClient.get('/used-tractor-enquiries/getAllEnquiries', {
         params: { listingId },
       });
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch leads' };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch leads');
     }
   },
 
   // Documents Endpoints
-  getListingDocuments: async (listingId: number | string) => {
+  getListingDocuments: async (
+    listingId: number | string
+  ): Promise<ApiResult<MetaPage<UsedDocument>>> => {
     try {
-      const response = await apiClient.get(`/used-tractor-documents/getAllDocuments`, {
-        params: { listingId },
+      const response = await apiClient.get('/used-tractor-documents/getAllTractorDocs', {
+        params: { listingId, limit: 50 },
       });
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to fetch documents',
-      };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch documents');
     }
   },
 };

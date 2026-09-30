@@ -5,9 +5,9 @@ import AdminSidebar from '@/components/dashboard/AdminSidebar';
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
-      <div className="flex flex-col md:flex-row gap-6 w-full max-w-[1400px] mx-auto h-[calc(100vh-10rem)]">
+      <div className="mx-auto flex h-[calc(100vh-10rem)] w-full max-w-[1400px] flex-col gap-6 md:flex-row">
         <AdminSidebar />
-        <div className="glass-panel p-6 sm:p-8 w-full overflow-y-auto hidden-scrollbar relative">
+        <div className="glass-panel hidden-scrollbar relative w-full overflow-y-auto p-6 sm:p-8">
           {children}
         </div>
       </div>

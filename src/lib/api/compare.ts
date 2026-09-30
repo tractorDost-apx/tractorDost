@@ -53,8 +53,16 @@ export const compareAPI = {
   /**
    * Fetch frequency of tractor comparisons
    */
-  getFrequencyOfCompare: async (params?: { page?: number; limit?: number; search?: string; sort?: string }) => {
-    const response = await apiClient.get<CompareFrequencyResponse>('/compare/frequency-of-compare', { params });
+  getFrequencyOfCompare: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sort?: string;
+  }) => {
+    const response = await apiClient.get<CompareFrequencyResponse>(
+      '/compare/frequency-of-compare',
+      { params }
+    );
     return response.data;
   },
 
@@ -64,8 +72,11 @@ export const compareAPI = {
   compareTractors: async (ids: number[], state?: string) => {
     const params: any = { ids: ids.join(',') };
     if (state) params.state = state;
-    
-    const response = await apiClient.get<{ success: boolean; data: Tractor[] }>('/compare/comparing', { params });
+
+    const response = await apiClient.get<{ success: boolean; data: Tractor[] }>(
+      '/compare/comparing',
+      { params }
+    );
     return response.data;
   },
 

@@ -3,21 +3,30 @@ import Link from 'next/link';
 
 export function DashboardFooter() {
   const year = new Date().getFullYear();
-  
+
   return (
-    <footer className="w-full mt-auto py-6 border-t border-[var(--border-subtle)] bg-background/50">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 sm:px-6">
-        <p className="text-sm text-muted font-medium">
+    <footer className="bg-background/50 mt-auto w-full border-t border-[var(--border-subtle)] py-6">
+      <div className="flex flex-col items-center justify-between gap-4 px-4 sm:px-6 md:flex-row">
+        <p className="text-muted text-sm font-medium">
           &copy; {year} TractorDost. All rights reserved.
         </p>
         <div className="flex items-center gap-6 text-sm font-medium">
-          <Link href="/contact" className="text-muted hover:text-[var(--color-brand-green)] transition-colors">
+          <Link
+            href="/contact"
+            className="text-muted transition-colors hover:text-[var(--color-brand-green)]"
+          >
             Support
           </Link>
-          <Link href="/terms" className="text-muted hover:text-[var(--color-brand-green)] transition-colors">
+          <Link
+            href="/terms"
+            className="text-muted transition-colors hover:text-[var(--color-brand-green)]"
+          >
             Terms of Service
           </Link>
-          <Link href="/privacy" className="text-muted hover:text-[var(--color-brand-green)] transition-colors">
+          <Link
+            href="/privacy"
+            className="text-muted transition-colors hover:text-[var(--color-brand-green)]"
+          >
             Privacy Policy
           </Link>
         </div>

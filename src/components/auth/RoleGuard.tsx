@@ -11,10 +11,10 @@ interface RoleGuardProps {
   redirectTo?: string;
 }
 
-export const RoleGuard: React.FC<RoleGuardProps> = ({ 
-  children, 
+export const RoleGuard: React.FC<RoleGuardProps> = ({
+  children,
   allowedRoles,
-  redirectTo = '/login'
+  redirectTo = '/login',
 }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();

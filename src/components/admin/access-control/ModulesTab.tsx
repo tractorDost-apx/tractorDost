@@ -5,34 +5,71 @@ import { accessControlAPI, ModuleTreeNode, Module } from '@/lib/api/accessContro
 import { Plus, Edit, Trash2, LayoutGrid, ChevronRight, ChevronDown } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 
-const ModuleRow = ({ node, level = 0, onEdit, onDelete }: { node: ModuleTreeNode, level?: number, onEdit: (m: Module) => void, onDelete: (id: number) => void }) => {
+const ModuleRow = ({
+  node,
+  level = 0,
+  onEdit,
+  onDelete,
+}: {
+  node: ModuleTreeNode;
+  level?: number;
+  onEdit: (m: Module) => void;
+  onDelete: (id: number) => void;
+}) => {
   const [expanded, setExpanded] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
 
   return (
     <>
-      <div className="flex items-center justify-between p-3 border-b border-[var(--border-subtle)] hover:bg-foreground/5 transition-colors">
+      <div className="hover:bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-3 transition-colors">
         <div className="flex items-center gap-2" style={{ paddingLeft: `${level * 24}px` }}>
           {hasChildren ? (
-            <button onClick={() => setExpanded(!expanded)} className="p-1 hover:bg-foreground/10 rounded">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="hover:bg-foreground/10 rounded p-1"
+            >
               {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>
           ) : (
             <div className="w-6" /> // spacer
           )}
           <span className="font-bold">{node.name}</span>
-          <span className="text-xs font-mono bg-foreground/10 px-2 py-0.5 rounded text-muted">{node.code}</span>
-          {!node.isActive && <span className="text-[10px] uppercase font-bold bg-red-500/10 text-red-500 px-2 py-0.5 rounded">Inactive</span>}
+          <span className="bg-foreground/10 text-muted rounded px-2 py-0.5 font-mono text-xs">
+            {node.code}
+          </span>
+          {!node.isActive && (
+            <span className="rounded bg-red-500/10 px-2 py-0.5 text-[10px] font-bold text-red-500 uppercase">
+              Inactive
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted">Order: {node.sortOrder}</span>
-          <button onClick={() => onEdit(node)} className="p-1.5 text-muted hover:text-blue-400 bg-foreground/5 rounded-lg ml-4"><Edit size={14} /></button>
-          <button onClick={() => onDelete(node.id)} className="p-1.5 text-muted hover:text-red-400 bg-foreground/5 rounded-lg"><Trash2 size={14} /></button>
+          <span className="text-muted text-xs">Order: {node.sortOrder}</span>
+          <button
+            onClick={() => onEdit(node)}
+            className="text-muted bg-foreground/5 ml-4 rounded-lg p-1.5 hover:text-blue-400"
+          >
+            <Edit size={14} />
+          </button>
+          <button
+            onClick={() => onDelete(node.id)}
+            className="text-muted bg-foreground/5 rounded-lg p-1.5 hover:text-red-400"
+          >
+            <Trash2 size={14} />
+          </button>
         </div>
       </div>
-      {expanded && hasChildren && node.children.map(child => (
-        <ModuleRow key={child.id} node={child} level={level + 1} onEdit={onEdit} onDelete={onDelete} />
-      ))}
+      {expanded &&
+        hasChildren &&
+        node.children.map((child) => (
+          <ModuleRow
+            key={child.id}
+            node={child}
+            level={level + 1}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
     </>
   );
 };
@@ -51,7 +88,7 @@ export default function ModulesTab() {
     description: '',
     parentId: '',
     sortOrder: '0',
-    isActive: true
+    isActive: true,
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -64,7 +101,7 @@ export default function ModulesTab() {
       setLoading(true);
       const [treeRes, listRes] = await Promise.all([
         accessControlAPI.getModuleTree(),
-        accessControlAPI.listModules({ limit: 1000 })
+        accessControlAPI.listModules({ limit: 1000 }),
       ]);
       setTree(treeRes.data || []);
       setFlatModules(listRes.data?.data || []);
@@ -84,11 +121,18 @@ export default function ModulesTab() {
         description: module.description || '',
         parentId: module.parentId ? module.parentId.toString() : '',
         sortOrder: module.sortOrder.toString(),
-        isActive: module.isActive
+        isActive: module.isActive,
       });
     } else {
       setEditingModule(null);
-      setFormData({ name: '', code: '', description: '', parentId: '', sortOrder: '0', isActive: true });
+      setFormData({
+        name: '',
+        code: '',
+        description: '',
+        parentId: '',
+        sortOrder: '0',
+        isActive: true,
+      });
     }
     setIsModalOpen(true);
   };
@@ -100,7 +144,7 @@ export default function ModulesTab() {
       const payload = {
         ...formData,
         parentId: formData.parentId ? parseInt(formData.parentId) : null,
-        sortOrder: parseInt(formData.sortOrder)
+        sortOrder: parseInt(formData.sortOrder),
       };
 
       if (editingModule) {
@@ -127,85 +171,141 @@ export default function ModulesTab() {
     }
   };
 
-  if (loading) return <div className="flex justify-center p-12"><TractorLoader className="text-[var(--color-brand-green)]" size={48} /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center p-12">
+        <TractorLoader className="text-[var(--color-brand-green)]" size={48} />
+      </div>
+    );
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold flex items-center gap-2">
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-xl font-bold">
           <LayoutGrid className="text-[var(--color-brand-green)]" size={24} /> System Modules
         </h2>
         <button
           onClick={() => openModal()}
-          className="spatial-button px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2"
+          className="spatial-button flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold"
         >
           <Plus size={16} /> Add Module
         </button>
       </div>
 
-      <div className="bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl overflow-hidden">
-        <div className="flex items-center justify-between p-4 bg-foreground/5 border-b border-[var(--border-subtle)]">
-          <span className="text-sm font-bold text-muted uppercase tracking-wider">Module Structure</span>
-          <span className="text-sm font-bold text-muted uppercase tracking-wider">Actions</span>
+      <div className="bg-foreground/5 overflow-hidden rounded-2xl border border-[var(--border-subtle)]">
+        <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-4">
+          <span className="text-muted text-sm font-bold tracking-wider uppercase">
+            Module Structure
+          </span>
+          <span className="text-muted text-sm font-bold tracking-wider uppercase">Actions</span>
         </div>
         <div className="flex flex-col">
           {tree.length === 0 ? (
-            <div className="p-8 text-center text-muted font-bold">No modules found</div>
+            <div className="text-muted p-8 text-center font-bold">No modules found</div>
           ) : (
-            tree.map(node => <ModuleRow key={node.id} node={node} onEdit={openModal} onDelete={handleDelete} />)
+            tree.map((node) => (
+              <ModuleRow key={node.id} node={node} onEdit={openModal} onDelete={handleDelete} />
+            ))
           )}
         </div>
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="glass-panel max-w-lg w-full p-6 rounded-2xl animate-fade-in relative max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-black mb-6">{editingModule ? 'Edit Module' : 'Create New Module'}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="glass-panel animate-fade-in relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl p-6">
+            <h2 className="mb-6 text-2xl font-black">
+              {editingModule ? 'Edit Module' : 'Create New Module'}
+            </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-muted mb-1">Name</label>
-                  <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required className="w-full h-12 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 font-bold focus:border-[var(--color-brand-green)] outline-none" />
+                  <label className="text-muted mb-1 block text-sm font-bold">Name</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    className="bg-foreground/5 h-12 w-full rounded-xl border border-[var(--border-subtle)] px-4 font-bold outline-none focus:border-[var(--color-brand-green)]"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-muted mb-1">Code</label>
-                  <input type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} required className="w-full h-12 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 font-bold focus:border-[var(--color-brand-green)] outline-none" placeholder="e.g. USER_MANAGEMENT" />
+                  <label className="text-muted mb-1 block text-sm font-bold">Code</label>
+                  <input
+                    type="text"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    required
+                    className="bg-foreground/5 h-12 w-full rounded-xl border border-[var(--border-subtle)] px-4 font-bold outline-none focus:border-[var(--color-brand-green)]"
+                    placeholder="e.g. USER_MANAGEMENT"
+                  />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-muted mb-1">Description</label>
-                <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full h-20 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl p-4 font-medium focus:border-[var(--color-brand-green)] outline-none resize-none" />
+                <label className="text-muted mb-1 block text-sm font-bold">Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="bg-foreground/5 h-20 w-full resize-none rounded-xl border border-[var(--border-subtle)] p-4 font-medium outline-none focus:border-[var(--color-brand-green)]"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-muted mb-1">Parent Module</label>
+                  <label className="text-muted mb-1 block text-sm font-bold">Parent Module</label>
                   <select
                     value={formData.parentId}
-                    onChange={e => setFormData({ ...formData, parentId: e.target.value })}
-                    className="w-full h-12 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 font-bold focus:border-[var(--color-brand-green)] outline-none appearance-none"
+                    onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
+                    className="bg-foreground/5 h-12 w-full appearance-none rounded-xl border border-[var(--border-subtle)] px-4 font-bold outline-none focus:border-[var(--color-brand-green)]"
                   >
                     <option value="">-- None (Root) --</option>
-                    {flatModules.filter(m => m.id !== editingModule?.id).map(m => (
-                      <option key={m.id} value={m.id}>{m.name}</option>
-                    ))}
+                    {flatModules
+                      .filter((m) => m.id !== editingModule?.id)
+                      .map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-muted mb-1">Sort Order</label>
-                  <input type="number" value={formData.sortOrder} onChange={e => setFormData({ ...formData, sortOrder: e.target.value })} required className="w-full h-12 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 font-bold focus:border-[var(--color-brand-green)] outline-none" />
+                  <label className="text-muted mb-1 block text-sm font-bold">Sort Order</label>
+                  <input
+                    type="number"
+                    value={formData.sortOrder}
+                    onChange={(e) => setFormData({ ...formData, sortOrder: e.target.value })}
+                    required
+                    className="bg-foreground/5 h-12 w-full rounded-xl border border-[var(--border-subtle)] px-4 font-bold outline-none focus:border-[var(--color-brand-green)]"
+                  />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mt-2">
-                <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="w-4 h-4 accent-[var(--color-brand-green)]" />
-                <label htmlFor="isActive" className="text-sm font-bold">Module is Active</label>
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="h-4 w-4 accent-[var(--color-brand-green)]"
+                />
+                <label htmlFor="isActive" className="text-sm font-bold">
+                  Module is Active
+                </label>
               </div>
 
-              <div className="flex justify-end gap-3 mt-6 border-t border-[var(--border-subtle)] pt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-xl text-sm font-bold hover:bg-foreground/10 transition-colors">Cancel</button>
-                <button type="submit" disabled={submitting} className="spatial-button px-6 py-2 rounded-xl text-sm font-bold flex items-center justify-center">
+              <div className="mt-6 flex justify-end gap-3 border-t border-[var(--border-subtle)] pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="hover:bg-foreground/10 rounded-xl px-4 py-2 text-sm font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="spatial-button flex items-center justify-center rounded-xl px-6 py-2 text-sm font-bold"
+                >
                   {submitting ? <TractorLoader size={20} /> : 'Save Module'}
                 </button>
               </div>

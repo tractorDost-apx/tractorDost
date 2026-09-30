@@ -2,16 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { usedTractorDocumentAPI } from '@/lib/api/used-documents';
-import {
-  FileText,
-  CheckCircle2,
-  XCircle,
-} from 'lucide-react';
+import { FileText, CheckCircle2 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Pagination from '@/components/shared/Pagination';
+import type { UsedDocument } from '@/types/models/used-listing';
 
 export default function AdminUsedDocumentsPage() {
-  const [documents, setDocuments] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<UsedDocument[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Pagination State
@@ -24,74 +21,104 @@ export default function AdminUsedDocumentsPage() {
 
   const fetchDocs = () => {
     setLoading(true);
-    usedTractorDocumentAPI.getAllDocuments().then((res: any) => {
+    usedTractorDocumentAPI.getAllDocuments({ limit: 50 }).then((res) => {
       if (res.success && res.data) {
-        setDocuments(res.data);
+        setDocuments(res.data.data);
       }
       setLoading(false);
     });
   };
 
-  const verifyDoc = (id: number, status: string) => {
-    usedTractorDocumentAPI.verifyDocument(id, status).then((res: any) => {
-      if(res.success) {
+  // The backend only supports verifying (stamps verifiedAt); there is no reject action
+  const verifyDoc = (id: number) => {
+    usedTractorDocumentAPI.verifyDocument(id).then((res) => {
+      if (res.success) {
         fetchDocs();
       }
     });
-  }
+  };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="mx-auto max-w-7xl space-y-6 p-6">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-black text-foreground tracking-tight">Document Verification</h1>
-          <p className="text-muted font-medium mt-1">Review RC and Loan Clearance documents.</p>
+          <h1 className="text-foreground text-3xl font-black tracking-tight">
+            Document Verification
+          </h1>
+          <p className="text-muted mt-1 font-medium">Review RC and Loan Clearance documents.</p>
         </div>
       </div>
 
-      <div className="bg-background rounded-3xl border border-[var(--border-subtle)] shadow-sm overflow-hidden">
+      <div className="bg-background overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr className="bg-foreground/5 border-b border-[var(--border-subtle)]">
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Listing ID</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Doc Type</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">File</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider text-right">Actions</th>
+                <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                  Listing ID
+                </th>
+                <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                  Doc Type
+                </th>
+                <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                  File
+                </th>
+                <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                  Status
+                </th>
+                <th className="text-muted px-6 py-4 text-right text-xs font-black tracking-wider uppercase">
+                  Actions
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/10">
+            <tbody className="divide-foreground/10 divide-y">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
-                    <TractorLoader className="text-[var(--color-brand-green)] mx-auto mb-2" size={48} />
+                    <TractorLoader
+                      className="mx-auto mb-2 text-[var(--color-brand-green)]"
+                      size={48}
+                    />
                   </td>
                 </tr>
               ) : documents.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted font-medium">
+                  <td colSpan={5} className="text-muted px-6 py-12 text-center font-medium">
                     No documents pending review.
                   </td>
                 </tr>
               ) : (
-                documents.slice((page - 1) * limit, page * limit).map((doc: any) => (
+                documents.slice((page - 1) * limit, page * limit).map((doc) => (
                   <tr key={doc.id} className="hover:bg-foreground/[0.02] transition-colors">
                     <td className="px-6 py-4 font-bold">#{doc.listingId}</td>
                     <td className="px-6 py-4 font-bold uppercase">{doc.docType}</td>
                     <td className="px-6 py-4">
-                      <a href={doc.fileUrl} target="_blank" className="text-blue-500 font-bold text-sm underline flex items-center gap-1"><FileText size={14}/> View Document</a>
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-sm font-bold text-blue-500 underline"
+                      >
+                        <FileText size={14} /> View Document
+                      </a>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${doc.status === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-500' : doc.status === 'REJECTED' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>
-                        {doc.status}
+                      <span
+                        className={`rounded px-2 py-1 text-xs font-bold uppercase ${doc.verifiedAt ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}
+                      >
+                        {doc.verifiedAt ? 'Verified' : 'Pending'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {doc.status === 'PENDING' && (
+                      {!doc.verifiedAt && (
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => verifyDoc(doc.id, 'VERIFIED')} className="p-2 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded transition-colors"><CheckCircle2 size={16}/></button>
-                          <button onClick={() => verifyDoc(doc.id, 'REJECTED')} className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors"><XCircle size={16}/></button>
+                          <button
+                            onClick={() => verifyDoc(doc.id)}
+                            title="Mark as verified"
+                            className="rounded bg-emerald-500/10 p-2 text-emerald-500 transition-colors hover:bg-emerald-500 hover:text-white"
+                          >
+                            <CheckCircle2 size={16} />
+                          </button>
                         </div>
                       )}
                     </td>
@@ -101,7 +128,7 @@ export default function AdminUsedDocumentsPage() {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         {!loading && documents.length > 0 && (
           <Pagination
@@ -110,7 +137,10 @@ export default function AdminUsedDocumentsPage() {
             totalCount={documents.length}
             totalPages={Math.ceil(documents.length / limit)}
             onPageChange={setPage}
-            onLimitChange={(l) => { setLimit(l); setPage(1); }}
+            onLimitChange={(l) => {
+              setLimit(l);
+              setPage(1);
+            }}
           />
         )}
       </div>

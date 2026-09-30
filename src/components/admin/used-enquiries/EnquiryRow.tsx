@@ -45,25 +45,65 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'NEW':
-      return <span className="px-2.5 py-1 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-lg text-xs font-black uppercase">New</span>;
+      return (
+        <span className="rounded-lg border border-blue-500/20 bg-blue-500/10 px-2.5 py-1 text-xs font-black text-blue-500 uppercase">
+          New
+        </span>
+      );
     case 'ATTEMPTED':
-      return <span className="px-2.5 py-1 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-lg text-xs font-black uppercase">Attempted</span>;
+      return (
+        <span className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-black text-indigo-500 uppercase">
+          Attempted
+        </span>
+      );
     case 'CONTACTED':
-      return <span className="px-2.5 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-lg text-xs font-black uppercase">Contacted</span>;
+      return (
+        <span className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-black text-amber-500 uppercase">
+          Contacted
+        </span>
+      );
     case 'QUALIFIED':
-      return <span className="px-2.5 py-1 bg-teal-500/10 text-teal-500 border border-teal-500/20 rounded-lg text-xs font-black uppercase">Qualified</span>;
+      return (
+        <span className="rounded-lg border border-teal-500/20 bg-teal-500/10 px-2.5 py-1 text-xs font-black text-teal-500 uppercase">
+          Qualified
+        </span>
+      );
     case 'INTERESTED':
-      return <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-xs font-black uppercase">Interested</span>;
+      return (
+        <span className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-black text-emerald-500 uppercase">
+          Interested
+        </span>
+      );
     case 'DEALER_ASSIGNED':
-      return <span className="px-2.5 py-1 bg-purple-500/10 text-purple-500 border border-purple-500/20 rounded-lg text-xs font-black uppercase">Dealer Assigned</span>;
+      return (
+        <span className="rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1 text-xs font-black text-purple-500 uppercase">
+          Dealer Assigned
+        </span>
+      );
     case 'CONVERTED':
-      return <span className="px-2.5 py-1 bg-green-500/10 text-green-500 border border-green-500/20 rounded-lg text-xs font-black uppercase">Converted</span>;
+      return (
+        <span className="rounded-lg border border-green-500/20 bg-green-500/10 px-2.5 py-1 text-xs font-black text-green-500 uppercase">
+          Converted
+        </span>
+      );
     case 'LOST':
-      return <span className="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-xs font-black uppercase">Lost</span>;
+      return (
+        <span className="rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-xs font-black text-red-500 uppercase">
+          Lost
+        </span>
+      );
     case 'SPAM':
-      return <span className="px-2.5 py-1 bg-rose-950/20 text-rose-400 border border-rose-500/10 rounded-lg text-xs font-black uppercase">Spam</span>;
+      return (
+        <span className="rounded-lg border border-rose-500/10 bg-rose-950/20 px-2.5 py-1 text-xs font-black text-rose-400 uppercase">
+          Spam
+        </span>
+      );
     default:
-      return <span className="px-2.5 py-1 bg-foreground/10 text-foreground border border-foreground/20 rounded-lg text-xs font-black uppercase">{status}</span>;
+      return (
+        <span className="bg-foreground/10 text-foreground border-foreground/20 rounded-lg border px-2.5 py-1 text-xs font-black uppercase">
+          {status}
+        </span>
+      );
   }
 };
 
@@ -78,8 +118,10 @@ export const EnquiryRow: React.FC<EnquiryRowProps> = ({
   onDelete,
 }) => {
   const listing = enquiry.listing;
-  const brandName = typeof listing?.tractorBrand === 'object' ? listing.tractorBrand.name : listing?.tractorBrand;
-  const modelName = typeof listing?.tractorModel === 'object' ? listing.tractorModel.name : listing?.tractorModel;
+  const brandName =
+    typeof listing?.tractorBrand === 'object' ? listing.tractorBrand.name : listing?.tractorBrand;
+  const modelName =
+    typeof listing?.tractorModel === 'object' ? listing.tractorModel.name : listing?.tractorModel;
 
   const allowedNext = VALID_TRANSITIONS[enquiry.status] || [];
   const selectOptions = [enquiry.status, ...allowedNext];
@@ -88,11 +130,11 @@ export const EnquiryRow: React.FC<EnquiryRowProps> = ({
     <tr className="hover:bg-foreground/[0.01] transition-colors duration-200">
       <td className="px-6 py-4.5">
         <div className="flex flex-col">
-          <span className="font-black text-foreground flex items-center gap-1.5">
+          <span className="text-foreground flex items-center gap-1.5 font-black">
             <User size={14} className="text-muted opacity-80" />
             {enquiry.name}
           </span>
-          <span className="text-xs font-bold text-muted mt-1 flex items-center gap-1.5">
+          <span className="text-muted mt-1 flex items-center gap-1.5 text-xs font-bold">
             <Phone size={12} className="text-muted opacity-70" />
             {enquiry.mobile}
           </span>
@@ -101,24 +143,23 @@ export const EnquiryRow: React.FC<EnquiryRowProps> = ({
 
       <td className="px-6 py-4.5">
         <div className="flex flex-col">
-          <span className="font-bold text-foreground">
-            Listing #{enquiry.listingId}
-          </span>
+          <span className="text-foreground font-bold">Listing #{enquiry.listingId}</span>
           {brandName && (
-            <span className="text-xs font-medium text-muted mt-0.5 flex items-center gap-1">
+            <span className="text-muted mt-0.5 flex items-center gap-1 text-xs font-medium">
               {brandName} {modelName}
             </span>
           )}
         </div>
       </td>
 
-      <td className="px-6 py-4.5 max-w-xs">
-        <div className="text-sm font-medium text-foreground/95 break-words flex items-start gap-1.5">
-          <MessageSquare size={14} className="text-muted shrink-0 mt-0.5" />
+      <td className="max-w-xs px-6 py-4.5">
+        <div className="text-foreground/95 flex items-start gap-1.5 text-sm font-medium break-words">
+          <MessageSquare size={14} className="text-muted mt-0.5 shrink-0" />
           <p>{enquiry.message || <em className="text-muted opacity-60">No message</em>}</p>
         </div>
-        <span className="text-[10px] text-muted font-bold block mt-1">
-          Received: {new Date(enquiry.createdAt).toLocaleDateString('en-IN', {
+        <span className="text-muted mt-1 block text-[10px] font-bold">
+          Received:{' '}
+          {new Date(enquiry.createdAt).toLocaleDateString('en-IN', {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -128,9 +169,7 @@ export const EnquiryRow: React.FC<EnquiryRowProps> = ({
         </span>
       </td>
 
-      <td className="px-6 py-4.5">
-        {getStatusBadge(enquiry.status)}
-      </td>
+      <td className="px-6 py-4.5">{getStatusBadge(enquiry.status)}</td>
 
       <td className="px-6 py-4.5 text-right">
         <div className="flex items-center justify-end gap-3">
@@ -138,7 +177,7 @@ export const EnquiryRow: React.FC<EnquiryRowProps> = ({
             <TractorLoader size={20} />
           ) : (
             <select
-              className="bg-foreground/5 hover:bg-foreground/10 border border-[var(--border-subtle)] text-xs font-bold rounded-xl px-3 py-2 outline-none cursor-pointer transition-all focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
+              className="bg-foreground/5 hover:bg-foreground/10 cursor-pointer rounded-xl border border-[var(--border-subtle)] px-3 py-2 text-xs font-bold transition-all outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
               value={enquiry.status}
               onChange={(e) => onUpdateStatus(enquiry.id, e.target.value)}
               disabled={selectOptions.length <= 1}
@@ -157,7 +196,7 @@ export const EnquiryRow: React.FC<EnquiryRowProps> = ({
                 onDelete(enquiry.id);
               }
             }}
-            className="p-2 text-muted hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+            className="text-muted rounded-xl p-2 transition-all hover:bg-red-500/10 hover:text-red-500"
             title="Delete Enquiry"
           >
             <Trash2 size={16} />

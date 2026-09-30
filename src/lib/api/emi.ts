@@ -66,7 +66,10 @@ export const emiAPI = {
     startDate?: string;
     endDate?: string;
   }) => {
-    const response = await apiClient.get<{ success: boolean; data: any; message?: string }>('/emi-calculations', { params });
+    const response = await apiClient.get<{ success: boolean; data: any; message?: string }>(
+      '/emi-calculations',
+      { params }
+    );
     return response.data;
   },
 
@@ -74,7 +77,9 @@ export const emiAPI = {
    * Fetch a single saved calculation details by its ID
    */
   getCalculationById: async (id: number) => {
-    const response = await apiClient.get<{ success: boolean; data: any; message?: string }>(`/emi-calculations/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: any; message?: string }>(
+      `/emi-calculations/${id}`
+    );
     return response.data;
   },
 
@@ -82,7 +87,10 @@ export const emiAPI = {
    * Update an existing EMI calculation record (Admin only)
    */
   updateCalculation: async (id: number, data: Partial<CreateEmiCalculationPayload>) => {
-    const response = await apiClient.patch<{ success: boolean; data: any; message?: string }>(`/emi-calculations/${id}`, data);
+    const response = await apiClient.patch<{ success: boolean; data: any; message?: string }>(
+      `/emi-calculations/${id}`,
+      data
+    );
     return response.data;
   },
 
@@ -90,7 +98,9 @@ export const emiAPI = {
    * Delete an EMI calculation record (Admin only)
    */
   deleteCalculation: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; data: any; message?: string }>(`/emi-calculations/${id}`);
+    const response = await apiClient.delete<{ success: boolean; data: any; message?: string }>(
+      `/emi-calculations/${id}`
+    );
     return response.data;
-  }
+  },
 };

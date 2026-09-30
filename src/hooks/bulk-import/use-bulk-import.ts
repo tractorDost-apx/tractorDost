@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import axios from 'axios';
 import type { BulkImportApi } from '@/lib/api/bulk-import';
-import type { BulkImportErrorBody, ImportProgress, ImportReport, SheetIssue } from '@/types/api/bulk-import';
+import type {
+  BulkImportErrorBody,
+  ImportProgress,
+  ImportReport,
+  SheetIssue,
+} from '@/types/api/bulk-import';
 
 // Two explicit steps, both validated on the server (rules live in each BACKEND *.import.ts):
 //   1. Test   → POST …/preview  (read-only; returns a previewToken when it passes)
@@ -127,9 +132,21 @@ function reducer(state: BulkImportState, action: Action): BulkImportState {
     case 'validated':
       return { ...state, phase: 'ready', uploadPercent: 100, validation: action.report };
     case 'validation-failed':
-      return { ...state, phase: 'invalid', failure: action.failure, validation: action.failure.report ?? null };
+      return {
+        ...state,
+        phase: 'invalid',
+        failure: action.failure,
+        validation: action.failure.report ?? null,
+      };
     case 'import-start':
-      return { ...state, phase: 'importing', uploadPercent: 0, progress: null, failure: null, result: null };
+      return {
+        ...state,
+        phase: 'importing',
+        uploadPercent: 0,
+        progress: null,
+        failure: null,
+        result: null,
+      };
     case 'progress':
       // A poll can land after the import response; it must not overwrite the final state.
       return state.phase === 'importing' ? { ...state, progress: action.progress } : state;
@@ -147,15 +164,22 @@ function reducer(state: BulkImportState, action: Action): BulkImportState {
 // ---------------------------------------------------------------------------
 
 export const formatBytes = (bytes: number) =>
-  bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  bytes < 1024 * 1024
+    ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+    : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 
 export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** ".xlsx, .xls or .csv" */
 const listExtensions = (extensions: string[]) =>
-  extensions.length > 1 ? `${extensions.slice(0, -1).join(', ')} or ${extensions[extensions.length - 1]}` : extensions[0];
+  extensions.length > 1
+    ? `${extensions.slice(0, -1).join(', ')} or ${extensions[extensions.length - 1]}`
+    : extensions[0];
 
-function checkFile(file: File, config: Pick<BulkImportConfig, 'extensions' | 'maxFileBytes'>): string | null {
+function checkFile(
+  file: File,
+  config: Pick<BulkImportConfig, 'extensions' | 'maxFileBytes'>
+): string | null {
   const name = file.name.toLowerCase();
   const allowed = listExtensions(config.extensions);
   if (!config.extensions.some((ext) => name.endsWith(ext))) {
@@ -177,7 +201,11 @@ const isReport = (v: unknown): v is ImportReport =>
   typeof v === 'object' && v !== null && 'summary' in v && 'failed' in v;
 
 /** Turns any error from the import endpoint into a message an admin can act on. */
-function toFailure(error: unknown, stage: 'test' | 'import', labels: BulkImportLabels): ImportFailure {
+function toFailure(
+  error: unknown,
+  stage: 'test' | 'import',
+  labels: BulkImportLabels
+): ImportFailure {
   if (!axios.isAxiosError(error) || !error.response) {
     return stage === 'import'
       ? {
@@ -198,7 +226,9 @@ function toFailure(error: unknown, stage: 'test' | 'import', labels: BulkImportL
   }
 
   const { status } = error.response;
-  const body = (typeof error.response.data === 'object' ? error.response.data : null) as BulkImportErrorBody | null;
+  const body = (
+    typeof error.response.data === 'object' ? error.response.data : null
+  ) as BulkImportErrorBody | null;
   const serverMessage = body?.message;
 
   if (status === 422 && isReport(body?.error)) {
@@ -211,7 +241,8 @@ function toFailure(error: unknown, stage: 'test' | 'import', labels: BulkImportL
     };
   }
   if (status === 400) {
-    const sheetIssues = body?.error && 'sheetIssues' in body.error ? body.error.sheetIssues : undefined;
+    const sheetIssues =
+      body?.error && 'sheetIssues' in body.error ? body.error.sheetIssues : undefined;
     return {
       kind: 'file',
       title: 'File could not be used',
@@ -224,7 +255,9 @@ function toFailure(error: unknown, stage: 'test' | 'import', labels: BulkImportL
     return {
       kind: 'not-tested',
       title: 'Test required — nothing was saved',
-      message: serverMessage ?? 'This file has not passed a test on the server. Re-run the test, then insert.',
+      message:
+        serverMessage ??
+        'This file has not passed a test on the server. Re-run the test, then insert.',
       retryable: false,
     };
   }
@@ -232,12 +265,19 @@ function toFailure(error: unknown, stage: 'test' | 'import', labels: BulkImportL
     return {
       kind: 'busy',
       title: 'Another import is running',
-      message: serverMessage ?? `Another ${labels.singular} import is being saved. Wait for it to finish, then try again.`,
+      message:
+        serverMessage ??
+        `Another ${labels.singular} import is being saved. Wait for it to finish, then try again.`,
       retryable: true,
     };
   }
   if (status === 413) {
-    return { kind: 'file', title: 'File too large', message: 'The server rejected the file because it is too large.', retryable: false };
+    return {
+      kind: 'file',
+      title: 'File too large',
+      message: 'The server rejected the file because it is too large.',
+      retryable: false,
+    };
   }
   if (status === 401 || status === 403) {
     return {
@@ -250,7 +290,9 @@ function toFailure(error: unknown, stage: 'test' | 'import', labels: BulkImportL
   return {
     kind: 'server',
     title: 'Unexpected server error',
-    message: serverMessage ?? `The server responded with an error (${status}). Nothing was saved; please retry.`,
+    message:
+      serverMessage ??
+      `The server responded with an error (${status}). Nothing was saved; please retry.`,
     retryable: true,
   };
 }
@@ -287,7 +329,8 @@ function checkTestReport(report: ImportReport, labels: BulkImportLabels): Import
   return null;
 }
 
-const plural = (n: number, word: string) => `${n.toLocaleString('en-IN')} ${word}${n === 1 ? '' : 's'}`;
+const plural = (n: number, word: string) =>
+  `${n.toLocaleString('en-IN')} ${word}${n === 1 ? '' : 's'}`;
 
 /** Maps the dry-run outcome onto the checklist shown while testing. */
 function deriveSteps(state: BulkImportState, labels: BulkImportLabels): ValidationStep[] {
@@ -307,7 +350,8 @@ function deriveSteps(state: BulkImportState, labels: BulkImportLabels): Validati
     step.status = status;
     step.detail = detail;
   };
-  const rest = (from: number, status: StepStatus) => steps.slice(from).forEach((s) => (s.status = status));
+  const rest = (from: number, status: StepStatus) =>
+    steps.slice(from).forEach((s) => (s.status = status));
 
   if (phase === 'idle') return steps;
   if (failure?.kind === 'client') {
@@ -332,7 +376,11 @@ function deriveSteps(state: BulkImportState, labels: BulkImportLabels): Validati
   if (!report) {
     if (failure?.sheetIssues?.length) {
       set('read', 'passed', 'File opened');
-      set('columns', 'failed', `No usable sheet: ${failure.sheetIssues.map((s) => `"${s.sheet}" — ${s.message}`).join(' ')}`);
+      set(
+        'columns',
+        'failed',
+        `No usable sheet: ${failure.sheetIssues.map((s) => `"${s.sheet}" — ${s.message}`).join(' ')}`
+      );
       rest(3, 'skipped');
     } else {
       set('read', 'failed', failure?.message);
@@ -343,12 +391,20 @@ function deriveSteps(state: BulkImportState, labels: BulkImportLabels): Validati
   }
 
   const { summary } = report;
-  set('read', 'passed', `${plural(summary.totalRows, 'data row')} in ${plural(summary.sheetsProcessed, 'sheet')}`);
+  set(
+    'read',
+    'passed',
+    `${plural(summary.totalRows, 'data row')} in ${plural(summary.sheetsProcessed, 'sheet')}`
+  );
 
   // Header problems: rows were not checked, because their columns can't be trusted.
   const headerErrors = report.headerErrors ?? [];
   if (headerErrors.length) {
-    set('columns', 'failed', `${plural(headerErrors.length, 'column problem')} in the header row — see "Column problems" below`);
+    set(
+      'columns',
+      'failed',
+      `${plural(headerErrors.length, 'column problem')} in the header row — see "Column problems" below`
+    );
     rest(3, 'skipped');
     set('done', 'failed', 'Fix the header row, then choose the file again');
     return steps;
@@ -357,33 +413,49 @@ function deriveSteps(state: BulkImportState, labels: BulkImportLabels): Validati
   const extraColumns = report.extraColumns ?? [];
   const columnNotes = [
     report.sheetIssues.length && `${plural(report.sheetIssues.length, 'sheet')} skipped`,
-    report.ignoredColumns.length && `${plural(report.ignoredColumns.length, 'column')} not recognised (will be ignored)`,
+    report.ignoredColumns.length &&
+      `${plural(report.ignoredColumns.length, 'column')} not recognised (will be ignored)`,
   ].filter(Boolean);
-  const columnInfo = extraColumns.length ? `${plural(extraColumns.length, 'extra column')} will be saved as additional specs` : '';
+  const columnInfo = extraColumns.length
+    ? `${plural(extraColumns.length, 'extra column')} will be saved as additional specs`
+    : '';
   set(
     'columns',
     columnNotes.length ? 'warning' : 'passed',
-    [...columnNotes, columnInfo].filter(Boolean).join(' · ') || 'All columns recognised',
+    [...columnNotes, columnInfo].filter(Boolean).join(' · ') || 'All columns recognised'
   );
 
   const dataErrorRows = report.failed.filter((r) => r.errors.some((e) => !e.required)).length;
   const corrections = report.warnings.reduce((n, w) => n + w.count, 0);
   if (dataErrorRows) set('data', 'failed', `${plural(dataErrorRows, 'row')} with invalid values`);
-  else if (corrections) set('data', 'warning', `${plural(corrections, 'value')} will be auto-corrected`);
+  else if (corrections)
+    set('data', 'warning', `${plural(corrections, 'value')} will be auto-corrected`);
   else set('data', 'passed', `${plural(summary.validRows, 'row')} valid`);
 
   const missingRows = report.failed.filter((r) => r.errors.some((e) => e.required)).length;
-  set('required', missingRows ? 'failed' : 'passed', missingRows ? `${plural(missingRows, 'row')} missing required values` : 'All required values present');
+  set(
+    'required',
+    missingRows ? 'failed' : 'passed',
+    missingRows
+      ? `${plural(missingRows, 'row')} missing required values`
+      : 'All required values present'
+  );
 
   const dupNotes = [
     summary.skipped && `${plural(summary.skipped, 'duplicate row')} will be skipped`,
-    summary.updated && `${plural(summary.updated, 'row')} match existing ${labels.plural} and will update them`,
+    summary.updated &&
+      `${plural(summary.updated, 'row')} match existing ${labels.plural} and will update them`,
   ].filter(Boolean);
-  set('duplicates', dupNotes.length ? 'warning' : 'passed', dupNotes.length ? dupNotes.join(' · ') : 'No duplicates found');
+  set(
+    'duplicates',
+    dupNotes.length ? 'warning' : 'passed',
+    dupNotes.length ? dupNotes.join(' · ') : 'No duplicates found'
+  );
 
   // The verdict comes from the phase, so this step can never say "passed" while the test failed.
   if (phase === 'ready') set('done', 'passed', 'Ready to insert — nothing has been saved');
-  else if (summary.failed) set('done', 'failed', `${plural(summary.failed, 'row')} must be fixed before importing`);
+  else if (summary.failed)
+    set('done', 'failed', `${plural(summary.failed, 'row')} must be fixed before importing`);
   else set('done', 'failed', failure?.title ?? 'Test did not pass');
   return steps;
 }
@@ -394,7 +466,7 @@ function deriveSteps(state: BulkImportState, labels: BulkImportLabels): Validati
 
 export function useBulkImport<R extends ImportReport>(
   config: BulkImportConfig<R>,
-  { onImported }: { onImported?: (report: R) => void } = {},
+  { onImported }: { onImported?: (report: R) => void } = {}
 ) {
   const [state, dispatch] = useReducer(reducer, initialState);
   // Every file selection starts a new run; responses from an older run are dropped.
@@ -420,11 +492,16 @@ export function useBulkImport<R extends ImportReport>(
       // The test only ever calls the read-only preview endpoint.
       const res = await api.preview(file, {
         signal: controller.signal,
-        onUploadProgress: (percent) => runRef.current === runId && dispatch({ type: 'upload', percent }),
+        onUploadProgress: (percent) =>
+          runRef.current === runId && dispatch({ type: 'upload', percent }),
       });
       if (runRef.current !== runId) return;
       const problem = checkTestReport(res.data, labels);
-      dispatch(problem ? { type: 'validation-failed', failure: problem } : { type: 'validated', report: res.data });
+      dispatch(
+        problem
+          ? { type: 'validation-failed', failure: problem }
+          : { type: 'validated', report: res.data }
+      );
     } catch (error) {
       if (axios.isCancel(error) || runRef.current !== runId) return;
       dispatch({ type: 'validation-failed', failure: toFailure(error, 'test', labels) });
@@ -441,14 +518,22 @@ export function useBulkImport<R extends ImportReport>(
         dispatch({
           type: 'client-invalid',
           file: picked,
-          failure: { kind: 'client', title: 'File not accepted', message: problem, retryable: false },
+          failure: {
+            kind: 'client',
+            title: 'File not accepted',
+            message: problem,
+            retryable: false,
+          },
         });
         return;
       }
       // Snapshot the bytes so the insert sends exactly what was tested, even if the file changes on disk.
       let snapshot: File;
       try {
-        snapshot = new File([await picked.arrayBuffer()], picked.name, { type: picked.type, lastModified: picked.lastModified });
+        snapshot = new File([await picked.arrayBuffer()], picked.name, {
+          type: picked.type,
+          lastModified: picked.lastModified,
+        });
       } catch {
         if (runRef.current !== runId) return;
         dispatch({
@@ -457,7 +542,8 @@ export function useBulkImport<R extends ImportReport>(
           failure: {
             kind: 'client',
             title: 'File not readable',
-            message: 'The browser could not read this file. Close it in other programs and select it again.',
+            message:
+              'The browser could not read this file. Close it in other programs and select it again.',
             retryable: false,
           },
         });
@@ -467,7 +553,7 @@ export function useBulkImport<R extends ImportReport>(
       dispatch({ type: 'select', file: snapshot });
       void runTest(snapshot, runId);
     },
-    [runTest],
+    [runTest]
   );
 
   /** Re-runs the dry run on the current file (e.g. after "server unreachable", or when an import was rejected). */
@@ -518,7 +604,8 @@ export function useBulkImport<R extends ImportReport>(
       dispatch({ type: 'imported', report: res.data });
       onImportedRef.current?.(res.data);
     } catch (error) {
-      if (runRef.current === runId) dispatch({ type: 'import-failed', failure: toFailure(error, 'import', labels) });
+      if (runRef.current === runId)
+        dispatch({ type: 'import-failed', failure: toFailure(error, 'import', labels) });
     } finally {
       poll.abort();
       window.clearTimeout(timer);

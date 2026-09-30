@@ -36,9 +36,9 @@ export const usersAPI = {
   /**
    * Fetch all users with pagination and filters
    */
-  getAllUsers: async (params?: { 
-    page?: number; 
-    limit?: number; 
+  getAllUsers: async (params?: {
+    page?: number;
+    limit?: number;
     search?: string;
     role?: string;
     isActive?: 'true' | 'false';
@@ -52,7 +52,9 @@ export const usersAPI = {
    * Fetch a single user by ID
    */
   getUserById: async (id: number) => {
-    const response = await apiClient.get<{ success: boolean; data: User }>(`/users/getUserById/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: User }>(
+      `/users/getUserById/${id}`
+    );
     return response.data;
   },
 
@@ -68,7 +70,10 @@ export const usersAPI = {
    * Update a user (Admin)
    */
   updateUserById: async (id: number, data: Partial<User>) => {
-    const response = await apiClient.patch<{ success: boolean; data: User }>(`/users/updateUserById/${id}`, data);
+    const response = await apiClient.patch<{ success: boolean; data: User }>(
+      `/users/updateUserById/${id}`,
+      data
+    );
     return response.data;
   },
 
@@ -76,7 +81,10 @@ export const usersAPI = {
    * Toggle a user's active status (Admin)
    */
   toggleUserActive: async (id: number) => {
-    const response = await apiClient.patch<{ success: boolean; data: { id: number; isActive: boolean; message: string } }>(`/users/toggleUserActive/${id}`);
+    const response = await apiClient.patch<{
+      success: boolean;
+      data: { id: number; isActive: boolean; message: string };
+    }>(`/users/toggleUserActive/${id}`);
     return response.data;
   },
 
@@ -84,7 +92,9 @@ export const usersAPI = {
    * Delete a user (Super Admin only)
    */
   deleteUserById: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; message: string }>(`/users/deleteUserById/${id}`);
+    const response = await apiClient.delete<{ success: boolean; message: string }>(
+      `/users/deleteUserById/${id}`
+    );
     return response.data;
-  }
+  },
 };

@@ -11,7 +11,11 @@ import { type BulkImportConfig, useBulkImport } from '@/hooks/bulk-import/use-bu
 
 export const IMPLEMENT_IMPORT_CONFIG: BulkImportConfig<ImplementImportReport> = {
   api: implementAPI.bulkImport,
-  labels: { singular: 'implement', plural: 'implements', matchRule: 'by slug, or by brand and model name' },
+  labels: {
+    singular: 'implement',
+    plural: 'implements',
+    matchRule: 'by slug, or by brand and model name',
+  },
   // The server reads .xlsx only (it checks the file signature and cached formula results).
   accept: '.xlsx',
   extensions: ['.xlsx'],
@@ -32,6 +36,8 @@ export const IMPLEMENT_IMPORT_CONFIG: BulkImportConfig<ImplementImportReport> = 
   },
 };
 
-export function useImplementBulkImport(options: { onImported?: (report: ImplementImportReport) => void } = {}) {
+export function useImplementBulkImport(
+  options: { onImported?: (report: ImplementImportReport) => void } = {}
+) {
   return useBulkImport(IMPLEMENT_IMPORT_CONFIG, options);
 }

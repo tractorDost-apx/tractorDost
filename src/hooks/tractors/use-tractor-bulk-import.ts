@@ -33,6 +33,8 @@ export const TRACTOR_IMPORT_CONFIG: BulkImportConfig = {
   maxFileBytes: 50 * 1024 * 1024,
 };
 
-export function useTractorBulkImport(options: { onImported?: (report: ImportReport) => void } = {}) {
+export function useTractorBulkImport(
+  options: { onImported?: (report: ImportReport) => void } = {}
+) {
   return useBulkImport(TRACTOR_IMPORT_CONFIG, options);
 }

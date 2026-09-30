@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Tractor, IndianRupee, Tag, ShieldCheck, FileText, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import {
+  X,
+  Tractor,
+  IndianRupee,
+  Tag,
+  ShieldCheck,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+} from 'lucide-react';
 import { DealerInventoryItem } from '@/types/models/dealerInventory';
 import { usedTractorListingAPI } from '@/lib/api/used-listings';
 
@@ -29,17 +39,29 @@ export function CreateUsedListingModal({
   const [financeAvailable, setFinanceAvailable] = useState<boolean>(false);
 
   // Condition Grades
-  const [conditionGrade, setConditionGrade] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>('GOOD');
-  const [tyreCondition, setTyreCondition] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>('GOOD');
+  const [conditionGrade, setConditionGrade] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>(
+    'GOOD'
+  );
+  const [tyreCondition, setTyreCondition] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>(
+    'GOOD'
+  );
   const [engineConditionPct, setEngineConditionPct] = useState<number>(85);
-  const [hydraulicsCondition, setHydraulicsCondition] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>('GOOD');
-  const [clutchCondition, setClutchCondition] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>('GOOD');
-  const [bodyCondition, setBodyCondition] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>('GOOD');
+  const [hydraulicsCondition, setHydraulicsCondition] = useState<
+    'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'
+  >('GOOD');
+  const [clutchCondition, setClutchCondition] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>(
+    'GOOD'
+  );
+  const [bodyCondition, setBodyCondition] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR'>(
+    'GOOD'
+  );
 
   // Legal & Documents
   const [rcAvailable, setRcAvailable] = useState<boolean>(true);
   const [insuranceValidity, setInsuranceValidity] = useState<string>('');
-  const [loanClearanceStatus, setLoanClearanceStatus] = useState<'CLEAR' | 'HYPOTHECATED' | 'PENDING_NOC'>('CLEAR');
+  const [loanClearanceStatus, setLoanClearanceStatus] = useState<
+    'CLEAR' | 'HYPOTHECATED' | 'PENDING_NOC'
+  >('CLEAR');
 
   // Location & Details
   const [state, setState] = useState<string>('Maharashtra');
@@ -90,7 +112,9 @@ export function CreateUsedListingModal({
         clutchCondition,
         bodyCondition,
         rcAvailable,
-        insuranceValidity: insuranceValidity ? new Date(insuranceValidity).toISOString() : undefined,
+        insuranceValidity: insuranceValidity
+          ? new Date(insuranceValidity).toISOString()
+          : undefined,
         loanClearanceStatus,
         state: state.trim(),
         district: district.trim(),
@@ -116,24 +140,24 @@ export function CreateUsedListingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/30 flex items-center justify-center p-4 animate-fade-in">
-      <div className="w-full max-w-2xl bg-[var(--background)] text-foreground border border-[var(--border-subtle)] rounded-3xl shadow-2xl overflow-hidden flex flex-col my-8 relative [backdrop-filter:none]">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/30 p-4">
+      <div className="text-foreground relative my-8 flex w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl [backdrop-filter:none]">
         {/* Header Banner */}
-        <div className="p-6 border-b border-[var(--border-subtle)] flex items-center justify-between bg-foreground/[0.03]">
+        <div className="bg-foreground/[0.03] flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20">
+            <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
               <Tag size={22} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-black text-foreground tracking-tight">
+                <h3 className="text-foreground text-xl font-black tracking-tight">
                   List Tractor for Sale
                 </h3>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20">
+                <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-[var(--color-brand-green)] uppercase">
                   Dealer Listing
                 </span>
               </div>
-              <p className="text-xs font-medium text-muted mt-0.5">
+              <p className="text-muted mt-0.5 text-xs font-medium">
                 Publish a used tractor marketplace listing directly from your stock inventory.
               </p>
             </div>
@@ -141,52 +165,60 @@ export function CreateUsedListingModal({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-muted hover:text-foreground hover:bg-foreground/10 transition-colors"
+            className="text-muted hover:text-foreground hover:bg-foreground/10 rounded-xl p-2 transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Form Content */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6 text-xs max-h-[80vh] overflow-y-auto hidden-scrollbar">
+        <form
+          onSubmit={handleSubmit}
+          className="hidden-scrollbar max-h-[80vh] space-y-6 overflow-y-auto p-6 text-xs"
+        >
           {error && (
-            <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bold flex items-start gap-2.5">
-              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2.5 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-bold text-rose-500">
+              <AlertCircle size={18} className="mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Pre-filled Inventory Context Card */}
-          <div className="p-4 rounded-2xl bg-[var(--color-brand-green)]/5 border border-[var(--color-brand-green)]/20 space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-bold text-muted uppercase tracking-wider">
+          <div className="space-y-2 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/5 p-4">
+            <div className="text-muted flex items-center justify-between text-[11px] font-bold tracking-wider uppercase">
               <span>Inventory Stock Context</span>
               <span className="text-[var(--color-brand-green)]">Pre-filled Catalog Info</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-3">
               <div>
                 <span className="text-muted block text-[10px]">Brand</span>
-                <span className="font-black text-foreground text-sm">{item.brand || 'Catalog Brand'}</span>
+                <span className="text-foreground text-sm font-black">
+                  {item.brand || 'Catalog Brand'}
+                </span>
               </div>
               <div>
                 <span className="text-muted block text-[10px]">Model Name</span>
-                <span className="font-black text-foreground text-sm">{modelTitle}</span>
+                <span className="text-foreground text-sm font-black">{modelTitle}</span>
               </div>
               <div>
                 <span className="text-muted block text-[10px]">Dealership Seller</span>
-                <span className="font-bold text-foreground">{dealerName || 'Authorized Dealer'}</span>
+                <span className="text-foreground font-bold">
+                  {dealerName || 'Authorized Dealer'}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Pricing & Years */}
           <div className="space-y-4">
-            <h4 className="font-black text-foreground text-sm border-b border-[var(--border-subtle)] pb-2 flex items-center gap-2">
-              <IndianRupee size={16} className="text-[var(--color-brand-green)]" /> Pricing & Basic Usage
+            <h4 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-sm font-black">
+              <IndianRupee size={16} className="text-[var(--color-brand-green)]" /> Pricing & Basic
+              Usage
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Asking Price (₹) *</label>
+                <label className="text-muted block font-bold">Asking Price (₹) *</label>
                 <input
                   type="number"
                   required
@@ -194,12 +226,12 @@ export function CreateUsedListingModal({
                   placeholder="e.g. 450000"
                   value={askingPrice}
                   onChange={(e) => setAskingPrice(e.target.value)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] shadow-sm"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3.5 py-2.5 font-mono text-sm font-bold shadow-sm focus:border-[var(--color-brand-green)] focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Manufacturing Year *</label>
+                <label className="text-muted block font-bold">Manufacturing Year *</label>
                 <input
                   type="number"
                   required
@@ -207,29 +239,29 @@ export function CreateUsedListingModal({
                   max={currentYear}
                   value={yearOfManufacture}
                   onChange={(e) => setYearOfManufacture(parseInt(e.target.value) || currentYear)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] shadow-sm"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3.5 py-2.5 font-mono text-sm font-bold shadow-sm focus:border-[var(--color-brand-green)] focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Hours Used (Engine)</label>
+                <label className="text-muted block font-bold">Hours Used (Engine)</label>
                 <input
                   type="number"
                   min={0}
                   value={hoursUsed}
                   onChange={(e) => setHoursUsed(parseInt(e.target.value) || 0)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] shadow-sm"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3.5 py-2.5 font-mono text-sm font-bold shadow-sm focus:border-[var(--color-brand-green)] focus:outline-none"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Ownership</label>
+                <label className="text-muted block font-bold">Ownership</label>
                 <select
                   value={ownership}
                   onChange={(e) => setOwnership(parseInt(e.target.value))}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none focus:border-[var(--color-brand-green)]"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
                 >
                   <option value={1}>1st Owner</option>
                   <option value={2}>2nd Owner</option>
@@ -238,23 +270,23 @@ export function CreateUsedListingModal({
                 </select>
               </div>
 
-              <div className="p-3 rounded-xl bg-foreground/[0.03] border border-[var(--border-subtle)] flex items-center justify-between">
-                <span className="font-bold text-foreground">Price Negotiable</span>
+              <div className="bg-foreground/[0.03] flex items-center justify-between rounded-xl border border-[var(--border-subtle)] p-3">
+                <span className="text-foreground font-bold">Price Negotiable</span>
                 <input
                   type="checkbox"
                   checked={negotiable}
                   onChange={(e) => setNegotiable(e.target.checked)}
-                  className="h-4 w-4 accent-[var(--color-brand-green)] cursor-pointer"
+                  className="h-4 w-4 cursor-pointer accent-[var(--color-brand-green)]"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-foreground/[0.03] border border-[var(--border-subtle)] flex items-center justify-between col-span-2 sm:col-span-1">
-                <span className="font-bold text-foreground">Finance Available</span>
+              <div className="bg-foreground/[0.03] col-span-2 flex items-center justify-between rounded-xl border border-[var(--border-subtle)] p-3 sm:col-span-1">
+                <span className="text-foreground font-bold">Finance Available</span>
                 <input
                   type="checkbox"
                   checked={financeAvailable}
                   onChange={(e) => setFinanceAvailable(e.target.checked)}
-                  className="h-4 w-4 accent-[var(--color-brand-green)] cursor-pointer"
+                  className="h-4 w-4 cursor-pointer accent-[var(--color-brand-green)]"
                 />
               </div>
             </div>
@@ -262,17 +294,18 @@ export function CreateUsedListingModal({
 
           {/* Tractor Condition Grades */}
           <div className="space-y-4">
-            <h4 className="font-black text-foreground text-sm border-b border-[var(--border-subtle)] pb-2 flex items-center gap-2">
-              <Sparkles size={16} className="text-[var(--color-brand-green)]" /> Tractor Condition Rating
+            <h4 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-sm font-black">
+              <Sparkles size={16} className="text-[var(--color-brand-green)]" /> Tractor Condition
+              Rating
             </h4>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Overall Condition</label>
+                <label className="text-muted block font-bold">Overall Condition</label>
                 <select
                   value={conditionGrade}
                   onChange={(e) => setConditionGrade(e.target.value as any)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent</option>
                   <option value="GOOD">Good</option>
@@ -282,11 +315,11 @@ export function CreateUsedListingModal({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Tyre Condition</label>
+                <label className="text-muted block font-bold">Tyre Condition</label>
                 <select
                   value={tyreCondition}
                   onChange={(e) => setTyreCondition(e.target.value as any)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent (80-100%)</option>
                   <option value="GOOD">Good (60-80%)</option>
@@ -296,23 +329,23 @@ export function CreateUsedListingModal({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Engine Health %</label>
+                <label className="text-muted block font-bold">Engine Health %</label>
                 <input
                   type="number"
                   min={0}
                   max={100}
                   value={engineConditionPct}
                   onChange={(e) => setEngineConditionPct(parseInt(e.target.value) || 0)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-mono font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-mono font-bold focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Hydraulics Condition</label>
+                <label className="text-muted block font-bold">Hydraulics Condition</label>
                 <select
                   value={hydraulicsCondition}
                   onChange={(e) => setHydraulicsCondition(e.target.value as any)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent</option>
                   <option value="GOOD">Good</option>
@@ -322,11 +355,11 @@ export function CreateUsedListingModal({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Clutch Condition</label>
+                <label className="text-muted block font-bold">Clutch Condition</label>
                 <select
                   value={clutchCondition}
                   onChange={(e) => setClutchCondition(e.target.value as any)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent</option>
                   <option value="GOOD">Good</option>
@@ -336,11 +369,11 @@ export function CreateUsedListingModal({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Body & Paint Condition</label>
+                <label className="text-muted block font-bold">Body & Paint Condition</label>
                 <select
                   value={bodyCondition}
                   onChange={(e) => setBodyCondition(e.target.value as any)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent</option>
                   <option value="GOOD">Good</option>
@@ -353,27 +386,28 @@ export function CreateUsedListingModal({
 
           {/* Legal Documents */}
           <div className="space-y-4">
-            <h4 className="font-black text-foreground text-sm border-b border-[var(--border-subtle)] pb-2 flex items-center gap-2">
-              <ShieldCheck size={16} className="text-[var(--color-brand-green)]" /> Legal & RC Documents
+            <h4 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-sm font-black">
+              <ShieldCheck size={16} className="text-[var(--color-brand-green)]" /> Legal & RC
+              Documents
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 rounded-xl bg-foreground/[0.03] border border-[var(--border-subtle)] flex items-center justify-between">
-                <span className="font-bold text-foreground">RC Available</span>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="bg-foreground/[0.03] flex items-center justify-between rounded-xl border border-[var(--border-subtle)] p-3">
+                <span className="text-foreground font-bold">RC Available</span>
                 <input
                   type="checkbox"
                   checked={rcAvailable}
                   onChange={(e) => setRcAvailable(e.target.checked)}
-                  className="h-4 w-4 accent-[var(--color-brand-green)] cursor-pointer"
+                  className="h-4 w-4 cursor-pointer accent-[var(--color-brand-green)]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Loan Clearance Status</label>
+                <label className="text-muted block font-bold">Loan Clearance Status</label>
                 <select
                   value={loanClearanceStatus}
                   onChange={(e) => setLoanClearanceStatus(e.target.value as any)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 >
                   <option value="CLEAR">NOC Clear</option>
                   <option value="HYPOTHECATED">Hypothecated</option>
@@ -382,12 +416,12 @@ export function CreateUsedListingModal({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Insurance Valid Till</label>
+                <label className="text-muted block font-bold">Insurance Valid Till</label>
                 <input
                   type="date"
                   value={insuranceValidity}
                   onChange={(e) => setInsuranceValidity(e.target.value)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-medium focus:outline-none [color-scheme:light] dark:[color-scheme:dark]"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-medium [color-scheme:light] focus:outline-none dark:[color-scheme:dark]"
                 />
               </div>
             </div>
@@ -395,72 +429,73 @@ export function CreateUsedListingModal({
 
           {/* Location & Summary */}
           <div className="space-y-4">
-            <h4 className="font-black text-foreground text-sm border-b border-[var(--border-subtle)] pb-2 flex items-center gap-2">
-              <FileText size={16} className="text-[var(--color-brand-green)]" /> Listing Location & Details
+            <h4 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-sm font-black">
+              <FileText size={16} className="text-[var(--color-brand-green)]" /> Listing Location &
+              Details
             </h4>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="space-y-1">
-                <label className="font-bold text-muted block">State *</label>
+                <label className="text-muted block font-bold">State *</label>
                 <input
                   type="text"
                   required
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">District *</label>
+                <label className="text-muted block font-bold">District *</label>
                 <input
                   type="text"
                   required
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">City / Village</label>
+                <label className="text-muted block font-bold">City / Village</label>
                 <input
                   type="text"
                   value={villageCity}
                   onChange={(e) => setVillageCity(e.target.value)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-bold focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-muted block">Pincode</label>
+                <label className="text-muted block font-bold">Pincode</label>
                 <input
                   type="text"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
-                  className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-foreground font-mono font-bold focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] px-3 py-2 font-mono font-bold focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-muted block">Listing Description / Highlights</label>
+              <label className="text-muted block font-bold">Listing Description / Highlights</label>
               <textarea
                 rows={3}
                 placeholder="Mention single-hand usage, recent servicing, battery condition, attached implements, etc..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl p-3 text-foreground text-xs font-medium focus:outline-none focus:border-[var(--color-brand-green)] resize-y"
+                className="text-foreground w-full resize-y rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] p-3 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
               />
             </div>
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t border-[var(--border-subtle)] flex items-center justify-end gap-3">
+          <div className="flex items-center justify-end gap-3 border-t border-[var(--border-subtle)] pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold text-muted hover:text-foreground hover:bg-foreground/10 transition-colors"
+              className="text-muted hover:text-foreground hover:bg-foreground/10 rounded-xl px-5 py-2.5 text-xs font-bold transition-colors"
             >
               Cancel
             </button>
@@ -468,7 +503,7 @@ export function CreateUsedListingModal({
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2.5 bg-[var(--color-brand-green)] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Tag size={16} />
               {submitting ? 'Publishing Listing...' : 'Publish Listing for Sale'}

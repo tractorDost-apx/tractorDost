@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Activity, Calendar, FileText, ShoppingBag, MessageSquare, Phone, Check, AlertCircle, User as UserIcon } from 'lucide-react';
+import {
+  X,
+  Save,
+  Activity,
+  Calendar,
+  FileText,
+  ShoppingBag,
+  MessageSquare,
+  Phone,
+  Check,
+  AlertCircle,
+  User as UserIcon,
+} from 'lucide-react';
 import { User } from '@/types/models/user';
 import { usersAPI, UserStats } from '@/lib/api/users';
 import { apiClient } from '@/lib/api/axios/axios';
@@ -14,7 +26,7 @@ interface UserEditModalProps {
 export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<UserStats | null>(null);
-  const [roles, setRoles] = useState<{id: number, name: string}[]>([]);
+  const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -40,18 +52,18 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
         console.error('Failed to fetch modal data', err);
       }
     };
-    
+
     fetchStatsAndRoles();
   }, [user.id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -64,7 +76,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
         ...formData,
         roleId: formData.roleId ? Number(formData.roleId) : undefined,
       };
-      
+
       const res = await usersAPI.updateUserById(user.id, dataToUpdate);
       if (res.success) {
         onSaved();
@@ -76,190 +88,223 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
     }
   };
 
-  const SectionTitle = ({ icon: Icon, title, colorClass = "text-[var(--color-brand-green)]" }: { icon: any, title: string, colorClass?: string }) => (
-    <div className="flex items-center gap-2 text-foreground mb-4 border-b border-foreground/10 pb-2">
+  const SectionTitle = ({
+    icon: Icon,
+    title,
+    colorClass = 'text-[var(--color-brand-green)]',
+  }: {
+    icon: any;
+    title: string;
+    colorClass?: string;
+  }) => (
+    <div className="text-foreground border-foreground/10 mb-4 flex items-center gap-2 border-b pb-2">
       <Icon size={18} className={colorClass} />
-      <h3 className="font-black text-sm uppercase tracking-wider">{title}</h3>
+      <h3 className="text-sm font-black tracking-wider uppercase">{title}</h3>
     </div>
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-sm">
-      <div 
-        className="w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl animate-fade-in shadow-2xl border border-foreground/10 overflow-hidden"
+    <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
+      <div
+        className="animate-fade-in border-foreground/10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
         style={{ background: 'var(--background)' }}
       >
         {/* Sticky Header */}
-        <div className="px-6 py-5 border-b border-foreground/10 flex justify-between items-center bg-background shrink-0 z-10">
+        <div className="border-foreground/10 bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
           <div>
-            <h2 className="text-2xl font-black text-foreground tracking-tight">Edit User Master</h2>
-            <p className="text-sm font-bold text-muted mt-1">ID: #{user.id}</p>
+            <h2 className="text-foreground text-2xl font-black tracking-tight">Edit User Master</h2>
+            <p className="text-muted mt-1 text-sm font-bold">ID: #{user.id}</p>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="h-10 w-10 flex items-center justify-center rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground transition-colors"
+            className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex h-10 w-10 items-center justify-center rounded-full transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Scrollable Form Body */}
-        <div className="overflow-y-auto p-6 md:p-8 flex-1">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8">
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3 text-red-500">
-              <AlertCircle size={20} className="shrink-0 mt-0.5" />
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-red-500">
+              <AlertCircle size={20} className="mt-0.5 shrink-0" />
               <p className="text-sm font-bold">{error}</p>
             </div>
           )}
 
           <form id="edit-user-form" onSubmit={handleSubmit} className="flex flex-col gap-10">
-            
             {/* SECTION 1: Identity & Access */}
             <section>
               <SectionTitle icon={UserIcon} title="Identity & Access" />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-foreground/[0.02] p-6 rounded-2xl border border-foreground/5">
-                
+
+              <div className="bg-foreground/[0.02] border-foreground/5 grid grid-cols-1 gap-6 rounded-2xl border p-6 md:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Full Name</label>
-                  <input 
-                    type="text" 
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
-                    className="w-full bg-background border border-foreground/10 rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-background border-foreground/10 text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="Enter full name"
                   />
                 </div>
-                
+
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Email</label>
-                  <input 
-                    type="email" 
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Email
+                  </label>
+                  <input
+                    type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-background border border-foreground/10 rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-background border-foreground/10 text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="Enter email address"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Mobile (Read-only)</label>
-                  <input 
-                    type="text" 
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Mobile (Read-only)
+                  </label>
+                  <input
+                    type="text"
                     value={user.mobile?.toString() || ''}
                     disabled
-                    className="w-full bg-background border border-foreground/10 rounded-xl px-4 py-3 text-sm font-bold text-foreground opacity-60 cursor-not-allowed"
+                    className="bg-background border-foreground/10 text-foreground w-full cursor-not-allowed rounded-xl border px-4 py-3 text-sm font-bold opacity-60"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Role</label>
-                  <select 
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Role
+                  </label>
+                  <select
                     name="roleId"
                     value={formData.roleId}
                     onChange={handleChange}
-                    className="w-full bg-background border border-foreground/10 rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all appearance-none"
+                    className="bg-background border-foreground/10 text-foreground w-full appearance-none rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                   >
                     <option value="">Select a role...</option>
-                    {roles.map(role => (
-                      <option key={role.id} value={role.id}>{role.name}</option>
+                    {roles.map((role) => (
+                      <option key={role.id} value={role.id}>
+                        {role.name}
+                      </option>
                     ))}
                     {roles.length === 0 && <option value={user.roleId}>{user.role?.name}</option>}
                   </select>
                 </div>
 
-                <div className="md:col-span-2 pt-2">
-                  <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-background border border-foreground/10 hover:border-[var(--color-brand-green)]/50 transition-colors max-w-sm">
+                <div className="pt-2 md:col-span-2">
+                  <label className="bg-background border-foreground/10 flex max-w-sm cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors hover:border-[var(--color-brand-green)]/50">
                     <div className="relative flex items-center justify-center">
-                      <input 
-                        type="checkbox" 
-                        name="isActive" 
+                      <input
+                        type="checkbox"
+                        name="isActive"
                         checked={formData.isActive}
                         onChange={handleChange}
-                        className="peer sr-only" 
+                        className="peer sr-only"
                       />
-                      <div className="w-6 h-6 rounded-md border-2 border-foreground/20 peer-checked:bg-[var(--color-brand-green)] peer-checked:border-[var(--color-brand-green)] transition-all flex items-center justify-center">
-                        <Check size={14} className="text-white opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100 transition-all" strokeWidth={4} />
+                      <div className="border-foreground/20 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-green)] peer-checked:bg-[var(--color-brand-green)]">
+                        <Check
+                          size={14}
+                          className="scale-50 text-white opacity-0 transition-all peer-checked:scale-100 peer-checked:opacity-100"
+                          strokeWidth={4}
+                        />
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">Active Status</span>
-                      <span className="text-[10px] text-muted">User can access the platform</span>
+                      <span className="text-foreground text-sm font-bold">Active Status</span>
+                      <span className="text-muted text-[10px]">User can access the platform</span>
                     </div>
                   </label>
                 </div>
-
               </div>
             </section>
 
             {/* SECTION 2: Stats */}
             <section>
-              <SectionTitle icon={Activity} title="User Activity Stats" colorClass="text-[var(--color-brand-orange)]" />
-              
+              <SectionTitle
+                icon={Activity}
+                title="User Activity Stats"
+                colorClass="text-[var(--color-brand-orange)]"
+              />
+
               {!stats ? (
-                <div className="animate-pulse flex gap-4">
-                  <div className="h-24 bg-foreground/5 rounded-2xl flex-1"></div>
-                  <div className="h-24 bg-foreground/5 rounded-2xl flex-1"></div>
-                  <div className="h-24 bg-foreground/5 rounded-2xl flex-1"></div>
+                <div className="flex animate-pulse gap-4">
+                  <div className="bg-foreground/5 h-24 flex-1 rounded-2xl"></div>
+                  <div className="bg-foreground/5 h-24 flex-1 rounded-2xl"></div>
+                  <div className="bg-foreground/5 h-24 flex-1 rounded-2xl"></div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-foreground/[0.02] border border-foreground/10 p-5 rounded-2xl flex flex-col gap-2 hover:border-[var(--color-brand-green)]/30 transition-colors shadow-sm">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-muted uppercase tracking-wider">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                    <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <ShoppingBag size={14} className="text-[var(--color-brand-green)]" /> Listings
                     </div>
-                    <div className="text-3xl font-black text-foreground">{stats.totalListings}</div>
+                    <div className="text-foreground text-3xl font-black">{stats.totalListings}</div>
                   </div>
 
-                  <div className="bg-foreground/[0.02] border border-foreground/10 p-5 rounded-2xl flex flex-col gap-2 hover:border-[var(--color-brand-green)]/30 transition-colors shadow-sm">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-muted uppercase tracking-wider">
+                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                    <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <MessageSquare size={14} className="text-blue-500" /> Enquiries
                     </div>
-                    <div className="text-3xl font-black text-foreground">{stats.totalEnquiries}</div>
+                    <div className="text-foreground text-3xl font-black">
+                      {stats.totalEnquiries}
+                    </div>
                   </div>
 
-                  <div className="bg-foreground/[0.02] border border-foreground/10 p-5 rounded-2xl flex flex-col gap-2 hover:border-[var(--color-brand-green)]/30 transition-colors shadow-sm">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-muted uppercase tracking-wider">
+                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                    <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <Phone size={14} className="text-rose-500" /> Leads
                     </div>
-                    <div className="text-3xl font-black text-foreground">{stats.totalLeads}</div>
+                    <div className="text-foreground text-3xl font-black">{stats.totalLeads}</div>
                   </div>
 
-                  <div className="bg-foreground/[0.02] border border-foreground/10 p-5 rounded-2xl flex flex-col gap-2 hover:border-[var(--color-brand-green)]/30 transition-colors shadow-sm">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-muted uppercase tracking-wider">
+                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                    <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <FileText size={14} className="text-purple-500" /> Loans
                     </div>
-                    <div className="text-3xl font-black text-foreground">{stats.totalLoanApplications}</div>
+                    <div className="text-foreground text-3xl font-black">
+                      {stats.totalLoanApplications}
+                    </div>
                   </div>
-                  
-                  <div className="col-span-2 md:col-span-4 bg-background border border-foreground/10 p-4 rounded-xl flex items-center gap-3 justify-center text-sm font-bold text-muted shadow-sm">
+
+                  <div className="bg-background border-foreground/10 text-muted col-span-2 flex items-center justify-center gap-3 rounded-xl border p-4 text-sm font-bold shadow-sm md:col-span-4">
                     <Calendar size={16} className="text-[var(--color-brand-orange)]" />
-                    Member Since: <span className="text-foreground">{new Date(stats.memberSince).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    Member Since:{' '}
+                    <span className="text-foreground">
+                      {new Date(stats.memberSince).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </span>
                   </div>
                 </div>
               )}
             </section>
-
           </form>
         </div>
 
         {/* Sticky Footer */}
-        <div className="px-6 py-4 border-t border-foreground/10 bg-background shrink-0 flex justify-end gap-3 z-10">
-          <button 
-            type="button" 
+        <div className="border-foreground/10 bg-background z-10 flex shrink-0 justify-end gap-3 border-t px-6 py-4">
+          <button
+            type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-2.5 rounded-xl font-bold text-foreground bg-foreground/5 hover:bg-foreground/10 transition-colors disabled:opacity-50"
+            className="text-foreground bg-foreground/5 hover:bg-foreground/10 rounded-xl px-6 py-2.5 font-bold transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             form="edit-user-form"
             disabled={loading}
-            className="px-8 py-2.5 rounded-xl font-black text-white bg-[var(--color-brand-green)] hover:shadow-[0_10px_20px_rgba(29,191,115,0.3)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none disabled:shadow-none flex items-center gap-2"
+            className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-8 py-2.5 font-black text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(29,191,115,0.3)] disabled:transform-none disabled:opacity-50 disabled:shadow-none"
           >
             {loading ? (
               <>

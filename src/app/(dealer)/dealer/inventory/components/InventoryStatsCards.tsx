@@ -12,18 +12,18 @@ interface InventoryStatsCardsProps {
 export function InventoryStatsCards({ stats, loading }: InventoryStatsCardsProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 space-y-3 animate-pulse"
+            className="bg-foreground/5 animate-pulse space-y-3 rounded-2xl border border-[var(--border-subtle)] p-5"
           >
             <div className="flex items-center justify-between">
-              <div className="h-4 bg-foreground/10 rounded w-1/2" />
-              <div className="h-10 w-10 rounded-xl bg-foreground/10" />
+              <div className="bg-foreground/10 h-4 w-1/2 rounded" />
+              <div className="bg-foreground/10 h-10 w-10 rounded-xl" />
             </div>
-            <div className="h-8 bg-foreground/10 rounded w-1/3" />
-            <div className="h-3 bg-foreground/5 rounded w-3/4" />
+            <div className="bg-foreground/10 h-8 w-1/3 rounded" />
+            <div className="bg-foreground/5 h-3 w-3/4 rounded" />
           </div>
         ))}
       </div>
@@ -70,29 +70,33 @@ export function InventoryStatsCards({ stats, loading }: InventoryStatsCardsProps
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card, idx) => {
         const Icon = card.icon;
         return (
           <div
             key={idx}
-            className="bg-foreground/5 rounded-2xl p-5 border border-[var(--border-subtle)] flex items-center justify-between gap-4"
+            className="bg-foreground/5 flex items-center justify-between gap-4 rounded-2xl border border-[var(--border-subtle)] p-5"
           >
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-muted uppercase tracking-wider truncate mb-1">
+            <div className="min-w-0 flex-1">
+              <p className="text-muted mb-1 truncate text-xs font-bold tracking-wider uppercase">
                 {card.title}
               </p>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-foreground tracking-tight">
+                <span className="text-foreground text-3xl font-black tracking-tight">
                   {card.value}
                 </span>
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${card.bgClass} ${card.colorClass}`}>
+                <span
+                  className={`rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${card.bgClass} ${card.colorClass}`}
+                >
                   {card.badge}
                 </span>
               </div>
             </div>
 
-            <div className={`h-12 w-12 rounded-2xl flex items-center justify-center border ${card.bgClass} ${card.colorClass} shrink-0`}>
+            <div
+              className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${card.bgClass} ${card.colorClass} shrink-0`}
+            >
               <Icon size={24} />
             </div>
           </div>

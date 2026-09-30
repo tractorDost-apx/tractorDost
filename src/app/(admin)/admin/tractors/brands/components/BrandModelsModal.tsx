@@ -36,62 +36,75 @@ export default function BrandModelsModal({ brand, onClose }: BrandModelsModalPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-sm animate-fade-in">
-      <div 
-        className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl shadow-2xl border border-foreground/10 overflow-hidden"
+    <div className="bg-background/80 animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
+      <div
+        className="border-foreground/10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
         style={{ background: 'var(--background)' }}
       >
-        <div className="px-6 py-5 border-b border-foreground/10 flex justify-between items-center bg-background shrink-0 z-10">
+        <div className="border-foreground/10 bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
           <div>
-            <h2 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
+            <h2 className="text-foreground flex items-center gap-2 text-2xl font-black tracking-tight">
               <TractorIcon className="text-[var(--color-brand-green)]" />
               {brand.name} Models
             </h2>
-            <p className="text-sm font-bold text-muted mt-1">
+            <p className="text-muted mt-1 text-sm font-bold">
               Showing all tractors associated with {brand.name}
             </p>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="h-10 w-10 flex items-center justify-center rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground transition-colors"
+            className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex h-10 w-10 items-center justify-center rounded-full transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="overflow-y-auto p-6 md:p-8 flex-1 bg-foreground/[0.02]">
+        <div className="bg-foreground/[0.02] flex-1 overflow-y-auto p-6 md:p-8">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted gap-3">
+            <div className="text-muted flex flex-col items-center justify-center gap-3 py-12">
               <TractorLoader className="text-[var(--color-brand-green)]" size={48} />
               <span className="font-bold">Loading models...</span>
             </div>
           ) : tractors.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted gap-2 text-center">
-              <TractorIcon size={48} className="opacity-20 mb-2" />
-              <p className="font-bold text-lg text-foreground/70">No Models Found</p>
-              <p className="text-sm font-medium">There are currently no tractors mapped to this brand.</p>
+            <div className="text-muted flex flex-col items-center justify-center gap-2 py-12 text-center">
+              <TractorIcon size={48} className="mb-2 opacity-20" />
+              <p className="text-foreground/70 text-lg font-bold">No Models Found</p>
+              <p className="text-sm font-medium">
+                There are currently no tractors mapped to this brand.
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {tractors.map((tractor) => {
-                const primaryImage = tractor.media?.find(m => m.isPrimary) || tractor.media?.[0];
+                const primaryImage = tractor.media?.find((m) => m.isPrimary) || tractor.media?.[0];
                 return (
                   <Link
                     key={tractor.id}
                     href={`/admin/tractors/${tractor.id}`}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-background border border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/50 hover:shadow-md transition-all group"
+                    className="bg-background group flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-green)]/50 hover:shadow-md"
                   >
-                    <div className="h-16 w-16 rounded-xl bg-foreground/5 flex items-center justify-center overflow-hidden p-1 shrink-0">
+                    <div className="bg-foreground/5 flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl p-1">
                       {primaryImage ? (
-                        <img src={primaryImage.url} alt={tractor.modelName} className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                        <img
+                          src={primaryImage.url}
+                          alt={tractor.modelName}
+                          className="h-full w-full object-contain transition-transform group-hover:scale-110"
+                        />
                       ) : (
                         <TractorIcon size={24} className="text-muted" />
                       )}
                     </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-black text-foreground truncate">{tractor.modelName}</span>
-                      <span className="text-xs font-bold text-muted truncate">{tractor.hp ? `${tractor.hp} HP` : 'HP N/A'} • {tractor.driveType.replace('_', ' ')}</span>
-                      <span className={`inline-flex items-center w-fit mt-1 px-1.5 py-0.5 rounded text-[10px] font-black tracking-wide uppercase ${tractor.isActive ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-red-500/10 text-red-500'}`}>
+                    <div className="flex min-w-0 flex-col">
+                      <span className="text-foreground truncate font-black">
+                        {tractor.modelName}
+                      </span>
+                      <span className="text-muted truncate text-xs font-bold">
+                        {tractor.hp ? `${tractor.hp} HP` : 'HP N/A'} •{' '}
+                        {tractor.driveType.replace('_', ' ')}
+                      </span>
+                      <span
+                        className={`mt-1 inline-flex w-fit items-center rounded px-1.5 py-0.5 text-[10px] font-black tracking-wide uppercase ${tractor.isActive ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-red-500/10 text-red-500'}`}
+                      >
                         {tractor.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>

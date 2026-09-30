@@ -10,11 +10,7 @@ interface DeleteInventoryModalProps {
   onConfirm: (inventoryId: number) => Promise<any>;
 }
 
-export function DeleteInventoryModal({
-  item,
-  onClose,
-  onConfirm,
-}: DeleteInventoryModalProps) {
+export function DeleteInventoryModal({ item, onClose, onConfirm }: DeleteInventoryModalProps) {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,42 +31,42 @@ export function DeleteInventoryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/25 dark:bg-black/60 flex items-center justify-center p-4 animate-fade-in">
-      <div className="w-full max-w-md bg-[var(--background)] text-foreground border border-rose-500/20 rounded-3xl shadow-2xl overflow-hidden p-6 space-y-6 text-center relative [backdrop-filter:none]">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/25 p-4 dark:bg-black/60">
+      <div className="text-foreground relative w-full max-w-md space-y-6 overflow-hidden rounded-3xl border border-rose-500/20 bg-[var(--background)] p-6 text-center shadow-2xl [backdrop-filter:none]">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-muted hover:text-foreground hover:bg-foreground/10 transition-colors"
+          className="text-muted hover:text-foreground hover:bg-foreground/10 absolute top-4 right-4 rounded-xl p-2 transition-colors"
         >
           <X size={18} />
         </button>
 
-        <div className="h-16 w-16 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center mx-auto">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-500/10 text-rose-500">
           <AlertTriangle size={32} />
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-xl font-black text-foreground tracking-tight">
+          <h3 className="text-foreground text-xl font-black tracking-tight">
             Remove Inventory Item?
           </h3>
-          <p className="text-sm text-muted font-medium leading-relaxed">
-            Are you sure you want to remove <span className="font-bold text-foreground">&quot;{title}&quot;</span> from your dealership stock?
+          <p className="text-muted text-sm leading-relaxed font-medium">
+            Are you sure you want to remove{' '}
+            <span className="text-foreground font-bold">&quot;{title}&quot;</span> from your
+            dealership stock?
           </p>
-          <p className="text-xs text-rose-500 font-bold pt-1">
-            This action cannot be undone.
-          </p>
+          <p className="pt-1 text-xs font-bold text-rose-500">This action cannot be undone.</p>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bold">
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs font-bold text-rose-500">
             {error}
           </div>
         )}
 
-        <div className="pt-2 flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-3 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-xs font-bold text-muted hover:text-foreground hover:bg-foreground/10 transition-colors w-1/2"
+            className="text-muted hover:text-foreground hover:bg-foreground/10 w-1/2 rounded-xl px-5 py-2.5 text-xs font-bold transition-colors"
           >
             Cancel
           </button>
@@ -79,7 +75,7 @@ export function DeleteInventoryModal({
             type="button"
             disabled={submitting}
             onClick={handleDelete}
-            className="px-5 py-2.5 bg-rose-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-rose-600 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 w-1/2"
+            className="inline-flex w-1/2 items-center justify-center gap-2 rounded-xl bg-rose-500 px-5 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Trash2 size={16} />
             {submitting ? 'Removing...' : 'Remove'}

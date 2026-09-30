@@ -24,7 +24,9 @@ export const implementCategoryAPI = {
    * Fetch all implement categories (flat list)
    */
   getAllImplementCategories: async () => {
-    const response = await apiClient.get<{ success: boolean; data: ImplementCategory[] }>('/implement-categories');
+    const response = await apiClient.get<{ success: boolean; data: ImplementCategory[] }>(
+      '/implement-categories'
+    );
     return response.data;
   },
 
@@ -32,7 +34,9 @@ export const implementCategoryAPI = {
    * Fetch all implement categories as a tree (with children)
    */
   getImplementCategoryTree: async () => {
-    const response = await apiClient.get<ImplementCategoryTreeResponse>('/implement-categories/tree');
+    const response = await apiClient.get<ImplementCategoryTreeResponse>(
+      '/implement-categories/tree'
+    );
     return response.data;
   },
 
@@ -40,7 +44,10 @@ export const implementCategoryAPI = {
    * Fetch all active categories (flat)
    */
   getAllActiveCategoriesFlat: async (params?: { brandId?: number }) => {
-    const response = await apiClient.get<{ success: boolean; data: ImplementCategory[] }>('/implement-categories/all-active', { params });
+    const response = await apiClient.get<{ success: boolean; data: ImplementCategory[] }>(
+      '/implement-categories/all-active',
+      { params }
+    );
     return response.data;
   },
 
@@ -48,7 +55,9 @@ export const implementCategoryAPI = {
    * Fetch a single implement category by ID
    */
   getImplementCategoryById: async (id: number) => {
-    const response = await apiClient.get<{ success: boolean; data: ImplementCategory }>(`/implement-categories/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: ImplementCategory }>(
+      `/implement-categories/${id}`
+    );
     return response.data;
   },
 
@@ -82,7 +91,9 @@ export const implementCategoryAPI = {
    * Toggle the active status of an implement category
    */
   toggleImplementCategoryActive: async (id: number) => {
-    const response = await apiClient.patch<{ success: boolean; data: ImplementCategory }>(`/implement-categories/${id}/toggle-active`);
+    const response = await apiClient.patch<{ success: boolean; data: ImplementCategory }>(
+      `/implement-categories/${id}/toggle-active`
+    );
     return response.data;
   },
 
@@ -90,7 +101,9 @@ export const implementCategoryAPI = {
    * Delete an implement category
    */
   deleteImplementCategory: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; data: null }>(`/implement-categories/${id}`);
+    const response = await apiClient.delete<{ success: boolean; data: null }>(
+      `/implement-categories/${id}`
+    );
     return response.data;
   },
 
@@ -98,7 +111,10 @@ export const implementCategoryAPI = {
    * Reorder categories
    */
   reorderCategories: async (id: number, newSortOrder: number) => {
-    const response = await apiClient.patch<{ success: boolean; data: ImplementCategory }>(`/implement-categories/${id}/reorder`, { sortOrder: newSortOrder });
+    const response = await apiClient.patch<{ success: boolean; data: ImplementCategory }>(
+      `/implement-categories/${id}/reorder`,
+      { sortOrder: newSortOrder }
+    );
     return response.data;
-  }
+  },
 };

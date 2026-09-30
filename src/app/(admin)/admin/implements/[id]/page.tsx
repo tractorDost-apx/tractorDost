@@ -29,10 +29,10 @@ export default function EditImplementPage({ params }: { params: Promise<{ id: st
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center min-h-[50vh]">
-        <div className="flex flex-col items-center gap-4 text-muted">
+      <div className="flex h-full min-h-[50vh] w-full items-center justify-center">
+        <div className="text-muted flex flex-col items-center gap-4">
           <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
-          <p className="text-sm font-bold animate-pulse">Loading implement details...</p>
+          <p className="animate-pulse text-sm font-bold">Loading implement details...</p>
         </div>
       </div>
     );
@@ -40,10 +40,10 @@ export default function EditImplementPage({ params }: { params: Promise<{ id: st
 
   if (!implement) {
     return (
-      <div className="w-full h-full flex items-center justify-center min-h-[50vh]">
+      <div className="flex h-full min-h-[50vh] w-full items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-black text-foreground mb-2">Implement Not Found</h2>
-          <p className="text-sm text-muted">The implement you're trying to edit doesn't exist.</p>
+          <h2 className="text-foreground mb-2 text-xl font-black">Implement Not Found</h2>
+          <p className="text-muted text-sm">The implement you're trying to edit doesn't exist.</p>
         </div>
       </div>
     );

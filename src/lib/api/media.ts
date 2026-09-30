@@ -24,7 +24,13 @@ export const mediaAPI = {
   /**
    * Fetch all media items
    */
-  getAllMedia: async (params?: { page?: number; limit?: number; search?: string; targetType?: string; targetId?: number }) => {
+  getAllMedia: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    targetType?: string;
+    targetId?: number;
+  }) => {
     const response = await apiClient.get<PaginatedResponse<Media>>('/media/getAll', { params });
     return response.data;
   },
@@ -33,7 +39,10 @@ export const mediaAPI = {
    * Upload and create new media item(s)
    */
   createMedia: async (data: FormData) => {
-    const response = await apiClient.post<{ success: boolean; data: Media[] }>('/media/create', data);
+    const response = await apiClient.post<{ success: boolean; data: Media[] }>(
+      '/media/create',
+      data
+    );
     return response.data;
   },
 
@@ -41,7 +50,9 @@ export const mediaAPI = {
    * Delete a media item
    */
   deleteMedia: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; data: Media }>(`/media/delete/${id}`);
+    const response = await apiClient.delete<{ success: boolean; data: Media }>(
+      `/media/delete/${id}`
+    );
     return response.data;
-  }
+  },
 };

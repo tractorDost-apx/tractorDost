@@ -1,11 +1,20 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/store/AuthContext';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useState, useEffect, useRef } from 'react';
-import { User as UserIcon, LogOut, Heart, LayoutDashboard, Menu, X, Search, Bell } from 'lucide-react';
+import {
+  User as UserIcon,
+  LogOut,
+  Heart,
+  LayoutDashboard,
+  Menu,
+  X,
+  Search,
+  Bell,
+} from 'lucide-react';
 import { DashboardNavbar } from './DashboardNavbar';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { brandAPI, Brand } from '@/lib/api/brands';
@@ -35,7 +44,11 @@ export function Navbar() {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  const isDashboardRoute = pathname?.startsWith('/dashboard') || pathname?.startsWith('/admin') || pathname?.startsWith('/dealer') || pathname?.startsWith('/agent');
+  const isDashboardRoute =
+    pathname?.startsWith('/dashboard') ||
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/dealer') ||
+    pathname?.startsWith('/agent');
 
   if (isDashboardRoute) {
     return <DashboardNavbar />;
@@ -43,23 +56,32 @@ export function Navbar() {
 
   return (
     <>
-      <div className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4 md:px-6 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'top-2' : 'top-6'}`}>
+      <div
+        className={`pointer-events-none fixed top-4 right-0 left-0 z-50 flex justify-center px-4 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-6 ${scrolled ? 'top-2' : 'top-6'}`}
+      >
         <nav
-          className={`spatial-panel !rounded-2xl flex items-center justify-between px-6 py-2.5 w-full max-w-[1380px] pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'shadow-[var(--nav-shadow-scrolled)] border-[var(--border-subtle)] bg-[var(--panel-bg)] backdrop-blur-2xl' : 'shadow-none border-[var(--border-subtle)] bg-background/40 backdrop-blur-md'}`}
+          className={`spatial-panel pointer-events-auto flex w-full max-w-[1380px] items-center justify-between !rounded-2xl px-6 py-2.5 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'border-[var(--border-subtle)] bg-[var(--panel-bg)] shadow-[var(--nav-shadow-scrolled)] backdrop-blur-2xl' : 'bg-background/40 border-[var(--border-subtle)] shadow-none backdrop-blur-md'}`}
         >
-
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-3 mr-4 lg:mr-8 shrink-0">
+          <Link href="/" className="group mr-4 flex shrink-0 items-center gap-3 lg:mr-8">
             <div className="relative flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
-              <img src="/TD%20Black.png" alt="TractorDost Logo" className="h-8 lg:h-9 w-auto logo-light" />
-              <img src="/TD%20White.png" alt="TractorDost Logo" className="h-8 lg:h-9 w-auto logo-dark" />
+              <img
+                src="/TD%20Black.png"
+                alt="TractorDost Logo"
+                className="logo-light h-8 w-auto lg:h-9"
+              />
+              <img
+                src="/TD%20White.png"
+                alt="TractorDost Logo"
+                className="logo-dark h-8 w-auto lg:h-9"
+              />
             </div>
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden xl:flex items-center gap-1 2xl:gap-2">
-            <NavDropdownMenu 
-              label="Tractors" 
+          <div className="hidden items-center gap-1 xl:flex 2xl:gap-2">
+            <NavDropdownMenu
+              label="Tractors"
               pathname={pathname}
               items={[
                 { title: 'BRANDS', desc: '', href: '#brands' },
@@ -68,33 +90,49 @@ export function Navbar() {
                 { title: 'UPCOMING TRACTORS', desc: '', href: '/tractors/upcoming' },
                 { title: 'LATEST TRACTORS', desc: '', href: '/tractors/latest' },
                 { title: 'ELECTRIC TRACTORS', desc: '', href: '/tractors/electric' },
-                { title: 'CNG TRACTORS', desc: '', href: '/tractors/cng' }
+                { title: 'CNG TRACTORS', desc: '', href: '/tractors/cng' },
               ]}
             />
-            
-            <NavDropdownMenu 
-              label="Used Tractors" 
+
+            <NavDropdownMenu
+              label="Used Tractors"
               pathname={pathname}
               items={[
-                { title: 'Buy Used Tractors', desc: 'Verified second-hand tractors', href: '/used-tractors' },
-                { title: 'Sell Your Tractor', desc: 'Get the best market price', href: '/sell-used-tractor' },
-                { title: 'Valuation Tool', desc: 'Check true market value', href: '/used-tractor-valuation' }
+                {
+                  title: 'Buy Used Tractors',
+                  desc: 'Verified second-hand tractors',
+                  href: '/used-tractors',
+                },
+                {
+                  title: 'Sell Your Tractor',
+                  desc: 'Get the best market price',
+                  href: '/sell-used-tractor',
+                },
+                {
+                  title: 'Valuation Tool',
+                  desc: 'Check true market value',
+                  href: '/used-tractor-valuation',
+                },
               ]}
             />
 
             <NavLink href="/compare" label="Compare" pathname={pathname} highlight={true} />
-            
-            <NavDropdownMenu 
-              label="Finance" 
+
+            <NavDropdownMenu
+              label="Finance"
               pathname={pathname}
               items={[
                 { title: 'Tractor Loan', desc: 'Low interest financing', href: '/loan' },
-                { title: 'EMI Calculator', desc: 'Calculate monthly payments', href: '/emi-calculator' }
+                {
+                  title: 'EMI Calculator',
+                  desc: 'Calculate monthly payments',
+                  href: '/emi-calculator',
+                },
               ]}
             />
 
-            <NavDropdownMenu 
-              label="Implements" 
+            <NavDropdownMenu
+              label="Implements"
               pathname={pathname}
               items={[
                 { title: 'BRANDS', desc: '', href: '#brands' },
@@ -102,14 +140,14 @@ export function Navbar() {
                 { title: 'POPULAR IMPLEMENTS', desc: '', href: '/implements/popular' },
                 { title: 'LATEST IMPLEMENTS', desc: '', href: '/implements/latest' },
                 { title: 'ELECTRIC IMPLEMENTS', desc: '', href: '/implements/electric' },
-                { title: 'CNG IMPLEMENTS', desc: '', href: '/implements/cng' }
+                { title: 'CNG IMPLEMENTS', desc: '', href: '/implements/cng' },
               ]}
             />
 
             <NavLink href="/news" label="News" pathname={pathname} />
 
-            <NavDropdownMenu 
-              label="More" 
+            <NavDropdownMenu
+              label="More"
               pathname={pathname}
               align="right"
               items={[
@@ -118,70 +156,100 @@ export function Navbar() {
                 { title: 'Videos', desc: 'Reviews and tutorials', href: '/videos' },
                 { title: 'FAQ & Support', desc: 'Get your questions answered', href: '/faq' },
                 { title: 'About Us', desc: 'Our mission and story', href: '/about' },
-                { title: 'Contact', desc: 'Get in touch with us', href: '/contact' }
+                { title: 'Contact', desc: 'Get in touch with us', href: '/contact' },
               ]}
             />
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 lg:gap-4 ml-auto shrink-0">
-
+          <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-4">
             {/* Primary Sell CTA */}
-            <Link href="/sell-used-tractor" className="hidden sm:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] border border-[var(--color-brand-orange)]/20 hover:bg-[var(--color-brand-orange)] hover:text-white hover:shadow-[0_10px_20px_rgba(186,91,52,0.3)] transition-all duration-300 text-sm font-black tracking-wide uppercase">
-              <span className="text-base leading-none mb-[2px]">+</span> Sell
+            <Link
+              href="/sell-used-tractor"
+              className="hidden items-center gap-1.5 rounded-full border border-[var(--color-brand-orange)]/20 bg-[var(--color-brand-orange)]/10 px-4 py-1.5 text-sm font-black tracking-wide text-[var(--color-brand-orange)] uppercase transition-all duration-300 hover:bg-[var(--color-brand-orange)] hover:text-white hover:shadow-[0_10px_20px_rgba(186,91,52,0.3)] sm:flex"
+            >
+              <span className="mb-[2px] text-base leading-none">+</span> Sell
             </Link>
 
-            <div className="hidden sm:block ml-1">
+            <div className="ml-1 hidden sm:block">
               <ThemeToggle />
             </div>
 
-            <button className="hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-foreground/70 transition-all hover:bg-foreground/10 hover:text-foreground hover:scale-110 active:scale-95">
+            <button className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground hidden h-9 w-9 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-95 sm:flex">
               <Search size={18} strokeWidth={2.5} />
             </button>
 
-            <div className="h-5 w-[1px] bg-foreground/20 mx-1 hidden sm:block" />
+            <div className="bg-foreground/20 mx-1 hidden h-5 w-[1px] sm:block" />
 
             {isAuthenticated ? (
-              <div className="flex items-center gap-1 sm:gap-2 ml-1">
+              <div className="ml-1 flex items-center gap-1 sm:gap-2">
                 {/* Notification Bell */}
-                <button className="hidden sm:flex h-9 w-9 items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:bg-foreground/10 transition-all relative hover:scale-110 active:scale-95">
+                <button className="text-foreground/80 hover:text-foreground hover:bg-foreground/10 relative hidden h-9 w-9 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-95 sm:flex">
                   <Bell size={18} strokeWidth={2.5} />
-                  <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[var(--color-brand-orange)] border border-background shadow-sm" />
+                  <span className="border-background absolute top-2 right-2 h-2 w-2 rounded-full border bg-[var(--color-brand-orange)] shadow-sm" />
                 </button>
 
-                <div className="relative group">
-                  <button onClick={() => router.push(user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN' ? '/admin/dashboard' : user?.role?.name === 'DEALER' ? '/dealer/dashboard' : '/dashboard')} className="flex items-center justify-center rounded-full focus:outline-none cursor-pointer">
+                <div className="group relative">
+                  <button
+                    onClick={() =>
+                      router.push(
+                        user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN'
+                          ? '/admin/dashboard'
+                          : user?.role?.name === 'DEALER'
+                            ? '/dealer/dashboard'
+                            : '/dashboard'
+                      )
+                    }
+                    className="flex cursor-pointer items-center justify-center rounded-full focus:outline-none"
+                  >
                     <UserAvatar photoUrl={user?.profilePhoto} name={user?.fullName} size={40} />
                   </button>
-                  <div className="absolute top-full right-0 w-full h-3" />
+                  <div className="absolute top-full right-0 h-3 w-full" />
 
-                {/* Dropdown Menu */}
-                <div 
-                  className="absolute right-0 top-[120%] w-64 rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 nav-dropdown-glass"
-                >
-                  <div className="px-3 py-3 border-b border-[var(--border-subtle)] mb-1 bg-foreground/5 rounded-xl">
-                      <p className="text-sm font-black text-foreground tracking-tight truncate">{user?.fullName || 'TractorDost User'}</p>
-                      <p className="text-xs text-muted font-medium mt-0.5 truncate">{user?.mobile ? `+91 ${user.mobile}` : 'Welcome'}</p>
+                  {/* Dropdown Menu */}
+                  <div className="nav-dropdown-glass pointer-events-none absolute top-[120%] right-0 z-50 flex w-64 translate-y-4 scale-95 flex-col gap-1 rounded-[1.5rem] p-2.5 opacity-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
+                    <div className="bg-foreground/5 mb-1 rounded-xl border-b border-[var(--border-subtle)] px-3 py-3">
+                      <p className="text-foreground truncate text-sm font-black tracking-tight">
+                        {user?.fullName || 'TractorDost User'}
+                      </p>
+                      <p className="text-muted mt-0.5 truncate text-xs font-medium">
+                        {user?.mobile ? `+91 ${user.mobile}` : 'Welcome'}
+                      </p>
+                    </div>
+
+                    {/* Dashboard Link based on role */}
+                    <Link
+                      href={
+                        user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN'
+                          ? '/admin/dashboard'
+                          : user?.role?.name === 'DEALER'
+                            ? '/dealer/dashboard'
+                            : '/dashboard'
+                      }
+                      className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                    >
+                      <LayoutDashboard size={16} /> My Dashboard
+                    </Link>
+
+                    <Link
+                      href="/profile"
+                      className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                    >
+                      <UserIcon size={16} /> My Profile
+                    </Link>
+                    <Link
+                      href="/wishlist"
+                      className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                    >
+                      <Heart size={16} /> Wishlist
+                    </Link>
+                    <button
+                      onClick={() => logout()}
+                      className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-red-500 transition-colors hover:bg-red-500/10"
+                    >
+                      <LogOut size={16} /> Log Out
+                    </button>
                   </div>
-                  
-                  {/* Dashboard Link based on role */}
-                  <Link href={user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN' ? '/admin/dashboard' : user?.role?.name === 'DEALER' ? '/dealer/dashboard' : '/dashboard'} className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
-                    <LayoutDashboard size={16} /> My Dashboard
-                  </Link>
-
-                  <Link href="/profile" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
-                    <UserIcon size={16} /> My Profile
-                  </Link>
-                  <Link href="/wishlist" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-foreground hover:bg-foreground/10 hover:text-[var(--color-brand-green)] rounded-xl transition-colors">
-                    <Heart size={16} /> Wishlist
-                  </Link>
-                  <button 
-                    onClick={() => logout()}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-500/10 rounded-xl transition-colors text-left w-full mt-1"
-                  >
-                    <LogOut size={16} /> Log Out
-                  </button>
-                </div>
                 </div>
               </div>
             ) : (
@@ -189,7 +257,7 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)}
-                  className="spatial-button px-6 py-2 text-sm rounded-full shadow-lg shrink-0 whitespace-nowrap"
+                  className="spatial-button shrink-0 rounded-full px-6 py-2 text-sm whitespace-nowrap shadow-lg"
                 >
                   Login
                 </button>
@@ -198,7 +266,7 @@ export function Navbar() {
 
             {/* Mobile Menu Toggle */}
             <button
-              className="xl:hidden flex h-10 w-10 items-center justify-center rounded-full bg-foreground/5 text-foreground transition-all hover:bg-foreground/10"
+              className="bg-foreground/5 text-foreground hover:bg-foreground/10 flex h-10 w-10 items-center justify-center rounded-full transition-all xl:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -209,29 +277,65 @@ export function Navbar() {
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed inset-0 z-40 bg-[var(--background)]/95 backdrop-blur-3xl transition-all duration-500 xl:hidden flex flex-col pt-24 px-6 overflow-y-auto ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-40 flex flex-col overflow-y-auto bg-[var(--background)]/95 px-6 pt-24 backdrop-blur-3xl transition-all duration-500 xl:hidden ${mobileMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
       >
         <div className="flex flex-col gap-5 text-2xl font-black">
-          <Link href="/tractors" className="hover:text-[var(--color-brand-green)] transition-colors">New Tractors</Link>
-          <Link href="/used-tractors" className="hover:text-[var(--color-brand-green)] transition-colors">Used Tractors</Link>
-          <Link href="/implements" className="hover:text-[var(--color-brand-green)] transition-colors">Implements & Tyres</Link>
-          <Link href="/dealers" className="hover:text-[var(--color-brand-green)] transition-colors">Find Dealers</Link>
-          <Link href="/loan" className="hover:text-[var(--color-brand-green)] transition-colors">Finance & EMI</Link>
-          <Link href="/news" className="hover:text-[var(--color-brand-green)] transition-colors">News & Reviews</Link>
+          <Link
+            href="/tractors"
+            className="transition-colors hover:text-[var(--color-brand-green)]"
+          >
+            New Tractors
+          </Link>
+          <Link
+            href="/used-tractors"
+            className="transition-colors hover:text-[var(--color-brand-green)]"
+          >
+            Used Tractors
+          </Link>
+          <Link
+            href="/implements"
+            className="transition-colors hover:text-[var(--color-brand-green)]"
+          >
+            Implements & Tyres
+          </Link>
+          <Link href="/dealers" className="transition-colors hover:text-[var(--color-brand-green)]">
+            Find Dealers
+          </Link>
+          <Link href="/loan" className="transition-colors hover:text-[var(--color-brand-green)]">
+            Finance & EMI
+          </Link>
+          <Link href="/news" className="transition-colors hover:text-[var(--color-brand-green)]">
+            News & Reviews
+          </Link>
 
-          <div className="h-[1px] bg-[var(--border-subtle)] my-2" />
-          <Link href="/sell-used-tractor" className="text-[var(--color-brand-orange)] flex items-center gap-2">
+          <div className="my-2 h-[1px] bg-[var(--border-subtle)]" />
+          <Link
+            href="/sell-used-tractor"
+            className="flex items-center gap-2 text-[var(--color-brand-orange)]"
+          >
             <span>+</span> Sell Your Tractor
           </Link>
         </div>
-        <div className="mt-auto mb-10 flex justify-between items-center border-t border-[var(--border-subtle)] pt-6">
+        <div className="mt-auto mb-10 flex items-center justify-between border-t border-[var(--border-subtle)] pt-6">
           <ThemeToggle />
           {!isAuthenticated ? (
-            <button onClick={() => { router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`); setMobileMenuOpen(false); }} className="text-lg font-bold text-[var(--color-brand-green)]">
+            <button
+              onClick={() => {
+                router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+                setMobileMenuOpen(false);
+              }}
+              className="text-lg font-bold text-[var(--color-brand-green)]"
+            >
               Log In to Account →
             </button>
           ) : (
-            <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-lg font-bold text-red-500">
+            <button
+              onClick={() => {
+                logout();
+                setMobileMenuOpen(false);
+              }}
+              className="text-lg font-bold text-red-500"
+            >
               Log Out
             </button>
           )}
@@ -241,33 +345,64 @@ export function Navbar() {
   );
 }
 
-function NavLink({ href, label, highlight = false, pathname }: { href: string; label: string, highlight?: boolean, pathname: string }) {
+function NavLink({
+  href,
+  label,
+  highlight = false,
+  pathname,
+}: {
+  href: string;
+  label: string;
+  highlight?: boolean;
+  pathname: string;
+}) {
   const isActive = pathname === href;
 
   return (
     <Link
       href={href}
-      className={`relative px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors rounded-full group ${isActive ? 'text-foreground bg-foreground/10' : highlight ? 'text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10' : 'text-muted hover:text-foreground hover:bg-foreground/10'}`}
+      className={`group relative rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${isActive ? 'text-foreground bg-foreground/10' : highlight ? 'text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10' : 'text-muted hover:text-foreground hover:bg-foreground/10'}`}
     >
       {label}
       {isActive && (
-        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[var(--color-brand-green)] shadow-[0_0_8px_var(--color-brand-green)]" />
+        <span className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[var(--color-brand-green)] shadow-[0_0_8px_var(--color-brand-green)]" />
       )}
     </Link>
   );
 }
 
-function DropdownLink({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) {
+function DropdownLink({
+  href,
+  icon,
+  label,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+}) {
   return (
-    <Link href={href} className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-muted hover:text-foreground hover:bg-foreground/10 rounded-xl transition-all">
+    <Link
+      href={href}
+      className="text-muted hover:text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all"
+    >
       <span className="opacity-70">{icon}</span>
       {label}
     </Link>
   );
 }
 
-function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: string, items: { title: string, desc: string, href: string }[], pathname: string, align?: 'left' | 'center' | 'right' }) {
-  const isActive = items.some(item => pathname === item.href);
+function NavDropdownMenu({
+  label,
+  items,
+  pathname,
+  align = 'center',
+}: {
+  label: string;
+  items: { title: string; desc: string; href: string }[];
+  pathname: string;
+  align?: 'left' | 'center' | 'right';
+}) {
+  const isActive = items.some((item) => pathname === item.href);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [isBrandOpen, setIsBrandOpen] = useState(true);
 
@@ -281,11 +416,15 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
   // Equipment Brand & Categories dropdown states (for Implements)
   const [eqBrands, setEqBrands] = useState<EquipmentBrand[]>([]);
   const [activeEqBrandId, setActiveEqBrandId] = useState<number | null>(null);
-  const [categoriesByBrand, setCategoriesByBrand] = useState<Record<number, ImplementCategory[]>>({});
+  const [categoriesByBrand, setCategoriesByBrand] = useState<Record<number, ImplementCategory[]>>(
+    {}
+  );
   const [loadingEqBrandId, setLoadingEqBrandId] = useState<number | null>(null);
 
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
-  const [implementsByBrandAndCategory, setImplementsByBrandAndCategory] = useState<Record<string, Implement[]>>({});
+  const [implementsByBrandAndCategory, setImplementsByBrandAndCategory] = useState<
+    Record<string, Implement[]>
+  >({});
   const [loadingCategoryId, setLoadingCategoryId] = useState<number | null>(null);
 
   const [positionRightCategory, setPositionRightCategory] = useState(true);
@@ -299,9 +438,12 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
     if (familiesByBrand[brandId] === undefined && loadingBrandId !== brandId) {
       setLoadingBrandId(brandId);
       try {
-        const res = await tractorFamilyAPI.getFamiliesByBrand(brandId, { isActive: 'true', limit: 100 });
+        const res = await tractorFamilyAPI.getFamiliesByBrand(brandId, {
+          isActive: 'true',
+          limit: 100,
+        });
         if (res.success) {
-          setFamiliesByBrand(prev => ({ ...prev, [brandId]: res.data.items }));
+          setFamiliesByBrand((prev) => ({ ...prev, [brandId]: res.data.items }));
         }
       } catch (err) {
         console.error('Failed to load families for brand', brandId, err);
@@ -319,7 +461,7 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
       try {
         const res = await implementCategoryAPI.getAllActiveCategoriesFlat({ brandId });
         if (res.success) {
-          setCategoriesByBrand(prev => ({ ...prev, [brandId]: res.data }));
+          setCategoriesByBrand((prev) => ({ ...prev, [brandId]: res.data }));
         }
       } catch (err) {
         console.error('Failed to load categories for brand', brandId, err);
@@ -335,9 +477,14 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
     if (implementsByBrandAndCategory[key] === undefined && loadingCategoryId !== categoryId) {
       setLoadingCategoryId(categoryId);
       try {
-        const res = await implementAPI.getAllImplements({ brandId, categoryId, isActive: 'true', limit: 100 });
+        const res = await implementAPI.getAllImplements({
+          brandId,
+          categoryId,
+          isActive: 'true',
+          limit: 100,
+        });
         if (res.success) {
-          setImplementsByBrandAndCategory(prev => ({ ...prev, [key]: res.data.data }));
+          setImplementsByBrandAndCategory((prev) => ({ ...prev, [key]: res.data.data }));
         }
       } catch (err) {
         console.error('Failed to load implements for brand/category', brandId, categoryId, err);
@@ -351,7 +498,8 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
     if (activeBrandId && brandsPanelRef.current) {
       const rect = brandsPanelRef.current.getBoundingClientRect();
       const spaceOnRight = window.innerWidth - rect.right;
-      if (spaceOnRight < 348) { // 328px panel width + 20px padding
+      if (spaceOnRight < 348) {
+        // 328px panel width + 20px padding
         setPositionRight(false);
       } else {
         setPositionRight(true);
@@ -403,7 +551,10 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
     if (label === 'Implements') {
       const fetchEqBrands = async () => {
         try {
-          const res = await equipmentBrandAPI.getAllEquipmentBrands({ isActive: 'true', limit: 100 });
+          const res = await equipmentBrandAPI.getAllEquipmentBrands({
+            isActive: 'true',
+            limit: 100,
+          });
           if (res.success) {
             setEqBrands(res.data.data);
           }
@@ -418,58 +569,77 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
   const alignmentClasses = {
     left: 'left-0',
     center: 'left-1/2 -translate-x-1/2',
-    right: 'right-0'
+    right: 'right-0',
   };
 
   return (
-    <div className="relative group/nav">
+    <div className="group/nav relative">
       {/* Trigger */}
-      <button className={`relative px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors rounded-full flex items-center gap-1.5 ${isActive ? 'text-foreground bg-foreground/10' : 'text-muted hover:text-foreground hover:bg-foreground/10'}`}>
+      <button
+        className={`relative flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${isActive ? 'text-foreground bg-foreground/10' : 'text-muted hover:text-foreground hover:bg-foreground/10'}`}
+      >
         {label}
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 opacity-50 group-hover/nav:rotate-180 transition-transform duration-300">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={3}
+          stroke="currentColor"
+          className="h-3 w-3 opacity-50 transition-transform duration-300 group-hover/nav:rotate-180"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
         {isActive && (
-          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[var(--color-brand-green)] shadow-[0_0_8px_var(--color-brand-green)]" />
+          <span className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[var(--color-brand-green)] shadow-[0_0_8px_var(--color-brand-green)]" />
         )}
       </button>
 
       {/* Invisible Hover Bridge - w-full ensures it doesn't overlap other icons */}
-      <div className="absolute top-full left-0 w-full h-5" />
+      <div className="absolute top-full left-0 h-5 w-full" />
 
       {/* Dropdown Content */}
-      <div 
-        className={`absolute ${alignmentClasses[align]} top-[calc(100%+1rem)] w-[280px] rounded-[1.5rem] opacity-0 translate-y-4 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] p-2.5 flex flex-col gap-1 z-50 nav-dropdown-glass`}
+      <div
+        className={`absolute ${alignmentClasses[align]} nav-dropdown-glass pointer-events-none top-[calc(100%+1rem)] z-50 flex w-[280px] translate-y-4 scale-95 flex-col gap-1 rounded-[1.5rem] p-2.5 opacity-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/nav:pointer-events-auto group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:opacity-100`}
       >
         {items.map((item, i) => {
           if (item.title === 'BRANDS') {
             if (label === 'Tractors') {
               return (
-                <div 
-                  key={i} 
-                  className="relative group/submenu flex flex-col"
-                >
+                <div key={i} className="group/submenu relative flex flex-col">
                   {/* Trigger Row */}
-                  <div className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-foreground/10 text-foreground hover:text-[var(--color-brand-green)] cursor-pointer transition-all">
+                  <div className="hover:bg-foreground/10 text-foreground flex cursor-pointer items-center justify-between rounded-xl px-4 py-3 transition-all hover:text-[var(--color-brand-green)]">
                     <span className="text-sm font-black tracking-tight uppercase">Brands</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5 transition-transform duration-300">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={3}
+                      stroke="currentColor"
+                      className="h-3.5 w-3.5 transition-transform duration-300"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                      />
                     </svg>
                   </div>
 
                   {/* Submenu Content */}
-                  <div 
+                  <div
                     ref={brandsPanelRef}
-                    className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
+                    className="pointer-events-none absolute top-0 left-full z-[60] w-[328px] scale-95 pl-2 opacity-0 transition-all duration-300 group-hover/submenu:pointer-events-auto group-hover/submenu:scale-100 group-hover/submenu:opacity-100"
                   >
-                    <div 
-                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
+                    <div
+                      className="nav-dropdown-glass relative flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5"
                       onMouseLeave={() => setActiveBrandId(null)}
                     >
                       {/* Scrollable Brands List (displays exactly 3 complete items) */}
-                      <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                      <div className="brand-scrollbar flex max-h-[112px] flex-col gap-0.5 overflow-x-hidden overflow-y-auto pr-1">
                         {brands.length === 0 ? (
-                          <span className="text-xs text-muted/60 px-3 py-2.5 italic font-bold block shrink-0">No active brands</span>
+                          <span className="text-muted/60 block shrink-0 px-3 py-2.5 text-xs font-bold italic">
+                            No active brands
+                          </span>
                         ) : (
                           brands.map((brand) => {
                             const displayName = brand.name.toLowerCase().includes('tractor')
@@ -477,14 +647,14 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                               : `${brand.name} Tractors`;
                             const isBrandActive = activeBrandId === brand.id;
                             return (
-                              <Link 
-                                key={brand.id} 
+                              <Link
+                                key={brand.id}
                                 href={`/tractors?brand=${brand.id}`}
                                 onMouseEnter={() => handleBrandHover(brand.id)}
-                                className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
-                                  isBrandActive 
-                                    ? 'text-[var(--color-brand-green)] bg-foreground/5' 
-                                    : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                  isBrandActive
+                                    ? 'bg-foreground/5 text-[var(--color-brand-green)]'
+                                    : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
                                 }`}
                               >
                                 {displayName}
@@ -495,61 +665,63 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                       </div>
 
                       {/* Separator / Divider */}
-                      <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+                      <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
 
                       {/* ALL BRANDS (outside scroll) */}
-                      <Link 
+                      <Link
                         href="/brands"
-                        className="block w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                        className="text-foreground hover:bg-foreground/5 block w-full shrink-0 rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
                       >
                         All Brands
                       </Link>
 
                       {/* Family Dropdown Panel (renders nested next to Brands panel) */}
-                      <div 
-                        className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[70] ${
-                          activeBrandId 
-                            ? 'opacity-100 scale-100 pointer-events-auto' 
-                            : 'opacity-0 scale-95 pointer-events-none'
+                      <div
+                        className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                          activeBrandId
+                            ? 'pointer-events-auto scale-100 opacity-100'
+                            : 'pointer-events-none scale-95 opacity-0'
                         }`}
                       >
-                        <div 
-                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
-                        >
+                        <div className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5">
                           {loadingBrandId === activeBrandId ? (
-                            <div className="flex items-center justify-center py-6 shrink-0">
-                              <span className="text-xs font-bold text-muted animate-pulse">Loading families...</span>
+                            <div className="flex shrink-0 items-center justify-center py-6">
+                              <span className="text-muted animate-pulse text-xs font-bold">
+                                Loading families...
+                              </span>
                             </div>
                           ) : activeBrandId && familiesByBrand[activeBrandId]?.length > 0 ? (
                             <>
                               {/* Scrollable Families List */}
-                              <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                              <div className="brand-scrollbar flex max-h-[112px] flex-col gap-0.5 overflow-x-hidden overflow-y-auto pr-1">
                                 {familiesByBrand[activeBrandId].map((family) => (
-                                  <Link 
-                                    key={family.id} 
+                                  <Link
+                                    key={family.id}
                                     href={`/tractors?brand=${activeBrandId}&family=${family.id}`}
-                                    className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
+                                    className="text-muted hover:bg-foreground/5 block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors hover:text-[var(--color-brand-green)]"
                                   >
                                     {family.name}
                                   </Link>
                                 ))}
                               </div>
-                              
+
                               {/* Separator / Divider */}
-                              <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+                              <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
 
                               {/* ALL FAMILIES button */}
-                              <Link 
+                              <Link
                                 href={`/tractors?brand=${activeBrandId}`}
-                                className="flex items-center justify-between w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                                className="text-foreground hover:bg-foreground/5 flex w-full shrink-0 items-center justify-between rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
                               >
                                 <span>All Families</span>
                                 <span className="text-xs leading-none">→</span>
                               </Link>
                             </>
                           ) : (
-                            <div className="flex items-center justify-center py-6 px-3 shrink-0">
-                              <span className="text-xs font-bold text-muted/60 italic">No families available</span>
+                            <div className="flex shrink-0 items-center justify-center px-3 py-6">
+                              <span className="text-muted/60 text-xs font-bold italic">
+                                No families available
+                              </span>
                             </div>
                           )}
                         </div>
@@ -561,36 +733,51 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
             }
 
             if (label === 'Implements') {
-              const activeBrandCategories = activeEqBrandId !== null ? (categoriesByBrand[activeEqBrandId] || []) : [];
-              const activeCategory = activeCategoryId !== null ? activeBrandCategories.find((c: ImplementCategory) => c.id === activeCategoryId) : undefined;
+              const activeBrandCategories =
+                activeEqBrandId !== null ? categoriesByBrand[activeEqBrandId] || [] : [];
+              const activeCategory =
+                activeCategoryId !== null
+                  ? activeBrandCategories.find((c: ImplementCategory) => c.id === activeCategoryId)
+                  : undefined;
               const activeCategorySlug = activeCategory?.slug || '';
-              const activeBrandSlug = activeEqBrandId !== null ? (eqBrands.find(b => b.id === activeEqBrandId)?.slug || '') : '';
+              const activeBrandSlug =
+                activeEqBrandId !== null
+                  ? eqBrands.find((b) => b.id === activeEqBrandId)?.slug || ''
+                  : '';
 
               return (
-                <div 
-                  key={i} 
-                  className="relative group/submenu flex flex-col"
-                >
+                <div key={i} className="group/submenu relative flex flex-col">
                   {/* Trigger Row */}
-                  <div className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-foreground/10 text-foreground hover:text-[var(--color-brand-green)] cursor-pointer transition-all">
+                  <div className="hover:bg-foreground/10 text-foreground flex cursor-pointer items-center justify-between rounded-xl px-4 py-3 transition-all hover:text-[var(--color-brand-green)]">
                     <span className="text-sm font-black tracking-tight uppercase">Brands</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5 transition-transform duration-300">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={3}
+                      stroke="currentColor"
+                      className="h-3.5 w-3.5 transition-transform duration-300"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                      />
                     </svg>
                   </div>
 
                   {/* Submenu Content */}
-                  <div 
-                    className="absolute left-full top-0 pl-2 w-[328px] opacity-0 scale-95 pointer-events-none group-hover/submenu:opacity-100 group-hover/submenu:scale-100 group-hover/submenu:pointer-events-auto transition-all duration-300 z-[60]"
-                  >
-                    <div 
-                      className="relative w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
+                  <div className="pointer-events-none absolute top-0 left-full z-[60] w-[328px] scale-95 pl-2 opacity-0 transition-all duration-300 group-hover/submenu:pointer-events-auto group-hover/submenu:scale-100 group-hover/submenu:opacity-100">
+                    <div
+                      className="nav-dropdown-glass relative flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5"
                       onMouseLeave={() => setActiveEqBrandId(null)}
                     >
                       {/* Scrollable Brands List */}
-                      <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
+                      <div className="brand-scrollbar flex max-h-[112px] flex-col gap-0.5 overflow-x-hidden overflow-y-auto pr-1">
                         {eqBrands.length === 0 ? (
-                          <span className="text-xs text-muted/60 px-3 py-2.5 italic font-bold block shrink-0">No active brands</span>
+                          <span className="text-muted/60 block shrink-0 px-3 py-2.5 text-xs font-bold italic">
+                            No active brands
+                          </span>
                         ) : (
                           eqBrands.map((brand) => {
                             const displayName = brand.name.toLowerCase().includes('implement')
@@ -598,14 +785,14 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                               : `${brand.name} Implements`;
                             const isBrandActive = activeEqBrandId === brand.id;
                             return (
-                              <Link 
-                                key={brand.id} 
+                              <Link
+                                key={brand.id}
                                 href={`/implements?brand=${brand.slug}`}
                                 onMouseEnter={() => handleEqBrandHover(brand.id)}
-                                className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
-                                  isBrandActive 
-                                    ? 'text-[var(--color-brand-green)] bg-foreground/5' 
-                                    : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                  isBrandActive
+                                    ? 'bg-foreground/5 text-[var(--color-brand-green)]'
+                                    : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
                                 }`}
                               >
                                 {displayName}
@@ -616,39 +803,43 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                       </div>
 
                       {/* Separator / Divider */}
-                      <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+                      <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
 
                       {/* ALL BRANDS (outside scroll) */}
-                      <Link 
+                      <Link
                         href="/implements"
-                        className="block w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                        className="text-foreground hover:bg-foreground/5 block w-full shrink-0 rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
                       >
                         All Brands
                       </Link>
 
                       {/* Category Dropdown Panel (renders nested next to Brands panel) */}
-                      <div 
+                      <div
                         ref={categoryPanelRef}
-                        className={`absolute ${positionRightCategory ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[70] ${
-                          activeEqBrandId 
-                            ? 'opacity-100 scale-100 pointer-events-auto' 
-                            : 'opacity-0 scale-95 pointer-events-none'
+                        className={`absolute ${positionRightCategory ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                          activeEqBrandId
+                            ? 'pointer-events-auto scale-100 opacity-100'
+                            : 'pointer-events-none scale-95 opacity-0'
                         }`}
                       >
-                        <div 
-                          className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
+                        <div
+                          className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5"
                           onMouseLeave={() => setActiveCategoryId(null)}
                         >
                           {loadingEqBrandId === activeEqBrandId ? (
-                            <div className="flex items-center justify-center py-6 shrink-0">
-                              <span className="text-xs font-bold text-muted animate-pulse">Loading categories...</span>
+                            <div className="flex shrink-0 items-center justify-center py-6">
+                              <span className="text-muted animate-pulse text-xs font-bold">
+                                Loading categories...
+                              </span>
                             </div>
                           ) : activeEqBrandId && activeBrandCategories.length > 0 ? (
                             <>
                               {/* Scrollable Categories List */}
-                              <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-1 brand-scrollbar">
+                              <div className="brand-scrollbar flex max-h-[112px] flex-col gap-1 overflow-x-hidden overflow-y-auto pr-1">
                                 {(() => {
-                                  const parents = activeBrandCategories.filter((c: ImplementCategory) => c.parentId === null);
+                                  const parents = activeBrandCategories.filter(
+                                    (c: ImplementCategory) => c.parentId === null
+                                  );
                                   const childrenMap: Record<number, ImplementCategory[]> = {};
                                   activeBrandCategories.forEach((c: ImplementCategory) => {
                                     const pId = c.parentId;
@@ -664,8 +855,11 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                                     const children = childrenMap[parent.id] || [];
                                     if (children.length > 0) {
                                       return (
-                                        <div key={parent.id} className="flex flex-col gap-0.5 mt-1 shrink-0">
-                                          <div className="text-muted/50 px-3 py-1 font-extrabold tracking-wider text-[10px] uppercase">
+                                        <div
+                                          key={parent.id}
+                                          className="mt-1 flex shrink-0 flex-col gap-0.5"
+                                        >
+                                          <div className="text-muted/50 px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase">
                                             {parent.name}
                                           </div>
                                           {children.map((child) => {
@@ -674,11 +868,13 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                                               <Link
                                                 key={child.id}
                                                 href={`/implements/${child.slug}?brand=${activeBrandSlug}`}
-                                                onMouseEnter={() => handleCategoryHover(activeEqBrandId, child.id)}
-                                                className={`block w-full py-2 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 pl-5 ${
-                                                  isChildActive 
-                                                    ? 'text-[var(--color-brand-green)] bg-foreground/5' 
-                                                    : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                                onMouseEnter={() =>
+                                                  handleCategoryHover(activeEqBrandId, child.id)
+                                                }
+                                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2 pl-5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                                  isChildActive
+                                                    ? 'bg-foreground/5 text-[var(--color-brand-green)]'
+                                                    : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
                                                 }`}
                                               >
                                                 {child.name}
@@ -693,11 +889,13 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                                         <Link
                                           key={parent.id}
                                           href={`/implements/${parent.slug}?brand=${activeBrandSlug}`}
-                                          onMouseEnter={() => handleCategoryHover(activeEqBrandId, parent.id)}
-                                          className={`block w-full py-2.5 px-3 text-xs font-black rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0 ${
-                                            isParentActive 
-                                              ? 'text-[var(--color-brand-green)] bg-foreground/5' 
-                                              : 'text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5'
+                                          onMouseEnter={() =>
+                                            handleCategoryHover(activeEqBrandId, parent.id)
+                                          }
+                                          className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                            isParentActive
+                                              ? 'bg-foreground/5 text-[var(--color-brand-green)]'
+                                              : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
                                           }`}
                                         >
                                           {parent.name}
@@ -709,65 +907,72 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
                               </div>
                             </>
                           ) : (
-                            <div className="flex items-center justify-center py-6 px-3 shrink-0">
-                              <span className="text-xs font-bold text-muted/60 italic">No categories available</span>
+                            <div className="flex shrink-0 items-center justify-center px-3 py-6">
+                              <span className="text-muted/60 text-xs font-bold italic">
+                                No categories available
+                              </span>
                             </div>
                           )}
 
                           {/* Implement Models Dropdown Panel (renders nested next to Category panel) */}
-                          <div 
+                          <div
                             ref={implementsPanelRef}
-                            className={`absolute ${positionRightImplement ? 'left-full pl-2' : 'right-full pr-2'} top-0 w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[80] ${
-                              activeCategoryId 
-                                ? 'opacity-100 scale-100 pointer-events-auto' 
-                                : 'opacity-0 scale-95 pointer-events-none'
+                            className={`absolute ${positionRightImplement ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[80] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                              activeCategoryId
+                                ? 'pointer-events-auto scale-100 opacity-100'
+                                : 'pointer-events-none scale-95 opacity-0'
                             }`}
                           >
-                            <div 
-                              className="w-full rounded-[1.5rem] p-2.5 flex flex-col gap-1 nav-dropdown-glass"
-                            >
+                            <div className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5">
                               {loadingCategoryId === activeCategoryId ? (
-                                <div className="flex items-center justify-center py-6 shrink-0">
-                                  <span className="text-xs font-bold text-muted animate-pulse">Loading implements...</span>
+                                <div className="flex shrink-0 items-center justify-center py-6">
+                                  <span className="text-muted animate-pulse text-xs font-bold">
+                                    Loading implements...
+                                  </span>
                                 </div>
-                              ) : activeCategoryId && implementsByBrandAndCategory[`${activeEqBrandId}_${activeCategoryId}`]?.length > 0 ? (
+                              ) : activeCategoryId &&
+                                implementsByBrandAndCategory[
+                                  `${activeEqBrandId}_${activeCategoryId}`
+                                ]?.length > 0 ? (
                                 <>
                                   {/* Scrollable Implements List */}
-                                  <div className="overflow-y-auto overflow-x-hidden max-h-[112px] pr-1 flex flex-col gap-0.5 brand-scrollbar">
-                                    {implementsByBrandAndCategory[`${activeEqBrandId}_${activeCategoryId}`].map((implement) => (
-                                      <Link 
-                                        key={implement.id} 
+                                  <div className="brand-scrollbar flex max-h-[112px] flex-col gap-0.5 overflow-x-hidden overflow-y-auto pr-1">
+                                    {implementsByBrandAndCategory[
+                                      `${activeEqBrandId}_${activeCategoryId}`
+                                    ].map((implement) => (
+                                      <Link
+                                        key={implement.id}
                                         href={`/implements/${implement.category?.slug}/${implement.slug}`}
-                                        className="block w-full py-2.5 px-3 text-xs font-black text-muted hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal whitespace-nowrap truncate uppercase shrink-0"
+                                        className="text-muted hover:bg-foreground/5 block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors hover:text-[var(--color-brand-green)]"
                                       >
                                         {implement.modelName}
                                       </Link>
                                     ))}
                                   </div>
-                                  
+
                                   {/* Separator / Divider */}
-                                  <div className="h-[1px] bg-[var(--border-subtle)] my-1 shrink-0" />
+                                  <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
 
                                   {/* ALL ITEMS link */}
-                                  <Link 
+                                  <Link
                                     href={`/implements/${activeCategorySlug}?brand=${activeBrandSlug}`}
-                                    className="flex items-center justify-between w-full py-2.5 px-3 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] hover:bg-foreground/5 rounded-lg transition-colors leading-normal uppercase tracking-wider shrink-0"
+                                    className="text-foreground hover:bg-foreground/5 flex w-full shrink-0 items-center justify-between rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
                                   >
                                     <span>All models</span>
                                     <span className="text-xs leading-none">→</span>
                                   </Link>
                                 </>
                               ) : (
-                                <div className="flex items-center justify-center py-6 px-3 shrink-0">
-                                  <span className="text-xs font-bold text-muted/60 italic">No implements available</span>
+                                <div className="flex shrink-0 items-center justify-center px-3 py-6">
+                                  <span className="text-muted/60 text-xs font-bold italic">
+                                    No implements available
+                                  </span>
                                 </div>
                               )}
                             </div>
                           </div>
-
                         </div>
                       </div>
-
                     </div>
                   </div>
                 </div>
@@ -776,10 +981,18 @@ function NavDropdownMenu({ label, items, pathname, align = 'center' }: { label: 
           }
 
           return (
-            <Link key={i} href={item.href} className="flex flex-col px-4 py-3 rounded-xl hover:bg-foreground/10 transition-colors group/item">
-              <span className="text-sm font-black text-foreground group-hover/item:text-[var(--color-brand-green)] transition-colors tracking-tight">{item.title}</span>
+            <Link
+              key={i}
+              href={item.href}
+              className="hover:bg-foreground/10 group/item flex flex-col rounded-xl px-4 py-3 transition-colors"
+            >
+              <span className="text-foreground text-sm font-black tracking-tight transition-colors group-hover/item:text-[var(--color-brand-green)]">
+                {item.title}
+              </span>
               {item.desc && (
-                <span className="text-[11px] font-bold text-muted mt-0.5 leading-tight">{item.desc}</span>
+                <span className="text-muted mt-0.5 text-[11px] leading-tight font-bold">
+                  {item.desc}
+                </span>
               )}
             </Link>
           );

@@ -5,19 +5,23 @@ import { implementAPI } from '@/lib/api/implements';
 import ImplementDetailsClient from './ImplementDetailsClient';
 
 type Props = {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  
+
   try {
     const res = await implementAPI.getImplementById(id);
     if (res.success && res.data) {
       const impl = res.data;
       return {
-        title: impl.seoTitle || `${impl.brand?.name || ''} ${impl.modelName} Price, Specifications & Compatibility | TractorDost`,
-        description: impl.seoDescription || `Explore specifications, price range, and tractor compatibility for ${impl.brand?.name || ''} ${impl.modelName} on TractorDost.`,
+        title:
+          impl.seoTitle ||
+          `${impl.brand?.name || ''} ${impl.modelName} Price, Specifications & Compatibility | TractorDost`,
+        description:
+          impl.seoDescription ||
+          `Explore specifications, price range, and tractor compatibility for ${impl.brand?.name || ''} ${impl.modelName} on TractorDost.`,
       };
     }
   } catch (error) {
@@ -26,13 +30,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: 'Implement Details | TractorDost',
-    description: 'Find detailed specifications, prices, and features of top agricultural implements on TractorDost.',
+    description:
+      'Find detailed specifications, prices, and features of top agricultural implements on TractorDost.',
   };
 }
 
 export default async function ImplementDetailsPage({ params }: Props) {
   const { id } = await params;
-  
+
   let implement: any = null;
   let similarImplements: any[] = [];
 
@@ -44,10 +49,10 @@ export default async function ImplementDetailsPage({ params }: Props) {
       // Fetch similar implements by brandId or categoryId if available
       if (implement.brandId || implement.categoryId) {
         try {
-          const simRes = await implementAPI.getAllImplements({ 
-            brandId: implement.brandId || undefined, 
+          const simRes = await implementAPI.getAllImplements({
+            brandId: implement.brandId || undefined,
             categoryId: implement.categoryId || undefined,
-            limit: 4 
+            limit: 4,
           });
           if (simRes.success && simRes.data) {
             const list = simRes.data.data || [];
@@ -66,10 +71,5 @@ export default async function ImplementDetailsPage({ params }: Props) {
     notFound();
   }
 
-  return (
-    <ImplementDetailsClient 
-      implement={implement} 
-      similarImplements={similarImplements} 
-    />
-  );
+  return <ImplementDetailsClient implement={implement} similarImplements={similarImplements} />;
 }

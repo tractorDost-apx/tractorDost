@@ -42,17 +42,18 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
     district: dealer.district || '',
     pincode: dealer.pincode || '',
     serviceRadiusKm: dealer.serviceRadiusKm || 10,
-    workingHours: typeof dealer.workingHours === 'string' 
-      ? dealer.workingHours 
-      : dealer.workingHours 
-        ? JSON.stringify(dealer.workingHours, null, 2) 
-        : 'Standard Business Hours (9:00 AM - 7:00 PM)',
-    serviceAreas: Array.isArray(dealer.serviceAreas) 
-      ? dealer.serviceAreas.join(', ') 
-      : typeof dealer.serviceAreas === 'string' 
-        ? dealer.serviceAreas 
-        : dealer.serviceAreas 
-          ? JSON.stringify(dealer.serviceAreas) 
+    workingHours:
+      typeof dealer.workingHours === 'string'
+        ? dealer.workingHours
+        : dealer.workingHours
+          ? JSON.stringify(dealer.workingHours, null, 2)
+          : 'Standard Business Hours (9:00 AM - 7:00 PM)',
+    serviceAreas: Array.isArray(dealer.serviceAreas)
+      ? dealer.serviceAreas.join(', ')
+      : typeof dealer.serviceAreas === 'string'
+        ? dealer.serviceAreas
+        : dealer.serviceAreas
+          ? JSON.stringify(dealer.serviceAreas)
           : '',
     aboutDealer: dealer.aboutDealer || '',
     seoTitle: dealer.seoTitle || '',
@@ -112,7 +113,10 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
 
       let parsedWorkingHours: any = formData.workingHours;
       try {
-        if (formData.workingHours.trim().startsWith('{') || formData.workingHours.trim().startsWith('[')) {
+        if (
+          formData.workingHours.trim().startsWith('{') ||
+          formData.workingHours.trim().startsWith('[')
+        ) {
           parsedWorkingHours = JSON.parse(formData.workingHours);
         }
       } catch (err) {
@@ -121,7 +125,10 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
 
       let parsedServiceAreas: any = formData.serviceAreas;
       if (formData.serviceAreas.includes(',')) {
-        parsedServiceAreas = formData.serviceAreas.split(',').map((s) => s.trim()).filter(Boolean);
+        parsedServiceAreas = formData.serviceAreas
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
       }
 
       const payload: UpdateDealerPayload = {
@@ -161,34 +168,35 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 animate-fade-in pb-12">
+    <form onSubmit={handleSubmit} className="animate-fade-in space-y-8 pb-12">
       {/* Top Header Card */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="glass-panel flex flex-col items-start justify-between gap-4 rounded-3xl p-6 sm:flex-row sm:items-center sm:p-8">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-black text-foreground">Edit Basic Information</h1>
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20">
+            <h1 className="text-foreground text-2xl font-black">Edit Basic Information</h1>
+            <span className="rounded-md border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2.5 py-1 text-[10px] font-black tracking-wider text-[var(--color-brand-green)] uppercase">
               Self-Service Mode
             </span>
           </div>
-          <p className="text-xs text-muted font-medium mt-1">
-            Update your business contact details, location, operational hours, and general profile description.
+          <p className="text-muted mt-1 text-xs font-medium">
+            Update your business contact details, location, operational hours, and general profile
+            description.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex w-full items-center gap-3 sm:w-auto">
           <button
             type="button"
             onClick={onCancel}
             disabled={saving}
-            className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-foreground/5 hover:bg-foreground/10 text-foreground border border-[var(--border-subtle)] transition-colors flex items-center justify-center gap-2"
+            className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-bold transition-colors sm:flex-none"
           >
             <X size={16} /> Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 sm:flex-none px-6 py-2.5 bg-[var(--color-brand-green)] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 sm:flex-none"
           >
             {saving ? (
               <span>Saving Changes...</span>
@@ -203,219 +211,228 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
 
       {/* Error & Success Messages */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bold flex items-center gap-2">
+        <div className="flex items-center gap-2 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-bold text-rose-500">
           <AlertTriangle size={18} className="shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {successMessage && (
-        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
+        <div className="flex items-center gap-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-xs font-bold text-emerald-600 dark:text-emerald-400">
           <CheckCircle2 size={18} className="shrink-0" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {/* Read-Only KYC Notice Banner */}
-      <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-start gap-3">
-        <AlertTriangle size={20} className="shrink-0 text-amber-500 mt-0.5" />
+      <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5 text-xs font-bold text-amber-600 dark:text-amber-400">
+        <AlertTriangle size={20} className="mt-0.5 shrink-0 text-amber-500" />
         <div className="space-y-1">
-          <div className="font-black uppercase tracking-wider text-xs">Read-Only Safety Notice</div>
-          <p className="font-medium text-foreground">
-            KYC information (PAN & GST), Verification status, Certification status, Ratings, and System IDs are locked and cannot be changed from your profile edit form.
-            If KYC correction is required, please contact TractorDost support.
+          <div className="text-xs font-black tracking-wider uppercase">Read-Only Safety Notice</div>
+          <p className="text-foreground font-medium">
+            KYC information (PAN & GST), Verification status, Certification status, Ratings, and
+            System IDs are locked and cannot be changed from your profile edit form. If KYC
+            correction is required, please contact TractorDost support.
           </p>
         </div>
       </div>
 
       {/* EDITABLE SECTION 1: Basic Information */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
+      <div className="glass-panel space-y-6 rounded-3xl p-6 sm:p-8">
+        <h2 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4 text-lg font-black">
           <Info size={20} className="text-[var(--color-brand-green)]" />
           1. Basic Profile Details
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+        <div className="grid grid-cols-1 gap-6 text-sm md:grid-cols-2">
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">Business Name *</label>
+            <label className="text-muted mb-1 block text-xs font-bold">Business Name *</label>
             <input
               type="text"
               name="businessName"
               value={formData.businessName}
               onChange={handleChange}
               placeholder="Dealership Business Name"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1 flex items-center justify-between">
+            <label className="text-muted mb-1 block flex items-center justify-between text-xs font-bold">
               <span>Slug (Public URL Identifier)</span>
-              <span className="text-[10px] text-muted/70 flex items-center gap-1"><Lock size={10} /> Read-Only</span>
+              <span className="text-muted/70 flex items-center gap-1 text-[10px]">
+                <Lock size={10} /> Read-Only
+              </span>
             </label>
             <input
               type="text"
               value={dealer.slug}
               disabled
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-4 py-2.5 text-muted font-mono text-xs cursor-not-allowed opacity-60"
+              className="bg-foreground/5 text-muted w-full cursor-not-allowed rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 font-mono text-xs opacity-60"
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1 flex items-center justify-between">
+            <label className="text-muted mb-1 block flex items-center justify-between text-xs font-bold">
               <span>Dealer Type</span>
-              <span className="text-[10px] text-muted/70 flex items-center gap-1"><Lock size={10} /> Read-Only</span>
+              <span className="text-muted/70 flex items-center gap-1 text-[10px]">
+                <Lock size={10} /> Read-Only
+              </span>
             </label>
-            <div className="p-2.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl flex items-center opacity-60">
+            <div className="bg-foreground/5 flex items-center rounded-xl border border-[var(--border-subtle)] p-2.5 opacity-60">
               <DealerTypeBadge dealerType={dealer.dealerType} />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1 flex items-center justify-between">
+            <label className="text-muted mb-1 block flex items-center justify-between text-xs font-bold">
               <span>Active Status</span>
-              <span className="text-[10px] text-muted/70 flex items-center gap-1"><Lock size={10} /> Read-Only</span>
+              <span className="text-muted/70 flex items-center gap-1 text-[10px]">
+                <Lock size={10} /> Read-Only
+              </span>
             </label>
-            <div className="p-2.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl flex items-center opacity-60">
+            <div className="bg-foreground/5 flex items-center rounded-xl border border-[var(--border-subtle)] p-2.5 opacity-60">
               <ActiveBadge isActive={dealer.isActive} />
             </div>
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-xs font-bold text-muted block mb-1">About Dealership</label>
+            <label className="text-muted mb-1 block text-xs font-bold">About Dealership</label>
             <textarea
               name="aboutDealer"
               rows={4}
               value={formData.aboutDealer}
               onChange={handleChange}
               placeholder="Tell farmers and customers about your dealership history, authorized services, and offerings..."
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl p-4 text-foreground text-sm font-medium focus:outline-none transition-colors resize-y"
+              className="bg-foreground/5 text-foreground w-full resize-y rounded-xl border border-[var(--border-subtle)] p-4 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* EDITABLE SECTION 2: Contact Information */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
+      <div className="glass-panel space-y-6 rounded-3xl p-6 sm:p-8">
+        <h2 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4 text-lg font-black">
           <Phone size={20} className="text-[var(--color-brand-green)]" />
           2. Contact Details
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+        <div className="grid grid-cols-1 gap-6 text-sm sm:grid-cols-2">
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">Phone Number *</label>
+            <label className="text-muted mb-1 block text-xs font-bold">Phone Number *</label>
             <input
               type="text"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               placeholder="Primary Phone Number"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">WhatsApp Number</label>
+            <label className="text-muted mb-1 block text-xs font-bold">WhatsApp Number</label>
             <input
               type="text"
               name="whatsapp"
               value={formData.whatsapp}
               onChange={handleChange}
               placeholder="WhatsApp Contact Number"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">Email Address</label>
+            <label className="text-muted mb-1 block text-xs font-bold">Email Address</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="Official Business Email"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">Official Website URL</label>
+            <label className="text-muted mb-1 block text-xs font-bold">Official Website URL</label>
             <input
               type="text"
               name="website"
               value={formData.website}
               onChange={handleChange}
               placeholder="https://www.yourdealership.com"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* EDITABLE SECTION 3: Location & Operational Info */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
+      <div className="glass-panel space-y-6 rounded-3xl p-6 sm:p-8">
+        <h2 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4 text-lg font-black">
           <MapPin size={20} className="text-[var(--color-brand-green)]" />
           3. Location & Operational Info
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+        <div className="grid grid-cols-1 gap-6 text-sm md:grid-cols-3">
           <div className="md:col-span-3">
-            <label className="text-xs font-bold text-muted block mb-1">Complete Dealership Address *</label>
+            <label className="text-muted mb-1 block text-xs font-bold">
+              Complete Dealership Address *
+            </label>
             <textarea
               name="address"
               rows={2}
               value={formData.address}
               onChange={handleChange}
               placeholder="Street address, landmark..."
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl p-3 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] p-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">State *</label>
+            <label className="text-muted mb-1 block text-xs font-bold">State *</label>
             <input
               type="text"
               name="state"
               value={formData.state}
               onChange={handleChange}
               placeholder="State"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">District *</label>
+            <label className="text-muted mb-1 block text-xs font-bold">District *</label>
             <input
               type="text"
               name="district"
               value={formData.district}
               onChange={handleChange}
               placeholder="District"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">Pincode</label>
+            <label className="text-muted mb-1 block text-xs font-bold">Pincode</label>
             <input
               type="text"
               name="pincode"
               value={formData.pincode}
               onChange={handleChange}
               placeholder="6-digit pincode"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">Service Radius (Km)</label>
+            <label className="text-muted mb-1 block text-xs font-bold">Service Radius (Km)</label>
             <input
               type="number"
               name="serviceRadiusKm"
@@ -424,46 +441,50 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               min={1}
               max={500}
               placeholder="e.g. 50"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-bold focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-xs font-bold text-muted block mb-1">Service Areas Covered (comma separated)</label>
+            <label className="text-muted mb-1 block text-xs font-bold">
+              Service Areas Covered (comma separated)
+            </label>
             <input
               type="text"
               name="serviceAreas"
               value={formData.serviceAreas}
               onChange={handleChange}
               placeholder="e.g. Taluka A, Taluka B, District Center"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
 
           <div className="md:col-span-3">
-            <label className="text-xs font-bold text-muted block mb-1">Working Hours Description / Schedule</label>
+            <label className="text-muted mb-1 block text-xs font-bold">
+              Working Hours Description / Schedule
+            </label>
             <input
               type="text"
               name="workingHours"
               value={formData.workingHours}
               onChange={handleChange}
               placeholder="e.g. Mon-Sat: 9:00 AM - 7:00 PM, Sun: Closed"
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* EDITABLE SECTION 4: SEO Settings */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
-        <h2 className="text-lg font-black text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4">
+      <div className="glass-panel space-y-6 rounded-3xl p-6 sm:p-8">
+        <h2 className="text-foreground flex items-center gap-2 border-b border-[var(--border-subtle)] pb-4 text-lg font-black">
           <Globe size={20} className="text-[var(--color-brand-green)]" />
           4. SEO & Search Presence
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+        <div className="grid grid-cols-1 gap-6 text-sm md:grid-cols-2">
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">SEO Title</label>
+            <label className="text-muted mb-1 block text-xs font-bold">SEO Title</label>
             <input
               type="text"
               name="seoTitle"
@@ -471,12 +492,12 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               onChange={handleChange}
               placeholder="Search Title (max 60 chars)"
               maxLength={60}
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-muted block mb-1">SEO Description</label>
+            <label className="text-muted mb-1 block text-xs font-bold">SEO Description</label>
             <input
               type="text"
               name="seoDescription"
@@ -484,47 +505,63 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               onChange={handleChange}
               placeholder="Search Summary Description (max 160 chars)"
               maxLength={160}
-              className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl px-4 py-2.5 text-foreground text-sm font-medium focus:outline-none transition-colors"
+              className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* READ-ONLY SECTIONS PREVIEW */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+      <div className="glass-panel space-y-6 rounded-3xl p-6 sm:p-8">
         <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
-          <h2 className="text-lg font-black text-muted flex items-center gap-2">
+          <h2 className="text-muted flex items-center gap-2 text-lg font-black">
             <Lock size={18} className="text-muted" />
             Read-Only System & KYC Summary (Non-Editable)
           </h2>
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/20">
+          <span className="rounded-md border border-rose-500/20 bg-rose-500/10 px-2.5 py-1 text-[10px] font-black tracking-wider text-rose-500 uppercase">
             Read-Only Protection
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
-          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
-            <span className="text-muted block text-[10px] font-sans font-bold">PAN Number</span>
-            <span className="text-foreground font-black tracking-wider uppercase text-sm">{dealer.panNumber || 'NOT PROVIDED'}</span>
-            <span className="text-[10px] text-emerald-500 block font-sans mt-0.5">🔒 Verified KYC</span>
+        <div className="grid grid-cols-1 gap-4 font-mono text-xs sm:grid-cols-2 lg:grid-cols-4">
+          <div className="bg-foreground/5 rounded-xl border border-[var(--border-subtle)] p-3.5">
+            <span className="text-muted block font-sans text-[10px] font-bold">PAN Number</span>
+            <span className="text-foreground text-sm font-black tracking-wider uppercase">
+              {dealer.panNumber || 'NOT PROVIDED'}
+            </span>
+            <span className="mt-0.5 block font-sans text-[10px] text-emerald-500">
+              🔒 Verified KYC
+            </span>
           </div>
 
-          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
-            <span className="text-muted block text-[10px] font-sans font-bold">GSTIN Number</span>
-            <span className="text-foreground font-black tracking-wider uppercase text-sm">{dealer.gstNumber || 'NOT PROVIDED'}</span>
-            <span className="text-[10px] text-emerald-500 block font-sans mt-0.5">🔒 Verified KYC</span>
+          <div className="bg-foreground/5 rounded-xl border border-[var(--border-subtle)] p-3.5">
+            <span className="text-muted block font-sans text-[10px] font-bold">GSTIN Number</span>
+            <span className="text-foreground text-sm font-black tracking-wider uppercase">
+              {dealer.gstNumber || 'NOT PROVIDED'}
+            </span>
+            <span className="mt-0.5 block font-sans text-[10px] text-emerald-500">
+              🔒 Verified KYC
+            </span>
           </div>
 
-          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
-            <span className="text-muted block text-[10px] font-sans font-bold">Verification Status</span>
-            <span className="text-foreground font-bold font-sans text-sm block mt-0.5">{dealer.verificationStatus}</span>
-            <span className="text-[10px] text-muted block font-sans">🔒 Managed by Admin</span>
+          <div className="bg-foreground/5 rounded-xl border border-[var(--border-subtle)] p-3.5">
+            <span className="text-muted block font-sans text-[10px] font-bold">
+              Verification Status
+            </span>
+            <span className="text-foreground mt-0.5 block font-sans text-sm font-bold">
+              {dealer.verificationStatus}
+            </span>
+            <span className="text-muted block font-sans text-[10px]">🔒 Managed by Admin</span>
           </div>
 
-          <div className="p-3.5 bg-foreground/5 rounded-xl border border-[var(--border-subtle)]">
-            <span className="text-muted block text-[10px] font-sans font-bold">Rating & Reviews</span>
-            <span className="text-amber-500 font-bold font-sans text-sm block mt-0.5">{Number(dealer.rating || 0).toFixed(1)} ★ ({dealer.reviewsCount})</span>
-            <span className="text-[10px] text-muted block font-sans">🔒 System Metric</span>
+          <div className="bg-foreground/5 rounded-xl border border-[var(--border-subtle)] p-3.5">
+            <span className="text-muted block font-sans text-[10px] font-bold">
+              Rating & Reviews
+            </span>
+            <span className="mt-0.5 block font-sans text-sm font-bold text-amber-500">
+              {Number(dealer.rating || 0).toFixed(1)} ★ ({dealer.reviewsCount})
+            </span>
+            <span className="text-muted block font-sans text-[10px]">🔒 System Metric</span>
           </div>
         </div>
       </div>
@@ -535,14 +572,14 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="px-6 py-3 rounded-xl text-xs font-bold bg-foreground/5 hover:bg-foreground/10 text-foreground border border-[var(--border-subtle)] transition-colors flex items-center gap-2"
+          className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] px-6 py-3 text-xs font-bold transition-colors"
         >
           <X size={16} /> Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-8 py-3 bg-[var(--color-brand-green)] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shadow-md flex items-center gap-2"
+          className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-8 py-3 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90"
         >
           {saving ? (
             <span>Saving Changes...</span>

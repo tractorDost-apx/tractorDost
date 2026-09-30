@@ -3,17 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import { brandAPI } from '@/lib/api/brands';
 import { ConditionGrade } from '@/lib/api/usedTractors';
-import { 
-  Calculator, 
-  IndianRupee, 
-  Tractor, 
-  TrendingUp, 
-  Timer, 
-  CheckCircle2, 
+import {
+  Calculator,
+  IndianRupee,
+  Tractor,
+  TrendingUp,
+  Timer,
+  CheckCircle2,
   ArrowRight,
   ShieldCheck,
   RefreshCcw,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 
 export default function UsedTractorValuationPage() {
   const router = useRouter();
-  
+
   // State
   const [brands, setBrands] = useState<any[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -33,11 +33,11 @@ export default function UsedTractorValuationPage() {
     model: '',
     year: new Date().getFullYear(),
     hours: 0,
-    condition: ConditionGrade.GOOD
+    condition: ConditionGrade.GOOD,
   });
 
   useEffect(() => {
-    brandAPI.getAllBrands().then(res => {
+    brandAPI.getAllBrands().then((res) => {
       if (res.success && res.data && Array.isArray(res.data.data)) {
         setBrands(res.data.data);
       }
@@ -46,9 +46,9 @@ export default function UsedTractorValuationPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'number' ? Number(value) : value
+      [name]: type === 'number' ? Number(value) : value,
     }));
   };
 
@@ -61,7 +61,7 @@ export default function UsedTractorValuationPage() {
     setTimeout(() => {
       // Smart Mock Algorithm
       let basePrice = 450000;
-      
+
       const brandLower = formData.brand.toLowerCase();
       if (brandLower.includes('mahindra')) basePrice = 550000;
       if (brandLower.includes('john deere')) basePrice = 750000;
@@ -71,7 +71,7 @@ export default function UsedTractorValuationPage() {
       // Age Depreciation: ~4-6% per year
       const age = Math.max(0, new Date().getFullYear() - formData.year);
       const ageDepreciation = Math.min(0.6, age * 0.05); // Max 60% drop
-      
+
       // Usage Depreciation: ~1% per 1000 hours
       const usageDepreciation = Math.min(0.2, (formData.hours / 1000) * 0.01);
 
@@ -80,12 +80,12 @@ export default function UsedTractorValuationPage() {
       // Condition Multiplier
       if (formData.condition === ConditionGrade.EXCELLENT) estimatedPrice *= 1.05; // +5%
       if (formData.condition === ConditionGrade.FAIR) estimatedPrice *= 0.85; // -15%
-      if (formData.condition === ConditionGrade.POOR) estimatedPrice *= 0.70; // -30%
+      if (formData.condition === ConditionGrade.POOR) estimatedPrice *= 0.7; // -30%
 
       // Create a sensible min/max range (+/- 8%)
       const result = {
         min: Math.floor((estimatedPrice * 0.92) / 1000) * 1000,
-        max: Math.floor((estimatedPrice * 1.08) / 1000) * 1000
+        max: Math.floor((estimatedPrice * 1.08) / 1000) * 1000,
       };
 
       setValuationResult(result);
@@ -97,100 +97,110 @@ export default function UsedTractorValuationPage() {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-background">
-      <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-        
+    <div className="bg-background min-h-screen pt-24 pb-16">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-12 px-4 lg:grid-cols-12">
         {/* Left Column: Form */}
-        <div className="lg:col-span-5 relative z-10">
+        <div className="relative z-10 lg:col-span-5">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] rounded-full text-xs font-black uppercase tracking-widest mb-4">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
               <Sparkles size={14} /> AI Valuation Tool
             </div>
-            <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight leading-tight">
+            <h1 className="mb-4 text-4xl leading-tight font-black tracking-tight md:text-5xl">
               Check True <span className="text-[var(--color-brand-green)]">Market Value</span>
             </h1>
-            <p className="text-muted font-medium text-lg">
+            <p className="text-muted text-lg font-medium">
               Get an instant, data-driven price estimate for your used tractor before you sell.
             </p>
           </div>
 
-          <div className="bg-foreground/5 p-8 rounded-[2rem] border border-[var(--border-subtle)] shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-brand-green)] opacity-5 blur-[100px] rounded-full pointer-events-none"></div>
-            
+          <div className="bg-foreground/5 relative overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-8 shadow-2xl">
+            <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 rounded-full bg-[var(--color-brand-green)] opacity-5 blur-[100px]"></div>
+
             <form onSubmit={calculateValuation} className="relative z-10 space-y-6">
-              
               <div>
-                <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Tractor Brand *</label>
-                <select 
+                <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                  Tractor Brand *
+                </label>
+                <select
                   name="brand"
                   required
                   value={formData.brand}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
+                  className="bg-background text-foreground w-full appearance-none rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
                 >
                   <option value="">Select Brand</option>
-                  {brands.map(b => (
-                    <option key={b.id} value={b.name}>{b.name}</option>
+                  {brands.map((b) => (
+                    <option key={b.id} value={b.name}>
+                      {b.name}
+                    </option>
                   ))}
                   <option value="Other">Other</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Tractor Model *</label>
-                <input 
-                  type="text" 
+                <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                  Tractor Model *
+                </label>
+                <input
+                  type="text"
                   name="model"
                   required
                   placeholder="e.g. 575 DI"
                   value={formData.model}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                  className="bg-background text-foreground w-full rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Year of Mfg *</label>
-                  <input 
-                    type="number" 
+                  <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                    Year of Mfg *
+                  </label>
+                  <input
+                    type="number"
                     name="year"
                     required
                     min={1980}
                     max={new Date().getFullYear()}
                     value={formData.year}
                     onChange={handleChange}
-                    className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                    className="bg-background text-foreground w-full rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Hours Used *</label>
-                  <input 
-                    type="number" 
+                  <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                    Hours Used *
+                  </label>
+                  <input
+                    type="number"
                     name="hours"
                     required
                     min={0}
                     placeholder="e.g. 2500"
                     value={formData.hours || ''}
                     onChange={handleChange}
-                    className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all"
+                    className="bg-background text-foreground w-full rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-black uppercase tracking-widest text-muted mb-2 block">Overall Condition *</label>
-                <select 
+                <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                  Overall Condition *
+                </label>
+                <select
                   name="condition"
                   required
                   value={formData.condition}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 bg-background border border-[var(--border-subtle)] rounded-2xl text-sm font-bold text-foreground focus:ring-2 focus:ring-[var(--color-brand-green)] focus:border-transparent outline-none transition-all appearance-none"
+                  className="bg-background text-foreground w-full appearance-none rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
                 >
                   <option value={ConditionGrade.EXCELLENT}>Excellent (Like New)</option>
                   <option value={ConditionGrade.GOOD}>Good (Well Maintained)</option>
@@ -202,7 +212,7 @@ export default function UsedTractorValuationPage() {
               <button
                 type="submit"
                 disabled={isCalculating}
-                className="w-full flex items-center justify-center gap-2 px-8 py-5 bg-[var(--color-brand-green)] text-white font-black uppercase tracking-widest rounded-2xl hover:bg-[var(--color-brand-green)]/90 transition-all shadow-lg shadow-[var(--color-brand-green)]/20 disabled:opacity-70 group mt-4"
+                className="group mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-8 py-5 font-black tracking-widest text-white uppercase shadow-[var(--color-brand-green)]/20 shadow-lg transition-all hover:bg-[var(--color-brand-green)]/90 disabled:opacity-70"
               >
                 {isCalculating ? (
                   <>
@@ -219,87 +229,95 @@ export default function UsedTractorValuationPage() {
         </div>
 
         {/* Right Column: Results & Info */}
-        <div className="lg:col-span-7 flex flex-col justify-center h-full">
-          
+        <div className="flex h-full flex-col justify-center lg:col-span-7">
           {!valuationResult && !isCalculating && (
-            <div className="bg-foreground/5 rounded-[3rem] p-12 text-center border-2 border-dashed border-[var(--border-subtle)]">
-              <div className="w-24 h-24 bg-foreground/10 text-muted rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="bg-foreground/5 rounded-[3rem] border-2 border-dashed border-[var(--border-subtle)] p-12 text-center">
+              <div className="bg-foreground/10 text-muted mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full">
                 <Calculator size={48} />
               </div>
-              <h3 className="text-2xl font-black mb-4">Enter Tractor Details</h3>
-              <p className="text-muted font-medium max-w-sm mx-auto">
-                Fill out the form on the left to receive a highly accurate, data-backed estimate of your tractor's current market value.
+              <h3 className="mb-4 text-2xl font-black">Enter Tractor Details</h3>
+              <p className="text-muted mx-auto max-w-sm font-medium">
+                Fill out the form on the left to receive a highly accurate, data-backed estimate of
+                your tractor's current market value.
               </p>
-              
-              <div className="grid grid-cols-3 gap-4 mt-12 pt-12 border-t border-[var(--border-subtle)] text-left">
+
+              <div className="mt-12 grid grid-cols-3 gap-4 border-t border-[var(--border-subtle)] pt-12 text-left">
                 <div>
-                  <TrendingUp className="text-[var(--color-brand-green)] mb-3" size={24} />
-                  <h4 className="font-bold text-sm mb-1">Live Data</h4>
-                  <p className="text-xs text-muted">Based on 10,000+ recent sales</p>
+                  <TrendingUp className="mb-3 text-[var(--color-brand-green)]" size={24} />
+                  <h4 className="mb-1 text-sm font-bold">Live Data</h4>
+                  <p className="text-muted text-xs">Based on 10,000+ recent sales</p>
                 </div>
                 <div>
-                  <Timer className="text-[var(--color-brand-green)] mb-3" size={24} />
-                  <h4 className="font-bold text-sm mb-1">Instant</h4>
-                  <p className="text-xs text-muted">Get price in 2 seconds</p>
+                  <Timer className="mb-3 text-[var(--color-brand-green)]" size={24} />
+                  <h4 className="mb-1 text-sm font-bold">Instant</h4>
+                  <p className="text-muted text-xs">Get price in 2 seconds</p>
                 </div>
                 <div>
-                  <ShieldCheck className="text-[var(--color-brand-green)] mb-3" size={24} />
-                  <h4 className="font-bold text-sm mb-1">Accurate</h4>
-                  <p className="text-xs text-muted">Considers age & usage</p>
+                  <ShieldCheck className="mb-3 text-[var(--color-brand-green)]" size={24} />
+                  <h4 className="mb-1 text-sm font-bold">Accurate</h4>
+                  <p className="text-muted text-xs">Considers age & usage</p>
                 </div>
               </div>
             </div>
           )}
 
           {isCalculating && (
-            <div className="bg-foreground/5 rounded-[3rem] p-12 text-center border border-[var(--border-subtle)] flex flex-col items-center justify-center min-h-[400px]">
-                <TractorLoader size={100} className="text-[var(--color-brand-green)]" />
-              <h3 className="text-2xl font-black animate-pulse">Analyzing Market Data...</h3>
-              <p className="text-muted mt-2">Comparing with recent {formData.brand} sales in your region.</p>
+            <div className="bg-foreground/5 flex min-h-[400px] flex-col items-center justify-center rounded-[3rem] border border-[var(--border-subtle)] p-12 text-center">
+              <TractorLoader size={100} className="text-[var(--color-brand-green)]" />
+              <h3 className="animate-pulse text-2xl font-black">Analyzing Market Data...</h3>
+              <p className="text-muted mt-2">
+                Comparing with recent {formData.brand} sales in your region.
+              </p>
             </div>
           )}
 
           {valuationResult && !isCalculating && (
             <div className="animate-in zoom-in-95 fade-in duration-500">
-              <div className="bg-[var(--color-brand-green)] text-white rounded-t-[3rem] p-10 text-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+              <div className="relative overflow-hidden rounded-t-[3rem] bg-[var(--color-brand-green)] p-10 text-center text-white">
+                <div className="absolute top-0 right-0 h-full w-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 <div className="relative z-10">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 rounded-full text-xs font-black uppercase tracking-widest mb-6 backdrop-blur-sm">
+                  <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-black tracking-widest uppercase backdrop-blur-sm">
                     <CheckCircle2 size={16} /> Valuation Complete
                   </div>
-                  
-                  <p className="text-white/80 font-bold uppercase tracking-widest text-sm mb-2">Estimated Market Range</p>
-                  <h2 className="text-5xl md:text-6xl font-black mb-2 flex items-center justify-center gap-2">
-                    {formatPrice(valuationResult.min)} 
+
+                  <p className="mb-2 text-sm font-bold tracking-widest text-white/80 uppercase">
+                    Estimated Market Range
+                  </p>
+                  <h2 className="mb-2 flex items-center justify-center gap-2 text-5xl font-black md:text-6xl">
+                    {formatPrice(valuationResult.min)}
                     <span className="text-3xl text-white/50">-</span>
                     {formatPrice(valuationResult.max)}
                   </h2>
-                  <p className="text-white/80 font-medium">
-                    For {formData.year} {formData.brand} {formData.model} ({formData.condition.toLowerCase()} condition)
+                  <p className="font-medium text-white/80">
+                    For {formData.year} {formData.brand} {formData.model} (
+                    {formData.condition.toLowerCase()} condition)
                   </p>
                 </div>
               </div>
-              
-              <div className="bg-foreground/5 rounded-b-[3rem] p-10 border border-t-0 border-[var(--border-subtle)] text-center shadow-2xl">
-                <h3 className="text-xl font-black mb-4">Happy with this price?</h3>
-                <p className="text-muted font-medium mb-8 max-w-md mx-auto">
-                  Thousands of verified buyers are looking for {formData.brand} tractors right now. List it for free on Tractor Dost and sell within 15 days.
+
+              <div className="bg-foreground/5 rounded-b-[3rem] border border-t-0 border-[var(--border-subtle)] p-10 text-center shadow-2xl">
+                <h3 className="mb-4 text-xl font-black">Happy with this price?</h3>
+                <p className="text-muted mx-auto mb-8 max-w-md font-medium">
+                  Thousands of verified buyers are looking for {formData.brand} tractors right now.
+                  List it for free on Tractor Dost and sell within 15 days.
                 </p>
-                
-                <Link 
+
+                <Link
                   href={`/sell-used-tractor?brand=${encodeURIComponent(formData.brand)}&model=${encodeURIComponent(formData.model)}&year=${formData.year}&price=${valuationResult.max}`}
-                  className="inline-flex items-center justify-center gap-3 px-8 py-5 bg-foreground text-background font-black uppercase tracking-widest rounded-2xl hover:bg-foreground/90 transition-all shadow-xl hover:-translate-y-1 w-full md:w-auto"
+                  className="bg-foreground text-background hover:bg-foreground/90 inline-flex w-full items-center justify-center gap-3 rounded-2xl px-8 py-5 font-black tracking-widest uppercase shadow-xl transition-all hover:-translate-y-1 md:w-auto"
                 >
                   Sell For {formatPrice(valuationResult.max)} <ArrowRight size={20} />
                 </Link>
-                
-                <div className="mt-8 text-xs font-bold text-muted uppercase tracking-widest cursor-pointer hover:text-[var(--color-brand-green)]" onClick={() => setValuationResult(null)}>
+
+                <div
+                  className="text-muted mt-8 cursor-pointer text-xs font-bold tracking-widest uppercase hover:text-[var(--color-brand-green)]"
+                  onClick={() => setValuationResult(null)}
+                >
                   Recalculate Valuation
                 </div>
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>

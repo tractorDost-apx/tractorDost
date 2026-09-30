@@ -27,8 +27,16 @@ export const equipmentBrandAPI = {
   /**
    * Fetch all equipment brands with pagination and search
    */
-  getAllEquipmentBrands: async (params?: { page?: number; limit?: number; search?: string; isActive?: string }) => {
-    const response = await apiClient.get<PaginatedResponse<EquipmentBrand>>('/equipment-brands/getAllEquipmentBrands', { params });
+  getAllEquipmentBrands: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    isActive?: string;
+  }) => {
+    const response = await apiClient.get<PaginatedResponse<EquipmentBrand>>(
+      '/equipment-brands/getAllEquipmentBrands',
+      { params }
+    );
     return response.data;
   },
 
@@ -36,7 +44,9 @@ export const equipmentBrandAPI = {
    * Fetch a single equipment brand by ID
    */
   getEquipmentBrandById: async (id: number) => {
-    const response = await apiClient.get<{ success: boolean; data: EquipmentBrand }>(`/equipment-brands/getEquipmentBrandById/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: EquipmentBrand }>(
+      `/equipment-brands/getEquipmentBrandById/${id}`
+    );
     return response.data;
   },
 
@@ -70,7 +80,9 @@ export const equipmentBrandAPI = {
    * Toggle the active status of an equipment brand
    */
   toggleEquipmentBrandActive: async (id: number) => {
-    const response = await apiClient.patch<{ success: boolean; data: EquipmentBrand }>(`/equipment-brands/${id}/toggle-active`);
+    const response = await apiClient.patch<{ success: boolean; data: EquipmentBrand }>(
+      `/equipment-brands/${id}/toggle-active`
+    );
     return response.data;
   },
 
@@ -78,7 +90,9 @@ export const equipmentBrandAPI = {
    * Delete an equipment brand
    */
   deleteEquipmentBrand: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; data: null }>(`/equipment-brands/${id}`);
+    const response = await apiClient.delete<{ success: boolean; data: null }>(
+      `/equipment-brands/${id}`
+    );
     return response.data;
-  }
+  },
 };

@@ -41,7 +41,9 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
     selectedTractorId,
   } = inputs;
 
-  const [activeTab, setActiveTab] = useState<'brand' | 'manual'>(selectedBrandId ? 'brand' : 'manual');
+  const [activeTab, setActiveTab] = useState<'brand' | 'manual'>(
+    selectedBrandId ? 'brand' : 'manual'
+  );
 
   // Handle switching tabs
   const handleTabChange = (tab: 'brand' | 'manual') => {
@@ -111,17 +113,17 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col gap-6 bg-[var(--card-bg)] border border-[var(--card-border)] p-6 md:p-8 rounded-3xl shadow-[var(--card-shadow)] relative overflow-hidden backdrop-blur-md">
+    <div className="relative flex w-full flex-col gap-6 overflow-hidden rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-[var(--card-shadow)] backdrop-blur-md md:p-8">
       {/* Background glow element */}
-      <div className="absolute top-0 left-0 w-24 h-24 bg-[var(--color-brand-green)]/5 rounded-full blur-2xl pointer-events-none" />
-      
-      <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
-        <h2 className="text-xl md:text-2xl font-black uppercase text-foreground tracking-tight">
+      <div className="pointer-events-none absolute top-0 left-0 h-24 w-24 rounded-full bg-[var(--color-brand-green)]/5 blur-2xl" />
+
+      <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
+        <h2 className="text-foreground text-xl font-black tracking-tight uppercase md:text-2xl">
           Calculation Form
         </h2>
         <button
           onClick={onReset}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-foreground/5 hover:bg-[var(--color-brand-orange)]/10 text-xs font-bold text-muted hover:text-[var(--color-brand-orange)] border border-transparent hover:border-[var(--color-brand-orange)]/20 transition-all uppercase tracking-wider"
+          className="bg-foreground/5 text-muted flex items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-bold tracking-wider uppercase transition-all hover:border-[var(--color-brand-orange)]/20 hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)]"
           title="Reset calculations to default"
         >
           <RotateCcw size={13} /> Reset
@@ -130,14 +132,14 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
 
       {/* TRACTOR PRICE SELECTOR TABS */}
       <div className="flex flex-col gap-3">
-        <label className="text-xs font-black uppercase tracking-wider text-muted">
+        <label className="text-muted text-xs font-black tracking-wider uppercase">
           Pricing Method
         </label>
-        <div className="grid grid-cols-2 bg-foreground/5 p-1 rounded-2xl border border-[var(--border-subtle)]">
+        <div className="bg-foreground/5 grid grid-cols-2 rounded-2xl border border-[var(--border-subtle)] p-1">
           <button
             type="button"
             onClick={() => handleTabChange('manual')}
-            className={`py-2 px-4 rounded-xl text-sm font-bold uppercase transition-all ${
+            className={`rounded-xl px-4 py-2 text-sm font-bold uppercase transition-all ${
               activeTab === 'manual'
                 ? 'bg-background text-[var(--color-brand-green)] shadow-md'
                 : 'text-muted hover:text-foreground'
@@ -148,7 +150,7 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
           <button
             type="button"
             onClick={() => handleTabChange('brand')}
-            className={`py-2 px-4 rounded-xl text-sm font-bold uppercase transition-all ${
+            className={`rounded-xl px-4 py-2 text-sm font-bold uppercase transition-all ${
               activeTab === 'brand'
                 ? 'bg-background text-[var(--color-brand-green)] shadow-md'
                 : 'text-muted hover:text-foreground'
@@ -161,13 +163,15 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
 
       {/* BRAND & MODEL SELECTORS */}
       {activeTab === 'brand' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-foreground/5 p-4 rounded-2xl border border-[var(--border-subtle)] animate-fade-in">
+        <div className="bg-foreground/5 animate-fade-in grid grid-cols-1 gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 md:grid-cols-2">
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-black uppercase tracking-wider text-muted">Brand</label>
+            <label className="text-muted text-[10px] font-black tracking-wider uppercase">
+              Brand
+            </label>
             <select
               value={selectedBrandId || ''}
               onChange={(e) => onBrandChange(e.target.value ? Number(e.target.value) : undefined)}
-              className="w-full bg-background border border-[var(--border-subtle)] rounded-xl px-3 py-2.5 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/60 transition-colors"
+              className="bg-background text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
               disabled={loadingBrands}
             >
               <option value="">{loadingBrands ? 'Loading Brands...' : 'Select Brand'}</option>
@@ -180,19 +184,21 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-black uppercase tracking-wider text-muted">Model</label>
+            <label className="text-muted text-[10px] font-black tracking-wider uppercase">
+              Model
+            </label>
             <select
               value={selectedTractorId || ''}
               onChange={(e) => onTractorChange(e.target.value ? Number(e.target.value) : undefined)}
-              className="w-full bg-background border border-[var(--border-subtle)] rounded-xl px-3 py-2.5 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/60 transition-colors"
+              className="bg-background text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
               disabled={!selectedBrandId || loadingTractors}
             >
               <option value="">
                 {!selectedBrandId
                   ? 'First select a Brand'
                   : loadingTractors
-                  ? 'Loading Models...'
-                  : 'Select Model'}
+                    ? 'Loading Models...'
+                    : 'Select Model'}
               </option>
               {tractors.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -206,22 +212,27 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
 
       {/* TRACTOR PRICE INPUT */}
       <div className="flex flex-col gap-2">
-        <div className="flex justify-between items-center">
-          <label htmlFor="vehiclePrice" className="text-xs font-black uppercase tracking-wider text-muted">
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="vehiclePrice"
+            className="text-muted text-xs font-black tracking-wider uppercase"
+          >
             Tractor Ex-Showroom Price
           </label>
           {errors.vehiclePrice && (
-            <span className="text-[10px] font-bold text-red-500 uppercase">{errors.vehiclePrice}</span>
+            <span className="text-[10px] font-bold text-red-500 uppercase">
+              {errors.vehiclePrice}
+            </span>
           )}
         </div>
-        <div className="flex items-center bg-background border border-[var(--border-subtle)] focus-within:border-[var(--color-brand-green)] rounded-2xl px-4 py-3 shadow-inner transition-colors">
-          <span className="text-muted font-bold mr-2">₹</span>
+        <div className="bg-background flex items-center rounded-2xl border border-[var(--border-subtle)] px-4 py-3 shadow-inner transition-colors focus-within:border-[var(--color-brand-green)]">
+          <span className="text-muted mr-2 font-bold">₹</span>
           <input
             id="vehiclePrice"
             type="number"
             value={vehiclePrice || ''}
             onChange={(e) => handlePriceChange(parseInt(e.target.value, 10))}
-            className="w-full bg-transparent border-none outline-none font-bold text-lg text-foreground focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="text-foreground w-full [appearance:textfield] border-none bg-transparent text-lg font-bold outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             placeholder="Enter price"
             min={EMI_LIMITS.VEHICLE_PRICE_MIN}
             max={EMI_LIMITS.VEHICLE_PRICE_MAX}
@@ -234,17 +245,17 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
           step={EMI_LIMITS.VEHICLE_PRICE_STEP}
           value={vehiclePrice}
           onChange={(e) => handlePriceChange(parseInt(e.target.value, 10))}
-          className="w-full h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer accent-[var(--color-brand-green)] mt-2"
+          className="bg-foreground/10 mt-2 h-1 w-full cursor-pointer appearance-none rounded-lg accent-[var(--color-brand-green)]"
         />
-        
+
         {/* Quick select presets for farmer convenience */}
-        <div className="flex flex-wrap gap-2 mt-1">
+        <div className="mt-1 flex flex-wrap gap-2">
           {[400000, 600000, 800000, 1200000].map((amt) => (
             <button
               key={amt}
               type="button"
               onClick={() => setQuickPrice(amt)}
-              className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-lg bg-foreground/5 hover:bg-[var(--color-brand-green)]/10 text-muted hover:text-[var(--color-brand-green)] transition-all"
+              className="bg-foreground/5 text-muted rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase transition-all hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)]"
             >
               ₹ {(amt / 100000).toFixed(0)} Lakh
             </button>
@@ -254,38 +265,43 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
 
       {/* DOWN PAYMENT INPUTS */}
       <div className="flex flex-col gap-2">
-        <div className="flex justify-between items-center">
-          <label htmlFor="downPayment" className="text-xs font-black uppercase tracking-wider text-muted">
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="downPayment"
+            className="text-muted text-xs font-black tracking-wider uppercase"
+          >
             Down Payment
           </label>
           {errors.downPayment && (
-            <span className="text-[10px] font-bold text-red-500 uppercase">{errors.downPayment}</span>
+            <span className="text-[10px] font-bold text-red-500 uppercase">
+              {errors.downPayment}
+            </span>
           )}
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
           {/* Amount input */}
-          <div className="md:col-span-3 flex items-center bg-background border border-[var(--border-subtle)] focus-within:border-[var(--color-brand-green)] rounded-2xl px-4 py-3 shadow-inner transition-colors">
-            <span className="text-muted font-bold mr-2">₹</span>
+          <div className="bg-background flex items-center rounded-2xl border border-[var(--border-subtle)] px-4 py-3 shadow-inner transition-colors focus-within:border-[var(--color-brand-green)] md:col-span-3">
+            <span className="text-muted mr-2 font-bold">₹</span>
             <input
               id="downPayment"
               type="number"
               value={downPayment || ''}
               onChange={(e) => handleDownPaymentAmountChange(parseInt(e.target.value, 10))}
-              className="w-full bg-transparent border-none outline-none font-bold text-foreground focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="text-foreground w-full [appearance:textfield] border-none bg-transparent font-bold outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               placeholder="0"
               min={0}
               max={vehiclePrice}
             />
           </div>
-          
+
           {/* Percentage input */}
-          <div className="md:col-span-2 flex items-center bg-background border border-[var(--border-subtle)] focus-within:border-[var(--color-brand-green)] rounded-2xl px-4 py-3 shadow-inner transition-colors">
+          <div className="bg-background flex items-center rounded-2xl border border-[var(--border-subtle)] px-4 py-3 shadow-inner transition-colors focus-within:border-[var(--color-brand-green)] md:col-span-2">
             <input
               type="number"
               value={downPaymentPercent || ''}
               onChange={(e) => handleDownPaymentPercentChange(parseInt(e.target.value, 10))}
-              className="w-full bg-transparent border-none outline-none font-bold text-foreground focus:ring-0 text-right pr-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="text-foreground w-full [appearance:textfield] border-none bg-transparent pr-1 text-right font-bold outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               placeholder="0"
               min={0}
               max={EMI_LIMITS.DOWN_PAYMENT_MAX_PERCENT}
@@ -301,10 +317,10 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
           step={1}
           value={downPaymentPercent}
           onChange={(e) => handleDownPaymentPercentChange(parseInt(e.target.value, 10))}
-          className="w-full h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer accent-[var(--color-brand-green)] mt-2"
+          className="bg-foreground/10 mt-2 h-1 w-full cursor-pointer appearance-none rounded-lg accent-[var(--color-brand-green)]"
         />
 
-        <div className="flex justify-between items-center text-[10px] font-bold text-muted">
+        <div className="text-muted flex items-center justify-between text-[10px] font-bold">
           <span>Min: ₹0 (0%)</span>
           <span className="flex items-center gap-1">
             <HelpCircle size={10} /> Max down payment: {EMI_LIMITS.DOWN_PAYMENT_MAX_PERCENT}%
@@ -312,25 +328,30 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* INTEREST RATE */}
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <label htmlFor="interestRate" className="text-xs font-black uppercase tracking-wider text-muted">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="interestRate"
+              className="text-muted text-xs font-black tracking-wider uppercase"
+            >
               Interest Rate (% P.A.)
             </label>
             {errors.interestRate && (
-              <span className="text-[10px] font-bold text-red-500 uppercase">{errors.interestRate}</span>
+              <span className="text-[10px] font-bold text-red-500 uppercase">
+                {errors.interestRate}
+              </span>
             )}
           </div>
-          <div className="flex items-center bg-background border border-[var(--border-subtle)] focus-within:border-[var(--color-brand-green)] rounded-2xl px-4 py-3 shadow-inner transition-colors">
+          <div className="bg-background flex items-center rounded-2xl border border-[var(--border-subtle)] px-4 py-3 shadow-inner transition-colors focus-within:border-[var(--color-brand-green)]">
             <input
               id="interestRate"
               type="number"
               step="0.1"
               value={interestRate ?? ''}
               onChange={(e) => onChange({ ...inputs, interestRate: parseFloat(e.target.value) })}
-              className="w-full bg-transparent border-none outline-none font-bold text-foreground focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="text-foreground w-full [appearance:textfield] border-none bg-transparent font-bold outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               placeholder="0.0"
               min={EMI_LIMITS.INTEREST_RATE_MIN}
               max={EMI_LIMITS.INTEREST_RATE_MAX}
@@ -344,48 +365,58 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
             step={EMI_LIMITS.INTEREST_RATE_STEP}
             value={interestRate}
             onChange={(e) => onChange({ ...inputs, interestRate: parseFloat(e.target.value) })}
-            className="w-full h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer accent-[var(--color-brand-green)] mt-2"
+            className="bg-foreground/10 mt-2 h-1 w-full cursor-pointer appearance-none rounded-lg accent-[var(--color-brand-green)]"
           />
         </div>
 
         {/* TENURE */}
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <label htmlFor="tenureValue" className="text-xs font-black uppercase tracking-wider text-muted">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="tenureValue"
+              className="text-muted text-xs font-black tracking-wider uppercase"
+            >
               Loan Tenure
             </label>
             {errors.tenureValue && (
-              <span className="text-[10px] font-bold text-red-500 uppercase">{errors.tenureValue}</span>
+              <span className="text-[10px] font-bold text-red-500 uppercase">
+                {errors.tenureValue}
+              </span>
             )}
           </div>
 
-          <div className="flex items-center bg-background border border-[var(--border-subtle)] focus-within:border-[var(--color-brand-green)] rounded-2xl p-1 shadow-inner transition-colors">
+          <div className="bg-background flex items-center rounded-2xl border border-[var(--border-subtle)] p-1 shadow-inner transition-colors focus-within:border-[var(--color-brand-green)]">
             <input
               id="tenureValue"
               type="number"
               value={tenureValue || ''}
               onChange={(e) => onChange({ ...inputs, tenureValue: parseInt(e.target.value, 10) })}
-              className="w-full bg-transparent border-none outline-none font-bold text-foreground px-3 py-2 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="text-foreground w-full [appearance:textfield] border-none bg-transparent px-3 py-2 font-bold outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               placeholder="0"
-              min={tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MIN : EMI_LIMITS.TENURE_MONTHS_MIN}
-              max={tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MAX : EMI_LIMITS.TENURE_MONTHS_MAX}
+              min={
+                tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MIN : EMI_LIMITS.TENURE_MONTHS_MIN
+              }
+              max={
+                tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MAX : EMI_LIMITS.TENURE_MONTHS_MAX
+              }
             />
-            
+
             {/* Tenure Unit Select Tabs */}
-            <div className="flex bg-foreground/5 p-1 rounded-xl shrink-0">
+            <div className="bg-foreground/5 flex shrink-0 rounded-xl p-1">
               <button
                 type="button"
                 onClick={() => {
-                  const newTenureValue = tenureUnit === 'months' 
-                    ? Math.max(1, Math.round(tenureValue / 12)) 
-                    : tenureValue;
+                  const newTenureValue =
+                    tenureUnit === 'months'
+                      ? Math.max(1, Math.round(tenureValue / 12))
+                      : tenureValue;
                   onChange({
                     ...inputs,
                     tenureUnit: 'years',
                     tenureValue: newTenureValue,
                   });
                 }}
-                className={`py-1.5 px-3 rounded-lg text-xs font-bold uppercase transition-all ${
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold uppercase transition-all ${
                   tenureUnit === 'years'
                     ? 'bg-background text-[var(--color-brand-orange)] shadow-sm'
                     : 'text-muted hover:text-foreground'
@@ -396,16 +427,14 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  const newTenureValue = tenureUnit === 'years'
-                    ? tenureValue * 12
-                    : tenureValue;
+                  const newTenureValue = tenureUnit === 'years' ? tenureValue * 12 : tenureValue;
                   onChange({
                     ...inputs,
                     tenureUnit: 'months',
                     tenureValue: newTenureValue,
                   });
                 }}
-                className={`py-1.5 px-3 rounded-lg text-xs font-bold uppercase transition-all ${
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold uppercase transition-all ${
                   tenureUnit === 'months'
                     ? 'bg-background text-[var(--color-brand-orange)] shadow-sm'
                     : 'text-muted hover:text-foreground'
@@ -418,12 +447,18 @@ export const EmiCalculatorForm: React.FC<EmiCalculatorFormProps> = ({
 
           <input
             type="range"
-            min={tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MIN : EMI_LIMITS.TENURE_MONTHS_MIN}
-            max={tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MAX : EMI_LIMITS.TENURE_MONTHS_MAX}
-            step={tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_STEP : EMI_LIMITS.TENURE_MONTHS_STEP}
+            min={
+              tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MIN : EMI_LIMITS.TENURE_MONTHS_MIN
+            }
+            max={
+              tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_MAX : EMI_LIMITS.TENURE_MONTHS_MAX
+            }
+            step={
+              tenureUnit === 'years' ? EMI_LIMITS.TENURE_YEARS_STEP : EMI_LIMITS.TENURE_MONTHS_STEP
+            }
             value={tenureValue}
             onChange={(e) => onChange({ ...inputs, tenureValue: parseInt(e.target.value, 10) })}
-            className="w-full h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer accent-[var(--color-brand-green)] mt-2"
+            className="bg-foreground/10 mt-2 h-1 w-full cursor-pointer appearance-none rounded-lg accent-[var(--color-brand-green)]"
           />
         </div>
       </div>

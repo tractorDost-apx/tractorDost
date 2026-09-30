@@ -95,7 +95,9 @@ function EmiCalculatorContent() {
             const res = await tractorAPI.getTractorById(tractorId);
             if (res.success && res.data) {
               const tractor = res.data;
-              const price = Number(tractor.offerPrice || tractor.exShowroomPriceMin || EMI_DEFAULTS.VEHICLE_PRICE);
+              const price = Number(
+                tractor.offerPrice || tractor.exShowroomPriceMin || EMI_DEFAULTS.VEHICLE_PRICE
+              );
               const brandId = tractor.brandId;
 
               // Pre-fill inputs state
@@ -113,7 +115,8 @@ function EmiCalculatorContent() {
               // Pre-fetch tractor models of this brand so dropdown is populated
               if (brandId) {
                 const response = await tractorAPI.getAllTractors({ brandId, limit: 100 });
-                const tractorsList = (response.data as any)?.tractors || (response.data as any)?.data || [];
+                const tractorsList =
+                  (response.data as any)?.tractors || (response.data as any)?.data || [];
                 if (response.success) {
                   setTractors(tractorsList);
                 }
@@ -171,7 +174,11 @@ function EmiCalculatorContent() {
     if (tractorId) {
       const selectedTractor = tractors.find((t) => t.id === tractorId);
       if (selectedTractor) {
-        const price = Number(selectedTractor.offerPrice || selectedTractor.exShowroomPriceMin || EMI_DEFAULTS.VEHICLE_PRICE);
+        const price = Number(
+          selectedTractor.offerPrice ||
+            selectedTractor.exShowroomPriceMin ||
+            EMI_DEFAULTS.VEHICLE_PRICE
+        );
         setInputs((prev) => {
           const updatedDownPayment = Math.floor(price * (prev.downPaymentPercent / 100));
           return {
@@ -193,7 +200,7 @@ function EmiCalculatorContent() {
   // Perform computations
   const errors = validateEmiInputs(inputs);
   const hasErrors = Object.keys(errors).length > 0;
-  
+
   // Calculate results if inputs are mathematically usable
   const results = calculateEmiResults(inputs);
   const schedule = generateAmortizationSchedule(inputs);
@@ -202,7 +209,9 @@ function EmiCalculatorContent() {
   const handleReset = () => {
     setInputs({
       vehiclePrice: EMI_DEFAULTS.VEHICLE_PRICE,
-      downPayment: Math.floor(EMI_DEFAULTS.VEHICLE_PRICE * (EMI_DEFAULTS.DOWN_PAYMENT_PERCENT / 100)),
+      downPayment: Math.floor(
+        EMI_DEFAULTS.VEHICLE_PRICE * (EMI_DEFAULTS.DOWN_PAYMENT_PERCENT / 100)
+      ),
       downPaymentPercent: EMI_DEFAULTS.DOWN_PAYMENT_PERCENT,
       interestRate: EMI_DEFAULTS.INTEREST_RATE,
       tenureValue: EMI_DEFAULTS.TENURE_VALUE,
@@ -234,9 +243,8 @@ function EmiCalculatorContent() {
     if (Object.keys(validationErrors).length > 0) return;
     if (inputs.vehiclePrice < 50000 || inputs.vehiclePrice > 5000000) return;
 
-    const tenureMonths = inputs.tenureUnit === 'years' 
-      ? inputs.tenureValue * 12 
-      : inputs.tenureValue;
+    const tenureMonths =
+      inputs.tenureUnit === 'years' ? inputs.tenureValue * 12 : inputs.tenureValue;
 
     // 2. Prepare payload
     const payload = {
@@ -295,24 +303,25 @@ function EmiCalculatorContent() {
   ]);
 
   return (
-    <div className="w-full flex flex-col gap-10">
+    <div className="flex w-full flex-col gap-10">
       {/* HEADER SECTION */}
-      <div className="flex flex-col gap-2 relative">
-        <div className="flex items-center gap-2 text-xs font-black uppercase text-[var(--color-brand-green)] tracking-widest">
+      <div className="relative flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
           <ShieldCheck size={14} /> Smart Finance Tool
         </div>
-        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-foreground">
+        <h1 className="text-foreground text-3xl font-black tracking-tight uppercase md:text-5xl">
           Tractor EMI Calculator
         </h1>
-        <p className="text-muted text-sm md:text-base font-bold max-w-2xl">
-          Estimate monthly EMIs, total interest, and visualize your amortization schedule for easy agricultural and commercial vehicle loans.
+        <p className="text-muted max-w-2xl text-sm font-bold md:text-base">
+          Estimate monthly EMIs, total interest, and visualize your amortization schedule for easy
+          agricultural and commercial vehicle loans.
         </p>
       </div>
 
       {/* MAIN LAYOUT GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
         {/* Left column - inputs (Form) */}
-        <div className="lg:col-span-7 flex flex-col gap-8">
+        <div className="flex flex-col gap-8 lg:col-span-7">
           <EmiCalculatorForm
             inputs={inputs}
             onChange={setInputs}
@@ -327,22 +336,22 @@ function EmiCalculatorContent() {
           />
 
           {/* Quick presets helper */}
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-[var(--card-shadow)]">
-            <h3 className="text-sm font-black uppercase tracking-wider text-foreground">
+          <div className="flex flex-col gap-4 rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-[var(--card-shadow)] md:p-8">
+            <h3 className="text-foreground text-sm font-black tracking-wider uppercase">
               Quick Financing Presets
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {FINANCING_PRESETS.map((preset) => (
                 <button
                   key={preset.name}
                   type="button"
                   onClick={() => applyPreset(preset)}
-                  className="p-4 rounded-2xl bg-foreground/5 hover:bg-[var(--color-brand-orange)]/5 border border-[var(--border-subtle)] hover:border-[var(--color-brand-orange)]/20 transition-all text-left flex flex-col gap-1 hover:shadow-md group"
+                  className="bg-foreground/5 group flex flex-col gap-1 rounded-2xl border border-[var(--border-subtle)] p-4 text-left transition-all hover:border-[var(--color-brand-orange)]/20 hover:bg-[var(--color-brand-orange)]/5 hover:shadow-md"
                 >
-                  <span className="font-black text-xs text-foreground uppercase tracking-wide group-hover:text-[var(--color-brand-orange)] transition-colors">
+                  <span className="text-foreground text-xs font-black tracking-wide uppercase transition-colors group-hover:text-[var(--color-brand-orange)]">
                     {preset.name}
                   </span>
-                  <span className="text-[10px] text-muted font-bold leading-normal">
+                  <span className="text-muted text-[10px] leading-normal font-bold">
                     {preset.description}
                   </span>
                 </button>
@@ -352,17 +361,14 @@ function EmiCalculatorContent() {
         </div>
 
         {/* Right column - outputs (Charts, Results) */}
-        <div className="lg:col-span-5 flex flex-col gap-8">
+        <div className="flex flex-col gap-8 lg:col-span-5">
           <div className="relative">
-            <EmiCalculatorResult 
-              inputs={inputs} 
-              results={results} 
-            />
+            <EmiCalculatorResult inputs={inputs} results={results} />
             {/* Subtle background status indicator */}
-            <div className="absolute right-4 bottom-2 text-[10px] font-bold text-muted transition-all">
+            <div className="text-muted absolute right-4 bottom-2 text-[10px] font-bold transition-all">
               {registering ? (
                 <span className="flex items-center gap-1 text-[var(--color-brand-orange)]">
-                  <span className="w-1.5 h-1.5 bg-[var(--color-brand-orange)] rounded-full animate-ping" />
+                  <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[var(--color-brand-orange)]" />
                   Auto-registering...
                 </span>
               ) : registerSuccess ? (
@@ -370,7 +376,7 @@ function EmiCalculatorContent() {
               ) : null}
             </div>
           </div>
-          
+
           <EmiBreakdownChart
             loanAmount={results.loanAmount}
             totalInterest={results.totalInterest}
@@ -390,11 +396,13 @@ function EmiCalculatorContent() {
 
 export function EmiCalculator() {
   return (
-    <Suspense fallback={
-      <div className="flex h-96 items-center justify-center text-muted font-bold uppercase tracking-wider">
-        Loading Calculator...
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="text-muted flex h-96 items-center justify-center font-bold tracking-wider uppercase">
+          Loading Calculator...
+        </div>
+      }
+    >
       <EmiCalculatorContent />
     </Suspense>
   );

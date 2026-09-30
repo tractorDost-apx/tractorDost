@@ -53,34 +53,37 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fade-in">
-      <div className="w-full max-w-xl bg-zinc-950 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-md sm:p-6">
+      <div className="flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl">
         {/* Header */}
-        <div className="p-6 border-b border-white/10 flex items-center justify-between bg-zinc-900/50">
+        <div className="flex items-center justify-between border-b border-white/10 bg-zinc-900/50 p-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-lime-400/10 text-lime-400 border border-lime-400/20">
+            <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 p-2.5 text-lime-400">
               <ShieldCheck size={22} />
             </div>
             <div>
-              <h2 className="text-xl font-black tracking-tight text-foreground">Admin Moderation</h2>
-              <p className="text-xs font-bold text-muted mt-0.5">
-                Verify, certify, or alter operational status for <strong className="text-foreground">{dealer.businessName}</strong>.
+              <h2 className="text-foreground text-xl font-black tracking-tight">
+                Admin Moderation
+              </h2>
+              <p className="text-muted mt-0.5 text-xs font-bold">
+                Verify, certify, or alter operational status for{' '}
+                <strong className="text-foreground">{dealer.businessName}</strong>.
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
           {apiError && (
-            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-bold text-rose-400">
               <AlertCircle size={16} className="shrink-0" />
               <p>{apiError}</p>
             </div>
@@ -88,7 +91,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
 
           {/* Verification Status Selector */}
           <div className="space-y-3">
-            <label className="text-xs font-black uppercase text-lime-400 tracking-wider block">
+            <label className="block text-xs font-black tracking-wider text-lime-400 uppercase">
               1. Dealership Verification Status
             </label>
 
@@ -96,10 +99,10 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
               <button
                 type="button"
                 onClick={() => setVerificationStatus('VERIFIED')}
-                className={`p-3 rounded-2xl border text-xs font-black flex flex-col items-center gap-2 transition-all ${
+                className={`flex flex-col items-center gap-2 rounded-2xl border p-3 text-xs font-black transition-all ${
                   verificationStatus === 'VERIFIED'
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-lg shadow-emerald-500/10'
-                    : 'bg-white/5 text-muted border-white/10 hover:bg-white/10'
+                    ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400 shadow-lg shadow-emerald-500/10'
+                    : 'text-muted border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <CheckCircle2 size={20} />
@@ -109,10 +112,10 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
               <button
                 type="button"
                 onClick={() => setVerificationStatus('PENDING')}
-                className={`p-3 rounded-2xl border text-xs font-black flex flex-col items-center gap-2 transition-all ${
+                className={`flex flex-col items-center gap-2 rounded-2xl border p-3 text-xs font-black transition-all ${
                   verificationStatus === 'PENDING'
-                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/50 shadow-lg shadow-amber-500/10'
-                    : 'bg-white/5 text-muted border-white/10 hover:bg-white/10'
+                    ? 'border-amber-500/50 bg-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10'
+                    : 'text-muted border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <ShieldCheck size={20} />
@@ -122,10 +125,10 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
               <button
                 type="button"
                 onClick={() => setVerificationStatus('REJECTED')}
-                className={`p-3 rounded-2xl border text-xs font-black flex flex-col items-center gap-2 transition-all ${
+                className={`flex flex-col items-center gap-2 rounded-2xl border p-3 text-xs font-black transition-all ${
                   verificationStatus === 'REJECTED'
-                    ? 'bg-rose-500/20 text-rose-400 border-rose-500/50 shadow-lg shadow-rose-500/10'
-                    : 'bg-white/5 text-muted border-white/10 hover:bg-white/10'
+                    ? 'border-rose-500/50 bg-rose-500/20 text-rose-400 shadow-lg shadow-rose-500/10'
+                    : 'text-muted border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <XCircle size={20} />
@@ -134,8 +137,8 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
             </div>
 
             {verificationStatus === 'REJECTED' && (
-              <div className="space-y-1.5 animate-fade-in pt-2">
-                <label className="text-xs font-bold text-rose-400 block">
+              <div className="animate-fade-in space-y-1.5 pt-2">
+                <label className="block text-xs font-bold text-rose-400">
                   Rejection Reason <span className="text-rose-400">*</span>
                 </label>
                 <textarea
@@ -144,7 +147,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
                   placeholder="Specify clear reason for rejecting dealership application..."
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  className="w-full bg-rose-500/5 border border-rose-500/30 rounded-xl p-3 text-xs font-medium text-foreground focus:outline-none focus:border-rose-500"
+                  className="text-foreground w-full rounded-xl border border-rose-500/30 bg-rose-500/5 p-3 text-xs font-medium focus:border-rose-500 focus:outline-none"
                 />
               </div>
             )}
@@ -156,10 +159,10 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-xs font-black uppercase text-lime-400 tracking-wider block">
+                <label className="block text-xs font-black tracking-wider text-lime-400 uppercase">
                   2. Certified Dealership Badge
                 </label>
-                <p className="text-[11px] font-medium text-muted">
+                <p className="text-muted text-[11px] font-medium">
                   Grants official TractorDost Certified status & verified seal.
                 </p>
               </div>
@@ -167,10 +170,10 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
               <button
                 type="button"
                 onClick={() => setIsCertified(!isCertified)}
-                className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider transition-all flex items-center gap-2 ${
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider transition-all ${
                   isCertified
                     ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20'
-                    : 'bg-white/5 text-muted border border-white/10 hover:bg-white/10'
+                    : 'text-muted border border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <Award size={16} />
@@ -179,14 +182,16 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
             </div>
 
             {isCertified && (
-              <div className="space-y-1.5 animate-fade-in pt-1">
-                <label className="text-xs font-bold text-muted block">Certification Notes (Optional)</label>
+              <div className="animate-fade-in space-y-1.5 pt-1">
+                <label className="text-muted block text-xs font-bold">
+                  Certification Notes (Optional)
+                </label>
                 <input
                   type="text"
                   placeholder="Reason or criteria met for certification..."
                   value={certificationReason}
                   onChange={(e) => setCertificationReason(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-medium text-foreground focus:outline-none focus:border-lime-400/50"
+                  className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-medium focus:border-lime-400/50 focus:outline-none"
                 />
               </div>
             )}
@@ -198,10 +203,10 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-xs font-black uppercase text-lime-400 tracking-wider block">
+                <label className="block text-xs font-black tracking-wider text-lime-400 uppercase">
                   3. Operational Status
                 </label>
-                <p className="text-[11px] font-medium text-muted">
+                <p className="text-muted text-[11px] font-medium">
                   Active dealers appear publicly across search & dealership listings.
                 </p>
               </div>
@@ -209,10 +214,10 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
               <button
                 type="button"
                 onClick={() => setIsActive(!isActive)}
-                className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider transition-all flex items-center gap-2 ${
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider transition-all ${
                   isActive
                     ? 'bg-lime-400 text-black shadow-lg shadow-lime-400/20'
-                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                    : 'border border-rose-500/30 bg-rose-500/20 text-rose-400'
                 }`}
               >
                 <Power size={16} />
@@ -223,11 +228,11 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-white/10 bg-zinc-900/30 flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-3 border-t border-white/10 bg-zinc-900/30 p-6">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-xs font-bold text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+            className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-white/10"
           >
             Cancel
           </button>
@@ -236,18 +241,18 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
             <button
               type="button"
               onClick={() => setConfirmAction('CONFIRM')}
-              className="px-6 py-2.5 bg-lime-400 text-black font-black text-xs uppercase tracking-wider rounded-xl hover:bg-lime-300 transition-all shadow-lg shadow-lime-400/20"
+              className="rounded-xl bg-lime-400 px-6 py-2.5 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-lime-400/20 transition-all hover:bg-lime-300"
             >
               Apply Moderation
             </button>
           ) : (
-            <div className="flex items-center gap-2 animate-fade-in">
+            <div className="animate-fade-in flex items-center gap-2">
               <span className="text-xs font-bold text-amber-400">Confirm changes?</span>
               <button
                 type="button"
                 onClick={handleApplyModeration}
                 disabled={submitting}
-                className="px-5 py-2.5 bg-emerald-500 text-black font-black text-xs uppercase tracking-wider rounded-xl hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                className="rounded-xl bg-emerald-500 px-5 py-2.5 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 disabled:opacity-50"
               >
                 {submitting ? 'Applying...' : 'Yes, Save Changes'}
               </button>

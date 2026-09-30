@@ -1,57 +1,99 @@
 import { apiClient } from './axios/axios';
+import { toErrorResult, toResult } from './axios/result';
+import type { ApiResult } from '@/types/api/responses';
+import type { InspectionStatus, MetaPage, UsedInspection } from '@/types/models/used-listing';
+
+export interface InspectionListParams {
+  listingId?: number;
+  status?: InspectionStatus;
+  inspectorId?: number;
+  isCertified?: 'true' | 'false';
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Inspection responses embed the listing as stored (askingPrice arrives as a
+ * string there), so the nested listing is left loosely typed for callers.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type InspectionWithListing = UsedInspection & { listing: any };
 
 export const usedTractorInspectionAPI = {
-  createInspection: async (data: any) => {
+  /** Admin only. Listings get a PENDING inspection automatically on creation. */
+  createInspection: async (data: {
+    listingId: number;
+    inspectorId?: number;
+  }): Promise<ApiResult<UsedInspection>> => {
     try {
       const response = await apiClient.post('/used-tractor-inspections/createInspection', data);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to create inspection request' };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to create inspection request');
     }
   },
 
-  getAllInspections: async (params?: any) => {
+  /** Staff only; agents always get just their own assignments */
+  getAllInspections: async (
+    params?: InspectionListParams
+  ): Promise<ApiResult<MetaPage<InspectionWithListing>>> => {
     try {
-      const response = await apiClient.get('/used-tractor-inspections/getAllInspections', { params });
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch inspections' };
+      const response = await apiClient.get('/used-tractor-inspections/getAllInspections', {
+        params,
+      });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch inspections');
     }
   },
 
-  getInspectionById: async (id: number | string) => {
+  getInspectionById: async (id: number | string): Promise<ApiResult<InspectionWithListing>> => {
     try {
       const response = await apiClient.get(`/used-tractor-inspections/getInspection/${id}`);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch inspection details' };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch inspection details');
     }
   },
 
-  assignInspector: async (id: number | string, inspectorId: number) => {
+  /** Admin only; the inspection must be PENDING */
+  assignInspector: async (
+    id: number | string,
+    inspectorId: number
+  ): Promise<ApiResult<UsedInspection>> => {
     try {
-      const response = await apiClient.patch(`/used-tractor-inspections/assignInspector/${id}`, { inspectorId });
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to assign inspector' };
+      const response = await apiClient.patch(`/used-tractor-inspections/assignInspector/${id}`, {
+        inspectorId,
+      });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to assign inspector');
     }
   },
 
-  submitInspectionReport: async (id: number | string, formData: FormData) => {
+  /** FormData: engineScore, tyreScore, hydraulicsScore, bodyScore, clutchScore, inspectorNotes?, report? (file) */
+  submitInspectionReport: async (
+    id: number | string,
+    formData: FormData
+  ): Promise<ApiResult<UsedInspection>> => {
     try {
-      const response = await apiClient.patch(`/used-tractor-inspections/submitInspectionReport/${id}`, formData);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to submit inspection report' };
+      const response = await apiClient.patch(
+        `/used-tractor-inspections/submitInspectionReport/${id}`,
+        formData
+      );
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to submit inspection report');
     }
   },
-  
-  certifyInspection: async (id: number | string, isCertified: boolean) => {
+
+  /** Admin only; the inspection must be REPORT_UPLOADED. Also marks the listing certified. */
+  certifyInspection: async (id: number | string): Promise<ApiResult<UsedInspection>> => {
     try {
-      const response = await apiClient.patch(`/used-tractor-inspections/certifyInspection/${id}`, { isCertified });
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to certify tractor' };
+      const response = await apiClient.patch(`/used-tractor-inspections/certifyInspection/${id}`);
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to certify tractor');
     }
-  }
+  },
 };

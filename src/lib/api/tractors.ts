@@ -12,63 +12,63 @@ export enum LaunchStatus {
   LATEST = 'LATEST',
   UPCOMING = 'UPCOMING',
   DISCONTINUED = 'DISCONTINUED',
-  POPULAR = 'POPULAR'
+  POPULAR = 'POPULAR',
 }
 
 export enum FuelType {
   DIESEL = 'DIESEL',
   ELECTRIC = 'ELECTRIC',
   CNG = 'CNG',
-  PETROL = 'PETROL'
+  PETROL = 'PETROL',
 }
 
 export enum DriveType {
   TWO_WD = 'TWO_WD',
-  FOUR_WD = 'FOUR_WD'
+  FOUR_WD = 'FOUR_WD',
 }
 
 export enum EmissionNorm {
   TREM_III = 'TREM_III',
   TREM_IV = 'TREM_IV',
-  TREM_V = 'TREM_V'
+  TREM_V = 'TREM_V',
 }
 
 export enum CoolingType {
   AIR_COOLED = 'AIR_COOLED',
   WATER_COOLED = 'WATER_COOLED',
-  OIL_COOLED = 'OIL_COOLED'
+  OIL_COOLED = 'OIL_COOLED',
 }
 
 export enum SteeringType {
   POWER = 'POWER',
   MECHANICAL = 'MECHANICAL',
-  HYDROSTATIC = 'HYDROSTATIC'
+  HYDROSTATIC = 'HYDROSTATIC',
 }
 
 export enum BrakeType {
   OIL_IMMERSED_DISC = 'OIL_IMMERSED_DISC',
   DRUM = 'DRUM',
-  DRY_DISC = 'DRY_DISC'
+  DRY_DISC = 'DRY_DISC',
 }
 
 export enum ClutchType {
   SINGLE = 'SINGLE',
   DOUBLE = 'DOUBLE',
-  INDEPENDENT = 'INDEPENDENT'
+  INDEPENDENT = 'INDEPENDENT',
 }
 
 export enum HydraulicsType {
   POSITION_CONTROL = 'POSITION_CONTROL',
   DRAFT_CONTROL = 'DRAFT_CONTROL',
   POSITION_AND_DRAFT = 'POSITION_AND_DRAFT',
-  ADDC = 'ADDC'
+  ADDC = 'ADDC',
 }
 
 export enum PtoType {
   INDEPENDENT = 'INDEPENDENT',
   LIVE = 'LIVE',
   TRANSMISSION = 'TRANSMISSION',
-  GROUND_DRIVEN = 'GROUND_DRIVEN'
+  GROUND_DRIVEN = 'GROUND_DRIVEN',
 }
 
 export enum GearboxType {
@@ -76,19 +76,19 @@ export enum GearboxType {
   SYNCHROMESH = 'SYNCHROMESH',
   SYNCHRO_SHUTTLE = 'SYNCHRO_SHUTTLE',
   POWER_SHUTTLE = 'POWER_SHUTTLE',
-  CVT = 'CVT'
+  CVT = 'CVT',
 }
 
 export enum ParkingBrakeType {
   MECHANICAL = 'MECHANICAL',
   HYDRAULIC = 'HYDRAULIC',
-  ELECTRONIC = 'ELECTRONIC'
+  ELECTRONIC = 'ELECTRONIC',
 }
 
 export enum DisplayType {
   ANALOG = 'ANALOG',
   DIGITAL = 'DIGITAL',
-  TOUCHSCREEN = 'TOUCHSCREEN'
+  TOUCHSCREEN = 'TOUCHSCREEN',
 }
 
 export interface TractorPriceByState {
@@ -187,7 +187,6 @@ export interface TractorSpec {
   includedAccessories?: any | null;
 }
 
-
 export interface Tractor {
   id: number;
   brandId: number;
@@ -204,14 +203,14 @@ export interface Tractor {
   viewsCount: number;
   leadsCount: number;
   expectedLaunchDate?: string | null;
-  
+
   exShowroomPriceMin?: number | null;
   exShowroomPriceMax?: number | null;
   offerPrice?: number | null;
   financeAvailable: boolean;
-  
+
   hp?: number | null;
-  
+
   overview?: string | null;
   whyBuy?: string | null;
   expertReview?: string | null;
@@ -222,10 +221,10 @@ export interface Tractor {
   pros?: any | null;
   cons?: any | null;
   metaKeywords?: string | null;
-  
+
   createdAt: string;
   updatedAt: string;
-  
+
   brand?: Brand;
   family?: any;
   spec?: TractorSpec | null;
@@ -259,9 +258,9 @@ export const tractorAPI = {
   /**
    * Fetch all tractors with pagination, search and filters
    */
-  getAllTractors: async (params?: { 
-    page?: number; 
-    limit?: number; 
+  getAllTractors: async (params?: {
+    page?: number;
+    limit?: number;
     search?: string;
     brandId?: number;
     familyId?: number;
@@ -275,7 +274,9 @@ export const tractorAPI = {
    * Fetch a single tractor by ID
    */
   getTractorById: async (id: number) => {
-    const response = await apiClient.get<{ success: boolean; data: Tractor }>(`/tractor/getById/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: Tractor }>(
+      `/tractor/getById/${id}`
+    );
     return response.data;
   },
 
@@ -284,7 +285,10 @@ export const tractorAPI = {
    * (Expects JSON data initially. If we upload brochure, we might use FormData, but let's assume JSON first based on standard Prisma routes unless it's a multipart route)
    */
   createTractor: async (data: Partial<Tractor>) => {
-    const response = await apiClient.post<{ success: boolean; data: Tractor }>('/tractor/create', data);
+    const response = await apiClient.post<{ success: boolean; data: Tractor }>(
+      '/tractor/create',
+      data
+    );
     return response.data;
   },
 
@@ -292,7 +296,10 @@ export const tractorAPI = {
    * Update an existing tractor
    */
   updateTractor: async (id: number, data: Partial<Tractor>) => {
-    const response = await apiClient.put<{ success: boolean; data: Tractor }>(`/tractor/update/${id}`, data);
+    const response = await apiClient.put<{ success: boolean; data: Tractor }>(
+      `/tractor/update/${id}`,
+      data
+    );
     return response.data;
   },
 
@@ -303,7 +310,9 @@ export const tractorAPI = {
    * Delete a tractor
    */
   deleteTractor: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; data: Tractor }>(`/tractor/delete/${id}`);
+    const response = await apiClient.delete<{ success: boolean; data: Tractor }>(
+      `/tractor/delete/${id}`
+    );
     return response.data;
   },
 
@@ -313,15 +322,19 @@ export const tractorAPI = {
    */
   previewTractorImport: async (
     file: File,
-    options: { signal?: AbortSignal; onUploadProgress?: (percent: number) => void } = {},
+    options: { signal?: AbortSignal; onUploadProgress?: (percent: number) => void } = {}
   ) => {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await apiClient.post<BulkImportResponse>('/tractor/bulk-import/preview', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      signal: options.signal,
-      onUploadProgress: uploadPercent(options.onUploadProgress),
-    });
+    const response = await apiClient.post<BulkImportResponse>(
+      '/tractor/bulk-import/preview',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        signal: options.signal,
+        onUploadProgress: uploadPercent(options.onUploadProgress),
+      }
+    );
     return response.data;
   },
 
@@ -331,7 +344,11 @@ export const tractorAPI = {
    */
   bulkImportTractor: async (
     file: File,
-    options: { previewToken: string; importId?: string; onUploadProgress?: (percent: number) => void },
+    options: {
+      previewToken: string;
+      importId?: string;
+      onUploadProgress?: (percent: number) => void;
+    }
   ) => {
     const formData = new FormData();
     formData.append('previewToken', options.previewToken);
@@ -350,17 +367,18 @@ export const tractorAPI = {
   getBulkImportProgress: async (importId: string, signal?: AbortSignal) => {
     const response = await apiClient.get<{ success: boolean; data: ImportProgress }>(
       `/tractor/bulk-import/progress/${importId}`,
-      { signal },
+      { signal }
     );
     return response.data;
   },
-
 
   /**
    * Fetch all Tractor Specs
    */
   getAllTractorSpecs: async (params?: { page?: number; limit?: number; search?: string }) => {
-    const response = await apiClient.get<PaginatedResponse<TractorSpec>>('/tractor-specs/get', { params });
+    const response = await apiClient.get<PaginatedResponse<TractorSpec>>('/tractor-specs/get', {
+      params,
+    });
     return response.data;
   },
 
@@ -368,7 +386,10 @@ export const tractorAPI = {
    * Create a Tractor Spec
    */
   createTractorSpec: async (data: Partial<TractorSpec>) => {
-    const response = await apiClient.post<{ success: boolean; data: TractorSpec }>('/tractor-specs/create', data);
+    const response = await apiClient.post<{ success: boolean; data: TractorSpec }>(
+      '/tractor-specs/create',
+      data
+    );
     return response.data;
   },
 
@@ -376,16 +397,26 @@ export const tractorAPI = {
    * Update an existing Tractor Spec
    */
   updateTractorSpec: async (id: number, data: Partial<TractorSpec>) => {
-    const response = await apiClient.put<{ success: boolean; data: TractorSpec }>(`/tractor-specs/update/${id}`, data);
+    const response = await apiClient.put<{ success: boolean; data: TractorSpec }>(
+      `/tractor-specs/update/${id}`,
+      data
+    );
     return response.data;
   },
 
   /**
    * Fetch all State Prices
    */
-  getAllTractorPricesByState: async (params?: { page?: number; limit?: number; search?: string }) => {
+  getAllTractorPricesByState: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) => {
     // The backend returns a direct array in data, not paginated in the standard way, let's assume standard response structure
-    const response = await apiClient.get<{ success: boolean; data: TractorPriceByState[] }>('/tractor-price-by-state/getAll', { params });
+    const response = await apiClient.get<{ success: boolean; data: TractorPriceByState[] }>(
+      '/tractor-price-by-state/getAll',
+      { params }
+    );
     return response.data;
-  }
+  },
 };

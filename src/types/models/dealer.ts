@@ -1,4 +1,5 @@
-export type DealerType = 'BRAND_DEALER' | 'MULTI_BRAND' | 'USED_TRACTOR_DEALER';
+export type DealerType =
+  'BRAND_DEALER' | 'USED_DEALER' | 'SERVICE_CENTER' | 'IMPLEMENT_DEALER' | 'TYRE_DEALER';
 export type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 
 export interface DealerBrand {

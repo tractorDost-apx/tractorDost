@@ -1,3 +1,8 @@
-// Placeholder for responses.ts
-// This file is currently under development.
-export const placeholder = "responses.ts";
+/** Envelope returned by every BACKEND endpoint (see BACKEND/src/shared/types/appErrors.ts) */
+export interface ApiResult<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+  /** Zod issues on validation failures */
+  error?: unknown;
+}

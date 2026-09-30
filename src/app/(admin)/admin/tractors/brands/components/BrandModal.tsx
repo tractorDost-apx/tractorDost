@@ -12,7 +12,7 @@ interface BrandModalProps {
 
 export default function BrandModal({ brand, onClose }: BrandModalProps) {
   const isEditing = !!brand;
-  
+
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -28,7 +28,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,21 +56,24 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
   // Auto-generate slug from name if not editing
   useEffect(() => {
     if (!isEditing && formData.name) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        slug: formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        slug: formData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, ''),
       }));
     }
   }, [formData.name, isEditing]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -92,14 +95,17 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
       data.append('name', formData.name);
       data.append('slug', formData.slug);
       data.append('country', formData.country || '');
-      data.append('foundedYear', formData.foundedYear ? parseInt(formData.foundedYear).toString() : '');
+      data.append(
+        'foundedYear',
+        formData.foundedYear ? parseInt(formData.foundedYear).toString() : ''
+      );
       data.append('aboutBrand', formData.aboutBrand || '');
       data.append('isActive', formData.isActive.toString());
       data.append('isFeatured', formData.isFeatured.toString());
       data.append('sortOrder', parseInt(formData.sortOrder || '0').toString());
       data.append('seoTitle', formData.seoTitle || '');
       data.append('seoDescription', formData.seoDescription || '');
-      
+
       if (logoFile) {
         data.append('logo', logoFile);
       }
@@ -109,7 +115,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
       } else {
         await brandAPI.createBrand(data);
       }
-      
+
       onClose();
     } catch (err: any) {
       console.error(err);
@@ -119,143 +125,160 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
     }
   };
 
-  const SectionTitle = ({ icon: Icon, title }: { icon: any, title: string }) => (
-    <div className="flex items-center gap-2 text-foreground mb-4 border-b border-foreground/10 pb-2">
+  const SectionTitle = ({ icon: Icon, title }: { icon: any; title: string }) => (
+    <div className="text-foreground border-foreground/10 mb-4 flex items-center gap-2 border-b pb-2">
       <Icon size={18} className="text-[var(--color-brand-green)]" />
-      <h3 className="font-black text-sm uppercase tracking-wider">{title}</h3>
+      <h3 className="text-sm font-black tracking-wider uppercase">{title}</h3>
     </div>
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-sm">
-      <div 
-        className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl animate-fade-in shadow-2xl border border-foreground/10 overflow-hidden"
+    <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
+      <div
+        className="animate-fade-in border-foreground/10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
         style={{ background: 'var(--background)' }}
       >
         {/* Sticky Header */}
-        <div className="px-6 py-5 border-b border-foreground/10 flex justify-between items-center bg-background shrink-0 z-10">
-          <h2 className="text-2xl font-black text-foreground tracking-tight">
+        <div className="border-foreground/10 bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
+          <h2 className="text-foreground text-2xl font-black tracking-tight">
             {isEditing ? 'Edit Brand Master' : 'Create New Brand'}
           </h2>
-          <button 
+          <button
             onClick={onClose}
-            className="h-10 w-10 flex items-center justify-center rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground transition-colors"
+            className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex h-10 w-10 items-center justify-center rounded-full transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Scrollable Form Body */}
-        <div className="overflow-y-auto p-6 md:p-8 flex-1">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8">
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3 text-red-500">
-              <AlertCircle size={20} className="shrink-0 mt-0.5" />
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-red-500">
+              <AlertCircle size={20} className="mt-0.5 shrink-0" />
               <p className="text-sm font-bold">{error}</p>
             </div>
           )}
 
           <form id="brandForm" onSubmit={handleSubmit} className="flex flex-col gap-10">
-            
             {/* SECTION 1: Identity */}
             <section>
               <SectionTitle icon={FileText} title="Brand Identity" />
-              
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 {/* Logo Upload */}
-                <div className="md:col-span-4 flex flex-col gap-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Brand Logo</label>
-                  <div 
-                    className="aspect-square w-full rounded-2xl border-2 border-dashed border-foreground/20 flex flex-col items-center justify-center bg-foreground/5 overflow-hidden cursor-pointer hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 transition-colors group relative"
+                <div className="flex flex-col gap-2 md:col-span-4">
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Brand Logo
+                  </label>
+                  <div
+                    className="border-foreground/20 bg-foreground/5 group relative flex aspect-square w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-colors hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {logoPreview ? (
                       <>
-                        <img src={logoPreview} alt="Preview" className="h-full w-full object-contain p-4 bg-white" />
-                        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Upload size={24} className="text-white mb-2" />
-                          <span className="text-white text-xs font-bold">Change Logo</span>
+                        <img
+                          src={logoPreview}
+                          alt="Preview"
+                          className="h-full w-full bg-white object-contain p-4"
+                        />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                          <Upload size={24} className="mb-2 text-white" />
+                          <span className="text-xs font-bold text-white">Change Logo</span>
                         </div>
                       </>
                     ) : (
-                      <div className="flex flex-col items-center gap-3 text-muted group-hover:text-[var(--color-brand-green)] transition-colors p-6 text-center">
+                      <div className="text-muted flex flex-col items-center gap-3 p-6 text-center transition-colors group-hover:text-[var(--color-brand-green)]">
                         <Upload size={32} />
-                        <span className="text-xs font-bold leading-relaxed">Click to upload high-res transparent PNG</span>
+                        <span className="text-xs leading-relaxed font-bold">
+                          Click to upload high-res transparent PNG
+                        </span>
                       </div>
                     )}
                   </div>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    className="hidden" 
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
                     accept="image/*"
                     onChange={handleFileChange}
                   />
                 </div>
 
                 {/* Identity Fields */}
-                <div className="md:col-span-8 flex flex-col gap-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-4 md:col-span-8">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-muted uppercase tracking-wider">Brand Name *</label>
-                      <input 
-                        type="text" 
-                        name="name" 
+                      <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                        Brand Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                        className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                         placeholder="e.g. Mahindra"
                       />
                     </div>
-                    
+
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-muted uppercase tracking-wider">URL Slug *</label>
-                      <input 
-                        type="text" 
-                        name="slug" 
+                      <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                        URL Slug *
+                      </label>
+                      <input
+                        type="text"
+                        name="slug"
                         value={formData.slug}
                         onChange={handleChange}
                         required
-                        className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                        className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                         placeholder="e.g. mahindra"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-muted uppercase tracking-wider">Country of Origin</label>
-                      <input 
-                        type="text" 
-                        name="country" 
+                      <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                        Country of Origin
+                      </label>
+                      <input
+                        type="text"
+                        name="country"
                         value={formData.country}
                         onChange={handleChange}
-                        className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                        className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                         placeholder="e.g. India"
                       />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-muted uppercase tracking-wider">Founded Year</label>
-                      <input 
-                        type="number" 
-                        name="foundedYear" 
+                      <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                        Founded Year
+                      </label>
+                      <input
+                        type="number"
+                        name="foundedYear"
                         value={formData.foundedYear}
                         onChange={handleChange}
-                        className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                        className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                         placeholder="e.g. 1945"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-muted uppercase tracking-wider">About Brand</label>
-                    <textarea 
-                      name="aboutBrand" 
+                    <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                      About Brand
+                    </label>
+                    <textarea
+                      name="aboutBrand"
                       value={formData.aboutBrand}
                       onChange={handleChange}
                       rows={4}
-                      className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-medium text-foreground focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all resize-none"
+                      className="bg-foreground/5 text-foreground focus:bg-background w-full resize-none rounded-xl border border-transparent px-4 py-3 text-sm font-medium transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                       placeholder="Write a rich description about the brand's history and legacy..."
                     />
                   </div>
@@ -266,33 +289,41 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
             {/* SECTION 2: SEO */}
             <section>
               <SectionTitle icon={BarChart} title="SEO & Discovery" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-foreground/[0.02] p-6 rounded-2xl border border-foreground/5">
+              <div className="bg-foreground/[0.02] border-foreground/5 grid grid-cols-1 gap-6 rounded-2xl border p-6 md:grid-cols-2">
                 <div className="flex flex-col gap-1.5 md:col-span-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">SEO Title (Max 60 chars)</label>
-                  <input 
-                    type="text" 
-                    name="seoTitle" 
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    SEO Title (Max 60 chars)
+                  </label>
+                  <input
+                    type="text"
+                    name="seoTitle"
                     value={formData.seoTitle}
                     onChange={handleChange}
                     maxLength={60}
-                    className="w-full bg-background border border-foreground/10 rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-background border-foreground/10 text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="e.g. Mahindra Tractors - Best Price & Specs | TractorDost"
                   />
-                  <div className="text-[10px] text-right font-bold text-muted mt-1">{formData.seoTitle.length}/60</div>
+                  <div className="text-muted mt-1 text-right text-[10px] font-bold">
+                    {formData.seoTitle.length}/60
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5 md:col-span-2">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">SEO Description (Max 160 chars)</label>
-                  <textarea 
-                    name="seoDescription" 
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    SEO Description (Max 160 chars)
+                  </label>
+                  <textarea
+                    name="seoDescription"
                     value={formData.seoDescription}
                     onChange={handleChange}
                     maxLength={160}
                     rows={2}
-                    className="w-full bg-background border border-foreground/10 rounded-xl px-4 py-3 text-sm font-medium text-foreground focus:outline-none focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all resize-none"
+                    className="bg-background border-foreground/10 text-foreground w-full resize-none rounded-xl border px-4 py-3 text-sm font-medium transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="Discover all Mahindra tractor models, specifications, reviews, and latest on-road prices in India..."
                   />
-                  <div className="text-[10px] text-right font-bold text-muted mt-1">{formData.seoDescription.length}/160</div>
+                  <div className="text-muted mt-1 text-right text-[10px] font-bold">
+                    {formData.seoDescription.length}/160
+                  </div>
                 </div>
               </div>
             </section>
@@ -300,81 +331,88 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
             {/* SECTION 3: Settings */}
             <section>
               <SectionTitle icon={Settings2} title="Visibility & Settings" />
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Sort Order (Priority)</label>
-                  <input 
-                    type="number" 
-                    name="sortOrder" 
+                  <label className="text-muted text-xs font-bold tracking-wider uppercase">
+                    Sort Order (Priority)
+                  </label>
+                  <input
+                    type="number"
+                    name="sortOrder"
                     value={formData.sortOrder}
                     onChange={handleChange}
-                    className="w-full bg-foreground/5 border border-transparent rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="0"
                   />
                 </div>
 
-                <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-foreground/5 border border-transparent hover:border-[var(--color-brand-green)]/30 transition-colors">
+                <div className="grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2">
+                  <label className="bg-foreground/5 flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-4 transition-colors hover:border-[var(--color-brand-green)]/30">
                     <div className="relative flex items-center justify-center">
-                      <input 
-                        type="checkbox" 
-                        name="isActive" 
+                      <input
+                        type="checkbox"
+                        name="isActive"
                         checked={formData.isActive}
                         onChange={handleChange}
-                        className="peer sr-only" 
+                        className="peer sr-only"
                       />
-                      <div className="w-6 h-6 rounded-md border-2 border-foreground/20 peer-checked:bg-[var(--color-brand-green)] peer-checked:border-[var(--color-brand-green)] transition-all flex items-center justify-center">
-                        <Check size={14} className="text-white opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100 transition-all" strokeWidth={4} />
+                      <div className="border-foreground/20 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-green)] peer-checked:bg-[var(--color-brand-green)]">
+                        <Check
+                          size={14}
+                          className="scale-50 text-white opacity-0 transition-all peer-checked:scale-100 peer-checked:opacity-100"
+                          strokeWidth={4}
+                        />
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">Active Status</span>
-                      <span className="text-[10px] text-muted">Visible on frontend</span>
+                      <span className="text-foreground text-sm font-bold">Active Status</span>
+                      <span className="text-muted text-[10px]">Visible on frontend</span>
                     </div>
                   </label>
 
-                  <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-foreground/5 border border-transparent hover:border-[var(--color-brand-orange)]/30 transition-colors">
+                  <label className="bg-foreground/5 flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-4 transition-colors hover:border-[var(--color-brand-orange)]/30">
                     <div className="relative flex items-center justify-center">
-                      <input 
-                        type="checkbox" 
-                        name="isFeatured" 
+                      <input
+                        type="checkbox"
+                        name="isFeatured"
                         checked={formData.isFeatured}
                         onChange={handleChange}
-                        className="peer sr-only" 
+                        className="peer sr-only"
                       />
-                      <div className="w-6 h-6 rounded-md border-2 border-foreground/20 peer-checked:bg-[var(--color-brand-orange)] peer-checked:border-[var(--color-brand-orange)] transition-all flex items-center justify-center">
-                        <Check size={14} className="text-white opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100 transition-all" strokeWidth={4} />
+                      <div className="border-foreground/20 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-orange)] peer-checked:bg-[var(--color-brand-orange)]">
+                        <Check
+                          size={14}
+                          className="scale-50 text-white opacity-0 transition-all peer-checked:scale-100 peer-checked:opacity-100"
+                          strokeWidth={4}
+                        />
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">Featured Brand</span>
-                      <span className="text-[10px] text-muted">Showcase on homepage</span>
+                      <span className="text-foreground text-sm font-bold">Featured Brand</span>
+                      <span className="text-muted text-[10px]">Showcase on homepage</span>
                     </div>
                   </label>
                 </div>
-
               </div>
             </section>
-            
           </form>
         </div>
 
         {/* Sticky Footer */}
-        <div className="px-6 py-4 border-t border-foreground/10 bg-background shrink-0 flex justify-end gap-3 z-10">
-          <button 
-            type="button" 
+        <div className="border-foreground/10 bg-background z-10 flex shrink-0 justify-end gap-3 border-t px-6 py-4">
+          <button
+            type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-2.5 rounded-xl font-bold text-foreground bg-foreground/5 hover:bg-foreground/10 transition-colors disabled:opacity-50"
+            className="text-foreground bg-foreground/5 hover:bg-foreground/10 rounded-xl px-6 py-2.5 font-bold transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
-          <button 
+          <button
             type="submit"
             form="brandForm"
             disabled={loading}
-            className="px-8 py-2.5 rounded-xl font-black text-white bg-[var(--color-brand-green)] hover:shadow-[0_10px_20px_rgba(29,191,115,0.3)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none disabled:shadow-none flex items-center gap-2"
+            className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-8 py-2.5 font-black text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(29,191,115,0.3)] disabled:transform-none disabled:opacity-50 disabled:shadow-none"
           >
             {loading ? (
               <>

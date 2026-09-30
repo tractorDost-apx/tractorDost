@@ -3,14 +3,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/store/AuthContext';
 import { usedTractorInspectionAPI } from '@/lib/api/used-inspections';
-import { 
-  ClipboardCheck, 
+import {
+  ClipboardCheck,
   Calendar,
   MapPin,
   Search,
   Filter,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
@@ -31,7 +31,10 @@ export default function AgentInspectionsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await usedTractorInspectionAPI.getAllInspections({ inspectorId: user?.id, limit: 50 });
+      const res = await usedTractorInspectionAPI.getAllInspections({
+        inspectorId: user?.id,
+        limit: 50,
+      });
       if (res.success && res.data?.data) {
         setInspections(res.data.data);
       }
@@ -41,42 +44,45 @@ export default function AgentInspectionsPage() {
     setLoading(false);
   };
 
-  const filteredInspections = inspections.filter(i => {
+  const filteredInspections = inspections.filter((i) => {
     const matchStatus = statusFilter === 'ALL' || i.status === statusFilter;
-    const matchSearch = (i.listing?.tractorBrand || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        (i.listing?.tractorModel || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch =
+      (i.listing?.tractorBrand || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (i.listing?.tractorModel || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchStatus && matchSearch;
   });
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-black flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-black">
             <ClipboardCheck className="text-[var(--color-brand-green)]" size={32} />
             My Inspections
           </h1>
-          <p className="text-muted font-medium mt-1">Manage and track your assigned tractor inspections.</p>
+          <p className="text-muted mt-1 font-medium">
+            Manage and track your assigned tractor inspections.
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
+          <Search className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
           <input
             type="text"
             placeholder="Search by brand or model..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-background border border-[var(--border-subtle)] rounded-2xl font-bold focus:outline-none focus:border-[var(--color-brand-green)] transition-colors"
+            className="bg-background w-full rounded-2xl border border-[var(--border-subtle)] py-3.5 pr-4 pl-12 font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
           />
         </div>
         <div className="relative min-w-[200px]">
-          <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
+          <Filter className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-background border border-[var(--border-subtle)] rounded-2xl font-bold focus:outline-none focus:border-[var(--color-brand-green)] transition-colors appearance-none cursor-pointer"
+            className="bg-background w-full cursor-pointer appearance-none rounded-2xl border border-[var(--border-subtle)] py-3.5 pr-4 pl-12 font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
           >
             <option value="ALL">All Statuses</option>
             <option value="ASSIGNED">Assigned (Pending)</option>
@@ -91,10 +97,12 @@ export default function AgentInspectionsPage() {
           <TractorLoader className="text-[var(--color-brand-green)]" size={64} />
         </div>
       ) : (
-        <div className="bg-background rounded-[2rem] border border-[var(--border-subtle)] overflow-hidden shadow-sm">
+        <div className="bg-background overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] shadow-sm">
           <div className="divide-y divide-[var(--border-subtle)]">
             {filteredInspections.length === 0 ? (
-              <div className="p-12 text-center text-muted font-bold text-lg">No inspections found matching your criteria.</div>
+              <div className="text-muted p-12 text-center text-lg font-bold">
+                No inspections found matching your criteria.
+              </div>
             ) : (
               filteredInspections.map((inspection) => (
                 <InspectionRow key={inspection.id} inspection={inspection} />
@@ -113,44 +121,44 @@ function InspectionRow({ inspection }: { inspection: any }) {
   const images = listing.media?.filter((m: any) => m.mediaType !== 'pdf') || [];
 
   return (
-    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:bg-foreground/5 transition-colors">
-      <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-6 w-full">
+    <div className="hover:bg-foreground/5 flex flex-col items-center justify-between gap-6 p-6 transition-colors md:flex-row md:p-8">
+      <div className="flex w-full flex-1 flex-col items-start gap-6 md:flex-row md:items-center">
         {images.length > 0 ? (
-          <div className="relative w-full md:w-32 h-48 md:h-24 rounded-2xl overflow-hidden shrink-0 group border border-[var(--border-subtle)] bg-foreground/5 shadow-sm">
-            <img 
-              src={images[currentImageIndex]?.url} 
-              alt={`Tractor Image ${currentImageIndex + 1}`} 
-              className="w-full h-full object-cover transition-all duration-300 animate-in fade-in"
+          <div className="group bg-foreground/5 relative h-48 w-full shrink-0 overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-sm md:h-24 md:w-32">
+            <img
+              src={images[currentImageIndex]?.url}
+              alt={`Tractor Image ${currentImageIndex + 1}`}
+              className="animate-in fade-in h-full w-full object-cover transition-all duration-300"
             />
-            
+
             {images.length > 1 && (
               <>
                 {/* Left Arrow */}
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
                   }}
-                  className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  className="absolute top-1/2 left-1 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
                 >
                   <ChevronLeft size={12} />
                 </button>
 
                 {/* Right Arrow */}
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
                   }}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  className="absolute top-1/2 right-1 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
                 >
                   <ChevronRight size={12} />
                 </button>
 
                 {/* Indicators / Dots */}
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5 bg-black/30 px-1 py-0.5 rounded-full">
+                <div className="absolute bottom-1 left-1/2 flex -translate-x-1/2 gap-0.5 rounded-full bg-black/30 px-1 py-0.5">
                   {images.map((_: any, idx: number) => (
                     <button
                       key={idx}
@@ -159,8 +167,8 @@ function InspectionRow({ inspection }: { inspection: any }) {
                         e.preventDefault();
                         setCurrentImageIndex(idx);
                       }}
-                      className={`w-1 h-1 rounded-full transition-all ${
-                        idx === currentImageIndex ? 'bg-white w-2' : 'bg-white/50'
+                      className={`h-1 w-1 rounded-full transition-all ${
+                        idx === currentImageIndex ? 'w-2 bg-white' : 'bg-white/50'
                       }`}
                     />
                   ))}
@@ -169,36 +177,43 @@ function InspectionRow({ inspection }: { inspection: any }) {
             )}
           </div>
         ) : (
-          <div className="w-full md:w-32 h-48 md:h-24 rounded-2xl bg-foreground/5 flex flex-col items-center justify-center shrink-0 border border-[var(--border-subtle)] text-muted">
-            <span className="font-bold text-xs uppercase tracking-widest">No Image</span>
+          <div className="bg-foreground/5 text-muted flex h-48 w-full shrink-0 flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] md:h-24 md:w-32">
+            <span className="text-xs font-bold tracking-widest uppercase">No Image</span>
           </div>
         )}
-        
-        <div className="flex-1 flex flex-col gap-3">
-          <div className="flex items-center gap-4 flex-wrap">
-            <h3 className="font-black text-2xl group-hover:text-[var(--color-brand-green)] transition-colors">
+
+        <div className="flex flex-1 flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-4">
+            <h3 className="text-2xl font-black transition-colors group-hover:text-[var(--color-brand-green)]">
               {listing.tractorBrand} {listing.tractorModel}
             </h3>
-            <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
-              inspection.status === 'ASSIGNED' ? 'bg-orange-500/10 text-orange-500' : 
-              inspection.status === 'CERTIFIED' ? 'bg-[var(--color-brand-green)] text-white' :
-              'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
-            }`}>
+            <span
+              className={`rounded-full px-4 py-1.5 text-xs font-black tracking-widest uppercase ${
+                inspection.status === 'ASSIGNED'
+                  ? 'bg-orange-500/10 text-orange-500'
+                  : inspection.status === 'CERTIFIED'
+                    ? 'bg-[var(--color-brand-green)] text-white'
+                    : 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+              }`}
+            >
               {inspection.status.replace('_', ' ')}
             </span>
           </div>
-          
-          <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-muted">
-            <span className="flex items-center gap-2"><Calendar size={18} /> Assigned: {new Date(inspection.createdAt).toLocaleDateString()}</span>
-            <span className="flex items-center gap-2"><MapPin size={18} /> Location: {listing.villageCity || 'Unknown'}, {listing.district}</span>
+
+          <div className="text-muted flex flex-wrap items-center gap-6 text-sm font-bold">
+            <span className="flex items-center gap-2">
+              <Calendar size={18} /> Assigned: {new Date(inspection.createdAt).toLocaleDateString()}
+            </span>
+            <span className="flex items-center gap-2">
+              <MapPin size={18} /> Location: {listing.villageCity || 'Unknown'}, {listing.district}
+            </span>
           </div>
         </div>
       </div>
 
       <Link
         href={`/agent/inspections/${inspection.id}`}
-        className="px-8 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all w-full md:w-auto text-center shrink-0
-          bg-foreground text-background hover:scale-105 active:scale-95 shadow-lg"
+        className="bg-foreground text-background w-full shrink-0 rounded-xl px-8 py-3.5 text-center text-sm font-black tracking-wider uppercase shadow-lg transition-all hover:scale-105 active:scale-95 md:w-auto"
       >
         {inspection.status === 'ASSIGNED' ? 'Start Inspection' : 'View Report'}
       </Link>

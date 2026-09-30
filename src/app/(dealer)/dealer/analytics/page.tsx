@@ -18,7 +18,12 @@ export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'30_DAYS' | '90_DAYS' | 'YTD'>('30_DAYS');
 
   const funnelSteps = [
-    { label: 'Total Inquiries Received', count: 124, percentage: 100, color: 'bg-[var(--color-brand-green)]' },
+    {
+      label: 'Total Inquiries Received',
+      count: 124,
+      percentage: 100,
+      color: 'bg-[var(--color-brand-green)]',
+    },
     { label: 'Followed Up & Contacted', count: 98, percentage: 79, color: 'bg-blue-500' },
     { label: 'Showroom / Test Drive Taken', count: 54, percentage: 43, color: 'bg-purple-500' },
     { label: 'Deals Finalized & Delivered', count: 32, percentage: 26, color: 'bg-emerald-500' },
@@ -33,42 +38,60 @@ export default function AnalyticsPage() {
 
   const topModels = [
     { model: 'Swaraj 744 FE', brand: 'Swaraj', inquiries: 38, stock: 6, demand: 'HIGH' },
-    { model: 'Mahindra 575 DI SP Plus', brand: 'Mahindra', inquiries: 29, stock: 5, demand: 'HIGH' },
+    {
+      model: 'Mahindra 575 DI SP Plus',
+      brand: 'Mahindra',
+      inquiries: 29,
+      stock: 5,
+      demand: 'HIGH',
+    },
     { model: 'Eicher 380 Super DI', brand: 'Eicher', inquiries: 21, stock: 4, demand: 'STABLE' },
-    { model: 'Farmtrac 60 Powermaxx', brand: 'Farmtrac', inquiries: 16, stock: 3, demand: 'STABLE' },
-    { model: 'John Deere 5050 D', brand: 'John Deere', inquiries: 12, stock: 2, demand: 'MODERATE' },
+    {
+      model: 'Farmtrac 60 Powermaxx',
+      brand: 'Farmtrac',
+      inquiries: 16,
+      stock: 3,
+      demand: 'STABLE',
+    },
+    {
+      model: 'John Deere 5050 D',
+      brand: 'John Deere',
+      inquiries: 12,
+      stock: 2,
+      demand: 'MODERATE',
+    },
   ];
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="animate-fade-in space-y-8 pb-12">
       {/* Sleek Admin Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shrink-0">
+          <div className="shrink-0 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
             <BarChart3 size={26} />
           </div>
           <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
                 Dealership Analytics
               </h1>
-              <span className="px-3 py-1 rounded-full text-xs font-black bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 uppercase tracking-wider">
+              <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
                 Live Insights
               </span>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-muted mt-0.5">
+            <p className="text-muted mt-0.5 text-xs font-bold sm:text-sm">
               Performance metrics, customer inquiry conversions, and stock velocity analytics.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
-          <div className="flex items-center gap-1.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-3 py-1.5 text-xs">
+        <div className="flex shrink-0 items-center gap-3 self-start sm:self-auto">
+          <div className="bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs">
             <Calendar size={14} className="text-muted shrink-0" />
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value as any)}
-              className="bg-transparent text-foreground font-bold focus:outline-none cursor-pointer"
+              className="text-foreground cursor-pointer bg-transparent font-bold focus:outline-none"
             >
               <option value="30_DAYS">Last 30 Days</option>
               <option value="90_DAYS">Last 90 Days</option>
@@ -79,68 +102,79 @@ export default function AnalyticsPage() {
       </div>
 
       {/* KPI Stat Strip Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shrink-0 border border-[var(--color-brand-green)]/20">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-3 text-[var(--color-brand-green)]">
             <TrendingUp size={22} />
           </div>
           <div>
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-black tracking-tight text-foreground">+18.4%</span>
-              <span className="text-xs font-bold text-[var(--color-brand-green)] flex items-center">
+              <span className="text-foreground text-2xl font-black tracking-tight">+18.4%</span>
+              <span className="flex items-center text-xs font-bold text-[var(--color-brand-green)]">
                 <ArrowUpRight size={14} />
               </span>
             </div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">Lead Growth Rate</div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              Lead Growth Rate
+            </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-blue-500/10 text-blue-500 shrink-0 border border-blue-500/20">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 text-blue-500">
             <Tractor size={22} />
           </div>
           <div>
-            <div className="text-2xl font-black tracking-tight text-foreground">14 Days</div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">Stock Turnaround</div>
+            <div className="text-foreground text-2xl font-black tracking-tight">14 Days</div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              Stock Turnaround
+            </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-amber-500/10 text-amber-500 shrink-0 border border-amber-500/20">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-amber-500">
             <Star size={22} />
           </div>
           <div>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black tracking-tight text-foreground">4.8</span>
-              <span className="text-xs text-amber-500 font-bold">★</span>
+              <span className="text-foreground text-2xl font-black tracking-tight">4.8</span>
+              <span className="text-xs font-bold text-amber-500">★</span>
             </div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">Rating Score</div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              Rating Score
+            </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 p-4 sm:p-5 rounded-2xl flex items-center gap-4 border border-[var(--border-subtle)]">
-          <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 shrink-0 border border-emerald-500/20">
+        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
+          <div className="shrink-0 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-emerald-500">
             <IndianRupee size={22} />
           </div>
           <div>
-            <div className="text-2xl font-black tracking-tight text-foreground">₹42.5 L</div>
-            <div className="text-xs font-bold text-muted uppercase tracking-wider">Est. Monthly Deals</div>
+            <div className="text-foreground text-2xl font-black tracking-tight">₹42.5 L</div>
+            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+              Est. Monthly Deals
+            </div>
           </div>
         </div>
       </div>
 
       {/* Analytics Card Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Lead Conversion Funnel */}
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6">
+        <div className="glass-panel space-y-6 rounded-3xl border border-[var(--border-subtle)] p-6 sm:p-8">
           <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
             <div>
-              <h2 className="text-lg font-black text-foreground flex items-center gap-2">
-                <Users size={20} className="text-[var(--color-brand-green)]" /> Lead Conversion Funnel
+              <h2 className="text-foreground flex items-center gap-2 text-lg font-black">
+                <Users size={20} className="text-[var(--color-brand-green)]" /> Lead Conversion
+                Funnel
               </h2>
-              <p className="text-xs text-muted font-medium mt-0.5">Inquiry lifecycle efficiency from initial call to delivery.</p>
+              <p className="text-muted mt-0.5 text-xs font-medium">
+                Inquiry lifecycle efficiency from initial call to delivery.
+              </p>
             </div>
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20">
+            <span className="rounded-md border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2.5 py-1 text-[10px] font-black tracking-wider text-[var(--color-brand-green)] uppercase">
               25.8% Conversion
             </span>
           </div>
@@ -150,9 +184,11 @@ export default function AnalyticsPage() {
               <div key={idx} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="text-foreground">{step.label}</span>
-                  <span className="font-mono text-muted">{step.count} ({step.percentage}%)</span>
+                  <span className="text-muted font-mono">
+                    {step.count} ({step.percentage}%)
+                  </span>
                 </div>
-                <div className="h-3 rounded-full bg-foreground/5 border border-[var(--border-subtle)] overflow-hidden p-0.5">
+                <div className="bg-foreground/5 h-3 overflow-hidden rounded-full border border-[var(--border-subtle)] p-0.5">
                   <div
                     className={`h-full rounded-full ${step.color} transition-all duration-500`}
                     style={{ width: `${step.percentage}%` }}
@@ -164,32 +200,48 @@ export default function AnalyticsPage() {
         </div>
 
         {/* HP Segment Demand Breakdown */}
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6">
+        <div className="glass-panel space-y-6 rounded-3xl border border-[var(--border-subtle)] p-6 sm:p-8">
           <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
             <div>
-              <h2 className="text-lg font-black text-foreground flex items-center gap-2">
-                <Zap size={20} className="text-[var(--color-brand-green)]" /> HP Horsepower Segment Demand
+              <h2 className="text-foreground flex items-center gap-2 text-lg font-black">
+                <Zap size={20} className="text-[var(--color-brand-green)]" /> HP Horsepower Segment
+                Demand
               </h2>
-              <p className="text-xs text-muted font-medium mt-0.5">Stock availability vs farmer demand across HP ranges.</p>
+              <p className="text-muted mt-0.5 text-xs font-medium">
+                Stock availability vs farmer demand across HP ranges.
+              </p>
             </div>
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+            <span className="rounded-md border border-purple-500/20 bg-purple-500/10 px-2.5 py-1 text-[10px] font-black tracking-wider text-purple-600 uppercase dark:text-purple-400">
               4 Segments
             </span>
           </div>
 
           <div className="space-y-4">
             {hpSegments.map((seg, idx) => (
-              <div key={idx} className="p-3.5 rounded-2xl bg-foreground/5 border border-[var(--border-subtle)] space-y-2">
+              <div
+                key={idx}
+                className="bg-foreground/5 space-y-2 rounded-2xl border border-[var(--border-subtle)] p-3.5"
+              >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-black text-foreground">{seg.segment}</span>
-                  <span className="text-[var(--color-brand-green)] font-mono font-bold">{seg.leads} Enquiries</span>
+                  <span className="text-foreground font-black">{seg.segment}</span>
+                  <span className="font-mono font-bold text-[var(--color-brand-green)]">
+                    {seg.leads} Enquiries
+                  </span>
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-muted">
-                  <span>Stock Units: <strong className="text-foreground font-mono">{seg.stock}</strong></span>
-                  <span>Market Share: <strong className="text-foreground font-mono">{seg.share}%</strong></span>
+                <div className="text-muted flex items-center justify-between text-[11px]">
+                  <span>
+                    Stock Units: <strong className="text-foreground font-mono">{seg.stock}</strong>
+                  </span>
+                  <span>
+                    Market Share:{' '}
+                    <strong className="text-foreground font-mono">{seg.share}%</strong>
+                  </span>
                 </div>
-                <div className="h-2 rounded-full bg-foreground/10 overflow-hidden">
-                  <div className="h-full bg-[var(--color-brand-green)] rounded-full" style={{ width: `${seg.share * 2}%` }} />
+                <div className="bg-foreground/10 h-2 overflow-hidden rounded-full">
+                  <div
+                    className="h-full rounded-full bg-[var(--color-brand-green)]"
+                    style={{ width: `${seg.share * 2}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -198,42 +250,47 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Top Demanded Models Table */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6">
+      <div className="glass-panel space-y-6 rounded-3xl border border-[var(--border-subtle)] p-6 sm:p-8">
         <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
           <div>
-            <h2 className="text-lg font-black text-foreground flex items-center gap-2">
-              <Award size={20} className="text-[var(--color-brand-green)]" /> Top Demanded Tractor Models
+            <h2 className="text-foreground flex items-center gap-2 text-lg font-black">
+              <Award size={20} className="text-[var(--color-brand-green)]" /> Top Demanded Tractor
+              Models
             </h2>
-            <p className="text-xs text-muted font-medium mt-0.5">Most requested tractor models by farmers in your region.</p>
+            <p className="text-muted mt-0.5 text-xs font-medium">
+              Most requested tractor models by farmers in your region.
+            </p>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-[var(--border-subtle)] text-xs font-bold text-muted uppercase tracking-wider">
-                <th className="py-3 px-4">Tractor Model</th>
-                <th className="py-3 px-4">Brand</th>
-                <th className="py-3 px-4">Total Inquiries</th>
-                <th className="py-3 px-4">Stock Units</th>
-                <th className="py-3 px-4 text-right">Demand Index</th>
+              <tr className="text-muted border-b border-[var(--border-subtle)] text-xs font-bold tracking-wider uppercase">
+                <th className="px-4 py-3">Tractor Model</th>
+                <th className="px-4 py-3">Brand</th>
+                <th className="px-4 py-3">Total Inquiries</th>
+                <th className="px-4 py-3">Stock Units</th>
+                <th className="px-4 py-3 text-right">Demand Index</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
               {topModels.map((m, idx) => (
                 <tr key={idx} className="hover:bg-foreground/5 transition-colors">
-                  <td className="py-4 px-4 font-black text-foreground">{m.model}</td>
-                  <td className="py-4 px-4 text-xs text-muted font-bold">{m.brand}</td>
-                  <td className="py-4 px-4 font-mono font-bold text-[var(--color-brand-green)]">{m.inquiries}</td>
-                  <td className="py-4 px-4 font-mono text-muted">{m.stock} pcs</td>
-                  <td className="py-4 px-4 text-right">
+                  <td className="text-foreground px-4 py-4 font-black">{m.model}</td>
+                  <td className="text-muted px-4 py-4 text-xs font-bold">{m.brand}</td>
+                  <td className="px-4 py-4 font-mono font-bold text-[var(--color-brand-green)]">
+                    {m.inquiries}
+                  </td>
+                  <td className="text-muted px-4 py-4 font-mono">{m.stock} pcs</td>
+                  <td className="px-4 py-4 text-right">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-black tracking-wider uppercase ${
                         m.demand === 'HIGH'
-                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                          ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                           : m.demand === 'STABLE'
-                          ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-                          : 'bg-foreground/5 text-muted border-[var(--border-subtle)]'
+                            ? 'border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                            : 'bg-foreground/5 text-muted border-[var(--border-subtle)]'
                       }`}
                     >
                       {m.demand} DEMAND

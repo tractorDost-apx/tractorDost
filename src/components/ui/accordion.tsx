@@ -1,3 +1,3 @@
 // Placeholder for accordion.tsx
 // This file is currently under development.
-export const placeholder = "accordion.tsx";
+export const placeholder = 'accordion.tsx';

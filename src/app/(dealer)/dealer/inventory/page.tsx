@@ -112,9 +112,9 @@ export default function DealerInventoryPage() {
   // 1. Loading Dealer Context
   if (loadingDealer) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 size={36} className="text-[var(--color-brand-green)] animate-spin" />
-        <p className="text-sm font-bold text-muted">Resolving dealership credentials...</p>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
+        <Loader2 size={36} className="animate-spin text-[var(--color-brand-green)]" />
+        <p className="text-muted text-sm font-bold">Resolving dealership credentials...</p>
       </div>
     );
   }
@@ -123,57 +123,55 @@ export default function DealerInventoryPage() {
   if (dealerError) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center p-6 text-center">
-        <div className="glass-panel p-8 max-w-lg w-full space-y-4 border border-rose-500/20 bg-rose-500/5 rounded-3xl">
-          <div className="h-12 w-12 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto border border-rose-500/20">
+        <div className="glass-panel w-full max-w-lg space-y-4 rounded-3xl border border-rose-500/20 bg-rose-500/5 p-8">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-500/10 text-rose-500">
             <AlertCircle size={24} />
           </div>
-          <h2 className="text-xl font-bold text-foreground">Dealership Required</h2>
-          <p className="text-sm text-muted font-medium leading-relaxed">
-            {dealerError}
-          </p>
+          <h2 className="text-foreground text-xl font-bold">Dealership Required</h2>
+          <p className="text-muted text-sm leading-relaxed font-medium">{dealerError}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="animate-fade-in space-y-8 pb-12">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div
-          className={`fixed top-6 right-6 z-50 p-4 rounded-2xl border shadow-2xl flex items-center gap-3 animate-slide-in text-xs font-bold ${
+          className={`animate-slide-in fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border p-4 text-xs font-bold shadow-2xl ${
             toastMessage.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
-              : 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+              : 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
           }`}
         >
           {toastMessage.type === 'success' ? (
-            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+            <CheckCircle2 size={18} className="shrink-0 text-emerald-500" />
           ) : (
-            <AlertCircle size={18} className="text-rose-500 shrink-0" />
+            <AlertCircle size={18} className="shrink-0 text-rose-500" />
           )}
           <span>{toastMessage.text}</span>
         </div>
       )}
 
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shrink-0">
+          <div className="shrink-0 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
             <Tractor size={26} />
           </div>
           <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
                 Inventory Stock
               </h1>
               {dealerName && (
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 uppercase tracking-wider">
+                <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
                   {dealerName}
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-sm font-bold text-muted mt-0.5">
+            <p className="text-muted mt-0.5 text-xs font-bold sm:text-sm">
               Manage your tractor stock, availability status, and upcoming stock arrivals.
             </p>
           </div>
@@ -181,7 +179,7 @@ export default function DealerInventoryPage() {
 
         <button
           onClick={handleOpenAddModal}
-          className="px-5 py-2.5 bg-[var(--color-brand-green)] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 shrink-0 self-start sm:self-auto"
+          className="flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 sm:self-auto"
         >
           <Plus size={18} className="stroke-[3]" /> Add Inventory Item
         </button>
@@ -191,28 +189,28 @@ export default function DealerInventoryPage() {
       <InventoryStatsCards stats={stats} loading={loadingData} />
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="flex flex-col items-stretch justify-between gap-4 md:flex-row md:items-center">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search size={18} className="absolute left-3.5 top-3 text-muted" />
+          <Search size={18} className="text-muted absolute top-3 left-3.5" />
           <input
             type="text"
             placeholder="Search tractor name, brand, or custom model..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-foreground/5 border border-[var(--border-subtle)] focus:border-[var(--color-brand-green)] rounded-xl pl-10 pr-4 py-2 text-xs font-medium text-foreground focus:outline-none transition-colors"
+            className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] py-2 pr-4 pl-10 text-xs font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
           />
         </div>
 
         {/* Filters and Controls */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-3 py-1.5 text-xs">
+          <div className="bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs">
             <Filter size={14} className="text-muted shrink-0" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="bg-transparent text-foreground font-bold focus:outline-none cursor-pointer"
+              className="text-foreground cursor-pointer bg-transparent font-bold focus:outline-none"
             >
               <option value="ALL">All Statuses</option>
               <option value="IN_STOCK">In Stock</option>
@@ -223,14 +221,12 @@ export default function DealerInventoryPage() {
           </div>
 
           {/* Sort Selection */}
-          <div className="flex items-center gap-1.5 bg-foreground/5 border border-[var(--border-subtle)] rounded-xl px-3 py-1.5 text-xs">
+          <div className="bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs">
             <ArrowUpDown size={14} className="text-muted shrink-0" />
             <select
               value={queryParams.sortBy || 'updatedAt'}
-              onChange={(e) =>
-                setQueryParams({ ...queryParams, sortBy: e.target.value as any })
-              }
-              className="bg-transparent text-foreground font-bold focus:outline-none cursor-pointer"
+              onChange={(e) => setQueryParams({ ...queryParams, sortBy: e.target.value as any })}
+              className="text-foreground cursor-pointer bg-transparent font-bold focus:outline-none"
             >
               <option value="updatedAt">Recently Updated</option>
               <option value="stockCount">Highest Stock</option>
@@ -242,24 +238,27 @@ export default function DealerInventoryPage() {
           <button
             onClick={() => refetch()}
             disabled={loadingData}
-            className="p-2.5 rounded-xl bg-foreground/5 border border-[var(--border-subtle)] text-muted hover:text-foreground hover:border-[var(--color-brand-green)]/30 transition-all disabled:opacity-50 flex items-center justify-center"
+            className="bg-foreground/5 text-muted hover:text-foreground flex items-center justify-center rounded-xl border border-[var(--border-subtle)] p-2.5 transition-all hover:border-[var(--color-brand-green)]/30 disabled:opacity-50"
             title="Refresh Inventory"
           >
-            <RefreshCw size={16} className={loadingData ? 'animate-spin text-[var(--color-brand-green)]' : ''} />
+            <RefreshCw
+              size={16}
+              className={loadingData ? 'animate-spin text-[var(--color-brand-green)]' : ''}
+            />
           </button>
         </div>
       </div>
 
       {/* Data Error Banner */}
       {dataError && (
-        <div className="p-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 text-rose-500 text-xs font-bold flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-bold text-rose-500">
           <div className="flex items-center gap-2">
             <AlertCircle size={16} />
             <span>{dataError}</span>
           </div>
           <button
             onClick={() => refetch()}
-            className="px-3 py-1 bg-foreground/10 rounded-lg text-foreground hover:bg-foreground/20 transition-colors"
+            className="bg-foreground/10 text-foreground hover:bg-foreground/20 rounded-lg px-3 py-1 transition-colors"
           >
             Retry
           </button>

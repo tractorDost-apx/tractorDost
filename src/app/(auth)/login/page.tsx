@@ -12,7 +12,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { refreshUser } = useAuth();
-  
+
   const [step, setStep] = useState<1 | 2>(1);
   const [mobile, setMobile] = useState('');
   const [otp, setOtp] = useState('');
@@ -39,11 +39,11 @@ export default function LoginPage() {
       setError('Please enter a valid 10-digit mobile number');
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
       await authAPI.requestOtp(mobile);
       setStep(2);
@@ -62,17 +62,17 @@ export default function LoginPage() {
       setError('Please enter the 6-character OTP');
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
       await authAPI.verifyOtp(otp);
       const user = await refreshUser(); // Fetch user session via context
-      
+
       let targetPath = callbackUrl !== '/' ? callbackUrl : null;
-      
+
       if (!targetPath && user?.role?.name) {
         switch (user.role.name) {
           case 'ADMIN':
@@ -89,7 +89,7 @@ export default function LoginPage() {
             targetPath = '/dashboard';
         }
       }
-      
+
       router.push(targetPath || '/dashboard');
     } catch (err: unknown) {
       const errorResponse = err as { response?: { data?: { message?: string } } };
@@ -103,7 +103,7 @@ export default function LoginPage() {
     setIsResending(true);
     setError('');
     setSuccess('');
-    
+
     try {
       await authAPI.requestOtp(mobile);
       setSuccess('OTP resent successfully!');
@@ -117,49 +117,59 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[85vh] items-center justify-center p-4 relative w-full">
+    <div className="relative flex min-h-[85vh] w-full items-center justify-center p-4">
       {/* Dynamic Background Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-[var(--color-brand-green)]/10 blur-[120px] pointer-events-none animate-pulse-slow"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-blue-500/10 blur-[100px] pointer-events-none animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+      <div className="animate-pulse-slow pointer-events-none absolute top-[-10%] left-[-10%] h-[50vw] w-[50vw] rounded-full bg-[var(--color-brand-green)]/10 blur-[120px]"></div>
+      <div
+        className="animate-pulse-slow pointer-events-none absolute right-[-10%] bottom-[-10%] h-[40vw] w-[40vw] rounded-full bg-blue-500/10 blur-[100px]"
+        style={{ animationDelay: '2s' }}
+      ></div>
 
-      <div className="bg-[var(--card-bg)] backdrop-blur-3xl p-10 md:p-12 max-w-[440px] w-full relative overflow-hidden flex flex-col items-center rounded-3xl border border-[var(--border-subtle)] shadow-[var(--card-shadow)] hover:shadow-[var(--card-shadow-hover)] z-10 transition-all duration-500">
-        
+      <div className="relative z-10 flex w-full max-w-[440px] flex-col items-center overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--card-bg)] p-10 shadow-[var(--card-shadow)] backdrop-blur-3xl transition-all duration-500 hover:shadow-[var(--card-shadow-hover)] md:p-12">
         {/* Inner Card glow */}
-        <div className="absolute top-[-20%] right-[-10%] h-[250px] w-[250px] rounded-full bg-[var(--color-brand-green)]/10 blur-[60px] pointer-events-none" />
-        
+        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[250px] w-[250px] rounded-full bg-[var(--color-brand-green)]/10 blur-[60px]" />
+
         {/* Logo */}
-        <div className="flex items-center justify-center mb-8 relative z-10">
-          <div className="p-4 bg-foreground/5 rounded-3xl border border-[var(--border-subtle)] shadow-sm backdrop-blur-md">
-            <img src="/TD%20Black.png" alt="TractorDost Logo" className="h-12 w-auto logo-light object-contain" />
-            <img src="/TD%20White.png" alt="TractorDost Logo" className="h-12 w-auto logo-dark object-contain" />
+        <div className="relative z-10 mb-8 flex items-center justify-center">
+          <div className="bg-foreground/5 rounded-3xl border border-[var(--border-subtle)] p-4 shadow-sm backdrop-blur-md">
+            <img
+              src="/TD%20Black.png"
+              alt="TractorDost Logo"
+              className="logo-light h-12 w-auto object-contain"
+            />
+            <img
+              src="/TD%20White.png"
+              alt="TractorDost Logo"
+              className="logo-dark h-12 w-auto object-contain"
+            />
           </div>
         </div>
-        
-        <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3 text-center tracking-tight relative z-10">
+
+        <h1 className="text-foreground relative z-10 mb-3 text-center text-3xl font-black tracking-tight md:text-4xl">
           {step === 1 ? 'Welcome Back' : 'Verify Identity'}
         </h1>
-        <p className="text-muted text-sm md:text-base text-center mb-8 font-medium relative z-10 max-w-[300px]">
-          {step === 1 
-            ? 'Log in or create a new account to explore India\'s top tractors.' 
+        <p className="text-muted relative z-10 mb-8 max-w-[300px] text-center text-sm font-medium md:text-base">
+          {step === 1
+            ? "Log in or create a new account to explore India's top tractors."
             : `We've sent a secure OTP to +91 ${mobile}`}
         </p>
 
         {error && (
-          <div className="w-full p-4 mb-6 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-2xl font-bold text-center flex items-center justify-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+          <div className="animate-in fade-in slide-in-from-bottom-2 mb-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-center text-sm font-bold text-red-500">
             <ShieldCheck size={16} /> {error}
           </div>
         )}
 
         {success && (
-          <div className="w-full p-4 mb-6 bg-[var(--color-brand-green)]/10 border border-[var(--color-brand-green)]/20 text-[var(--color-brand-green)] text-sm rounded-2xl font-bold text-center flex items-center justify-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+          <div className="animate-in fade-in slide-in-from-bottom-2 mb-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-4 text-center text-sm font-bold text-[var(--color-brand-green)]">
             <ShieldCheck size={16} /> {success}
           </div>
         )}
 
         {step === 1 ? (
-          <form onSubmit={handleRequestOtp} className="w-full flex flex-col gap-5 z-10 relative">
-            <div className="relative group">
-              <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted font-bold text-lg select-none group-focus-within:text-[var(--color-brand-green)] transition-colors">
+          <form onSubmit={handleRequestOtp} className="relative z-10 flex w-full flex-col gap-5">
+            <div className="group relative">
+              <span className="text-muted absolute top-1/2 left-5 -translate-y-1/2 text-lg font-bold transition-colors select-none group-focus-within:text-[var(--color-brand-green)]">
                 +91
               </span>
               <input
@@ -168,28 +178,32 @@ export default function LoginPage() {
                 placeholder="Mobile Number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                className="w-full h-14 bg-background/50 border border-[var(--border-subtle)] rounded-xl pl-16 pr-5 text-lg font-black text-foreground placeholder:text-muted/60 focus:outline-none focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 transition-all hover:border-foreground/20"
+                className="bg-background/50 text-foreground placeholder:text-muted/60 hover:border-foreground/20 h-14 w-full rounded-xl border border-[var(--border-subtle)] pr-5 pl-16 text-lg font-black transition-all focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
                 required
                 disabled={isLoading}
               />
             </div>
-            
+
             <button
               type="submit"
               disabled={isLoading || mobile.length !== 10}
-              className="w-full h-14 rounded-xl text-base font-black mt-2 flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--color-brand-green)] text-white shadow-lg shadow-[var(--color-brand-green)]/20 hover:shadow-[var(--color-brand-green)]/40 transition-all hover:-translate-y-0.5 active:translate-y-0"
+              className="group mt-2 flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[var(--color-brand-green)] text-base font-black text-white shadow-[var(--color-brand-green)]/20 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-[var(--color-brand-green)]/40 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? (
                 <TractorLoader size={28} />
               ) : (
                 <>
-                  Continue <ArrowRight size={20} className="group-hover:translate-x-1.5 transition-transform" />
+                  Continue{' '}
+                  <ArrowRight
+                    size={20}
+                    className="transition-transform group-hover:translate-x-1.5"
+                  />
                 </>
               )}
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} className="w-full flex flex-col gap-5 z-10 relative">
+          <form onSubmit={handleVerifyOtp} className="relative z-10 flex w-full flex-col gap-5">
             <div className="relative">
               <input
                 type="text"
@@ -197,39 +211,36 @@ export default function LoginPage() {
                 placeholder="0 0 0 0 0 0"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                className="w-full h-14 bg-background/50 border border-[var(--border-subtle)] rounded-xl px-5 text-center text-2xl tracking-[0.5em] font-black text-foreground placeholder:text-muted/40 placeholder:tracking-widest focus:outline-none focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 transition-all hover:border-foreground/20"
+                className="bg-background/50 text-foreground placeholder:text-muted/40 hover:border-foreground/20 h-14 w-full rounded-xl border border-[var(--border-subtle)] px-5 text-center text-2xl font-black tracking-[0.5em] transition-all placeholder:tracking-widest focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
                 required
                 disabled={isLoading || isResending}
               />
             </div>
-            
+
             <button
               type="submit"
               disabled={isLoading || isResending || otp.length !== 6}
-              className="w-full h-14 rounded-xl text-base font-black mt-2 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--color-brand-green)] text-white shadow-lg shadow-[var(--color-brand-green)]/20 hover:shadow-[var(--color-brand-green)]/40 transition-all hover:-translate-y-0.5 active:translate-y-0"
+              className="group mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] text-base font-black text-white shadow-[var(--color-brand-green)]/20 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-[var(--color-brand-green)]/40 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isLoading ? (
-                <TractorLoader size={28} />
-              ) : (
-                'Secure Login'
-              )}
+              {isLoading ? <TractorLoader size={28} /> : 'Secure Login'}
             </button>
 
             {timeLeft > 0 ? (
-              <div className="text-center text-sm text-muted font-bold mt-2 py-2">
-                Resend OTP in <span className="text-[var(--color-brand-green)] font-black">{timeLeft}s</span>
+              <div className="text-muted mt-2 py-2 text-center text-sm font-bold">
+                Resend OTP in{' '}
+                <span className="font-black text-[var(--color-brand-green)]">{timeLeft}s</span>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={handleResendOtp}
                 disabled={isLoading || isResending}
-                className="mt-2 text-sm text-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]/80 font-black flex items-center justify-center gap-2 transition-colors py-2 mx-auto disabled:opacity-50"
+                className="mx-auto mt-2 flex items-center justify-center gap-2 py-2 text-sm font-black text-[var(--color-brand-green)] transition-colors hover:text-[var(--color-brand-green)]/80 disabled:opacity-50"
               >
                 {isResending ? 'Resending OTP...' : 'Resend OTP'}
               </button>
             )}
-            
+
             <button
               type="button"
               onClick={() => {
@@ -239,17 +250,29 @@ export default function LoginPage() {
                 setSuccess('');
               }}
               disabled={isLoading || isResending}
-              className="mt-4 text-sm text-muted hover:text-[var(--color-brand-green)] font-bold flex items-center justify-center gap-2 transition-colors py-2"
+              className="text-muted mt-4 flex items-center justify-center gap-2 py-2 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
             >
               <ArrowLeft size={16} /> Use a different number
             </button>
           </form>
         )}
-        
-        <div className="mt-10 text-xs text-muted/80 font-bold text-center z-10 leading-relaxed max-w-[280px]">
-          By proceeding, you agree to TractorDost&apos;s<br />
-          <Link href="/terms" className="text-foreground hover:text-[var(--color-brand-green)] transition-colors underline decoration-muted hover:decoration-[var(--color-brand-green)] underline-offset-4 mx-1">Terms</Link> & 
-          <Link href="/privacy" className="text-foreground hover:text-[var(--color-brand-green)] transition-colors underline decoration-muted hover:decoration-[var(--color-brand-green)] underline-offset-4 mx-1">Privacy Policy</Link>
+
+        <div className="text-muted/80 z-10 mt-10 max-w-[280px] text-center text-xs leading-relaxed font-bold">
+          By proceeding, you agree to TractorDost&apos;s
+          <br />
+          <Link
+            href="/terms"
+            className="text-foreground decoration-muted mx-1 underline underline-offset-4 transition-colors hover:text-[var(--color-brand-green)] hover:decoration-[var(--color-brand-green)]"
+          >
+            Terms
+          </Link>{' '}
+          &
+          <Link
+            href="/privacy"
+            className="text-foreground decoration-muted mx-1 underline underline-offset-4 transition-colors hover:text-[var(--color-brand-green)] hover:decoration-[var(--color-brand-green)]"
+          >
+            Privacy Policy
+          </Link>
         </div>
       </div>
     </div>

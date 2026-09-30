@@ -23,7 +23,6 @@ import FamilyModal from './components/FamilyModal';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Pagination from '@/components/shared/Pagination';
 
-
 export default function TractorFamiliesPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
@@ -139,7 +138,8 @@ export default function TractorFamiliesPage() {
       } catch (error: any) {
         console.error('Failed to delete family', error);
         alert(
-          error?.response?.data?.message || 'Failed to delete tractor family. Please make sure no tractors are linked to it.'
+          error?.response?.data?.message ||
+            'Failed to delete tractor family. Please make sure no tractors are linked to it.'
         );
       }
     }
@@ -158,15 +158,15 @@ export default function TractorFamiliesPage() {
   const activeBrand = brands.find((b) => b.id === selectedBrandId);
 
   return (
-    <div className="w-full h-full flex flex-col gap-6 animate-fade-in pb-12">
+    <div className="animate-fade-in flex h-full w-full flex-col gap-6 pb-12">
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
+          <h1 className="text-foreground flex items-center gap-2 text-3xl font-black tracking-tight">
             <FolderOpen className="text-[var(--color-brand-green)]" />
             Tractor Families
           </h1>
-          <p className="text-sm font-bold text-muted mt-1">
+          <p className="text-muted mt-1 text-sm font-bold">
             Manage families and model series of tractors categorized under specific brands.
           </p>
         </div>
@@ -176,7 +176,7 @@ export default function TractorFamiliesPage() {
               setSelectedFamily(null);
               setIsModalOpen(true);
             }}
-            className="spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap shrink-0"
+            className="spatial-button flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg"
           >
             <Plus size={16} /> Add New Family
           </button>
@@ -184,43 +184,54 @@ export default function TractorFamiliesPage() {
       </div>
 
       {loadingBrands ? (
-        <div className="flex flex-col items-center justify-center py-20 text-muted gap-3">
+        <div className="text-muted flex flex-col items-center justify-center gap-3 py-20">
           <TractorLoader className="text-[var(--color-brand-green)]" size={48} />
           <span className="font-bold">Loading Brand Configurations...</span>
         </div>
       ) : brands.length === 0 ? (
-        <div className="glass-panel p-8 rounded-2xl text-center text-muted">
-          <p className="font-bold text-lg text-foreground mb-2">No Active Brands Found</p>
-          <p className="text-sm">Please create and activate at least one brand first before managing tractor families.</p>
+        <div className="glass-panel text-muted rounded-2xl p-8 text-center">
+          <p className="text-foreground mb-2 text-lg font-bold">No Active Brands Found</p>
+          <p className="text-sm">
+            Please create and activate at least one brand first before managing tractor families.
+          </p>
         </div>
       ) : (
         <>
           {/* Brand Selector, Stats & Filters */}
-          <div className="flex flex-col gap-6 glass-panel p-6 rounded-2xl">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div className="glass-panel flex flex-col gap-6 rounded-2xl p-6">
+            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
               {/* Brand Selector */}
-              <div className="flex flex-col gap-1.5 w-full md:w-80">
-                <label className="text-xs font-black uppercase text-muted tracking-wider">Select Brand Namespace</label>
+              <div className="flex w-full flex-col gap-1.5 md:w-80">
+                <label className="text-muted text-xs font-black tracking-wider uppercase">
+                  Select Brand Namespace
+                </label>
                 <div className="relative">
                   <select
                     value={selectedBrandId || ''}
                     onChange={handleBrandChange}
-                    className="w-full pl-4 pr-10 py-3 bg-background border border-[var(--border-subtle)] rounded-xl text-sm font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none shadow-sm"
+                    className="bg-background text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] py-3 pr-10 pl-4 text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   >
                     {brands.map((brand) => (
-                      <option key={brand.id} value={brand.id} className="bg-background text-foreground">
+                      <option
+                        key={brand.id}
+                        value={brand.id}
+                        className="bg-background text-foreground"
+                      >
                         {brand.name}
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={16} />
+                  <ChevronDown
+                    className="text-muted pointer-events-none absolute top-1/2 right-3 -translate-y-1/2"
+                    size={16}
+                  />
                 </div>
               </div>
 
               {/* Stats */}
               {selectedBrandId && (
-                <div className="flex items-center gap-4 text-sm font-bold self-end md:self-auto">
-                  <div className="flex items-center gap-2 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] px-4 py-2.5 rounded-xl border border-[var(--color-brand-green)]/10">
+                <div className="flex items-center gap-4 self-end text-sm font-bold md:self-auto">
+                  <div className="flex items-center gap-2 rounded-xl border border-[var(--color-brand-green)]/10 bg-[var(--color-brand-green)]/10 px-4 py-2.5 text-[var(--color-brand-green)]">
                     <ShieldCheck size={18} />
                     Families in {activeBrand?.name}: {totalCount}
                   </div>
@@ -228,13 +239,13 @@ export default function TractorFamiliesPage() {
               )}
             </div>
 
-            <div className="w-full h-px bg-foreground/5"></div>
+            <div className="bg-foreground/5 h-px w-full"></div>
 
             {/* Filter controls */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-between w-full">
+            <div className="flex w-full flex-col flex-wrap items-center justify-between gap-4 sm:flex-row">
               {/* Left: Search input */}
-              <div className="relative w-full sm:w-80 group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted group-focus-within:text-[var(--color-brand-green)] transition-colors">
+              <div className="group relative w-full sm:w-80">
+                <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 transition-colors group-focus-within:text-[var(--color-brand-green)]">
                   <Search size={16} />
                 </div>
                 <input
@@ -245,33 +256,45 @@ export default function TractorFamiliesPage() {
                     setSearchTerm(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full bg-foreground/5 border border-transparent rounded-full py-2.5 pl-10 pr-4 text-sm font-medium text-foreground placeholder:text-muted focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all shadow-inner"
+                  className="bg-foreground/5 text-foreground placeholder:text-muted focus:bg-background w-full rounded-full border border-transparent py-2.5 pr-4 pl-10 text-sm font-medium shadow-inner transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                 />
               </div>
 
               {/* Right: Active status filter & Reset */}
-              <div className="flex flex-wrap gap-3 items-center w-full sm:w-auto justify-end">
+              <div className="flex w-full flex-wrap items-center justify-end gap-3 sm:w-auto">
                 <div className="relative w-full sm:w-44">
-                  <Activity className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                  <Activity
+                    className="text-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+                    size={14}
+                  />
                   <select
                     value={isActiveFilter}
                     onChange={(e) => {
                       setIsActiveFilter(e.target.value);
                       setPage(1);
                     }}
-                    className="w-full pl-9 pr-8 py-2 bg-background border border-[var(--border-subtle)] rounded-xl text-xs font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none shadow-sm"
+                    className="bg-background text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] py-2 pr-8 pl-9 text-xs font-bold shadow-sm outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                   >
-                    <option value="" className="bg-background text-foreground">All Statuses</option>
-                    <option value="true" className="bg-background text-foreground">Active Only</option>
-                    <option value="false" className="bg-background text-foreground">Inactive Only</option>
+                    <option value="" className="bg-background text-foreground">
+                      All Statuses
+                    </option>
+                    <option value="true" className="bg-background text-foreground">
+                      Active Only
+                    </option>
+                    <option value="false" className="bg-background text-foreground">
+                      Inactive Only
+                    </option>
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                  <ChevronDown
+                    className="text-muted pointer-events-none absolute top-1/2 right-3 -translate-y-1/2"
+                    size={14}
+                  />
                 </div>
 
                 {(searchTerm || isActiveFilter) && (
                   <button
                     onClick={handleResetFilters}
-                    className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold text-xs rounded-full transition-colors"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-full bg-red-500/10 px-4 py-2 text-xs font-bold text-red-500 transition-colors hover:bg-red-500/20 sm:w-auto"
                   >
                     <X size={14} /> Reset Filters
                   </button>
@@ -281,12 +304,12 @@ export default function TractorFamiliesPage() {
           </div>
 
           {/* Families Table */}
-          <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col min-h-[420px] md:min-h-[530px]">
-            <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[350px] md:min-h-[460px]">
-              <table className="w-full text-left text-sm relative">
-                <thead className="sticky top-0 bg-background/95 backdrop-blur-md z-10 text-muted uppercase text-[11px] font-black tracking-wider border-b border-[var(--border-subtle)]">
+          <div className="glass-panel flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl md:min-h-[530px]">
+            <div className="min-h-[350px] flex-1 overflow-x-auto overflow-y-auto md:min-h-[460px]">
+              <table className="relative w-full text-left text-sm">
+                <thead className="bg-background/95 text-muted sticky top-0 z-10 border-b border-[var(--border-subtle)] text-[11px] font-black tracking-wider uppercase backdrop-blur-md">
                   <tr>
-                    <th className="px-6 py-4 w-10"></th>
+                    <th className="w-10 px-6 py-4"></th>
                     <th className="px-6 py-4">Family Info</th>
                     <th className="px-6 py-4">URL Slug</th>
                     <th className="px-6 py-4">Linked Tractors</th>
@@ -298,13 +321,13 @@ export default function TractorFamiliesPage() {
                 <tbody className="divide-y divide-[var(--border-subtle)]">
                   {loadingFamilies ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-muted font-bold">
+                      <td colSpan={7} className="text-muted px-6 py-12 text-center font-bold">
                         Fetching families details...
                       </td>
                     </tr>
                   ) : families.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-muted font-bold">
+                      <td colSpan={7} className="text-muted px-6 py-12 text-center font-bold">
                         No families found matching your selection.
                       </td>
                     </tr>
@@ -312,17 +335,21 @@ export default function TractorFamiliesPage() {
                     families.map((family) => (
                       <React.Fragment key={family.id}>
                         <tr
-                          className={`hover:bg-foreground/5 transition-colors cursor-pointer ${
+                          className={`hover:bg-foreground/5 cursor-pointer transition-colors ${
                             expandedId === family.id ? 'bg-foreground/5' : ''
                           }`}
                           onClick={() => toggleExpand(family.id)}
                         >
-                          <td className="px-6 py-4 text-muted">
-                            {expandedId === family.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                          <td className="text-muted px-6 py-4">
+                            {expandedId === family.id ? (
+                              <ChevronUp size={18} />
+                            ) : (
+                              <ChevronDown size={18} />
+                            )}
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center p-1.5 border border-[var(--border-subtle)] shrink-0 shadow-sm">
+                              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm">
                                 {family.logoUrl ? (
                                   <img
                                     src={family.logoUrl}
@@ -330,26 +357,39 @@ export default function TractorFamiliesPage() {
                                     className="max-h-full max-w-full object-contain"
                                   />
                                 ) : (
-                                  <span className="text-gray-400 font-black text-[10px] uppercase">N/A</span>
+                                  <span className="text-[10px] font-black text-gray-400 uppercase">
+                                    N/A
+                                  </span>
                                 )}
                               </div>
                               <div className="flex flex-col gap-0.5">
-                                <div className="font-black text-foreground text-base tracking-tight">{family.name}</div>
-                                <div className="text-[10px] font-bold text-muted/70">ID: #{family.id}</div>
+                                <div className="text-foreground text-base font-black tracking-tight">
+                                  {family.name}
+                                </div>
+                                <div className="text-muted/70 text-[10px] font-bold">
+                                  ID: #{family.id}
+                                </div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-foreground/80 max-w-[200px] truncate" title={family.slug}>{family.slug}</td>
+                          <td
+                            className="text-foreground/80 max-w-[200px] truncate px-6 py-4 text-sm font-medium"
+                            title={family.slug}
+                          >
+                            {family.slug}
+                          </td>
                           <td className="px-6 py-4">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-foreground/5 text-foreground/80">
+                            <span className="bg-foreground/5 text-foreground/80 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black tracking-wide">
                               <Tractor size={12} className="text-muted" />
                               {family.tractorCount || 0} Tractors
                             </span>
                           </td>
-                          <td className="px-6 py-4 font-bold text-foreground/80">{family.sortOrder}</td>
+                          <td className="text-foreground/80 px-6 py-4 font-bold">
+                            {family.sortOrder}
+                          </td>
                           <td className="px-6 py-4">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-widest uppercase ${
+                              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-widest uppercase ${
                                 family.isActive
                                   ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
                                   : 'bg-red-500/10 text-red-500'
@@ -362,13 +402,13 @@ export default function TractorFamiliesPage() {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={(e) => handleEdit(family, e)}
-                                className="p-2 rounded-xl text-foreground/70 hover:text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10 transition-colors"
+                                className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)]"
                               >
                                 <Edit2 size={16} />
                               </button>
                               <button
                                 onClick={(e) => handleDelete(family.id, e)}
-                                className="p-2 rounded-xl text-foreground/70 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                                className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500"
                               >
                                 <Trash2 size={16} />
                               </button>
@@ -379,44 +419,57 @@ export default function TractorFamiliesPage() {
                         {/* EXPANDED DETAILS */}
                         {expandedId === family.id && (
                           <tr>
-                            <td colSpan={7} className="px-0 py-0 bg-foreground/[0.02]">
-                              <div className="p-6 md:p-8 flex flex-col gap-6 animate-fade-in border-b-2 border-[var(--color-brand-green)]">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full whitespace-normal">
+                            <td colSpan={7} className="bg-foreground/[0.02] px-0 py-0">
+                              <div className="animate-fade-in flex flex-col gap-6 border-b-2 border-[var(--color-brand-green)] p-6 md:p-8">
+                                <div className="grid w-full grid-cols-1 gap-8 whitespace-normal md:grid-cols-2">
                                   {/* Left Column - General Info */}
                                   <div className="flex flex-col gap-4">
-                                    <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-[var(--border-subtle)] pb-2">
+                                    <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-green)]">
                                       <FileText size={18} />
-                                      <h3 className="font-black text-sm uppercase tracking-wide">Family Identity & About</h3>
+                                      <h3 className="text-sm font-black tracking-wide uppercase">
+                                        Family Identity & About
+                                      </h3>
                                     </div>
-                                    <p className="text-sm text-foreground/80 font-medium leading-relaxed bg-background p-4 rounded-xl border border-[var(--border-subtle)] shadow-sm">
-                                      {family.description || 'No description provided for this family yet.'}
+                                    <p className="text-foreground/80 bg-background rounded-xl border border-[var(--border-subtle)] p-4 text-sm leading-relaxed font-medium shadow-sm">
+                                      {family.description ||
+                                        'No description provided for this family yet.'}
                                     </p>
                                   </div>
 
                                   {/* Right Column - SEO Info */}
                                   <div className="flex flex-col gap-4">
-                                    <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2">
+                                    <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-orange)]">
                                       <BarChart size={18} />
-                                      <h3 className="font-black text-sm uppercase tracking-wide">SEO & Meta Configuration</h3>
+                                      <h3 className="text-sm font-black tracking-wide uppercase">
+                                        SEO & Meta Configuration
+                                      </h3>
                                     </div>
 
-                                    <div className="flex flex-col gap-4 bg-background p-4 rounded-xl border border-[var(--border-subtle)] shadow-sm">
+                                    <div className="bg-background flex flex-col gap-4 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
                                       <div className="flex flex-col gap-1.5">
-                                        <span className="text-[10px] font-black uppercase text-muted tracking-wider">SEO Title</span>
-                                        <span className="text-sm font-bold text-foreground">
+                                        <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                                          SEO Title
+                                        </span>
+                                        <span className="text-foreground text-sm font-bold">
                                           {family.seoTitle || (
-                                            <span className="text-muted/50 italic font-medium">Not configured</span>
+                                            <span className="text-muted/50 font-medium italic">
+                                              Not configured
+                                            </span>
                                           )}
                                         </span>
                                       </div>
 
-                                      <div className="w-full h-px bg-foreground/5"></div>
+                                      <div className="bg-foreground/5 h-px w-full"></div>
 
                                       <div className="flex flex-col gap-1.5">
-                                        <span className="text-[10px] font-black uppercase text-muted tracking-wider">SEO Description</span>
-                                        <span className="text-sm font-medium text-foreground/80 leading-relaxed">
+                                        <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                                          SEO Description
+                                        </span>
+                                        <span className="text-foreground/80 text-sm leading-relaxed font-medium">
                                           {family.seoDescription || (
-                                            <span className="text-muted/50 italic font-medium">Not configured</span>
+                                            <span className="text-muted/50 font-medium italic">
+                                              Not configured
+                                            </span>
                                           )}
                                         </span>
                                       </div>
@@ -427,7 +480,7 @@ export default function TractorFamiliesPage() {
                                 <div className="flex justify-end pt-4">
                                   <button
                                     onClick={(e) => handleEdit(family, e)}
-                                    className="px-6 py-2.5 bg-[var(--color-brand-green)] text-white font-black text-sm uppercase tracking-wider rounded-xl hover:bg-[var(--color-brand-orange)] transition-colors shadow-lg shadow-[var(--color-brand-green)]/20 flex items-center gap-2"
+                                    className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/20 shadow-lg transition-colors hover:bg-[var(--color-brand-orange)]"
                                   >
                                     <Edit2 size={16} /> Edit Family Configuration
                                   </button>
@@ -445,21 +498,21 @@ export default function TractorFamiliesPage() {
 
             {/* Pagination controls */}
             {!loadingFamilies && totalPages > 1 && (
-              <div className="mt-auto p-4 border-t border-[var(--border-subtle)] flex items-center justify-between bg-background z-10 relative">
+              <div className="bg-background relative z-10 mt-auto flex items-center justify-between border-t border-[var(--border-subtle)] p-4">
                 <button
                   disabled={page === 1}
                   onClick={() => setPage((p) => p - 1)}
-                  className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
+                  className="bg-foreground/5 hover:bg-foreground/10 rounded-xl px-4 py-2 text-sm font-bold transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   Previous
                 </button>
-                <span className="text-sm font-bold text-muted">
+                <span className="text-muted text-sm font-bold">
                   Page {page} of {totalPages}
                 </span>
                 <button
                   disabled={page === totalPages}
                   onClick={() => setPage((p) => p + 1)}
-                  className="px-4 py-2 text-sm font-bold rounded-xl bg-foreground/5 hover:bg-foreground/10 disabled:opacity-50 disabled:pointer-events-none transition-colors"
+                  className="bg-foreground/5 hover:bg-foreground/10 rounded-xl px-4 py-2 text-sm font-bold transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   Next
                 </button>

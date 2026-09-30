@@ -76,7 +76,13 @@ export const accessControlAPI = {
     const response = await apiClient.get('/access-control/modules/tree');
     return response.data;
   },
-  listModules: async (params?: { search?: string; parentId?: number; isActive?: boolean; limit?: number; page?: number }) => {
+  listModules: async (params?: {
+    search?: string;
+    parentId?: number;
+    isActive?: boolean;
+    limit?: number;
+    page?: number;
+  }) => {
     const response = await apiClient.get('/access-control/modules/listModules', { params });
     return response.data;
   },
@@ -99,11 +105,15 @@ export const accessControlAPI = {
     return response.data;
   },
   assignRolePermissions: async (roleId: number, permissions: Partial<RolePermission>[]) => {
-    const response = await apiClient.post(`/access-control/roles/${roleId}/permissions`, { permissions });
+    const response = await apiClient.post(`/access-control/roles/${roleId}/permissions`, {
+      permissions,
+    });
     return response.data;
   },
   removeRolePermission: async (roleId: number, moduleId: number) => {
-    const response = await apiClient.delete(`/access-control/roles/${roleId}/permissions/${moduleId}`);
+    const response = await apiClient.delete(
+      `/access-control/roles/${roleId}/permissions/${moduleId}`
+    );
     return response.data;
   },
 
@@ -119,5 +129,5 @@ export const accessControlAPI = {
   revokeOverride: async (id: number) => {
     const response = await apiClient.delete(`/access-control/overrides/${id}`);
     return response.data;
-  }
+  },
 };

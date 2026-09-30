@@ -45,7 +45,10 @@ export const listingBoostAPI = {
 
   // Admin/Agent fetch all boosts
   getAllBoosts: async (params?: { page?: number; limit?: number; isActive?: boolean }) => {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<ListingBoost>>>('/listing-boosts/', { params });
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<ListingBoost>>>(
+      '/listing-boosts/',
+      { params }
+    );
     return response.data;
   },
 
@@ -53,5 +56,5 @@ export const listingBoostAPI = {
   deactivateBoost: async (id: number) => {
     const response = await apiClient.patch<ApiResponse<any>>(`/listing-boosts/${id}/deactivate`);
     return response.data;
-  }
+  },
 };

@@ -53,7 +53,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
 
   // Render children only if authenticated and authorized
   if (
-    !isAuthenticated || 
+    !isAuthenticated ||
     (allowedRoles && user?.role?.name && !allowedRoles.includes(user.role.name))
   ) {
     return null; // Return null to prevent flicker before redirect occurs

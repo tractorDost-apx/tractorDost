@@ -17,6 +17,12 @@ export interface ImplementImportReport extends ImportReport {
     implementRows: number;
     extraSpecRows: { total: number; valid: number; invalid: number; skipped: number };
   };
-  sheets: { name: string; kind: 'implements' | 'extraSpecs' | 'ignored'; headerRow?: number; dataRows: number; note?: string }[];
+  sheets: {
+    name: string;
+    kind: 'implements' | 'extraSpecs' | 'ignored';
+    headerRow?: number;
+    dataRows: number;
+    note?: string;
+  }[];
   columns: ImplementImportColumn[];
 }

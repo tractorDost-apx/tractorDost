@@ -12,11 +12,11 @@ export function UserAvatar({ photoUrl, name, size = 40, className = '' }: UserAv
   // If we have a photo, display it
   if (photoUrl) {
     return (
-      <div 
-        className={`rounded-full overflow-hidden flex items-center justify-center bg-foreground/10 border-2 border-[var(--border-subtle)] hover:border-[var(--color-brand-green)] transition-all ${className}`}
+      <div
+        className={`bg-foreground/10 flex items-center justify-center overflow-hidden rounded-full border-2 border-[var(--border-subtle)] transition-all hover:border-[var(--color-brand-green)] ${className}`}
         style={{ width: size, height: size, minWidth: size, minHeight: size }}
       >
-        <img src={photoUrl} alt={name || 'Profile'} className="w-full h-full object-cover" />
+        <img src={photoUrl} alt={name || 'Profile'} className="h-full w-full object-cover" />
       </div>
     );
   }
@@ -35,21 +35,32 @@ export function UserAvatar({ photoUrl, name, size = 40, className = '' }: UserAv
 
   // Background color based on name length to give a deterministic pseudorandom color
   const bgColors = [
-    'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-teal-500'
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-purple-500',
+    'bg-pink-500',
+    'bg-orange-500',
+    'bg-teal-500',
   ];
-  
+
   const isFallback = !name && !photoUrl;
 
-  const bgColor = name 
-    ? bgColors[name.length % bgColors.length] 
-    : 'bg-transparent'; // No background for outline mode
+  const bgColor = name ? bgColors[name.length % bgColors.length] : 'bg-transparent'; // No background for outline mode
 
   return (
-    <div 
-      className={`rounded-full flex items-center justify-center font-bold transition-all ${bgColor} ${isFallback ? 'border-2 border-[var(--border-subtle)] text-foreground/80 hover:text-foreground hover:bg-foreground/5' : 'border-2 border-transparent text-white hover:border-[var(--color-brand-green)]'} ${className}`}
+    <div
+      className={`flex items-center justify-center rounded-full font-bold transition-all ${bgColor} ${isFallback ? 'text-foreground/80 hover:text-foreground hover:bg-foreground/5 border-2 border-[var(--border-subtle)]' : 'border-2 border-transparent text-white hover:border-[var(--color-brand-green)]'} ${className}`}
       style={{ width: size, height: size, minWidth: size, minHeight: size, fontSize: size * 0.4 }}
     >
-      {initials ? initials : <UserIcon size={size * 0.5} strokeWidth={isFallback ? 2 : 2} className={isFallback ? 'text-foreground/80' : 'text-white/80'} />}
+      {initials ? (
+        initials
+      ) : (
+        <UserIcon
+          size={size * 0.5}
+          strokeWidth={isFallback ? 2 : 2}
+          className={isFallback ? 'text-foreground/80' : 'text-white/80'}
+        />
+      )}
     </div>
   );
 }

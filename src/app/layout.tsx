@@ -29,7 +29,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -49,12 +53,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-screen flex-col relative overflow-x-hidden selection:bg-[var(--color-spatial-accent-blue)] selection:text-white">
+      <body className="relative flex min-h-screen flex-col overflow-x-hidden selection:bg-[var(--color-spatial-accent-blue)] selection:text-white">
         <SplashScreen />
         <AuthProvider>
-          <LayoutOrchestrator>
-            {children}
-          </LayoutOrchestrator>
+          <LayoutOrchestrator>{children}</LayoutOrchestrator>
         </AuthProvider>
       </body>
     </html>

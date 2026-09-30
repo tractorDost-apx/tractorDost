@@ -16,5 +16,12 @@ interface ImplementBulkImportProps {
  * pick .xlsx → test (read-only preview) → Insert Data → progress → summary.
  */
 export default function ImplementBulkImport({ onImported, className }: ImplementBulkImportProps) {
-  return <BulkImportButton config={IMPLEMENT_IMPORT_CONFIG} label="Import Implement" onImported={onImported} className={className} />;
+  return (
+    <BulkImportButton
+      config={IMPLEMENT_IMPORT_CONFIG}
+      label="Import Implement"
+      onImported={onImported}
+      className={className}
+    />
+  );
 }

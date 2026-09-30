@@ -36,14 +36,16 @@ export const brandAPI = {
   /**
    * Fetch all brands with pagination and search
    */
-  getAllBrands: async (params?: { 
-    page?: number; 
-    limit?: number; 
+  getAllBrands: async (params?: {
+    page?: number;
+    limit?: number;
     search?: string;
     isActive?: string;
     isFeatured?: string;
   }) => {
-    const response = await apiClient.get<PaginatedResponse<Brand>>('/brand/get-all-brand', { params });
+    const response = await apiClient.get<PaginatedResponse<Brand>>('/brand/get-all-brand', {
+      params,
+    });
     return response.data;
   },
 
@@ -51,7 +53,9 @@ export const brandAPI = {
    * Fetch a single brand by ID
    */
   getBrandById: async (id: number) => {
-    const response = await apiClient.get<{ success: boolean; data: Brand }>(`/brand/get-brand/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: Brand }>(
+      `/brand/get-brand/${id}`
+    );
     return response.data;
   },
 
@@ -61,7 +65,7 @@ export const brandAPI = {
    */
   createBrand: async (data: FormData) => {
     const response = await apiClient.postForm<{ success: boolean; data: Brand }>(
-      '/brand/create-brand', 
+      '/brand/create-brand',
       data,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
@@ -74,7 +78,7 @@ export const brandAPI = {
    */
   updateBrand: async (id: number, data: FormData) => {
     const response = await apiClient.putForm<{ success: boolean; data: Brand }>(
-      `/brand/update-brand/${id}`, 
+      `/brand/update-brand/${id}`,
       data,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
@@ -85,7 +89,9 @@ export const brandAPI = {
    * Delete a brand
    */
   deleteBrand: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; data: Brand }>(`/brand/delete-brand/${id}`);
+    const response = await apiClient.delete<{ success: boolean; data: Brand }>(
+      `/brand/delete-brand/${id}`
+    );
     return response.data;
-  }
+  },
 };

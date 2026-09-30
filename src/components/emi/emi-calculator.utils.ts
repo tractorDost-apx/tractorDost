@@ -1,14 +1,17 @@
-import { EmiCalculatorInputs, EmiCalculatorResults, AmortizationScheduleEntry, YearlySummaryEntry } from './emi-calculator.types';
+import {
+  EmiCalculatorInputs,
+  EmiCalculatorResults,
+  AmortizationScheduleEntry,
+  YearlySummaryEntry,
+} from './emi-calculator.types';
 
 /**
  * Calculates monthly EMI and overall totals
  */
 export const calculateEmiResults = (inputs: EmiCalculatorInputs): EmiCalculatorResults => {
   const loanAmount = Math.max(0, inputs.vehiclePrice - inputs.downPayment);
-  const tenureMonths = inputs.tenureUnit === 'years' 
-    ? inputs.tenureValue * 12 
-    : inputs.tenureValue;
-  
+  const tenureMonths = inputs.tenureUnit === 'years' ? inputs.tenureValue * 12 : inputs.tenureValue;
+
   if (loanAmount === 0 || tenureMonths === 0) {
     return {
       loanAmount: 0,
@@ -21,7 +24,7 @@ export const calculateEmiResults = (inputs: EmiCalculatorInputs): EmiCalculatorR
   }
 
   const annualInterestRate = inputs.interestRate;
-  
+
   // Handle 0% interest promo rate
   if (annualInterestRate === 0) {
     const monthlyEmi = Math.round((loanAmount / tenureMonths) * 100) / 100;
@@ -36,18 +39,21 @@ export const calculateEmiResults = (inputs: EmiCalculatorInputs): EmiCalculatorR
     };
   }
 
-  const monthlyInterestRate = (annualInterestRate / 12) / 100;
-  
+  const monthlyInterestRate = annualInterestRate / 12 / 100;
+
   // Standard EMI formula: [P * r * (1+r)^n] / [(1+r)^n - 1]
-  const emiNumerator = loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, tenureMonths);
+  const emiNumerator =
+    loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, tenureMonths);
   const emiDenominator = Math.pow(1 + monthlyInterestRate, tenureMonths) - 1;
   const monthlyEmi = Math.round((emiNumerator / emiDenominator) * 100) / 100;
 
   const totalPayable = Math.round(monthlyEmi * tenureMonths * 100) / 100;
   const totalInterest = Math.max(0, Math.round((totalPayable - loanAmount) * 100) / 100);
 
-  const principalPercent = totalPayable > 0 ? Math.round((loanAmount / totalPayable) * 10000) / 100 : 100;
-  const interestPercent = totalPayable > 0 ? Math.round((totalInterest / totalPayable) * 10000) / 100 : 0;
+  const principalPercent =
+    totalPayable > 0 ? Math.round((loanAmount / totalPayable) * 10000) / 100 : 100;
+  const interestPercent =
+    totalPayable > 0 ? Math.round((totalInterest / totalPayable) * 10000) / 100 : 0;
 
   return {
     loanAmount,
@@ -62,41 +68,40 @@ export const calculateEmiResults = (inputs: EmiCalculatorInputs): EmiCalculatorR
 /**
  * Generates month-by-month amortization schedule
  */
-export const generateAmortizationSchedule = (inputs: EmiCalculatorInputs): AmortizationScheduleEntry[] => {
+export const generateAmortizationSchedule = (
+  inputs: EmiCalculatorInputs
+): AmortizationScheduleEntry[] => {
   const loanAmount = Math.max(0, inputs.vehiclePrice - inputs.downPayment);
-  const tenureMonths = inputs.tenureUnit === 'years' 
-    ? inputs.tenureValue * 12 
-    : inputs.tenureValue;
-  
+  const tenureMonths = inputs.tenureUnit === 'years' ? inputs.tenureValue * 12 : inputs.tenureValue;
+
   const schedule: AmortizationScheduleEntry[] = [];
   if (loanAmount === 0 || tenureMonths === 0) return schedule;
 
   const results = calculateEmiResults(inputs);
   const monthlyEmi = results.monthlyEmi;
   const annualInterestRate = inputs.interestRate;
-  const monthlyInterestRate = (annualInterestRate / 12) / 100;
+  const monthlyInterestRate = annualInterestRate / 12 / 100;
 
   let currentBalance = loanAmount;
 
   for (let month = 1; month <= tenureMonths; month++) {
     const startingBalance = currentBalance;
-    
+
     // Interest for the month
-    const interestPaid = annualInterestRate === 0 
-      ? 0 
-      : Math.round(startingBalance * monthlyInterestRate * 100) / 100;
-      
+    const interestPaid =
+      annualInterestRate === 0 ? 0 : Math.round(startingBalance * monthlyInterestRate * 100) / 100;
+
     // Principal for the month
     let principalPaid = Math.round((monthlyEmi - interestPaid) * 100) / 100;
-    
+
     // Adjust final month to zero out remaining balance due to rounding
     if (month === tenureMonths || currentBalance - principalPaid < 1.0) {
       principalPaid = startingBalance;
     }
-    
+
     const endingBalance = Math.max(0, Math.round((startingBalance - principalPaid) * 100) / 100);
     const actualEmiPaid = Math.round((principalPaid + interestPaid) * 100) / 100;
-    
+
     schedule.push({
       month,
       startingBalance,
@@ -116,7 +121,9 @@ export const generateAmortizationSchedule = (inputs: EmiCalculatorInputs): Amort
 /**
  * Generates a yearly summary from the amortization schedule
  */
-export const generateYearlySummary = (schedule: AmortizationScheduleEntry[]): YearlySummaryEntry[] => {
+export const generateYearlySummary = (
+  schedule: AmortizationScheduleEntry[]
+): YearlySummaryEntry[] => {
   const yearlySummary: YearlySummaryEntry[] = [];
   if (schedule.length === 0) return yearlySummary;
 

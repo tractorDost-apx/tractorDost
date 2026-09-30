@@ -1,3 +1,11 @@
-// Placeholder for format-currency.ts
-// This file is currently under development.
-export const placeholder = "format-currency.ts";
+const inrFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  maximumFractionDigits: 0,
+});
+
+/** ₹5,80,000 */
+export function formatINR(amount: number | string | null | undefined): string {
+  const value = Number(amount);
+  return Number.isFinite(value) ? inrFormatter.format(value) : '—';
+}

@@ -11,7 +11,7 @@ export default function EditTractorPage() {
   const searchParams = useSearchParams();
   const id = params?.id ? parseInt(params.id as string) : null;
   const initialTab = searchParams?.get('tab') || 'basic';
-  
+
   const [tractor, setTractor] = useState<Tractor | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,27 +38,31 @@ export default function EditTractorPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-[60vh] flex flex-col items-center justify-center gap-4 text-muted">
+      <div className="text-muted flex h-[60vh] w-full flex-col items-center justify-center gap-4">
         <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
-        <p className="font-bold mt-2">Loading Tractor Details...</p>
+        <p className="mt-2 font-bold">Loading Tractor Details...</p>
       </div>
     );
   }
 
   if (!tractor) {
     return (
-      <div className="w-full h-[60vh] flex flex-col items-center justify-center gap-4 text-red-500">
+      <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-4 text-red-500">
         <h2 className="text-2xl font-black">Tractor Not Found</h2>
-        <p className="font-bold text-muted">The requested tractor does not exist or has been removed.</p>
+        <p className="text-muted font-bold">
+          The requested tractor does not exist or has been removed.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-6 animate-fade-in pb-12">
+    <div className="animate-fade-in flex h-full w-full flex-col gap-6 pb-12">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-black tracking-tight text-foreground">Edit Tractor</h1>
-        <p className="text-sm font-bold text-muted">Update catalog information for {tractor.modelName}.</p>
+        <h1 className="text-foreground text-3xl font-black tracking-tight">Edit Tractor</h1>
+        <p className="text-muted text-sm font-bold">
+          Update catalog information for {tractor.modelName}.
+        </p>
       </div>
 
       <TractorForm isEdit={true} initialData={tractor} initialTab={initialTab} />

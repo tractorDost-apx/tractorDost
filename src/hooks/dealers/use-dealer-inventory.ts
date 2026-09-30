@@ -17,18 +17,18 @@ export function useDealerInventory() {
   const { user } = useAuth();
   const [dealerId, setDealerId] = useState<number | null>(null);
   const [dealerName, setDealerName] = useState<string>('');
-  
+
   // Data states
   const [inventory, setInventory] = useState<DealerInventoryItem[]>([]);
   const [pagination, setPagination] = useState<DealerInventoryPagination | null>(null);
   const [stats, setStats] = useState<DealerInventoryStats | null>(null);
-  
+
   // UI states
   const [loadingDealer, setLoadingDealer] = useState<boolean>(true);
   const [loadingData, setLoadingData] = useState<boolean>(true);
   const [dealerError, setDealerError] = useState<string | null>(null);
   const [dataError, setDataError] = useState<string | null>(null);
-  
+
   // Filter & Search states
   const [queryParams, setQueryParams] = useState<GetInventoryQueryParams>({
     page: 1,
@@ -36,12 +36,14 @@ export function useDealerInventory() {
     sortBy: 'updatedAt',
   });
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'IN_STOCK' | 'COMING_SOON' | 'OUT_OF_STOCK' | 'UNAVAILABLE'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<
+    'ALL' | 'IN_STOCK' | 'COMING_SOON' | 'OUT_OF_STOCK' | 'UNAVAILABLE'
+  >('ALL');
 
   // Resolve Dealer ID
   useEffect(() => {
     let isMounted = true;
-    
+
     async function resolveDealer() {
       if (!user?.id) {
         if (isMounted) setLoadingDealer(false);

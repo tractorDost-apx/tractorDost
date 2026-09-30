@@ -14,15 +14,15 @@ interface MediaUploaderProps {
   description?: string;
 }
 
-export default function MediaUploader({ 
-  files, 
-  onFilesChange, 
-  existingMedia = [], 
+export default function MediaUploader({
+  files,
+  onFilesChange,
+  existingMedia = [],
   onDeleteExisting,
   maxFiles = 10,
-  accept = "image/*",
-  label = "Media Upload",
-  description = "Upload images or documents."
+  accept = 'image/*',
+  label = 'Media Upload',
+  description = 'Upload images or documents.',
 }: MediaUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -30,9 +30,9 @@ export default function MediaUploader({
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -41,7 +41,7 @@ export default function MediaUploader({
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFiles(Array.from(e.dataTransfer.files));
     }
@@ -59,7 +59,7 @@ export default function MediaUploader({
       alert(`You can only upload up to ${maxFiles} files in total.`);
       const allowedNewFiles = newFiles.slice(0, maxFiles - totalCurrentFiles);
       if (allowedNewFiles.length > 0) {
-         onFilesChange([...files, ...allowedNewFiles]);
+        onFilesChange([...files, ...allowedNewFiles]);
       }
     } else {
       onFilesChange([...files, ...newFiles]);
@@ -75,15 +75,15 @@ export default function MediaUploader({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h4 className="text-sm font-bold text-foreground">{label}</h4>
-        {description && <p className="text-xs text-muted font-medium mt-1">{description}</p>}
+        <h4 className="text-foreground text-sm font-bold">{label}</h4>
+        {description && <p className="text-muted mt-1 text-xs font-medium">{description}</p>}
       </div>
 
-      <div 
-        className={`relative w-full rounded-2xl border-2 border-dashed transition-all p-8 flex flex-col items-center justify-center gap-4 text-center cursor-pointer ${
-          dragActive 
-            ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/5' 
-            : 'border-[var(--border-brand)] bg-[var(--border-subtle)] hover:border-foreground/40'
+      <div
+        className={`relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed p-8 text-center transition-all ${
+          dragActive
+            ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/5'
+            : 'hover:border-foreground/40 border-[var(--border-brand)] bg-[var(--border-subtle)]'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -91,14 +91,14 @@ export default function MediaUploader({
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
-        <div className="h-16 w-16 rounded-full bg-background flex items-center justify-center shadow-sm">
+        <div className="bg-background flex h-16 w-16 items-center justify-center rounded-full shadow-sm">
           <Upload size={28} className="text-[var(--color-brand-green)]" />
         </div>
         <div>
-          <p className="text-sm font-bold text-foreground">Click to upload or drag and drop</p>
-          <p className="text-xs font-medium text-muted mt-1">SVG, PNG, JPG or PDF (max. 10MB)</p>
+          <p className="text-foreground text-sm font-bold">Click to upload or drag and drop</p>
+          <p className="text-muted mt-1 text-xs font-medium">SVG, PNG, JPG or PDF (max. 10MB)</p>
         </div>
-        <input 
+        <input
           type="file"
           ref={fileInputRef}
           className="hidden"
@@ -110,30 +110,32 @@ export default function MediaUploader({
 
       {/* Previews */}
       {(files.length > 0 || existingMedia.length > 0) && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
-          
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {/* Existing Media */}
           {existingMedia.map((media) => (
-            <div key={media.id} className="relative group rounded-xl overflow-hidden bg-foreground/5 aspect-square border border-[var(--border-subtle)]">
+            <div
+              key={media.id}
+              className="group bg-foreground/5 relative aspect-square overflow-hidden rounded-xl border border-[var(--border-subtle)]"
+            >
               {media.type.includes('image') || accept.includes('image') ? (
-                <img src={media.url} alt="Media" className="w-full h-full object-cover" />
+                <img src={media.url} alt="Media" className="h-full w-full object-cover" />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center">
-                   <ImageIcon size={32} className="text-muted mb-2" />
-                   <span className="text-[10px] font-bold text-muted break-all">Document</span>
+                <div className="flex h-full w-full flex-col items-center justify-center p-2 text-center">
+                  <ImageIcon size={32} className="text-muted mb-2" />
+                  <span className="text-muted text-[10px] font-bold break-all">Document</span>
                 </div>
               )}
-              
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <button 
+
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                <button
                   type="button"
                   onClick={() => onDeleteExisting && onDeleteExisting(media.id)}
-                  className="h-8 w-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:scale-110 transition-transform"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition-transform hover:scale-110"
                 >
                   <X size={16} />
                 </button>
               </div>
-              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-black/60 text-white tracking-wider">
+              <div className="absolute top-2 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-white uppercase">
                 Existing
               </div>
             </div>
@@ -141,26 +143,33 @@ export default function MediaUploader({
 
           {/* New Files */}
           {files.map((file, idx) => (
-            <div key={idx} className="relative group rounded-xl overflow-hidden bg-foreground/5 aspect-square border border-[var(--border-subtle)]">
+            <div
+              key={idx}
+              className="group bg-foreground/5 relative aspect-square overflow-hidden rounded-xl border border-[var(--border-subtle)]"
+            >
               {file.type.includes('image') ? (
-                <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="Preview"
+                  className="h-full w-full object-cover"
+                />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center">
-                   <ImageIcon size={32} className="text-muted mb-2" />
-                   <span className="text-[10px] font-bold text-muted break-all">{file.name}</span>
+                <div className="flex h-full w-full flex-col items-center justify-center p-2 text-center">
+                  <ImageIcon size={32} className="text-muted mb-2" />
+                  <span className="text-muted text-[10px] font-bold break-all">{file.name}</span>
                 </div>
               )}
-              
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <button 
+
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                <button
                   type="button"
                   onClick={() => removeFile(idx)}
-                  className="h-8 w-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:scale-110 transition-transform"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition-transform hover:scale-110"
                 >
                   <X size={16} />
                 </button>
               </div>
-              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-[var(--color-brand-green)]/90 text-white tracking-wider">
+              <div className="absolute top-2 left-2 rounded bg-[var(--color-brand-green)]/90 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-white uppercase">
                 New
               </div>
             </div>

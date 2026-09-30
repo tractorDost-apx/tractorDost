@@ -16,5 +16,12 @@ interface TractorBulkImportProps {
  * pick file → test (dry run) → insert → progress → summary.
  */
 export default function TractorBulkImport({ onImported, className }: TractorBulkImportProps) {
-  return <BulkImportButton config={TRACTOR_IMPORT_CONFIG} label="Import Tractor" onImported={onImported} className={className} />;
+  return (
+    <BulkImportButton
+      config={TRACTOR_IMPORT_CONFIG}
+      label="Import Tractor"
+      onImported={onImported}
+      className={className}
+    />
+  );
 }

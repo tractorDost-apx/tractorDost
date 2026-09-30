@@ -10,28 +10,28 @@ export function VerificationBadge({ status }: VerificationBadgeProps) {
   switch (status) {
     case 'VERIFIED':
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-black tracking-wide text-emerald-400">
           <CheckCircle2 size={13} className="shrink-0 text-emerald-400" />
           VERIFIED
         </span>
       );
     case 'PENDING':
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-amber-500/10 text-amber-400 border border-amber-500/20">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-black tracking-wide text-amber-400">
           <Clock size={13} className="shrink-0 text-amber-400" />
           PENDING
         </span>
       );
     case 'REJECTED':
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-rose-500/10 text-rose-400 border border-rose-500/20">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 px-2.5 py-1 text-xs font-black tracking-wide text-rose-400">
           <XCircle size={13} className="shrink-0 text-rose-400" />
           REJECTED
         </span>
       );
     default:
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-gray-500/10 text-gray-400 border border-gray-500/20">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-500/20 bg-gray-500/10 px-2.5 py-1 text-xs font-black tracking-wide text-gray-400">
           {status}
         </span>
       );
@@ -45,7 +45,7 @@ interface CertifiedBadgeProps {
 export function CertifiedBadge({ isCertified }: CertifiedBadgeProps) {
   if (!isCertified) return null;
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-amber-400/15 text-amber-300 border border-amber-400/30 shadow-sm">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/15 px-2.5 py-1 text-xs font-black tracking-wide text-amber-300 shadow-sm">
       <Award size={13} className="shrink-0 text-amber-400" />
       CERTIFIED
     </span>
@@ -59,10 +59,10 @@ interface ActiveBadgeProps {
 export function ActiveBadge({ isActive }: ActiveBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-black tracking-wider uppercase ${
         isActive
-          ? 'bg-lime-400/10 text-lime-400 border border-lime-400/20'
-          : 'bg-zinc-700/30 text-zinc-400 border border-zinc-700/40'
+          ? 'border border-lime-400/20 bg-lime-400/10 text-lime-400'
+          : 'border border-zinc-700/40 bg-zinc-700/30 text-zinc-400'
       }`}
     >
       <Power size={11} className="shrink-0" />
@@ -104,7 +104,7 @@ export function DealerTypeBadge({ dealerType }: DealerTypeBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide border ${getStyle(
+      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-[11px] font-bold tracking-wide ${getStyle(
         dealerType
       )}`}
     >

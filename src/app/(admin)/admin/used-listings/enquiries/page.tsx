@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { usedTractorEnquiryAPI } from '@/lib/api/used-enquiries';
+import type { LeadStatus } from '@/types/models/used-listing';
 import { EnquiryFilters } from '@/components/admin/used-enquiries/EnquiryFilters';
 import { EnquiryTable } from '@/components/admin/used-enquiries/EnquiryTable';
 import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Pagination from '@/components/shared/Pagination';
-
 
 export default function AdminUsedEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<any[]>([]);
@@ -24,7 +24,9 @@ export default function AdminUsedEnquiriesPage() {
   const limit = 15;
 
   // Banner messages
-  const [alertMsg, setAlertMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [alertMsg, setAlertMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(
+    null
+  );
 
   // Debounce search input
   useEffect(() => {
@@ -66,8 +68,8 @@ export default function AdminUsedEnquiriesPage() {
           const enquiriesArray = Array.isArray(resData.data)
             ? resData.data
             : Array.isArray(resData)
-            ? resData
-            : [];
+              ? resData
+              : [];
           setEnquiries(enquiriesArray);
 
           if (resData.meta) {
@@ -112,10 +114,11 @@ export default function AdminUsedEnquiriesPage() {
     setCurrentPage(1);
   };
 
+  // EnquiryRow only offers statuses allowed by the backend transition map
   const updateStatus = (id: number, status: string) => {
     setUpdatingId(id);
     usedTractorEnquiryAPI
-      .updateEnquiryStatus(id, status)
+      .updateEnquiryStatus(id, status as LeadStatus)
       .then((res: any) => {
         if (res.success) {
           setEnquiries(enquiries.map((e) => (e.id === id ? { ...e, status } : e)));
@@ -149,11 +152,13 @@ export default function AdminUsedEnquiriesPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="mx-auto max-w-7xl space-y-6 p-6">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-black text-foreground tracking-tight">Used Tractor Enquiries</h1>
-          <p className="text-muted font-medium mt-1">
+          <h1 className="text-foreground text-3xl font-black tracking-tight">
+            Used Tractor Enquiries
+          </h1>
+          <p className="text-muted mt-1 font-medium">
             Manage and advance status leads for used tractor enquiries ({totalCount} total).
           </p>
         </div>
@@ -161,10 +166,10 @@ export default function AdminUsedEnquiriesPage() {
 
       {alertMsg && (
         <div
-          className={`flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300 ${
+          className={`flex items-center gap-3 rounded-2xl border p-4 transition-all duration-300 ${
             alertMsg.type === 'success'
-              ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
-              : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
+              ? 'border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400'
+              : 'border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400'
           }`}
         >
           {alertMsg.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
@@ -191,21 +196,21 @@ export default function AdminUsedEnquiriesPage() {
 
       {/* Pagination Controls */}
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-between bg-foreground/5 p-4 rounded-2xl border border-[var(--border-subtle)]">
+        <div className="bg-foreground/5 flex items-center justify-between rounded-2xl border border-[var(--border-subtle)] p-4">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-background border border-[var(--border-subtle)] hover:bg-foreground/5 transition-all disabled:opacity-50 disabled:pointer-events-none"
+            className="bg-background hover:bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold transition-all disabled:pointer-events-none disabled:opacity-50"
           >
             <ChevronLeft size={16} /> Previous
           </button>
-          <span className="text-sm font-bold text-muted">
+          <span className="text-muted text-sm font-bold">
             Page {currentPage} of {totalPages}
           </span>
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-background border border-[var(--border-subtle)] hover:bg-foreground/5 transition-all disabled:opacity-50 disabled:pointer-events-none"
+            className="bg-background hover:bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold transition-all disabled:pointer-events-none disabled:opacity-50"
           >
             Next <ChevronRight size={16} />
           </button>

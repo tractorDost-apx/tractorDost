@@ -2,7 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { brandAPI, Brand } from '@/lib/api/brands';
-import { Plus, Search, Edit2, Trash2, ShieldCheck, ChevronDown, ChevronUp, Globe, FileText, BarChart, Tag, Activity, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  ShieldCheck,
+  ChevronDown,
+  ChevronUp,
+  Globe,
+  FileText,
+  BarChart,
+  Tag,
+  Activity,
+  Filter,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import BrandModal from './components/BrandModal';
 import BrandModelsModal from './components/BrandModelsModal';
 import Pagination from '@/components/shared/Pagination';
@@ -29,12 +46,12 @@ export default function BrandsPage() {
   const fetchBrands = async () => {
     setLoading(true);
     try {
-      const response = await brandAPI.getAllBrands({ 
-        page, 
-        limit, 
+      const response = await brandAPI.getAllBrands({
+        page,
+        limit,
         search,
         isActive: isActiveFilter || undefined,
-        isFeatured: isFeaturedFilter || undefined
+        isFeatured: isFeaturedFilter || undefined,
       });
       if (response.success) {
         setBrands(response.data.data);
@@ -99,87 +116,115 @@ export default function BrandsPage() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-6 animate-fade-in pb-12">
+    <div className="animate-fade-in flex h-full w-full flex-col gap-6 pb-12">
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground">Brand Management</h1>
-          <p className="text-sm font-bold text-muted mt-1">Deep analysis & master view of tractor and equipment brands.</p>
+          <h1 className="text-foreground text-3xl font-black tracking-tight">Brand Management</h1>
+          <p className="text-muted mt-1 text-sm font-bold">
+            Deep analysis & master view of tractor and equipment brands.
+          </p>
         </div>
-        <button 
-          onClick={() => { setSelectedBrand(null); setIsModalOpen(true); }}
-          className="spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap shrink-0"
+        <button
+          onClick={() => {
+            setSelectedBrand(null);
+            setIsModalOpen(true);
+          }}
+          className="spatial-button flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg"
         >
           <Plus size={16} /> Add New Brand
         </button>
       </div>
 
       {/* Stats, Filters & Search */}
-      <div className="flex flex-col gap-4 glass-panel p-4 rounded-2xl">
+      <div className="glass-panel flex flex-col gap-4 rounded-2xl p-4">
         {/* Main container */}
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between w-full">
+        <div className="flex w-full flex-col items-center justify-between gap-4 lg:flex-row">
           {/* Left: Stats */}
-          <div className="flex items-center gap-4 text-sm font-bold w-full lg:w-auto shrink-0">
-            <div className="flex items-center gap-2 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] px-4 py-2 rounded-xl">
+          <div className="flex w-full shrink-0 items-center gap-4 text-sm font-bold lg:w-auto">
+            <div className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)]/10 px-4 py-2 text-[var(--color-brand-green)]">
               <ShieldCheck size={18} />
               Total Brands: {totalCount}
             </div>
           </div>
 
           {/* Right: Search, Filters, Reset */}
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-center w-full lg:w-auto justify-end">
+          <div className="flex w-full flex-col flex-wrap items-center justify-end gap-3 sm:flex-row lg:w-auto">
             {/* Search Input */}
-            <div className="relative w-full sm:w-64 md:w-72 group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted group-focus-within:text-[var(--color-brand-green)] transition-colors">
+            <div className="group relative w-full sm:w-64 md:w-72">
+              <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 transition-colors group-focus-within:text-[var(--color-brand-green)]">
                 <Search size={16} />
               </div>
-              <input 
-                type="text" 
-                placeholder="Search brands by name or year..." 
+              <input
+                type="text"
+                placeholder="Search brands by name or year..."
                 value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-                className="w-full bg-foreground/5 border border-transparent rounded-full py-2.5 pl-10 pr-4 text-sm font-medium text-foreground placeholder:text-muted focus:outline-none focus:bg-background focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 transition-all"
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
+                className="bg-foreground/5 text-foreground placeholder:text-muted focus:bg-background w-full rounded-full border border-transparent py-2.5 pr-4 pl-10 text-sm font-medium transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
               />
             </div>
 
             {/* Mobile Filter Toggle */}
-            <button 
+            <button
               onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-foreground/5 hover:bg-foreground/10 text-foreground font-bold text-sm rounded-full transition-colors"
+              className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex w-full items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-colors sm:w-auto md:hidden"
             >
               <Filter size={16} /> Filters
             </button>
 
             {/* Desktop Filters (Always visible on md and above) */}
-            <div className={`${showFilters ? 'flex' : 'hidden'} md:flex flex-col sm:flex-row gap-3 items-center w-full sm:w-auto`}>
+            <div
+              className={`${showFilters ? 'flex' : 'hidden'} w-full flex-col items-center gap-3 sm:w-auto sm:flex-row md:flex`}
+            >
               {/* Status Filter */}
               <div className="relative w-full sm:w-44">
-                <Activity className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                <Activity
+                  className="text-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+                  size={14}
+                />
                 <select
                   value={isActiveFilter}
-                  onChange={(e) => { setIsActiveFilter(e.target.value); setPage(1); }}
-                  className="w-full pl-9 pr-8 py-2 bg-background border border-[var(--border-subtle)] rounded-xl text-xs font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none"
+                  onChange={(e) => {
+                    setIsActiveFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  className="bg-background text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] py-2 pr-8 pl-9 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                 >
                   <option value="">All Statuses</option>
                   <option value="true">Active Only</option>
                   <option value="false">Inactive Only</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                <ChevronDown
+                  className="text-muted pointer-events-none absolute top-1/2 right-3 -translate-y-1/2"
+                  size={14}
+                />
               </div>
 
               {/* Featured Filter */}
               <div className="relative w-full sm:w-44">
-                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                <Tag
+                  className="text-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+                  size={14}
+                />
                 <select
                   value={isFeaturedFilter}
-                  onChange={(e) => { setIsFeaturedFilter(e.target.value); setPage(1); }}
-                  className="w-full pl-9 pr-8 py-2 bg-background border border-[var(--border-subtle)] rounded-xl text-xs font-bold text-foreground outline-none cursor-pointer focus:ring-2 focus:ring-[var(--color-brand-green)]/20 appearance-none"
+                  onChange={(e) => {
+                    setIsFeaturedFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  className="bg-background text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] py-2 pr-8 pl-9 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                 >
                   <option value="">All Types</option>
                   <option value="true">Featured Only</option>
                   <option value="false">Standard Only</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={14} />
+                <ChevronDown
+                  className="text-muted pointer-events-none absolute top-1/2 right-3 -translate-y-1/2"
+                  size={14}
+                />
               </div>
             </div>
 
@@ -187,7 +232,7 @@ export default function BrandsPage() {
             {(searchTerm || isActiveFilter || isFeaturedFilter) && (
               <button
                 onClick={handleResetFilters}
-                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold text-xs rounded-full transition-colors"
+                className="flex w-full items-center justify-center gap-1.5 rounded-full bg-red-500/10 px-4 py-2 text-xs font-bold text-red-500 transition-colors hover:bg-red-500/20 sm:w-auto"
               >
                 <X size={14} /> Reset Filters
               </button>
@@ -197,12 +242,12 @@ export default function BrandsPage() {
       </div>
 
       {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden flex-1 flex flex-col min-h-[420px] md:min-h-[530px]">
-        <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[350px] md:min-h-[460px]">
-          <table className="w-full text-left text-sm relative">
-            <thead className="sticky top-0 bg-background/95 backdrop-blur-md z-10 text-muted uppercase text-[11px] font-black tracking-wider border-b border-[var(--border-subtle)]">
+      <div className="glass-panel flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl md:min-h-[530px]">
+        <div className="min-h-[350px] flex-1 overflow-x-auto overflow-y-auto md:min-h-[460px]">
+          <table className="relative w-full text-left text-sm">
+            <thead className="bg-background/95 text-muted sticky top-0 z-10 border-b border-[var(--border-subtle)] text-[11px] font-black tracking-wider uppercase backdrop-blur-md">
               <tr>
-                <th className="px-6 py-4 w-10"></th>
+                <th className="w-10 px-6 py-4"></th>
                 <th className="px-6 py-4">Brand</th>
                 <th className="px-6 py-4">Founded / Country</th>
                 <th className="px-6 py-4">Models</th>
@@ -213,64 +258,88 @@ export default function BrandsPage() {
             <tbody className="divide-y divide-[var(--border-subtle)]">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-muted font-bold">
+                  <td colSpan={6} className="text-muted px-6 py-12 text-center font-bold">
                     Loading deep brand insights...
                   </td>
                 </tr>
               ) : brands.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-muted font-bold">
+                  <td colSpan={6} className="text-muted px-6 py-12 text-center font-bold">
                     No brands found matching your search.
                   </td>
                 </tr>
               ) : (
                 brands.map((brand) => (
                   <React.Fragment key={brand.id}>
-                    <tr 
-                      className={`hover:bg-foreground/5 transition-colors cursor-pointer ${expandedId === brand.id ? 'bg-foreground/5' : ''}`}
+                    <tr
+                      className={`hover:bg-foreground/5 cursor-pointer transition-colors ${expandedId === brand.id ? 'bg-foreground/5' : ''}`}
                       onClick={() => toggleExpand(brand.id)}
                     >
-                      <td className="px-6 py-4 text-muted">
-                        {expandedId === brand.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      <td className="text-muted px-6 py-4">
+                        {expandedId === brand.id ? (
+                          <ChevronUp size={18} />
+                        ) : (
+                          <ChevronDown size={18} />
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center p-1.5 border border-[var(--border-subtle)] shrink-0 shadow-sm">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm">
                             {brand.logoUrl ? (
-                              <img src={brand.logoUrl} alt={brand.name} className="max-h-full max-w-full object-contain" />
+                              <img
+                                src={brand.logoUrl}
+                                alt={brand.name}
+                                className="max-h-full max-w-full object-contain"
+                              />
                             ) : (
-                              <span className="text-gray-400 font-black text-[10px] uppercase">N/A</span>
+                              <span className="text-[10px] font-black text-gray-400 uppercase">
+                                N/A
+                              </span>
                             )}
                           </div>
                           <div className="flex flex-col gap-0.5">
-                            <div className="font-black text-foreground text-base tracking-tight">{brand.name}</div>
-                            <div className="text-[10px] font-bold text-muted/70 uppercase tracking-wider truncate max-w-[150px] sm:max-w-[200px]" title={brand.slug}>{brand.slug}</div>
+                            <div className="text-foreground text-base font-black tracking-tight">
+                              {brand.name}
+                            </div>
+                            <div
+                              className="text-muted/70 max-w-[150px] truncate text-[10px] font-bold tracking-wider uppercase sm:max-w-[200px]"
+                              title={brand.slug}
+                            >
+                              {brand.slug}
+                            </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                         <div className="flex flex-col gap-1 text-xs">
-                          <span className="font-bold text-foreground/80 flex items-center gap-1.5">
-                            <Globe size={12} className="text-muted"/> {brand.country || 'N/A'}
+                        <div className="flex flex-col gap-1 text-xs">
+                          <span className="text-foreground/80 flex items-center gap-1.5 font-bold">
+                            <Globe size={12} className="text-muted" /> {brand.country || 'N/A'}
                           </span>
-                          <span className="text-muted font-medium">Est. {brand.foundedYear || 'Unknown'}</span>
+                          <span className="text-muted font-medium">
+                            Est. {brand.foundedYear || 'Unknown'}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setModelsBrand(brand); }}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide bg-foreground/5 text-foreground/80 hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] transition-colors"
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setModelsBrand(brand);
+                          }}
+                          className="bg-foreground/5 text-foreground/80 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black tracking-wide transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)]"
                         >
                           {brand.totalModels || 0} Models
                         </button>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex gap-2 items-center">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-widest uppercase ${brand.isActive ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-red-500/10 text-red-500'}`}>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-widest uppercase ${brand.isActive ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-red-500/10 text-red-500'}`}
+                          >
                             {brand.isActive ? 'Active' : 'Inactive'}
                           </span>
                           {brand.isFeatured && (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-blue-500/10 text-blue-500">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-black tracking-widest text-blue-500 uppercase">
                               Featured
                             </span>
                           )}
@@ -278,86 +347,107 @@ export default function BrandsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
-                          <button 
+                          <button
                             onClick={(e) => handleEdit(brand, e)}
-                            className="p-2 rounded-xl text-foreground/70 hover:text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10 transition-colors"
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)]"
                           >
                             <Edit2 size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={(e) => handleDelete(brand.id, e)}
-                            className="p-2 rounded-xl text-foreground/70 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500"
                           >
                             <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
                     </tr>
-                    
+
                     {/* EXPANDED DEEP ANALYSIS VIEW */}
                     {expandedId === brand.id && (
                       <tr>
-                        <td colSpan={6} className="px-0 py-0 bg-foreground/[0.02]">
-                          <div className="p-6 md:p-8 flex flex-col gap-6 animate-fade-in border-b-2 border-[var(--color-brand-green)]">
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full whitespace-normal">
-                              
+                        <td colSpan={6} className="bg-foreground/[0.02] px-0 py-0">
+                          <div className="animate-fade-in flex flex-col gap-6 border-b-2 border-[var(--color-brand-green)] p-6 md:p-8">
+                            <div className="grid w-full grid-cols-1 gap-8 whitespace-normal md:grid-cols-2">
                               {/* Left Column - General Info */}
                               <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-[var(--border-subtle)] pb-2">
+                                <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-green)]">
                                   <FileText size={18} />
-                                  <h3 className="font-black text-sm uppercase tracking-wide">Brand Identity & About</h3>
+                                  <h3 className="text-sm font-black tracking-wide uppercase">
+                                    Brand Identity & About
+                                  </h3>
                                 </div>
-                                <p className="text-sm text-foreground/80 font-medium leading-relaxed bg-background p-4 rounded-xl border border-[var(--border-subtle)] shadow-sm">
-                                  {brand.aboutBrand || "No description provided for this brand yet."}
+                                <p className="text-foreground/80 bg-background rounded-xl border border-[var(--border-subtle)] p-4 text-sm leading-relaxed font-medium shadow-sm">
+                                  {brand.aboutBrand ||
+                                    'No description provided for this brand yet.'}
                                 </p>
-                                
-                                <div className="grid grid-cols-2 gap-4 mt-2">
-                                  <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
-                                    <span className="text-[10px] font-black uppercase text-muted tracking-wider flex items-center gap-1.5"><Activity size={12}/> Sort Order</span>
-                                    <span className="text-lg font-black text-foreground">{brand.sortOrder || 0}</span>
+
+                                <div className="mt-2 grid grid-cols-2 gap-4">
+                                  <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
+                                    <span className="text-muted flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase">
+                                      <Activity size={12} /> Sort Order
+                                    </span>
+                                    <span className="text-foreground text-lg font-black">
+                                      {brand.sortOrder || 0}
+                                    </span>
                                   </div>
-                                  <div className="bg-background border border-[var(--border-subtle)] p-4 rounded-xl shadow-sm flex flex-col gap-1">
-                                    <span className="text-[10px] font-black uppercase text-muted tracking-wider flex items-center gap-1.5"><Tag size={12}/> DB ID</span>
-                                    <span className="text-lg font-black text-foreground">#{brand.id}</span>
+                                  <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
+                                    <span className="text-muted flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase">
+                                      <Tag size={12} /> DB ID
+                                    </span>
+                                    <span className="text-foreground text-lg font-black">
+                                      #{brand.id}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Right Column - SEO Info */}
                               <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2">
+                                <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-orange)]">
                                   <BarChart size={18} />
-                                  <h3 className="font-black text-sm uppercase tracking-wide">SEO & Meta Configuration</h3>
+                                  <h3 className="text-sm font-black tracking-wide uppercase">
+                                    SEO & Meta Configuration
+                                  </h3>
                                 </div>
-                                
-                                <div className="flex flex-col gap-4 bg-background p-4 rounded-xl border border-[var(--border-subtle)] shadow-sm">
+
+                                <div className="bg-background flex flex-col gap-4 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
                                   <div className="flex flex-col gap-1.5">
-                                    <span className="text-[10px] font-black uppercase text-muted tracking-wider">SEO Title</span>
-                                    <span className="text-sm font-bold text-foreground">
-                                      {brand.seoTitle || <span className="text-muted/50 italic font-medium">Not configured</span>}
+                                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                                      SEO Title
+                                    </span>
+                                    <span className="text-foreground text-sm font-bold">
+                                      {brand.seoTitle || (
+                                        <span className="text-muted/50 font-medium italic">
+                                          Not configured
+                                        </span>
+                                      )}
                                     </span>
                                   </div>
-                                  
-                                  <div className="w-full h-px bg-foreground/5"></div>
-                                  
+
+                                  <div className="bg-foreground/5 h-px w-full"></div>
+
                                   <div className="flex flex-col gap-1.5">
-                                    <span className="text-[10px] font-black uppercase text-muted tracking-wider">SEO Description</span>
-                                    <span className="text-sm font-medium text-foreground/80 leading-relaxed">
-                                      {brand.seoDescription || <span className="text-muted/50 italic">Not configured</span>}
+                                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                                      SEO Description
+                                    </span>
+                                    <span className="text-foreground/80 text-sm leading-relaxed font-medium">
+                                      {brand.seoDescription || (
+                                        <span className="text-muted/50 italic">Not configured</span>
+                                      )}
                                     </span>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                            
+
                             <div className="flex justify-end pt-4">
-                               <button 
-                                  onClick={(e) => handleEdit(brand, e)}
-                                  className="px-6 py-2.5 bg-[var(--color-brand-green)] text-white font-black text-sm uppercase tracking-wider rounded-xl hover:bg-[var(--color-brand-orange)] transition-colors shadow-lg shadow-[var(--color-brand-green)]/20 flex items-center gap-2"
-                                >
-                                  <Edit2 size={16} /> Edit Brand Master
-                                </button>
+                              <button
+                                onClick={(e) => handleEdit(brand, e)}
+                                className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/20 shadow-lg transition-colors hover:bg-[var(--color-brand-orange)]"
+                              >
+                                <Edit2 size={16} /> Edit Brand Master
+                              </button>
                             </div>
                           </div>
                         </td>
@@ -377,17 +467,16 @@ export default function BrandsPage() {
           totalCount={totalCount}
           totalPages={totalPages}
           onPageChange={setPage}
-          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+          onLimitChange={(l) => {
+            setLimit(l);
+            setPage(1);
+          }}
         />
       </div>
 
-      {isModalOpen && (
-        <BrandModal brand={selectedBrand} onClose={handleModalClose} />
-      )}
-      
-      {modelsBrand && (
-        <BrandModelsModal brand={modelsBrand} onClose={() => setModelsBrand(null)} />
-      )}
+      {isModalOpen && <BrandModal brand={selectedBrand} onClose={handleModalClose} />}
+
+      {modelsBrand && <BrandModelsModal brand={modelsBrand} onClose={() => setModelsBrand(null)} />}
     </div>
   );
 }

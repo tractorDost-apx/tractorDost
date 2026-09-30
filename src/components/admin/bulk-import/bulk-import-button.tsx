@@ -19,9 +19,17 @@ interface BulkImportButtonProps<R extends ImportReport> {
  * Import button plus the whole workflow:
  * pick file → test (dry run) → insert → progress → summary.
  */
-export default function BulkImportButton<R extends ImportReport>({ config, label, onImported, className }: BulkImportButtonProps<R>) {
+export default function BulkImportButton<R extends ImportReport>({
+  config,
+  label,
+  onImported,
+  className,
+}: BulkImportButtonProps<R>) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { state, steps, canImport, selectFile, retest, startImport, reset } = useBulkImport(config, { onImported });
+  const { state, steps, canImport, selectFile, retest, startImport, reset } = useBulkImport(
+    config,
+    { onImported }
+  );
   const busy = state.phase === 'validating' || state.phase === 'importing';
 
   const chooseFile = () => {
@@ -38,14 +46,20 @@ export default function BulkImportButton<R extends ImportReport>({ config, label
 
   return (
     <>
-      <input ref={fileInputRef} type="file" accept={config.accept} onChange={handleFileChange} className="hidden" />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={config.accept}
+        onChange={handleFileChange}
+        className="hidden"
+      />
       <button
         type="button"
         onClick={chooseFile}
         disabled={busy}
         className={
           className ??
-          'spatial-button px-5 py-2.5 text-sm rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed'
+          'spatial-button flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg disabled:cursor-not-allowed disabled:opacity-60'
         }
       >
         <Upload size={16} /> {state.phase === 'importing' ? 'Importing…' : label}

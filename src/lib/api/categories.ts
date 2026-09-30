@@ -24,7 +24,10 @@ export const categoryAPI = {
    * Fetch all tractor categories (includes nested children tree)
    */
   getAllCategories: async (params?: { page?: number; limit?: number; search?: string }) => {
-    const response = await apiClient.get<PaginatedResponse<Category>>('/category/get-all-tractor-categories', { params });
+    const response = await apiClient.get<PaginatedResponse<Category>>(
+      '/category/get-all-tractor-categories',
+      { params }
+    );
     return response.data;
   },
 
@@ -32,7 +35,9 @@ export const categoryAPI = {
    * Fetch a single category by ID
    */
   getCategoryById: async (id: number) => {
-    const response = await apiClient.get<{ success: boolean; data: Category }>(`/category/get-tractor-categories-by-id/${id}`);
+    const response = await apiClient.get<{ success: boolean; data: Category }>(
+      `/category/get-tractor-categories-by-id/${id}`
+    );
     return response.data;
   },
 
@@ -42,7 +47,7 @@ export const categoryAPI = {
    */
   createCategory: async (data: FormData) => {
     const response = await apiClient.postForm<{ success: boolean; data: Category }>(
-      '/category/create-tractor-category', 
+      '/category/create-tractor-category',
       data,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
@@ -55,7 +60,7 @@ export const categoryAPI = {
    */
   updateCategory: async (id: number, data: FormData) => {
     const response = await apiClient.putForm<{ success: boolean; data: Category }>(
-      `/category/update-tractor-category/${id}`, 
+      `/category/update-tractor-category/${id}`,
       data,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
@@ -66,7 +71,9 @@ export const categoryAPI = {
    * Delete a category
    */
   deleteCategory: async (id: number) => {
-    const response = await apiClient.delete<{ success: boolean; data: Category }>(`/category/delete-tractor-category/${id}`);
+    const response = await apiClient.delete<{ success: boolean; data: Category }>(
+      `/category/delete-tractor-category/${id}`
+    );
     return response.data;
-  }
+  },
 };

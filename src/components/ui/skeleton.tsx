@@ -1,3 +1,3 @@
 // Placeholder for skeleton.tsx
 // This file is currently under development.
-export const placeholder = "skeleton.tsx";
+export const placeholder = 'skeleton.tsx';

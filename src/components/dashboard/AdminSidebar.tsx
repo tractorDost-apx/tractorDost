@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/store/AuthContext';
-import { 
-  LayoutDashboard, 
-  Users, 
+import {
+  LayoutDashboard,
+  Users,
   Tractor,
   MessageSquareText,
   Landmark,
@@ -29,15 +29,13 @@ import {
   Image as ImageIcon,
   BarChart2,
   ShieldCheck,
-  FolderOpen
+  FolderOpen,
 } from 'lucide-react';
 
 const NAV_GROUPS = [
   {
     title: 'Core',
-    items: [
-      { label: 'Overview', href: '/admin/dashboard', icon: LayoutDashboard },
-    ]
+    items: [{ label: 'Overview', href: '/admin/dashboard', icon: LayoutDashboard }],
   },
   {
     title: 'Network & People',
@@ -46,7 +44,7 @@ const NAV_GROUPS = [
       { label: 'Dealers & Showrooms', href: '/admin/dealers', icon: Store },
       { label: 'HR & Employees', href: '/admin/hr/employees', icon: Users },
       { label: 'Departments', href: '/admin/hr/departments', icon: Layers },
-    ]
+    ],
   },
   {
     title: 'Catalogs',
@@ -59,7 +57,7 @@ const NAV_GROUPS = [
       { label: 'State Pricing', href: '/admin/tractors/price-by-state', icon: IndianRupee },
       { label: 'Media Gallery', href: '/admin/media', icon: ImageIcon },
       { label: 'Compare Analytics', href: '/admin/compare', icon: BarChart2 },
-    ]
+    ],
   },
   {
     title: 'Ecosystem',
@@ -67,7 +65,7 @@ const NAV_GROUPS = [
       { label: 'Equipment Brands', href: '/admin/equipment/brands', icon: Tag },
       { label: 'Implement Categories', href: '/admin/implements/categories', icon: Layers },
       { label: 'Implements', href: '/admin/implements', icon: Wrench },
-    ]
+    ],
   },
   {
     title: 'Marketplace',
@@ -76,7 +74,7 @@ const NAV_GROUPS = [
       { label: 'Used Enquiries', href: '/admin/used-listings/enquiries', icon: MessageSquareText },
       { label: 'Inspections & Valuations', href: '/admin/valuation', icon: FileCheck },
       { label: 'Listing Boosts', href: '/admin/listing-boosts', icon: Layers },
-    ]
+    ],
   },
   {
     title: 'Sales & Finance',
@@ -84,13 +82,13 @@ const NAV_GROUPS = [
       { label: 'Leads & Enquiries', href: '/admin/leads', icon: MessageSquareText },
       { label: 'Loans & EMI', href: '/admin/finance/loan-applications', icon: Landmark },
       { label: 'Subscriptions & Billing', href: '/admin/finance/subscriptions', icon: CreditCard },
-    ]
+    ],
   },
   {
     title: 'Capitalization',
     items: [
       { label: 'All EMI Records', href: '/admin/finance/emi-calculations', icon: FileSpreadsheet },
-    ]
+    ],
   },
   {
     title: 'Content & Support',
@@ -99,7 +97,7 @@ const NAV_GROUPS = [
       { label: 'FAQs', href: '/admin/content/faqs', icon: MessageSquareText },
       { label: 'Grievances', href: '/admin/grievances', icon: AlertTriangle },
       { label: 'Reviews', href: '/admin/reviews', icon: FileCheck },
-    ]
+    ],
   },
   {
     title: 'System',
@@ -108,82 +106,101 @@ const NAV_GROUPS = [
       { label: 'Audit Logs', href: '/admin/settings/audit-logs', icon: FileText },
       { label: 'Reports', href: '/admin/reports', icon: BarChart },
       { label: 'Settings', href: '/admin/settings', icon: Settings },
-    ]
-  }
+    ],
+  },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
   const { logout, user } = useAuth();
-  
+
   // By default, open 'Core' and the group containing the active link
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
-    const activeGroup = NAV_GROUPS.find(group => 
-      group.items.some(item => pathname === item.href || pathname.startsWith(item.href + '/'))
+    const activeGroup = NAV_GROUPS.find((group) =>
+      group.items.some((item) => pathname === item.href || pathname.startsWith(item.href + '/'))
     );
     if (activeGroup) {
-      setOpenGroups(prev => Array.from(new Set([...prev, activeGroup.title, 'Core'])));
+      setOpenGroups((prev) => Array.from(new Set([...prev, activeGroup.title, 'Core'])));
     } else {
       setOpenGroups(['Core']);
     }
   }, [pathname]);
 
   const toggleGroup = (title: string) => {
-    setOpenGroups(prev => 
-      prev.includes(title) 
-        ? prev.filter(t => t !== title)
-        : [...prev, title]
+    setOpenGroups((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
     );
   };
-  
+
   const title = user?.role?.name === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin Panel';
 
   return (
-    <aside className={`flex-shrink-0 flex flex-col gap-2 h-full transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-full md:w-64'}`}>
-      <div className="glass-panel p-4 flex-1 overflow-y-auto hidden-scrollbar flex flex-col">
-        <div className="flex items-center justify-between px-2 mb-6 mt-2">
-          {!isCollapsed && <h2 className="text-xl font-black text-foreground whitespace-nowrap overflow-hidden">{title}</h2>}
-          <button onClick={() => setIsCollapsed(!isCollapsed)} className={`p-1.5 rounded-md hover:bg-foreground/10 text-muted hover:text-foreground transition-all ${isCollapsed ? 'mx-auto' : ''}`}>
-             <Menu size={20} />
+    <aside
+      className={`flex h-full flex-shrink-0 flex-col gap-2 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-full md:w-64'}`}
+    >
+      <div className="glass-panel hidden-scrollbar flex flex-1 flex-col overflow-y-auto p-4">
+        <div className="mt-2 mb-6 flex items-center justify-between px-2">
+          {!isCollapsed && (
+            <h2 className="text-foreground overflow-hidden text-xl font-black whitespace-nowrap">
+              {title}
+            </h2>
+          )}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={`hover:bg-foreground/10 text-muted hover:text-foreground rounded-md p-1.5 transition-all ${isCollapsed ? 'mx-auto' : ''}`}
+          >
+            <Menu size={20} />
           </button>
         </div>
-        
+
         <div className="flex flex-col gap-2">
           {NAV_GROUPS.map((group) => {
             const isOpen = openGroups.includes(group.title);
-            const hasActiveChild = group.items.some(item => pathname === item.href || pathname.startsWith(item.href + '/'));
+            const hasActiveChild = group.items.some(
+              (item) => pathname === item.href || pathname.startsWith(item.href + '/')
+            );
 
             return (
               <div key={group.title} className="flex flex-col">
-                <button 
+                <button
                   onClick={() => !isCollapsed && toggleGroup(group.title)}
                   title={isCollapsed ? group.title : undefined}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all ${
-                    isOpen || hasActiveChild ? 'text-foreground' : 'text-muted hover:bg-foreground/5 hover:text-foreground'
+                  className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-black tracking-widest uppercase transition-all ${
+                    isOpen || hasActiveChild
+                      ? 'text-foreground'
+                      : 'text-muted hover:bg-foreground/5 hover:text-foreground'
                   } ${isCollapsed ? 'justify-center' : ''}`}
                 >
                   {!isCollapsed ? (
                     <>
-                      <span className="opacity-80 whitespace-nowrap overflow-hidden">{group.title}</span>
-                      <ChevronDown 
-                        size={14} 
-                        className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+                      <span className="overflow-hidden whitespace-nowrap opacity-80">
+                        {group.title}
+                      </span>
+                      <ChevronDown
+                        size={14}
+                        className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                       />
                     </>
                   ) : (
-                    <span className="opacity-80 text-[10px] w-full text-center truncate">{group.title.substring(0, 3)}</span>
+                    <span className="w-full truncate text-center text-[10px] opacity-80">
+                      {group.title.substring(0, 3)}
+                    </span>
                   )}
                 </button>
-                
-                <div 
+
+                <div
                   className={`grid transition-all duration-200 ease-in-out ${
-                    isOpen || isCollapsed ? 'grid-rows-[1fr] opacity-100 mt-1 mb-2' : 'grid-rows-[0fr] opacity-0'
+                    isOpen || isCollapsed
+                      ? 'mt-1 mb-2 grid-rows-[1fr] opacity-100'
+                      : 'grid-rows-[0fr] opacity-0'
                   }`}
                 >
-                  <nav className={`flex flex-col gap-1 overflow-hidden ${isCollapsed ? 'px-0' : 'px-2'}`}>
+                  <nav
+                    className={`flex flex-col gap-1 overflow-hidden ${isCollapsed ? 'px-0' : 'px-2'}`}
+                  >
                     {group.items.map((item) => {
                       const isActive = pathname === item.href;
                       const Icon = item.icon;
@@ -192,14 +209,23 @@ export default function AdminSidebar() {
                           key={item.href}
                           href={item.href}
                           title={isCollapsed ? item.label : undefined}
-                          className={`flex items-center gap-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                            isActive 
-                              ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' 
+                          className={`flex items-center gap-3 rounded-xl py-2.5 text-sm font-bold transition-all ${
+                            isActive
+                              ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner'
                               : 'text-muted hover:bg-foreground/5 hover:text-foreground'
                           } ${isCollapsed ? 'justify-center px-0' : 'px-3'}`}
                         >
-                          <Icon size={18} className={isActive ? 'text-[var(--color-brand-green)] shrink-0' : 'opacity-70 shrink-0'} />
-                          {!isCollapsed && <span className="whitespace-nowrap overflow-hidden">{item.label}</span>}
+                          <Icon
+                            size={18}
+                            className={
+                              isActive
+                                ? 'shrink-0 text-[var(--color-brand-green)]'
+                                : 'shrink-0 opacity-70'
+                            }
+                          />
+                          {!isCollapsed && (
+                            <span className="overflow-hidden whitespace-nowrap">{item.label}</span>
+                          )}
                         </Link>
                       );
                     })}
@@ -210,15 +236,15 @@ export default function AdminSidebar() {
           })}
         </div>
       </div>
-      
+
       <div className="glass-panel p-4">
         <button
           onClick={() => logout()}
           title={isCollapsed ? 'Sign Out' : undefined}
-          className={`flex w-full items-center gap-3 py-3 rounded-xl font-bold text-red-500 hover:bg-red-500/10 transition-all text-sm ${isCollapsed ? 'justify-center px-0' : 'px-4'}`}
+          className={`flex w-full items-center gap-3 rounded-xl py-3 text-sm font-bold text-red-500 transition-all hover:bg-red-500/10 ${isCollapsed ? 'justify-center px-0' : 'px-4'}`}
         >
           <LogOut size={18} className="shrink-0" />
-          {!isCollapsed && <span className="whitespace-nowrap overflow-hidden">Sign Out</span>}
+          {!isCollapsed && <span className="overflow-hidden whitespace-nowrap">Sign Out</span>}
         </button>
       </div>
     </aside>

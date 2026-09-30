@@ -18,16 +18,26 @@ export const EnquiryTable: React.FC<EnquiryTableProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="bg-background rounded-3xl border border-[var(--border-subtle)] shadow-sm overflow-hidden">
+    <div className="bg-background overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full border-collapse text-left">
           <thead>
             <tr className="bg-foreground/5 border-b border-[var(--border-subtle)]">
-              <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Buyer Detail</th>
-              <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Listing Ref</th>
-              <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Message/Received</th>
-              <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider">Status</th>
-              <th className="px-6 py-4 text-xs font-black text-muted uppercase tracking-wider text-right">Actions</th>
+              <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                Buyer Detail
+              </th>
+              <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                Listing Ref
+              </th>
+              <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                Message/Received
+              </th>
+              <th className="text-muted px-6 py-4 text-xs font-black tracking-wider uppercase">
+                Status
+              </th>
+              <th className="text-muted px-6 py-4 text-right text-xs font-black tracking-wider uppercase">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-subtle)]">
@@ -36,13 +46,13 @@ export const EnquiryTable: React.FC<EnquiryTableProps> = ({
                 <td colSpan={5} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center justify-center gap-3">
                     <TractorLoader className="text-[var(--color-brand-green)]" size={48} />
-                    <p className="text-sm font-bold text-muted mt-2">Fetching enquiries...</p>
+                    <p className="text-muted mt-2 text-sm font-bold">Fetching enquiries...</p>
                   </div>
                 </td>
               </tr>
             ) : enquiries.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-16 text-center text-muted font-bold text-sm">
+                <td colSpan={5} className="text-muted px-6 py-16 text-center text-sm font-bold">
                   No enquiries found for the selected criteria.
                 </td>
               </tr>

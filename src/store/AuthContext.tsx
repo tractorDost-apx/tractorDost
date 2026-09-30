@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const handleLogoutEvent = () => {
       logout();
     };
-    
+
     if (typeof window !== 'undefined') {
       window.addEventListener('auth:logout', handleLogoutEvent);
       return () => {
@@ -88,8 +88,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (typeof window !== 'undefined') {
         const protectedRoutes = ['/dashboard', '/admin', '/dealer', '/profile', '/wishlist'];
         const currentPath = window.location.pathname;
-        const isProtected = protectedRoutes.some(route => currentPath.startsWith(route));
-        
+        const isProtected = protectedRoutes.some((route) => currentPath.startsWith(route));
+
         if (isProtected || explicit) {
           if (!currentPath.startsWith('/login')) {
             window.location.href = '/login';
@@ -108,11 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     refreshUser,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

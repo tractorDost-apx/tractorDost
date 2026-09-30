@@ -22,22 +22,25 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col h-full animate-fade-in max-w-2xl mx-auto w-full">
+    <div className="animate-fade-in mx-auto flex h-full w-full max-w-2xl flex-col">
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-foreground mb-2">My Profile</h1>
+        <h1 className="text-foreground mb-2 text-3xl font-black">My Profile</h1>
         <p className="text-muted font-medium">Manage your personal information and preferences.</p>
       </div>
 
-      <div className="flex flex-col items-center mb-8">
-        <div className="relative group cursor-pointer">
-          <div className="h-28 w-28 rounded-full bg-foreground/5 border-2 border-dashed border-[var(--border-brand)] flex items-center justify-center overflow-hidden transition-all group-hover:border-[var(--color-brand-green)]">
+      <div className="mb-8 flex flex-col items-center">
+        <div className="group relative cursor-pointer">
+          <div className="bg-foreground/5 flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-[var(--border-brand)] transition-all group-hover:border-[var(--color-brand-green)]">
             {user?.profilePhoto ? (
-              <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+              <img src={user.profilePhoto} alt="Profile" className="h-full w-full object-cover" />
             ) : (
-              <User size={40} className="text-muted group-hover:text-[var(--color-brand-green)] transition-colors" />
+              <User
+                size={40}
+                className="text-muted transition-colors group-hover:text-[var(--color-brand-green)]"
+              />
             )}
           </div>
-          <div className="absolute bottom-0 right-0 h-8 w-8 bg-[var(--color-brand-green)] rounded-full flex items-center justify-center text-white shadow-lg">
+          <div className="absolute right-0 bottom-0 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-brand-green)] text-white shadow-lg">
             <Camera size={14} />
           </div>
         </div>
@@ -45,52 +48,52 @@ export default function ProfilePage() {
 
       <form onSubmit={handleSave} className="space-y-5">
         <div>
-          <label className="text-sm font-bold text-muted ml-1 mb-2 block">Full Name</label>
+          <label className="text-muted mb-2 ml-1 block text-sm font-bold">Full Name</label>
           <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
-            <input 
-              type="text" 
+            <User className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
+            <input
+              type="text"
               defaultValue={user?.fullName || ''}
-              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all"
+              className="bg-foreground/5 text-foreground h-14 w-full rounded-2xl border border-[var(--border-subtle)] pr-4 pl-12 font-bold transition-all focus:border-[var(--color-brand-green)] focus:outline-none"
               placeholder="Enter your full name"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-sm font-bold text-muted ml-1 mb-2 block">Mobile Number</label>
+          <label className="text-muted mb-2 ml-1 block text-sm font-bold">Mobile Number</label>
           <div className="relative">
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
-            <input 
-              type="text" 
+            <Phone className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
+            <input
+              type="text"
               defaultValue={user?.mobile ? String(user.mobile) : ''}
               disabled
-              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-muted cursor-not-allowed"
+              className="bg-foreground/5 text-muted h-14 w-full cursor-not-allowed rounded-2xl border border-[var(--border-subtle)] pr-4 pl-12 font-bold"
             />
           </div>
-          <p className="text-xs text-muted mt-1 ml-1">Mobile number cannot be changed.</p>
+          <p className="text-muted mt-1 ml-1 text-xs">Mobile number cannot be changed.</p>
         </div>
 
         <div>
-          <label className="text-sm font-bold text-muted ml-1 mb-2 block">Email Address</label>
+          <label className="text-muted mb-2 ml-1 block text-sm font-bold">Email Address</label>
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
-            <input 
-              type="email" 
+            <Mail className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
+            <input
+              type="email"
               defaultValue={user?.email || ''}
-              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all"
+              className="bg-foreground/5 text-foreground h-14 w-full rounded-2xl border border-[var(--border-subtle)] pr-4 pl-12 font-bold transition-all focus:border-[var(--color-brand-green)] focus:outline-none"
               placeholder="Enter your email"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-sm font-bold text-muted ml-1 mb-2 block">Preferred Language</label>
+          <label className="text-muted mb-2 ml-1 block text-sm font-bold">Preferred Language</label>
           <div className="relative">
-            <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
-            <select 
+            <Globe className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
+            <select
               defaultValue={user?.preferredLanguage || 'English'}
-              className="w-full h-14 bg-foreground/5 border border-[var(--border-subtle)] rounded-2xl pl-12 pr-4 font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)] transition-all appearance-none"
+              className="bg-foreground/5 text-foreground h-14 w-full appearance-none rounded-2xl border border-[var(--border-subtle)] pr-4 pl-12 font-bold transition-all focus:border-[var(--color-brand-green)] focus:outline-none"
             >
               <option value="English">English</option>
               <option value="Marathi">मराठी (Marathi)</option>
@@ -99,17 +102,19 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="pt-4 flex items-center justify-between">
+        <div className="flex items-center justify-between pt-4">
           {success ? (
-            <p className="text-[var(--color-brand-green)] font-bold flex items-center gap-2">
+            <p className="flex items-center gap-2 font-bold text-[var(--color-brand-green)]">
               <CheckCircle2 size={20} /> Saved successfully!
             </p>
-          ) : <div />}
-          
-          <button 
+          ) : (
+            <div />
+          )}
+
+          <button
             type="submit"
             disabled={isLoading}
-            className="spatial-button h-12 px-8 rounded-xl font-bold flex items-center gap-2"
+            className="spatial-button flex h-12 items-center gap-2 rounded-xl px-8 font-bold"
           >
             {isLoading ? <TractorLoader size={20} /> : 'Save Changes'}
           </button>

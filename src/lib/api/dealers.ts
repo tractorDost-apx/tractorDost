@@ -29,7 +29,9 @@ export const dealerAPI = {
    * Get full dealer by ID including relations (brands, showroom, serviceCenter, inventory, grievances)
    * GET /dealers/getDealerById/:id
    */
-  getDealerById: async (id: number): Promise<{ success: boolean; message: string; data: Dealer }> => {
+  getDealerById: async (
+    id: number
+  ): Promise<{ success: boolean; message: string; data: Dealer }> => {
     const response = await apiClient.get<{ success: boolean; message: string; data: Dealer }>(
       `/dealers/getDealerById/${id}`
     );

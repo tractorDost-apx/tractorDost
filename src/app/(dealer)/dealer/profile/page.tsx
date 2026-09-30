@@ -77,9 +77,9 @@ export default function DealerProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 size={36} className="text-[var(--color-brand-green)] animate-spin" />
-        <p className="text-sm font-bold text-muted">Loading complete Dealer Profile...</p>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
+        <Loader2 size={36} className="animate-spin text-[var(--color-brand-green)]" />
+        <p className="text-muted text-sm font-bold">Loading complete Dealer Profile...</p>
       </div>
     );
   }
@@ -87,17 +87,17 @@ export default function DealerProfilePage() {
   if (error || !dealer) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center p-6 text-center">
-        <div className="glass-panel p-8 max-w-lg w-full space-y-4 border border-rose-500/20 bg-rose-500/5">
-          <div className="h-12 w-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto">
+        <div className="glass-panel w-full max-w-lg space-y-4 border border-rose-500/20 bg-rose-500/5 p-8">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-400">
             <AlertCircle size={24} />
           </div>
-          <h2 className="text-xl font-bold text-foreground">Dealer Profile</h2>
-          <p className="text-sm text-muted font-medium">
+          <h2 className="text-foreground text-xl font-bold">Dealer Profile</h2>
+          <p className="text-muted text-sm font-medium">
             {error || 'Unable to locate a dealer profile associated with your account.'}
           </p>
           <button
             onClick={() => fetchDealerData()}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold bg-white/10 text-foreground hover:bg-white/20 transition-colors inline-flex items-center gap-2"
+            className="text-foreground inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-xs font-bold transition-colors hover:bg-white/20"
           >
             <RefreshCw size={14} /> Retry Loading
           </button>
@@ -107,13 +107,9 @@ export default function DealerProfilePage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
       {mode === 'view' ? (
-        <DealerProfileView
-          dealer={dealer}
-          profile={profile}
-          onEdit={() => setMode('edit')}
-        />
+        <DealerProfileView dealer={dealer} profile={profile} onEdit={() => setMode('edit')} />
       ) : (
         <DealerProfileEdit
           dealer={dealer}

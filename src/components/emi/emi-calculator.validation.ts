@@ -12,7 +12,9 @@ export const validateEmiInputs = (inputs: EmiCalculatorInputs): EmiValidationErr
   }
 
   // Validate Down Payment
-  const maxDownPayment = Math.floor(inputs.vehiclePrice * (EMI_LIMITS.DOWN_PAYMENT_MAX_PERCENT / 100));
+  const maxDownPayment = Math.floor(
+    inputs.vehiclePrice * (EMI_LIMITS.DOWN_PAYMENT_MAX_PERCENT / 100)
+  );
   if (isNaN(inputs.downPayment) || inputs.downPayment < 0) {
     errors.downPayment = 'Down payment cannot be negative';
   } else if (inputs.downPayment > inputs.vehiclePrice) {

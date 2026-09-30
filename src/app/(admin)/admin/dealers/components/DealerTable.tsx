@@ -1,5 +1,16 @@
 import React from 'react';
-import { Eye, Edit2, ShieldCheck, Star, AlertTriangle, Phone, Mail, MapPin, Building2, Layers } from 'lucide-react';
+import {
+  Eye,
+  Edit2,
+  ShieldCheck,
+  Star,
+  AlertTriangle,
+  Phone,
+  Mail,
+  MapPin,
+  Building2,
+  Layers,
+} from 'lucide-react';
 import { Dealer } from '@/types/models/dealer';
 import {
   VerificationBadge,
@@ -27,10 +38,10 @@ export function DealerTable({
 }: DealerTableProps) {
   if (loading) {
     return (
-      <div className="glass-panel rounded-2xl p-8 border border-white/5 w-full">
+      <div className="glass-panel w-full rounded-2xl border border-white/5 p-8">
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-white/5 rounded-xl animate-pulse" />
+            <div key={i} className="h-16 animate-pulse rounded-xl bg-white/5" />
           ))}
         </div>
       </div>
@@ -39,32 +50,33 @@ export function DealerTable({
 
   if (dealers.length === 0) {
     return (
-      <div className="glass-panel rounded-2xl p-12 text-center border border-white/5 flex flex-col items-center justify-center gap-3 w-full">
-        <div className="p-4 rounded-2xl bg-white/5 text-muted">
+      <div className="glass-panel flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/5 p-12 text-center">
+        <div className="text-muted rounded-2xl bg-white/5 p-4">
           <Building2 size={36} />
         </div>
-        <h3 className="text-lg font-bold text-foreground">No dealers found</h3>
-        <p className="text-sm font-medium text-muted max-w-sm">
-          No dealership partners match your current filters or search term. Try resetting filters or adjusting search parameters.
+        <h3 className="text-foreground text-lg font-bold">No dealers found</h3>
+        <p className="text-muted max-w-sm text-sm font-medium">
+          No dealership partners match your current filters or search term. Try resetting filters or
+          adjusting search parameters.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="glass-panel rounded-2xl border border-white/5 flex-1 flex flex-col w-full max-w-full overflow-hidden shadow-xl">
+    <div className="glass-panel flex w-full max-w-full flex-1 flex-col overflow-hidden rounded-2xl border border-white/5 shadow-xl">
       {/* Horizontal Scroll Container */}
-      <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      <div className="scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent w-full overflow-x-auto">
         <table className="w-full min-w-[1000px] text-left text-sm whitespace-nowrap">
-          <thead className="bg-white/5 text-muted uppercase text-[11px] font-black tracking-wider border-b border-white/5 sticky top-0 z-10 backdrop-blur-md">
+          <thead className="text-muted sticky top-0 z-10 border-b border-white/5 bg-white/5 text-[11px] font-black tracking-wider uppercase backdrop-blur-md">
             <tr>
-              <th className="px-6 py-4 min-w-[240px]">Dealer & Type</th>
-              <th className="px-6 py-4 min-w-[180px]">Location</th>
-              <th className="px-6 py-4 min-w-[200px]">Contact</th>
-              <th className="px-6 py-4 min-w-[160px]">Verification</th>
-              <th className="px-6 py-4 min-w-[180px]">Rating & Feedback</th>
-              <th className="px-6 py-4 min-w-[120px]">Status</th>
-              <th className="px-6 py-4 min-w-[130px] text-right">Actions</th>
+              <th className="min-w-[240px] px-6 py-4">Dealer & Type</th>
+              <th className="min-w-[180px] px-6 py-4">Location</th>
+              <th className="min-w-[200px] px-6 py-4">Contact</th>
+              <th className="min-w-[160px] px-6 py-4">Verification</th>
+              <th className="min-w-[180px] px-6 py-4">Rating & Feedback</th>
+              <th className="min-w-[120px] px-6 py-4">Status</th>
+              <th className="min-w-[130px] px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
 
@@ -81,13 +93,13 @@ export function DealerTable({
                 <tr
                   key={dealer.id}
                   onClick={() => onSelectDealer(dealer)}
-                  className="hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                  className="group cursor-pointer transition-colors hover:bg-white/[0.03]"
                 >
                   {/* Dealer & Type */}
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1.5 whitespace-normal">
                       <div className="flex items-center gap-2">
-                        <span className="font-black text-foreground text-base tracking-tight group-hover:text-lime-400 transition-colors">
+                        <span className="text-foreground text-base font-black tracking-tight transition-colors group-hover:text-lime-400">
                           {dealer.businessName}
                         </span>
                         <CertifiedBadge isCertified={dealer.isCertified} />
@@ -95,7 +107,9 @@ export function DealerTable({
 
                       <div className="flex items-center gap-2">
                         <DealerTypeBadge dealerType={dealer.dealerType} />
-                        <span className="text-[10px] font-bold text-muted">Joined {formattedDate}</span>
+                        <span className="text-muted text-[10px] font-bold">
+                          Joined {formattedDate}
+                        </span>
                       </div>
                     </div>
                   </td>
@@ -103,12 +117,12 @@ export function DealerTable({
                   {/* Location */}
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-0.5 text-xs whitespace-normal">
-                      <span className="font-bold text-foreground/90 flex items-center gap-1">
-                        <MapPin size={13} className="text-lime-400 shrink-0" />
+                      <span className="text-foreground/90 flex items-center gap-1 font-bold">
+                        <MapPin size={13} className="shrink-0 text-lime-400" />
                         {dealer.district}, {dealer.state}
                       </span>
                       {dealer.pincode && (
-                        <span className="text-muted text-[11px] font-medium pl-4">
+                        <span className="text-muted pl-4 text-[11px] font-medium">
                           PIN: {dealer.pincode}
                         </span>
                       )}
@@ -119,13 +133,13 @@ export function DealerTable({
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-xs">
                       {dealer.phone && (
-                        <span className="font-bold text-foreground/80 flex items-center gap-1.5">
+                        <span className="text-foreground/80 flex items-center gap-1.5 font-bold">
                           <Phone size={12} className="text-muted shrink-0" />
                           {dealer.phone}
                         </span>
                       )}
                       {dealer.email && (
-                        <span className="text-muted font-medium flex items-center gap-1.5 truncate max-w-[180px]">
+                        <span className="text-muted flex max-w-[180px] items-center gap-1.5 truncate font-medium">
                           <Mail size={12} className="shrink-0" />
                           {dealer.email}
                         </span>
@@ -135,10 +149,13 @@ export function DealerTable({
 
                   {/* Verification */}
                   <td className="px-6 py-4">
-                    <div className="flex flex-col gap-1 items-start">
+                    <div className="flex flex-col items-start gap-1">
                       <VerificationBadge status={dealer.verificationStatus} />
                       {dealer.verificationStatus === 'REJECTED' && dealer.rejectionReason && (
-                        <span className="text-[10px] font-semibold text-rose-400/80 truncate max-w-[150px]" title={dealer.rejectionReason}>
+                        <span
+                          className="max-w-[150px] truncate text-[10px] font-semibold text-rose-400/80"
+                          title={dealer.rejectionReason}
+                        >
                           Reason: {dealer.rejectionReason}
                         </span>
                       )}
@@ -148,10 +165,12 @@ export function DealerTable({
                   {/* Rating & Feedback */}
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-xs">
-                      <div className="flex items-center gap-1 font-bold text-foreground">
-                        <Star size={13} className="fill-amber-400 text-amber-400 shrink-0" />
+                      <div className="text-foreground flex items-center gap-1 font-bold">
+                        <Star size={13} className="shrink-0 fill-amber-400 text-amber-400" />
                         <span>{ratingVal.toFixed(1)}</span>
-                        <span className="text-muted font-normal text-[11px]">({dealer.reviewsCount ?? 0} reviews)</span>
+                        <span className="text-muted text-[11px] font-normal">
+                          ({dealer.reviewsCount ?? 0} reviews)
+                        </span>
                       </div>
 
                       {(dealer.complaintsCount ?? 0) > 0 ? (
@@ -160,7 +179,9 @@ export function DealerTable({
                           {dealer.complaintsCount} complaints
                         </span>
                       ) : (
-                        <span className="text-[11px] text-muted font-medium">No active complaints</span>
+                        <span className="text-muted text-[11px] font-medium">
+                          No active complaints
+                        </span>
                       )}
                     </div>
                   </td>
@@ -172,10 +193,13 @@ export function DealerTable({
 
                   {/* Actions */}
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className="flex items-center justify-end gap-1.5"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <button
                         onClick={() => onSelectDealer(dealer)}
-                        className="p-2 rounded-xl text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+                        className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
                         title="View Full Dealer Details"
                       >
                         <Eye size={16} />
@@ -183,7 +207,7 @@ export function DealerTable({
 
                       <button
                         onClick={(e) => onEditDealer(dealer, e)}
-                        className="p-2 rounded-xl text-muted hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                        className="text-muted rounded-xl p-2 transition-colors hover:bg-blue-500/10 hover:text-blue-400"
                         title="Edit Dealer Details"
                       >
                         <Edit2 size={16} />
@@ -192,7 +216,7 @@ export function DealerTable({
                       {onAssignBrandDealer && (
                         <button
                           onClick={(e) => onAssignBrandDealer(dealer, e)}
-                          className="p-2 rounded-xl text-muted hover:text-amber-400 hover:bg-amber-400/10 transition-colors"
+                          className="text-muted rounded-xl p-2 transition-colors hover:bg-amber-400/10 hover:text-amber-400"
                           title="Assign Brand"
                         >
                           <Layers size={16} />
@@ -201,7 +225,7 @@ export function DealerTable({
 
                       <button
                         onClick={(e) => onModerateDealer(dealer, e)}
-                        className="p-2 rounded-xl text-muted hover:text-lime-400 hover:bg-lime-400/10 transition-colors"
+                        className="text-muted rounded-xl p-2 transition-colors hover:bg-lime-400/10 hover:text-lime-400"
                         title="Moderate / Verify Dealer"
                       >
                         <ShieldCheck size={16} />

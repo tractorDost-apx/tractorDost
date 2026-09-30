@@ -1,0 +1,200 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { Loader2, MessageSquareText, Phone, Tractor } from 'lucide-react';
+import { SpatialButton } from '@/components/ui/spatial-button';
+import { LeadStatusBadge } from '@/components/used-tractors/status-badges';
+import { useReceivedEnquiries } from '@/hooks/leads/use-my-enquiries';
+import { useLeadStatusUpdate } from '@/hooks/leads/use-lead-actions';
+import {
+  LEAD_STATUSES,
+  LEAD_STATUS_LABELS,
+  LEAD_STATUS_TRANSITIONS,
+} from '@/lib/constants/lead-statuses';
+import { formatDateTime } from '@/lib/utils/format-date';
+import type { LeadStatus, UsedEnquiry } from '@/types/models/used-listing';
+
+interface SellerEnquiryInboxProps {
+  /** Restrict to one listing; omit for all of the seller's listings */
+  listingId?: number;
+  /** Base route of the seller's listing pages, used to link each lead to its listing */
+  listingBasePath?: string;
+  title?: string;
+  description?: string;
+}
+
+const SELECT_CLASS =
+  'bg-secondary/20 border border-border/50 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-lime-400/50 focus:ring-1 focus:ring-lime-400/50 transition-all';
+
+export default function SellerEnquiryInbox({
+  listingId,
+  listingBasePath,
+  title = 'Buyer Enquiries',
+  description = 'Buyers who contacted you about your tractors. Call them and keep each lead status up to date.',
+}: SellerEnquiryInboxProps) {
+  const [status, setStatus] = useState<LeadStatus | undefined>(undefined);
+  const [page, setPage] = useState(1);
+  const [rowError, setRowError] = useState<{ id: number; text: string } | null>(null);
+
+  const { data, loading, error, reload } = useReceivedEnquiries({ listingId, status, page });
+  const { pendingId, updateStatus } = useLeadStatusUpdate();
+
+  const enquiries = data?.data ?? [];
+  const totalPages = data?.meta.totalPages ?? 1;
+
+  const handleStatusChange = async (enquiry: UsedEnquiry, next: LeadStatus) => {
+    setRowError(null);
+    const res = await updateStatus(enquiry.id, next);
+    if (res.success) {
+      reload();
+    } else {
+      setRowError({ id: enquiry.id, text: res.message });
+    }
+  };
+
+  return (
+    <div className="flex flex-col">
+      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <h2 className="text-foreground mb-2 text-2xl font-black">{title}</h2>
+          <p className="text-muted font-medium">{description}</p>
+        </div>
+        <select
+          value={status ?? ''}
+          onChange={(e) => {
+            setStatus((e.target.value || undefined) as LeadStatus | undefined);
+            setPage(1);
+          }}
+          className={SELECT_CLASS}
+          aria-label="Filter by status"
+        >
+          <option value="">All statuses</option>
+          {LEAD_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {LEAD_STATUS_LABELS[s]}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="animate-spin text-lime-400" size={28} />
+        </div>
+      ) : error ? (
+        <div className="glass-inner p-8 text-center">
+          <p className="mb-4 font-medium text-red-400">{error}</p>
+          <SpatialButton variant="glass" onClick={reload}>
+            Try again
+          </SpatialButton>
+        </div>
+      ) : enquiries.length === 0 ? (
+        <div className="glass-inner flex flex-col items-center p-10 text-center">
+          <MessageSquareText className="text-muted mb-3" size={36} />
+          <p className="text-foreground font-bold">No enquiries yet</p>
+          <p className="text-muted text-sm">Enquiries appear here as soon as buyers contact you.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {enquiries.map((enquiry) => {
+            const nextStatuses = LEAD_STATUS_TRANSITIONS[enquiry.status];
+            const busy = pendingId === enquiry.id;
+            return (
+              <div key={enquiry.id} className="glass-inner p-5">
+                <div className="mb-3 flex flex-col justify-between gap-3 md:flex-row md:items-start">
+                  <div>
+                    <p className="text-foreground text-lg font-bold">{enquiry.name}</p>
+                    <a
+                      href={`tel:${enquiry.mobile}`}
+                      className="flex items-center gap-1 text-sm font-bold text-lime-400 hover:text-lime-300"
+                    >
+                      <Phone size={14} /> {enquiry.mobile}
+                    </a>
+                    {!listingId && (
+                      <p className="text-muted mt-1 flex items-center gap-1 text-sm">
+                        <Tractor size={14} />
+                        {listingBasePath ? (
+                          <Link
+                            href={`${listingBasePath}/${enquiry.listing.id}`}
+                            className="hover:text-lime-400"
+                          >
+                            {enquiry.listing.tractorBrand} {enquiry.listing.tractorModel}
+                          </Link>
+                        ) : (
+                          `${enquiry.listing.tractorBrand} ${enquiry.listing.tractorModel}`
+                        )}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-start gap-2 md:items-end">
+                    <LeadStatusBadge status={enquiry.status} />
+                    <span className="text-muted text-xs font-bold">
+                      {formatDateTime(enquiry.createdAt)}
+                    </span>
+                  </div>
+                </div>
+
+                {enquiry.message && (
+                  <p className="bg-secondary/20 text-foreground mb-3 rounded-xl p-3 text-sm">
+                    &ldquo;{enquiry.message}&rdquo;
+                  </p>
+                )}
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {nextStatuses.length === 0 ? (
+                    <span className="text-muted text-xs font-medium">Closed lead</span>
+                  ) : (
+                    <>
+                      <span className="text-muted text-xs font-bold uppercase">Move to</span>
+                      {nextStatuses.map((next) => (
+                        <button
+                          key={next}
+                          disabled={busy}
+                          onClick={() => handleStatusChange(enquiry, next)}
+                          className={`glass-button px-3 py-1.5 text-xs font-bold disabled:opacity-40 ${
+                            next === 'SPAM' || next === 'LOST'
+                              ? 'text-muted hover:text-red-400'
+                              : 'text-foreground hover:text-lime-400'
+                          }`}
+                        >
+                          {LEAD_STATUS_LABELS[next]}
+                        </button>
+                      ))}
+                      {busy && <Loader2 size={14} className="animate-spin text-lime-400" />}
+                    </>
+                  )}
+                </div>
+                {rowError?.id === enquiry.id && (
+                  <p className="mt-2 text-xs text-red-400">{rowError.text}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-3">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="glass-button text-foreground px-4 py-2 text-sm font-bold disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <span className="text-muted text-sm font-bold">
+            Page {page} of {totalPages}
+          </span>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+            className="glass-button text-foreground px-4 py-2 text-sm font-bold disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

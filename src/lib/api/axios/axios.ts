@@ -11,7 +11,7 @@ apiClient.interceptors.request.use(
     // Only run on the client side
     if (typeof window !== 'undefined') {
       const cookies = document.cookie.split(';');
-      const accessTokenCookie = cookies.find(c => c.trim().startsWith('accessToken='));
+      const accessTokenCookie = cookies.find((c) => c.trim().startsWith('accessToken='));
       if (accessTokenCookie) {
         const token = accessTokenCookie.trim().substring('accessToken='.length);
         if (token) {
@@ -39,13 +39,21 @@ export const refreshAccessToken = async (): Promise<boolean> => {
 apiClient.interceptors.response.use(
   (res: AxiosResponse) => res,
   async (error: AxiosError) => {
-    const originalRequest = error.config as (typeof error.config & { _retry?: boolean });
+    const originalRequest = error.config as typeof error.config & { _retry?: boolean };
     const url = originalRequest?.url || '';
     // These endpoints 401 for reasons unrelated to an expired access token
     // (bad credentials, or the refresh endpoint itself) — never retry them.
-    const skipRefresh = url.includes('/auth/login') || url.includes('/auth/verify-otp') || url.includes('/auth/refresh');
+    const skipRefresh =
+      url.includes('/auth/login') ||
+      url.includes('/auth/verify-otp') ||
+      url.includes('/auth/refresh');
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !skipRefresh) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !skipRefresh
+    ) {
       originalRequest._retry = true;
 
       // Coalesce concurrent 401s into a single refresh call

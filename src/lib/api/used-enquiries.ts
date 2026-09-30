@@ -1,77 +1,108 @@
 import { apiClient } from './axios/axios';
+import { toErrorResult, toResult } from './axios/result';
+import type { ApiResult } from '@/types/api/responses';
+import type {
+  CreateEnquiryInput,
+  LeadStatus,
+  MetaPage,
+  UsedEnquiry,
+} from '@/types/models/used-listing';
 
-export interface EnquiryData {
-  tractorId?: number;
+export interface EnquiryListParams {
   listingId?: number;
-  enquiryType: string;
-  name: string;
-  mobile: string;
-  email?: string;
-  message?: string;
-  offerPrice?: number;
+  status?: LeadStatus;
+  page?: number;
+  limit?: number;
+}
+
+export interface AdminEnquiryListParams extends EnquiryListParams {
+  mobile?: string;
+  buyerId?: number;
+  dateFrom?: string;
+  dateTo?: string;
+  sortBy?: 'createdAt' | 'name' | 'status';
+  sortOrder?: 'asc' | 'desc';
 }
 
 export const usedTractorEnquiryAPI = {
-  createEnquiry: async (data: EnquiryData) => {
+  /** Sent as JSON: the backend validates listingId as a number */
+  createEnquiry: async (data: CreateEnquiryInput): Promise<ApiResult<UsedEnquiry>> => {
     try {
       const response = await apiClient.post('/used-tractor-enquiries/createEnquiry', data);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to submit enquiry' };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to submit enquiry');
     }
   },
 
-  getAllEnquiries: async (params?: any) => {
+  getAllEnquiries: async (
+    params?: AdminEnquiryListParams
+  ): Promise<ApiResult<MetaPage<UsedEnquiry>>> => {
     try {
       const response = await apiClient.get('/used-tractor-enquiries/getAllEnquiries', { params });
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch enquiries' };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch enquiries');
     }
   },
 
-  getMyEnquiries: async () => {
+  /** Enquiries the logged-in buyer has sent */
+  getMyEnquiries: async (
+    params?: Omit<EnquiryListParams, 'listingId'>
+  ): Promise<ApiResult<MetaPage<UsedEnquiry>>> => {
     try {
-      const response = await apiClient.get('/used-tractor-enquiries/getMyEnquiries');
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch your enquiries' };
+      const response = await apiClient.get('/used-tractor-enquiries/getMyEnquiries', { params });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch your enquiries');
     }
   },
 
-  getMyListingEnquiries: async () => {
+  /** Enquiries received on the logged-in seller's listings */
+  getMyListingEnquiries: async (
+    params?: EnquiryListParams
+  ): Promise<ApiResult<MetaPage<UsedEnquiry>>> => {
     try {
-      const response = await apiClient.get('/used-tractor-enquiries/getMyListingEnquiries');
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch enquiries for your listings' };
+      const response = await apiClient.get('/used-tractor-enquiries/getMyListingEnquiries', {
+        params,
+      });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch enquiries for your listings');
     }
   },
 
-  getEnquiryById: async (id: number | string) => {
+  getEnquiryById: async (id: number | string): Promise<ApiResult<UsedEnquiry>> => {
     try {
       const response = await apiClient.get(`/used-tractor-enquiries/getEnquiry/${id}`);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to fetch enquiry details' };
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch enquiry details');
     }
   },
 
-  updateEnquiryStatus: async (id: number | string, status: string, notes?: string) => {
+  /** Staff, or the seller who owns the listing */
+  updateEnquiryStatus: async (
+    id: number | string,
+    status: LeadStatus
+  ): Promise<ApiResult<UsedEnquiry>> => {
     try {
-      const response = await apiClient.patch(`/used-tractor-enquiries/updateEnquiryStatus/${id}`, { status, notes });
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to update enquiry status' };
+      const response = await apiClient.patch(`/used-tractor-enquiries/updateEnquiryStatus/${id}`, {
+        status,
+      });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to update enquiry status');
     }
   },
-  
-  deleteEnquiry: async (id: number | string) => {
+
+  /** Admin only; the backend answers 204 No Content */
+  deleteEnquiry: async (id: number | string): Promise<ApiResult<null>> => {
     try {
       const response = await apiClient.delete(`/used-tractor-enquiries/deleteEnquiry/${id}`);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Failed to delete enquiry' };
+      return toResult(response, 'Enquiry deleted');
+    } catch (error) {
+      return toErrorResult(error, 'Failed to delete enquiry');
     }
-  }
+  },
 };
