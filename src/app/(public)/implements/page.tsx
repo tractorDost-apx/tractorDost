@@ -35,6 +35,7 @@ function ImplementsListingContent() {
   // URL Query Parameters
   const brandQuery = searchParams.get('brand');
   const categoryQuery = searchParams.get('category');
+  const familyQuery = searchParams.get('family');
   const searchQueryParam = searchParams.get('search') || '';
   const hpQueryParam = searchParams.get('hp') || '';
   const usageQueryParam = searchParams.get('usage') || '';
@@ -57,6 +58,7 @@ function ImplementsListingContent() {
   // Local Filter & Pagination States synchronized with URL
   const [searchQuery, setSearchQuery] = useState(searchQueryParam);
   const [selectedBrand, setSelectedBrand] = useState<number | ''>('');
+  const [selectedFamily, setSelectedFamily] = useState<number | ''>('');
   const [selectedCategory, setSelectedCategory] = useState<number | ''>('');
   const [selectedHp, setSelectedHp] = useState<string>(hpQueryParam);
   const [selectedUsage, setSelectedUsage] = useState<string>(usageQueryParam);
@@ -180,8 +182,16 @@ function ImplementsListingContent() {
     setSortBy(sortQueryParam);
     setPage(pageQueryParam);
     setViewMode(viewQueryParam);
+
+    if (familyQuery) {
+      const parsedFamily = parseInt(familyQuery, 10);
+      setSelectedFamily(!isNaN(parsedFamily) ? parsedFamily : '');
+    } else {
+      setSelectedFamily('');
+    }
   }, [
     searchQueryParam,
+    familyQuery,
     hpQueryParam,
     usageQueryParam,
     priceQueryParam,
@@ -207,6 +217,7 @@ function ImplementsListingContent() {
 
         if (selectedBrand !== '') params.brandId = selectedBrand;
         if (selectedCategory !== '') params.categoryId = selectedCategory;
+        if (selectedFamily !== '') params.familyId = selectedFamily;
 
         // HP Range logic
         if (selectedHp === 'under30') {
@@ -282,6 +293,7 @@ function ImplementsListingContent() {
     searchQuery,
     selectedBrand,
     selectedCategory,
+    selectedFamily,
     selectedHp,
     selectedUsage,
     selectedPrice,
@@ -335,6 +347,7 @@ function ImplementsListingContent() {
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedBrand('');
+    setSelectedFamily('');
     setSelectedCategory('');
     setSelectedHp('');
     setSelectedUsage('');
@@ -498,6 +511,7 @@ function ImplementsListingContent() {
                 <Filter size={18} className="text-[var(--color-brand-green)]" /> Filters
               </h3>
               {(selectedBrand !== '' ||
+                selectedFamily !== '' ||
                 selectedCategory !== '' ||
                 selectedHp !== '' ||
                 selectedUsage !== '' ||
@@ -785,6 +799,7 @@ function ImplementsListingContent() {
 
               {/* Active Filter Chips */}
               {(selectedBrand !== '' ||
+                selectedFamily !== '' ||
                 selectedCategory !== '' ||
                 selectedHp !== '' ||
                 selectedUsage !== '' ||
@@ -799,6 +814,21 @@ function ImplementsListingContent() {
                           setSearchQuery('');
                           setPage(1);
                           updateUrlParams({ search: null, page: 1 });
+                        }}
+                        className="hover:text-[var(--color-brand-orange)]"
+                      >
+                        <X size={12} strokeWidth={3} />
+                      </button>
+                    </span>
+                  )}
+                  {selectedFamily !== '' && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-500">
+                      Series Filter
+                      <button
+                        onClick={() => {
+                          setSelectedFamily('');
+                          setPage(1);
+                          updateUrlParams({ family: null, page: 1 });
                         }}
                         className="hover:text-[var(--color-brand-orange)]"
                       >

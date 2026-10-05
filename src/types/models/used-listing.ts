@@ -228,6 +228,13 @@ export interface UsedEnquiry {
   name: string;
   mobile: string;
   message: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  pincode: string | null;
+  zone: string | null;
+  latitude: number | null;
+  longitude: number | null;
   status: LeadStatus;
   createdAt: string;
   updatedAt: string;

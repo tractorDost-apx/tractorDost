@@ -6,7 +6,7 @@ import { InventoryStatsCards } from './components/InventoryStatsCards';
 import { InventoryTable } from './components/InventoryTable';
 import { InventoryFormModal } from './components/InventoryFormModal';
 import { DeleteInventoryModal } from './components/DeleteInventoryModal';
-import { CreateUsedListingModal } from './components/CreateUsedListingModal';
+import { CreateDealerUsedListingModal } from '../used-listings/components/CreateDealerUsedListingModal';
 import { DealerInventoryItem } from '@/types/models/dealerInventory';
 import {
   Tractor,
@@ -81,8 +81,7 @@ export default function DealerInventoryPage() {
       await updateInventory(item.inventoryId, { isAvailable: nextState });
       showToast(
         'success',
-        `Availability for "${item.tractorName || item.customModel}" updated to ${
-          nextState ? 'Active' : 'Disabled'
+        `Availability for "${item.tractorName || item.customModel}" updated to ${nextState ? 'Active' : 'Disabled'
         }.`
       );
     } catch (err: any) {
@@ -139,11 +138,10 @@ export default function DealerInventoryPage() {
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div
-          className={`animate-slide-in fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border p-4 text-xs font-bold shadow-2xl ${
-            toastMessage.type === 'success'
+          className={`animate-slide-in fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border p-4 text-xs font-bold shadow-2xl ${toastMessage.type === 'success'
               ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
               : 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
-          }`}
+            }`}
         >
           {toastMessage.type === 'success' ? (
             <CheckCircle2 size={18} className="shrink-0 text-emerald-500" />
@@ -297,11 +295,16 @@ export default function DealerInventoryPage() {
 
       {/* Create Used Listing for Marketplace Modal */}
       {itemToListForSale && (
-        <CreateUsedListingModal
-          item={itemToListForSale}
-          dealerName={dealerName}
+        <CreateDealerUsedListingModal
+          isOpen={Boolean(itemToListForSale)}
           onClose={() => setItemToListForSale(null)}
-          onSuccess={(msg) => showToast('success', msg)}
+          onSuccess={(msg: string) => showToast('success', msg)}
+          initialData={{
+            brand: itemToListForSale.brand,
+            tractorName: itemToListForSale.tractorName,
+            customModel: itemToListForSale.customModel,
+            hp: itemToListForSale.hp,
+          }}
         />
       )}
     </div>

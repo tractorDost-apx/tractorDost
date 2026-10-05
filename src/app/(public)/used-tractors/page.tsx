@@ -1,182 +1,114 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { usedTractorListingAPI } from '@/lib/api/used-listings';
-import { usedTractorEnquiryAPI } from '@/lib/api/used-enquiries';
-import { UsedTractorListing, ConditionGrade, UrgencyLevel } from '@/lib/api/usedTractors';
-import type {
-  ListingFilters,
-  ListingSortBy,
-  LoanClearanceStatus,
-} from '@/types/models/used-listing';
-import { brandAPI, Brand } from '@/lib/api/brands';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   Search,
-  MapPin,
   Filter,
-  LayoutList,
-  LayoutGrid,
-  Calendar,
-  Gauge,
-  User,
-  CheckCircle2,
-  CircleDollarSign,
   X,
-  MessageCircle,
-  Info,
+  Grid3X3,
+  List,
+  Tractor,
   ShieldCheck,
-  ChevronRight,
-  Eye,
-  RotateCcw,
   Sparkles,
-  SlidersHorizontal,
-  FileCheck,
-  Building2,
-  Clock,
+  MapPin,
   ArrowUpDown,
-  Phone,
-  Check,
-  AlertCircle,
+  Plus,
+  RotateCcw,
+  Loader2,
+  SlidersHorizontal,
 } from 'lucide-react';
-import { TractorLoader } from '@/components/ui/TractorLoader';
-import Link from 'next/link';
+import { usedTractorListingAPI } from '@/lib/api/used-listings';
+import { brandAPI, Brand } from '@/lib/api/brands';
+import { PublicUsedTractorCard } from '@/components/used-tractors/PublicUsedTractorCard';
+import { PublicUsedEnquiryModal } from '@/components/used-tractors/PublicUsedEnquiryModal';
+import { PublicUsedQuickViewModal } from '@/components/used-tractors/PublicUsedQuickViewModal';
 import Pagination from '@/components/shared/Pagination';
+import type {
+  UsedTractorListing,
+  ListingFilters,
+  ListingSortBy,
+  ConditionGrade,
+} from '@/types/models/used-listing';
 
-// Major Indian States List
 const INDIAN_STATES = [
-  'Maharashtra',
-  'Punjab',
-  'Haryana',
-  'Uttar Pradesh',
-  'Madhya Pradesh',
-  'Rajasthan',
-  'Gujarat',
-  'Karnataka',
   'Andhra Pradesh',
-  'Tamil Nadu',
+  'Assam',
   'Bihar',
-  'West Bengal',
-  'Telangana',
-  'Odisha',
   'Chhattisgarh',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Tamil Nadu',
+  'Telangana',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
 ];
 
-export default function UsedTractorsPage() {
-  // Data States
+function UsedTractorsListingContent() {
+  const searchParams = useSearchParams();
+  const brandQuery = searchParams.get('brand');
+  const stateQuery = searchParams.get('state');
+
+  // Listings & Brand state
   const [tractors, setTractors] = useState<UsedTractorListing[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
+  const [totalTractors, setTotalTractors] = useState(0);
 
-  // UI Control States
+  // Layout & View state
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState<
-    'recent' | 'price_low' | 'price_high' | 'hours_low' | 'year_new' | 'quality_high'
-  >('recent');
-  const [mobileFilterOpen, setMobileFilterOpen] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Modals
-  const [enquiryModalOpen, setEnquiryModalOpen] = useState<UsedTractorListing | null>(null);
-  const [quickViewModalId, setQuickViewModalId] = useState<number | null>(null);
-  const [quickViewDetails, setQuickViewDetails] = useState<any>(null);
-  const [quickViewLoading, setQuickViewLoading] = useState<boolean>(false);
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(12);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Pagination State
-  const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(9);
-
-  // ----------------------------------------------------
-  // MAXIMUM FILTERS STATE
-  // ----------------------------------------------------
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [brandSearch, setBrandSearch] = useState<string>('');
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  // Filters State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  const [selectedPrice, setSelectedPrice] = useState<string>('');
+  const [selectedYear, setSelectedYear] = useState<string>('');
+  const [selectedHours, setSelectedHours] = useState<string>('');
+  const [selectedOwnership, setSelectedOwnership] = useState<string>('');
+  const [selectedCondition, setSelectedCondition] = useState<string>('');
+  const [isCertifiedOnly, setIsCertifiedOnly] = useState<boolean>(false);
+  const [financeOnly, setFinanceOnly] = useState<boolean>(false);
+  const [rcOnly, setRcOnly] = useState<boolean>(false);
+  const [sortBy, setSortBy] = useState<ListingSortBy>('newest');
 
-  // Price Filters
-  const [priceMin, setPriceMin] = useState<number | undefined>(undefined);
-  const [priceMax, setPriceMax] = useState<number | undefined>(undefined);
+  // Modals state
+  const [quickViewId, setQuickViewId] = useState<number | null>(null);
+  const [enquiryListing, setEnquiryListing] = useState<UsedTractorListing | null>(null);
 
-  // Year Filters
-  const [yearMin, setYearMin] = useState<number | undefined>(undefined);
-  const [yearMax, setYearMax] = useState<number | undefined>(undefined);
+  // Sync initial query params
+  useEffect(() => {
+    if (brandQuery) setSelectedBrand(brandQuery);
+    if (stateQuery) setSelectedState(stateQuery);
+  }, [brandQuery, stateQuery]);
 
-  // Condition & Verification
-  const [conditionGrade, setConditionGrade] = useState<string>('');
-  const [isCertified, setIsCertified] = useState<boolean>(false);
-  const [financeAvailable, setFinanceAvailable] = useState<boolean>(false);
-  const [rcAvailable, setRcAvailable] = useState<boolean>(false);
-  const [loanClearanceStatus, setLoanClearanceStatus] = useState<string>('');
-
-  // Usage & Ownership
-  const [maxHours, setMaxHours] = useState<number | undefined>(undefined);
-  const [ownership, setOwnership] = useState<number | undefined>(undefined);
-  const [urgency, setUrgency] = useState<string>('');
-
-  // Enquiry Form State
-  const [enquiryForm, setEnquiryForm] = useState({
-    name: '',
-    mobile: '',
-    offerPrice: '',
-    message: '',
-  });
-  const [submittingEnquiry, setSubmittingEnquiry] = useState<boolean>(false);
-  const [enquirySuccess, setEnquirySuccess] = useState<boolean>(false);
-  const [enquiryError, setEnquiryError] = useState<string | null>(null);
-
-  // Price presets
-  const pricePresets = [
-    { label: 'All Prices', min: undefined, max: undefined },
-    { label: 'Under ₹3L', min: undefined, max: 300000 },
-    { label: '₹3L - ₹5L', min: 300000, max: 500000 },
-    { label: '₹5L - ₹7L', min: 500000, max: 700000 },
-    { label: 'Above ₹7L', min: 700000, max: undefined },
-  ];
-
-  // Year presets
-  const yearPresets = [
-    { label: 'Any Year', min: undefined, max: undefined },
-    { label: '2023+', min: 2023, max: undefined },
-    { label: '2021+', min: 2021, max: undefined },
-    { label: '2019+', min: 2019, max: undefined },
-    { label: '2017+', min: 2017, max: undefined },
-  ];
-
-  // Formatter
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  // Helper for extracting listing image URL
-  const getListingImageUrl = (tractor: any) => {
-    if (tractor.imageUrl) return tractor.imageUrl;
-    if (Array.isArray(tractor.media) && tractor.media.length > 0 && tractor.media[0]?.url) {
-      return tractor.media[0].url;
-    }
-    if (
-      Array.isArray(tractor.documents) &&
-      tractor.documents.length > 0 &&
-      tractor.documents[0]?.url
-    ) {
-      return tractor.documents[0].url;
-    }
-    return 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80';
-  };
-
-  // Fetch Brands on Mount
+  // Fetch Brands list
   useEffect(() => {
     brandAPI
       .getAllBrands({ limit: 100 })
       .then((res) => {
         if (res.success) {
           const list =
-            (res.data as any)?.data ||
             (res.data as any)?.brands ||
+            (res.data as any)?.data ||
             (Array.isArray(res.data) ? res.data : []);
           setBrands(list.filter((b: any) => b.isActive));
         }
@@ -184,90 +116,84 @@ export default function UsedTractorsPage() {
       .catch(() => setBrands([]));
   }, []);
 
-  // Any filter or sort change starts again from the first server page
+  // Fetch Used Tractors based on filters
   useEffect(() => {
-    setPage(1);
-  }, [
-    searchQuery,
-    selectedBrand,
-    selectedState,
-    selectedDistrict,
-    priceMin,
-    priceMax,
-    yearMin,
-    yearMax,
-    conditionGrade,
-    isCertified,
-    financeAvailable,
-    rcAvailable,
-    loanClearanceStatus,
-    maxHours,
-    ownership,
-    urgency,
-    sortBy,
-  ]);
-
-  // API Call: Fetch Used Tractor Listings with Query Filters (getAllUsedTractorListing)
-  useEffect(() => {
-    const fetchTractors = async () => {
+    const fetchListings = async () => {
       setLoading(true);
       try {
-        // All filtering, sorting and paging happens on the server
-        const serverSort: Record<typeof sortBy, ListingSortBy> = {
-          recent: 'newest',
-          price_low: 'price_asc',
-          price_high: 'price_desc',
-          hours_low: 'hours_asc',
-          year_new: 'year_desc',
-          quality_high: 'newest', // no server-side quality sort; re-ordered within the page below
-        };
-
-        const apiParams: ListingFilters = {
+        const params: ListingFilters = {
           page,
           limit,
-          sortBy: serverSort[sortBy],
+          sortBy,
           ...(searchQuery.trim() && { search: searchQuery.trim() }),
           ...(selectedBrand && { tractorBrand: selectedBrand }),
           ...(selectedState && { state: selectedState }),
           ...(selectedDistrict && { district: selectedDistrict }),
-          ...(priceMin !== undefined && { priceMin }),
-          ...(priceMax !== undefined && { priceMax }),
-          ...(yearMin !== undefined && { yearMin }),
-          ...(yearMax !== undefined && { yearMax }),
-          ...(conditionGrade && { conditionGrade: conditionGrade as ConditionGrade }),
-          ...(isCertified && { isCertified: true }),
-          ...(financeAvailable && { financeAvailable: true }),
-          ...(rcAvailable && { rcAvailable: true }),
-          ...(loanClearanceStatus && {
-            loanClearanceStatus: loanClearanceStatus as LoanClearanceStatus,
-          }),
-          ...(maxHours !== undefined && { maxHours }),
-          ...(ownership !== undefined && { ownership }),
-          ...(urgency && { urgency: urgency as UrgencyLevel }),
+          ...(isCertifiedOnly && { isCertified: true }),
+          ...(financeOnly && { financeAvailable: true }),
+          ...(rcOnly && { rcAvailable: true }),
+          ...(selectedCondition && { conditionGrade: selectedCondition as ConditionGrade }),
         };
 
-        const res = await usedTractorListingAPI.getAllListings(apiParams);
-
-        const dataList = res.success && res.data ? res.data.data : [];
-        const total = res.success && res.data ? res.data.total : 0;
-
-        if (sortBy === 'quality_high') {
-          dataList.sort((a, b) => (b.listingQualityScore || 0) - (a.listingQualityScore || 0));
+        // Price mapping
+        if (selectedPrice === 'under3') {
+          params.priceMax = 300000;
+        } else if (selectedPrice === '3to5') {
+          params.priceMin = 300000;
+          params.priceMax = 500000;
+        } else if (selectedPrice === '5to7') {
+          params.priceMin = 500000;
+          params.priceMax = 700000;
+        } else if (selectedPrice === 'over7') {
+          params.priceMin = 700000;
         }
 
-        setTractors(dataList);
-        setTotalCount(total);
+        // Year mapping
+        if (selectedYear === '2023') {
+          params.yearMin = 2023;
+        } else if (selectedYear === '2021') {
+          params.yearMin = 2021;
+        } else if (selectedYear === '2019') {
+          params.yearMin = 2019;
+        } else if (selectedYear === '2017') {
+          params.yearMin = 2017;
+        }
+
+        // Hours mapping
+        if (selectedHours === 'under1000') {
+          params.maxHours = 1000;
+        } else if (selectedHours === 'under2500') {
+          params.maxHours = 2500;
+        } else if (selectedHours === 'under5000') {
+          params.maxHours = 5000;
+        }
+
+        // Ownership mapping
+        if (selectedOwnership) {
+          params.ownership = Number(selectedOwnership);
+        }
+
+        const res = await usedTractorListingAPI.getAllListings(params);
+        if (res.success && res.data) {
+          setTractors(res.data.data || []);
+          setTotalTractors(res.data.total || 0);
+          setTotalPages(res.data.totalPages || 1);
+        } else {
+          setTractors([]);
+          setTotalTractors(0);
+          setTotalPages(1);
+        }
       } catch (err) {
-        console.error('Failed to fetch database used tractors', err);
+        console.error('Failed to load used tractor listings', err);
         setTractors([]);
-        setTotalCount(0);
+        setTotalTractors(0);
       } finally {
         setLoading(false);
       }
     };
 
-    const debounceTimer = setTimeout(fetchTractors, 250);
-    return () => clearTimeout(debounceTimer);
+    const debounce = setTimeout(fetchListings, 300);
+    return () => clearTimeout(debounce);
   }, [
     page,
     limit,
@@ -275,1042 +201,583 @@ export default function UsedTractorsPage() {
     selectedBrand,
     selectedState,
     selectedDistrict,
-    priceMin,
-    priceMax,
-    yearMin,
-    yearMax,
-    conditionGrade,
-    isCertified,
-    financeAvailable,
-    rcAvailable,
-    loanClearanceStatus,
-    maxHours,
-    ownership,
-    urgency,
+    selectedPrice,
+    selectedYear,
+    selectedHours,
+    selectedOwnership,
+    selectedCondition,
+    isCertifiedOnly,
+    financeOnly,
+    rcOnly,
     sortBy,
   ]);
 
-  // Fetch Quick View Details using getUsedTractorListingById API (`/used-listings/get/:id`)
-  const handleOpenQuickView = async (id: number) => {
-    setQuickViewModalId(id);
-    setQuickViewLoading(true);
-    try {
-      const res = await usedTractorListingAPI.getListingById(id);
-      if (res.success && res.data) {
-        setQuickViewDetails(res.data);
-      } else {
-        // Fallback to local item if backend single fetch fails
-        const localItem = tractors.find((t) => t.id === id);
-        setQuickViewDetails(localItem || null);
-      }
-    } catch (err) {
-      const localItem = tractors.find((t) => t.id === id);
-      setQuickViewDetails(localItem || null);
-    } finally {
-      setQuickViewLoading(false);
-    }
-  };
-
-  // Submit Enquiry Lead API Call
-  const handleEnquirySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!enquiryModalOpen) return;
-
-    setSubmittingEnquiry(true);
-    setEnquiryError(null);
-
-    try {
-      const res = await usedTractorEnquiryAPI.createEnquiry({
-        listingId: enquiryModalOpen.id,
-        name: enquiryForm.name.trim(),
-        mobile: enquiryForm.mobile.trim(),
-        // The API has no offer field, so an offer travels inside the message
-        message: [
-          enquiryForm.message.trim() ||
-            `I am interested in buying ${enquiryModalOpen.tractorBrand} ${enquiryModalOpen.tractorModel}.`,
-          enquiryForm.offerPrice ? `My offer: ${formatPrice(Number(enquiryForm.offerPrice))}` : '',
-        ]
-          .filter(Boolean)
-          .join(' '),
-      });
-
-      if (res.success) {
-        setEnquirySuccess(true);
-      } else {
-        setEnquiryError(res.message || 'Failed to submit enquiry. Please try again.');
-      }
-    } catch (err: any) {
-      setEnquiryError('Network error. Unable to send enquiry.');
-    } finally {
-      setSubmittingEnquiry(false);
-    }
-  };
-
-  // Count active filters
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (searchQuery) count++;
-    if (selectedBrand) count++;
-    if (selectedState) count++;
-    if (selectedDistrict) count++;
-    if (priceMin !== undefined || priceMax !== undefined) count++;
-    if (yearMin !== undefined || yearMax !== undefined) count++;
-    if (conditionGrade) count++;
-    if (isCertified) count++;
-    if (financeAvailable) count++;
-    if (rcAvailable) count++;
-    if (loanClearanceStatus) count++;
-    if (maxHours !== undefined) count++;
-    if (ownership !== undefined) count++;
-    if (urgency) count++;
-    return count;
-  }, [
-    searchQuery,
-    selectedBrand,
-    selectedState,
-    selectedDistrict,
-    priceMin,
-    priceMax,
-    yearMin,
-    yearMax,
-    conditionGrade,
-    isCertified,
-    financeAvailable,
-    rcAvailable,
-    loanClearanceStatus,
-    maxHours,
-    ownership,
-    urgency,
-  ]);
-
-  // Clear all filters
-  const handleClearAllFilters = () => {
+  const clearAllFilters = () => {
     setSearchQuery('');
-    setBrandSearch('');
-    setSelectedBrand(null);
+    setSelectedBrand('');
     setSelectedState('');
     setSelectedDistrict('');
-    setPriceMin(undefined);
-    setPriceMax(undefined);
-    setYearMin(undefined);
-    setYearMax(undefined);
-    setConditionGrade('');
-    setIsCertified(false);
-    setFinanceAvailable(false);
-    setRcAvailable(false);
-    setLoanClearanceStatus('');
-    setMaxHours(undefined);
-    setOwnership(undefined);
-    setUrgency('');
+    setSelectedPrice('');
+    setSelectedYear('');
+    setSelectedHours('');
+    setSelectedOwnership('');
+    setSelectedCondition('');
+    setIsCertifiedOnly(false);
+    setFinanceOnly(false);
+    setRcOnly(false);
     setPage(1);
   };
 
-  // Filtered Brand List for Brand Selector
-  const filteredBrands = useMemo(() => {
-    if (!brandSearch) return brands;
-    return brands.filter((b) => b.name.toLowerCase().includes(brandSearch.toLowerCase()));
-  }, [brands, brandSearch]);
-
-  // The server already returns exactly one page
-  const paginatedTractors = tractors;
+  const hasActiveFilters =
+    searchQuery !== '' ||
+    selectedBrand !== '' ||
+    selectedState !== '' ||
+    selectedDistrict !== '' ||
+    selectedPrice !== '' ||
+    selectedYear !== '' ||
+    selectedHours !== '' ||
+    selectedOwnership !== '' ||
+    selectedCondition !== '' ||
+    isCertifiedOnly ||
+    financeOnly ||
+    rcOnly;
 
   return (
-    <div className="relative mx-auto min-h-screen w-full max-w-[1440px] px-4 py-8 sm:px-6">
-      {/* ---------------------------------------------------- */}
-      {/* HEADER SECTION */}
-      {/* ---------------------------------------------------- */}
-      <div className="animate-fade-in mb-10 flex flex-col items-center text-center">
-        <div className="mb-3 inline-flex items-center justify-center rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase shadow-sm">
-          <ShieldCheck size={16} className="mr-2 inline" /> Verified Pre-Owned Marketplace
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* HERO BANNER SECTION (Matching /tractors design) */}
+      <div className="relative mb-10 flex flex-col items-center justify-between overflow-hidden rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 via-background to-[var(--color-brand-orange)]/10 p-8 md:flex-row md:p-12">
+        <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[80px]" />
+        
+        <div className="z-10 flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs font-bold tracking-wider text-lime-400 uppercase">
+              <ShieldCheck size={14} /> Verified Pre-Owned Marketplace
+            </span>
+          </div>
+          <h1 className="text-foreground text-4xl font-black tracking-tight md:text-5xl">
+            Explore Used Tractors
+          </h1>
+          <p className="text-muted max-w-2xl text-base md:text-lg font-bold">
+            Find certified, reliable pre-owned tractors across India at genuine market prices with verified documentation and direct seller connection.
+          </p>
         </div>
-        <h1 className="text-foreground mb-3 text-4xl font-black tracking-tight md:text-5xl">
-          Find Used <span className="text-[var(--color-brand-green)]">Tractors & Machinery</span>
-        </h1>
-        <p className="text-muted max-w-2xl text-base font-bold md:text-lg">
-          Browse certified used tractors with full inspection scores, transparent pricing, finance
-          support, and direct seller details.
-        </p>
+
+        {/* Total Count & Sell Action Badge */}
+        <div className="z-10 mt-6 flex flex-col sm:flex-row items-center gap-4 md:mt-0">
+          <div className="bg-background/80 flex flex-col items-center rounded-2xl border border-[var(--border-subtle)] px-6 py-4 backdrop-blur-md">
+            <span className="text-3xl font-black text-[var(--color-brand-green)]">
+              {totalTractors}
+            </span>
+            <span className="text-muted text-[10px] font-black tracking-widest uppercase">
+              Tractors Available
+            </span>
+          </div>
+
+          <Link
+            href="/sell-used-tractor"
+            className="bg-[var(--color-brand-orange)] hover:opacity-90 text-white flex items-center gap-2 rounded-2xl px-6 py-4 font-black text-sm shadow-lg shadow-[var(--color-brand-orange)]/20 transition-all whitespace-nowrap"
+          >
+            <Plus size={18} /> Sell Tractor
+          </Link>
+        </div>
       </div>
 
-      {/* Main Container */}
-      <div className="flex flex-col gap-8 lg:flex-row">
-        {/* ---------------------------------------------------- */}
-        {/* LEFT COLUMN: MAXIMUM SMART FILTERS */}
-        {/* ---------------------------------------------------- */}
-        <aside
-          className={`flex w-full shrink-0 flex-col gap-6 lg:w-80 ${mobileFilterOpen ? 'bg-background fixed inset-0 z-50 overflow-y-auto p-6' : 'hidden lg:flex'} `}
+      <div className="flex flex-col items-start gap-8 lg:flex-row">
+        {/* MOBILE FILTER TOGGLE */}
+        <button
+          className="bg-foreground/5 flex w-full items-center justify-center gap-2 rounded-2xl border border-[var(--border-subtle)] py-4 font-bold lg:hidden"
+          onClick={() => setShowFilters(!showFilters)}
         >
-          <div className="rounded-3xl border border-[var(--border-subtle)] bg-[var(--card-bg)] p-6 shadow-[var(--card-shadow)] backdrop-blur-3xl lg:sticky lg:top-24">
-            {/* Filter Header */}
-            <div className="mb-6 flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
-              <div className="flex items-center gap-2">
-                <div className="rounded-xl bg-[var(--color-brand-green)]/10 p-2 text-[var(--color-brand-green)]">
-                  <SlidersHorizontal size={18} />
-                </div>
-                <div>
-                  <h3 className="text-foreground text-lg leading-none font-black">Smart Filters</h3>
-                  {activeFiltersCount > 0 && (
-                    <span className="text-[10px] font-bold text-[var(--color-brand-green)]">
-                      {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} active
-                    </span>
-                  )}
-                </div>
-              </div>
+          <Filter size={18} /> {showFilters ? 'Hide Filters' : 'Show Filters'}
+        </button>
 
-              <div className="flex items-center gap-2">
-                {activeFiltersCount > 0 && (
-                  <button
-                    onClick={handleClearAllFilters}
-                    className="flex items-center gap-1 text-xs font-bold text-red-500 transition-colors hover:text-red-600 hover:underline"
-                  >
-                    <RotateCcw size={12} /> Clear
-                  </button>
-                )}
-                {mobileFilterOpen && (
-                  <button
-                    onClick={() => setMobileFilterOpen(false)}
-                    className="bg-foreground/5 rounded-full p-2 lg:hidden"
-                  >
-                    <X size={18} />
-                  </button>
-                )}
+        {/* SIDEBAR FILTERS (Matching /tractors layout & PRD) */}
+        <aside
+          className={`flex w-full flex-shrink-0 flex-col gap-6 lg:w-72 ${showFilters ? 'flex' : 'hidden lg:flex'}`}
+        >
+          <div className="spatial-panel sticky top-24 flex flex-col gap-6 rounded-[2rem] p-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
+              <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+                <SlidersHorizontal size={18} className="text-[var(--color-brand-green)]" /> Filters
+              </h3>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearAllFilters}
+                  className="text-xs font-bold text-[var(--color-brand-orange)] hover:underline"
+                >
+                  Clear All
+                </button>
+              )}
+            </div>
+
+            {/* Filter: Search */}
+            <div className="flex flex-col gap-2">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                Search
+              </span>
+              <div className="relative">
+                <Search size={16} className="text-muted absolute top-1/2 left-3 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Model or City..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(1);
+                  }}
+                  className="bg-background w-full rounded-xl border border-[var(--border-subtle)] py-2.5 pr-4 pl-9 text-xs font-bold transition-colors focus:border-[var(--color-brand-green)]/50 focus:outline-none"
+                />
               </div>
             </div>
 
-            <div className="custom-scrollbar max-h-[calc(100vh-220px)] space-y-6 overflow-y-auto pr-1">
-              {/* 1. Keyword Search */}
-              <div>
-                <label className="text-muted mb-2 block text-[10px] font-black tracking-widest uppercase">
-                  Search Keyword
-                </label>
-                <div className="relative">
-                  <Search
-                    size={16}
-                    className="text-muted absolute top-1/2 left-3.5 -translate-y-1/2"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Model, brand, city..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] py-2.5 pr-8 pl-10 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="text-muted hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
-              </div>
+            {/* Filter: Location (State) */}
+            <div className="flex flex-col gap-2">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                State Location
+              </span>
+              <select
+                value={selectedState}
+                onChange={(e) => {
+                  setSelectedState(e.target.value);
+                  setPage(1);
+                }}
+                className="bg-background w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-xs font-bold text-foreground focus:border-[var(--color-brand-green)]/50 focus:outline-none"
+              >
+                <option value="">All States</option>
+                {INDIAN_STATES.map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              {/* 2. Brand Filter with Search */}
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="text-muted text-[10px] font-black tracking-widest uppercase">
-                    Tractor Brand
-                  </label>
-                  {selectedBrand && (
-                    <button
-                      onClick={() => setSelectedBrand(null)}
-                      className="text-[10px] font-bold text-[var(--color-brand-green)]"
-                    >
-                      Reset Brand
-                    </button>
-                  )}
-                </div>
+            {/* Filter: Trust & Verification Toggles */}
+            <div className="flex flex-col gap-2.5 border-t border-[var(--border-subtle)] pt-4">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                Trust & Verification
+              </span>
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-foreground">
+                <input
+                  type="checkbox"
+                  checked={isCertifiedOnly}
+                  onChange={(e) => {
+                    setIsCertifiedOnly(e.target.checked);
+                    setPage(1);
+                  }}
+                  className="h-4 w-4 rounded accent-lime-400"
+                />
+                <span className="flex items-center gap-1 text-lime-400">
+                  <ShieldCheck size={14} /> Certified Only
+                </span>
+              </label>
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-foreground">
+                <input
+                  type="checkbox"
+                  checked={financeOnly}
+                  onChange={(e) => {
+                    setFinanceOnly(e.target.checked);
+                    setPage(1);
+                  }}
+                  className="h-4 w-4 rounded accent-purple-400"
+                />
+                <span>Loan Available</span>
+              </label>
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-foreground">
+                <input
+                  type="checkbox"
+                  checked={rcOnly}
+                  onChange={(e) => {
+                    setRcOnly(e.target.checked);
+                    setPage(1);
+                  }}
+                  className="h-4 w-4 rounded accent-emerald-400"
+                />
+                <span>RC Book Available</span>
+              </label>
+            </div>
 
-                {brands.length > 5 && (
-                  <input
-                    type="text"
-                    placeholder="Search brand..."
-                    value={brandSearch}
-                    onChange={(e) => setBrandSearch(e.target.value)}
-                    className="bg-foreground/5 text-foreground mb-2 w-full rounded-lg border border-[var(--border-subtle)] px-3 py-1.5 text-xs font-bold outline-none"
-                  />
-                )}
-
-                <div className="custom-scrollbar flex max-h-40 flex-col gap-1.5 overflow-y-auto pr-1">
-                  <button
-                    onClick={() => setSelectedBrand(null)}
-                    className={`flex items-center justify-between rounded-xl border p-2.5 text-xs font-bold transition-all ${
-                      !selectedBrand
-                        ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
-                        : 'bg-foreground/5 text-foreground hover:bg-foreground/10 border-transparent'
+            {/* Filter: Brands */}
+            <div className="flex flex-col gap-2.5 border-t border-[var(--border-subtle)] pt-4">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                Brands
+              </span>
+              <div className="custom-scrollbar flex max-h-48 flex-col gap-1.5 overflow-y-auto pr-1">
+                <label
+                  className="group flex cursor-pointer items-center gap-2.5"
+                  onClick={() => {
+                    setSelectedBrand('');
+                    setPage(1);
+                  }}
+                >
+                  <div
+                    className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
+                      selectedBrand === ''
+                        ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]'
+                        : 'border-[var(--border-subtle)]'
                     }`}
                   >
-                    <span>All Brands</span>
-                    {!selectedBrand && <Check size={14} />}
-                  </button>
-                  {filteredBrands.map((brand) => (
-                    <button
-                      key={brand.id}
-                      onClick={() => setSelectedBrand(brand.name)}
-                      className={`flex items-center gap-2.5 rounded-xl border p-2.5 text-xs font-bold transition-all ${
+                    {selectedBrand === '' && <div className="h-2 w-2 rounded-sm bg-white" />}
+                  </div>
+                  <span
+                    className={`text-xs font-bold ${
+                      selectedBrand === '' ? 'text-foreground' : 'text-muted group-hover:text-foreground'
+                    }`}
+                  >
+                    All Brands
+                  </span>
+                </label>
+
+                {brands.map((brand) => (
+                  <label
+                    key={brand.id}
+                    className="group flex cursor-pointer items-center gap-2.5"
+                    onClick={() => {
+                      setSelectedBrand(brand.name);
+                      setPage(1);
+                    }}
+                  >
+                    <div
+                      className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
                         selectedBrand === brand.name
-                          ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
-                          : 'bg-foreground/5 text-foreground hover:bg-foreground/10 border-transparent'
+                          ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]'
+                          : 'border-[var(--border-subtle)]'
                       }`}
                     >
-                      {brand.logoUrl ? (
-                        <img
-                          src={brand.logoUrl}
-                          alt={brand.name}
-                          className="h-5 w-5 rounded bg-white object-contain p-0.5"
-                        />
-                      ) : (
-                        <div className="bg-foreground/10 flex h-5 w-5 items-center justify-center rounded text-[10px] font-black">
-                          {brand.name.charAt(0)}
-                        </div>
-                      )}
-                      <span className="flex-1 truncate text-left">{brand.name}</span>
-                      {selectedBrand === brand.name && <Check size={14} />}
-                    </button>
-                  ))}
-                </div>
+                      {selectedBrand === brand.name && <div className="h-2 w-2 rounded-sm bg-white" />}
+                    </div>
+                    <span
+                      className={`text-xs font-bold ${
+                        selectedBrand === brand.name ? 'text-foreground' : 'text-muted group-hover:text-foreground'
+                      }`}
+                    >
+                      {brand.name}
+                    </span>
+                  </label>
+                ))}
               </div>
+            </div>
 
-              {/* 3. Location Filters (State & District) */}
-              <div>
-                <label className="text-muted mb-2 block text-[10px] font-black tracking-widest uppercase">
-                  Location (State & District)
-                </label>
-                <div className="space-y-2">
-                  <select
-                    value={selectedState}
-                    onChange={(e) => {
-                      setSelectedState(e.target.value);
-                      setSelectedDistrict('');
+            {/* Filter: Price Range */}
+            <div className="flex flex-col gap-2.5 border-t border-[var(--border-subtle)] pt-4">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                Budget / Price
+              </span>
+              <div className="flex flex-col gap-1.5">
+                {[
+                  { value: '', label: 'All Prices' },
+                  { value: 'under3', label: 'Under ₹ 3 Lakh' },
+                  { value: '3to5', label: '₹ 3 - 5 Lakh' },
+                  { value: '5to7', label: '₹ 5 - 7 Lakh' },
+                  { value: 'over7', label: 'Above ₹ 7 Lakh' },
+                ].map((p) => (
+                  <label
+                    key={p.value}
+                    className="group flex cursor-pointer items-center gap-2.5"
+                    onClick={() => {
+                      setSelectedPrice(p.value);
+                      setPage(1);
                     }}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
                   >
-                    <option value="">All Indian States</option>
-                    {INDIAN_STATES.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-
-                  <input
-                    type="text"
-                    placeholder="Enter District (e.g. Pune, Ludhiana)"
-                    value={selectedDistrict}
-                    onChange={(e) => setSelectedDistrict(e.target.value)}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                  />
-                </div>
-              </div>
-
-              {/* 4. Price Range & Presets */}
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="text-muted text-[10px] font-black tracking-widest uppercase">
-                    Asking Price (INR)
-                  </label>
-                  {(priceMin !== undefined || priceMax !== undefined) && (
-                    <button
-                      onClick={() => {
-                        setPriceMin(undefined);
-                        setPriceMax(undefined);
-                      }}
-                      className="text-[10px] font-bold text-[var(--color-brand-green)]"
+                    <div
+                      className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
+                        selectedPrice === p.value
+                          ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]'
+                          : 'border-[var(--border-subtle)]'
+                      }`}
                     >
-                      Clear Price
-                    </button>
-                  )}
-                </div>
-
-                <div className="mb-2 grid grid-cols-2 gap-2">
-                  <input
-                    type="number"
-                    placeholder="Min Price"
-                    value={priceMin || ''}
-                    onChange={(e) =>
-                      setPriceMin(e.target.value ? Number(e.target.value) : undefined)
-                    }
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2 text-xs font-bold outline-none"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max Price"
-                    value={priceMax || ''}
-                    onChange={(e) =>
-                      setPriceMax(e.target.value ? Number(e.target.value) : undefined)
-                    }
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2 text-xs font-bold outline-none"
-                  />
-                </div>
-
-                {/* Price Presets Pills */}
-                <div className="flex flex-wrap gap-1.5">
-                  {pricePresets.slice(1).map((p) => {
-                    const isSelected = priceMin === p.min && priceMax === p.max;
-                    return (
-                      <button
-                        key={p.label}
-                        onClick={() => {
-                          setPriceMin(p.min);
-                          setPriceMax(p.max);
-                        }}
-                        className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold transition-all ${
-                          isSelected
-                            ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)] text-white'
-                            : 'bg-foreground/5 text-muted hover:text-foreground border-[var(--border-subtle)]'
-                        }`}
-                      >
-                        {p.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 5. Year Range & Presets */}
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="text-muted text-[10px] font-black tracking-widest uppercase">
-                    Manufacture Year
-                  </label>
-                  {(yearMin !== undefined || yearMax !== undefined) && (
-                    <button
-                      onClick={() => {
-                        setYearMin(undefined);
-                        setYearMax(undefined);
-                      }}
-                      className="text-[10px] font-bold text-[var(--color-brand-green)]"
+                      {selectedPrice === p.value && <div className="h-2 w-2 rounded-sm bg-white" />}
+                    </div>
+                    <span
+                      className={`text-xs font-bold ${
+                        selectedPrice === p.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'
+                      }`}
                     >
-                      Clear Year
-                    </button>
-                  )}
-                </div>
-
-                <div className="mb-2 flex flex-wrap gap-1.5">
-                  {yearPresets.slice(1).map((y) => {
-                    const isSelected = yearMin === y.min;
-                    return (
-                      <button
-                        key={y.label}
-                        onClick={() => {
-                          setYearMin(isSelected ? undefined : y.min);
-                          setYearMax(undefined);
-                        }}
-                        className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold transition-all ${
-                          isSelected
-                            ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)] text-white'
-                            : 'bg-foreground/5 text-muted hover:text-foreground border-[var(--border-subtle)]'
-                        }`}
-                      >
-                        {y.label}
-                      </button>
-                    );
-                  })}
-                </div>
+                      {p.label}
+                    </span>
+                  </label>
+                ))}
               </div>
+            </div>
 
-              {/* 6. Condition Grade Filter */}
-              <div>
-                <label className="text-muted mb-2 block text-[10px] font-black tracking-widest uppercase">
-                  Overall Condition
-                </label>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {['', 'EXCELLENT', 'GOOD', 'FAIR', 'POOR'].map((grade) => {
-                    const label = grade || 'Any Grade';
-                    const isSelected = conditionGrade === grade;
-                    return (
-                      <button
-                        key={label}
-                        onClick={() => setConditionGrade(grade)}
-                        className={`rounded-xl border px-2.5 py-2 text-center text-xs font-bold transition-all ${
-                          isSelected
-                            ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
-                            : 'bg-foreground/5 text-foreground hover:bg-foreground/10 border-transparent'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
+            {/* Filter: Year of Manufacture */}
+            <div className="flex flex-col gap-2.5 border-t border-[var(--border-subtle)] pt-4">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                Manufacturing Year
+              </span>
+              <div className="flex flex-col gap-1.5">
+                {[
+                  { value: '', label: 'Any Year' },
+                  { value: '2023', label: '2023 or Newer' },
+                  { value: '2021', label: '2021 or Newer' },
+                  { value: '2019', label: '2019 or Newer' },
+                  { value: '2017', label: '2017 or Newer' },
+                ].map((y) => (
+                  <label
+                    key={y.value}
+                    className="group flex cursor-pointer items-center gap-2.5"
+                    onClick={() => {
+                      setSelectedYear(y.value);
+                      setPage(1);
+                    }}
+                  >
+                    <div
+                      className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
+                        selectedYear === y.value
+                          ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]'
+                          : 'border-[var(--border-subtle)]'
+                      }`}
+                    >
+                      {selectedYear === y.value && <div className="h-2 w-2 rounded-sm bg-white" />}
+                    </div>
+                    <span
+                      className={`text-xs font-bold ${
+                        selectedYear === y.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'
+                      }`}
+                    >
+                      {y.label}
+                    </span>
+                  </label>
+                ))}
               </div>
+            </div>
 
-              {/* 7. Usage (Max Hours Used) */}
-              <div>
-                <label className="text-muted mb-2 block text-[10px] font-black tracking-widest uppercase">
-                  Max Hours Used
-                </label>
-                <select
-                  value={maxHours || ''}
-                  onChange={(e) => setMaxHours(e.target.value ? Number(e.target.value) : undefined)}
-                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2 text-xs font-bold outline-none"
-                >
-                  <option value="">Any Usage Hours</option>
-                  <option value="1000">Under 1,000 Hours</option>
-                  <option value="2500">Under 2,500 Hours</option>
-                  <option value="4000">Under 4,000 Hours</option>
-                </select>
+            {/* Filter: Usage / Hours Run */}
+            <div className="flex flex-col gap-2.5 border-t border-[var(--border-subtle)] pt-4">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                Hours Run (Meter)
+              </span>
+              <div className="flex flex-col gap-1.5">
+                {[
+                  { value: '', label: 'Any Usage' },
+                  { value: 'under1000', label: 'Under 1,000 hrs' },
+                  { value: 'under2500', label: 'Under 2,500 hrs' },
+                  { value: 'under5000', label: 'Under 5,000 hrs' },
+                ].map((h) => (
+                  <label
+                    key={h.value}
+                    className="group flex cursor-pointer items-center gap-2.5"
+                    onClick={() => {
+                      setSelectedHours(h.value);
+                      setPage(1);
+                    }}
+                  >
+                    <div
+                      className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
+                        selectedHours === h.value
+                          ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]'
+                          : 'border-[var(--border-subtle)]'
+                      }`}
+                    >
+                      {selectedHours === h.value && <div className="h-2 w-2 rounded-sm bg-white" />}
+                    </div>
+                    <span
+                      className={`text-xs font-bold ${
+                        selectedHours === h.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'
+                      }`}
+                    >
+                      {h.label}
+                    </span>
+                  </label>
+                ))}
               </div>
+            </div>
 
-              {/* 8. Ownership */}
-              <div>
-                <label className="text-muted mb-2 block text-[10px] font-black tracking-widest uppercase">
-                  Ownership
-                </label>
-                <div className="grid grid-cols-4 gap-1">
-                  {[
-                    { label: 'Any', val: undefined },
-                    { label: '1st', val: 1 },
-                    { label: '2nd', val: 2 },
-                    { label: '3rd+', val: 3 },
-                  ].map((o) => (
-                    <button
-                      key={o.label}
-                      onClick={() => setOwnership(o.val)}
-                      className={`rounded-lg border py-1.5 text-xs font-bold transition-all ${
-                        ownership === o.val
-                          ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)] text-white'
-                          : 'bg-foreground/5 text-muted hover:text-foreground border-transparent'
+            {/* Filter: Ownership */}
+            <div className="flex flex-col gap-2.5 border-t border-[var(--border-subtle)] pt-4">
+              <span className="text-muted text-xs font-black tracking-widest uppercase">
+                Ownership
+              </span>
+              <div className="flex flex-col gap-1.5">
+                {[
+                  { value: '', label: 'All Owners' },
+                  { value: '1', label: '1st Owner Only' },
+                  { value: '2', label: '2nd Owner' },
+                  { value: '3', label: '3rd+ Owner' },
+                ].map((o) => (
+                  <label
+                    key={o.value}
+                    className="group flex cursor-pointer items-center gap-2.5"
+                    onClick={() => {
+                      setSelectedOwnership(o.value);
+                      setPage(1);
+                    }}
+                  >
+                    <div
+                      className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
+                        selectedOwnership === o.value
+                          ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]'
+                          : 'border-[var(--border-subtle)]'
+                      }`}
+                    >
+                      {selectedOwnership === o.value && <div className="h-2 w-2 rounded-sm bg-white" />}
+                    </div>
+                    <span
+                      className={`text-xs font-bold ${
+                        selectedOwnership === o.value ? 'text-foreground' : 'text-muted group-hover:text-foreground'
                       }`}
                     >
                       {o.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 9. Urgency Filter */}
-              <div>
-                <label className="text-muted mb-2 block text-[10px] font-black tracking-widest uppercase">
-                  Seller Urgency
-                </label>
-                <select
-                  value={urgency}
-                  onChange={(e) => setUrgency(e.target.value)}
-                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2 text-xs font-bold outline-none"
-                >
-                  <option value="">Any Urgency</option>
-                  <option value="FIFTEEN_DAYS">Urgent (Within 15 Days)</option>
-                  <option value="THIRTY_DAYS">Within 30 Days</option>
-                  <option value="NO_RUSH">No Rush</option>
-                </select>
-              </div>
-
-              {/* 10. Verification & Legal Toggles */}
-              <div className="space-y-2.5 border-t border-[var(--border-subtle)] pt-2">
-                <label className="bg-foreground/5 hover:bg-foreground/10 flex cursor-pointer items-center gap-2.5 rounded-xl p-2.5 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={isCertified}
-                    onChange={(e) => setIsCertified(e.target.checked)}
-                    className="h-4 w-4 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)]"
-                  />
-                  <span className="text-foreground flex items-center gap-1.5 text-xs font-black">
-                    <ShieldCheck size={14} className="text-[var(--color-brand-green)]" /> Certified
-                    Only
-                  </span>
-                </label>
-
-                <label className="bg-foreground/5 hover:bg-foreground/10 flex cursor-pointer items-center gap-2.5 rounded-xl p-2.5 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={financeAvailable}
-                    onChange={(e) => setFinanceAvailable(e.target.checked)}
-                    className="h-4 w-4 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)]"
-                  />
-                  <span className="text-foreground flex items-center gap-1.5 text-xs font-black">
-                    <CircleDollarSign size={14} className="text-blue-500" /> Finance Available
-                  </span>
-                </label>
-
-                <label className="bg-foreground/5 hover:bg-foreground/10 flex cursor-pointer items-center gap-2.5 rounded-xl p-2.5 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={rcAvailable}
-                    onChange={(e) => setRcAvailable(e.target.checked)}
-                    className="h-4 w-4 rounded text-[var(--color-brand-green)] focus:ring-[var(--color-brand-green)]"
-                  />
-                  <span className="text-foreground flex items-center gap-1.5 text-xs font-black">
-                    <FileCheck size={14} className="text-emerald-500" /> Original RC Available
-                  </span>
-                </label>
+                    </span>
+                  </label>
+                ))}
               </div>
             </div>
-
-            {/* Mobile Apply Button */}
-            {mobileFilterOpen && (
-              <button
-                onClick={() => setMobileFilterOpen(false)}
-                className="mt-4 w-full rounded-xl bg-[var(--color-brand-green)] py-3 font-black text-white shadow-lg"
-              >
-                Apply Filters ({activeFiltersCount})
-              </button>
-            )}
           </div>
         </aside>
 
-        {/* ---------------------------------------------------- */}
-        {/* RIGHT COLUMN: LISTINGS & CONTROL BAR */}
-        {/* ---------------------------------------------------- */}
-        <main className="flex min-w-0 flex-1 flex-col gap-6">
-          {/* Top Controls Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--card-bg)] p-4 shadow-[var(--card-shadow)] backdrop-blur-xl">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setMobileFilterOpen(true)}
-                className="bg-foreground/5 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold lg:hidden"
-              >
-                <Filter size={16} /> Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}
-              </button>
+        {/* MAIN CONTENT AREA */}
+        <div className="flex w-full min-w-0 flex-1 flex-col gap-6">
+          {/* Top Bar Actions (Matching /tractors) */}
+          <div className="bg-background/50 flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-[var(--border-subtle)] p-4 backdrop-blur-md">
+            <div className="flex flex-col gap-2">
+              <p className="text-muted text-sm font-bold">
+                Showing <span className="text-foreground">{tractors.length}</span> tractors on this page
+              </p>
 
-              <div className="text-muted text-xs font-black tracking-wider uppercase">
-                Showing{' '}
-                <span className="text-foreground text-sm font-black">{tractors.length}</span>{' '}
-                Tractors
-              </div>
+              {/* Active Filter Chips */}
+              {hasActiveFilters && (
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedBrand && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-xs font-bold text-[var(--color-brand-green)]">
+                      {selectedBrand}
+                      <button onClick={() => setSelectedBrand('')}>
+                        <X size={12} />
+                      </button>
+                    </span>
+                  )}
+                  {selectedState && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-xs font-bold text-[var(--color-brand-green)]">
+                      {selectedState}
+                      <button onClick={() => setSelectedState('')}>
+                        <X size={12} />
+                      </button>
+                    </span>
+                  )}
+                  {selectedPrice && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-xs font-bold text-[var(--color-brand-green)]">
+                      Price Filter
+                      <button onClick={() => setSelectedPrice('')}>
+                        <X size={12} />
+                      </button>
+                    </span>
+                  )}
+                  {isCertifiedOnly && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-lime-400/10 px-2.5 py-0.5 text-xs font-bold text-lime-400">
+                      Certified
+                      <button onClick={() => setIsCertifiedOnly(false)}>
+                        <X size={12} />
+                      </button>
+                    </span>
+                  )}
+                  {financeOnly && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2.5 py-0.5 text-xs font-bold text-purple-400">
+                      Loan
+                      <button onClick={() => setFinanceOnly(false)}>
+                        <X size={12} />
+                      </button>
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
+            {/* View Mode & Sort */}
             <div className="flex items-center gap-3">
-              {/* Sort By Dropdown */}
               <div className="flex items-center gap-2">
-                <ArrowUpDown size={14} className="text-muted hidden sm:block" />
+                <ArrowUpDown size={14} className="text-muted" />
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-background text-foreground rounded-xl border border-[var(--border-subtle)] px-3 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
+                  onChange={(e) => {
+                    setSortBy(e.target.value as ListingSortBy);
+                    setPage(1);
+                  }}
+                  className="bg-background rounded-xl border border-[var(--border-subtle)] px-3 py-2 text-xs font-bold text-foreground focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                 >
-                  <option value="recent">Sort: Recently Added</option>
-                  <option value="price_low">Price: Low to High</option>
-                  <option value="price_high">Price: High to Low</option>
-                  <option value="hours_low">Hours: Low to High</option>
-                  <option value="year_new">Year: Newest First</option>
-                  <option value="quality_high">Quality Score: Highest</option>
+                  <option value="newest">Newest First</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="year_desc">Year: Newest</option>
+                  <option value="hours_asc">Lowest Hours</option>
                 </select>
               </div>
 
-              {/* View Layout Toggle */}
-              <div className="bg-background flex rounded-xl border border-[var(--border-subtle)] p-1 shadow-sm">
+              <div className="bg-foreground/5 flex items-center rounded-xl border border-[var(--border-subtle)] p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`rounded-lg p-1.5 transition-colors ${viewMode === 'grid' ? 'bg-[var(--color-brand-green)] text-white' : 'text-muted hover:text-foreground'}`}
+                  className={`rounded-lg p-1.5 transition-colors ${
+                    viewMode === 'grid'
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted hover:text-foreground'
+                  }`}
                   title="Grid View"
                 >
-                  <LayoutGrid size={16} />
+                  <Grid3X3 size={16} />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`rounded-lg p-1.5 transition-colors ${viewMode === 'list' ? 'bg-[var(--color-brand-green)] text-white' : 'text-muted hover:text-foreground'}`}
+                  className={`rounded-lg p-1.5 transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted hover:text-foreground'
+                  }`}
                   title="List View"
                 >
-                  <LayoutList size={16} />
+                  <List size={16} />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* ACTIVE FILTER BADGES ROW */}
-          {activeFiltersCount > 0 && (
-            <div className="animate-fade-in flex flex-wrap items-center gap-2">
-              <span className="text-muted text-[11px] font-black tracking-wider uppercase">
-                Active:
-              </span>
-
-              {searchQuery && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                  Search: "{searchQuery}"
-                  <button onClick={() => setSearchQuery('')}>
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-              {selectedBrand && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                  Brand: {selectedBrand}
-                  <button onClick={() => setSelectedBrand(null)}>
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-              {selectedState && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                  State: {selectedState}
-                  <button onClick={() => setSelectedState('')}>
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-              {(priceMin || priceMax) && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                  Price: ₹{priceMin ? priceMin / 100000 + 'L' : '0'} - ₹
-                  {priceMax ? priceMax / 100000 + 'L' : 'Max'}
-                  <button
-                    onClick={() => {
-                      setPriceMin(undefined);
-                      setPriceMax(undefined);
-                    }}
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-              {conditionGrade && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                  Grade: {conditionGrade}
-                  <button onClick={() => setConditionGrade('')}>
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-              {isCertified && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                  Certified Only
-                  <button onClick={() => setIsCertified(false)}>
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-              {financeAvailable && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-600">
-                  Finance Available
-                  <button onClick={() => setFinanceAvailable(false)}>
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-
-              <button
-                onClick={handleClearAllFilters}
-                className="ml-auto text-xs font-bold text-red-500 underline"
-              >
-                Clear All
-              </button>
-            </div>
-          )}
-
-          {/* ---------------------------------------------------- */}
-          {/* LISTINGS CONTAINER */}
-          {/* ---------------------------------------------------- */}
+          {/* LISTINGS CONTENT */}
           {loading ? (
-            <div className="flex w-full justify-center py-28">
-              <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
+            <div className="flex flex-1 flex-col items-center justify-center py-24">
+              <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={40} />
+              <p className="text-muted mt-3 text-xs font-bold">Finding matching pre-owned tractors...</p>
             </div>
-          ) : paginatedTractors.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-[var(--border-subtle)] bg-[var(--card-bg)] p-12 text-center shadow-[var(--card-shadow)] backdrop-blur-3xl">
-              <Search size={56} className="text-muted mb-4 opacity-40" />
-              <h3 className="text-foreground mb-2 text-2xl font-black">
-                No Matching Used Tractors
-              </h3>
-              <p className="text-muted mb-6 max-w-md text-sm font-bold">
-                We couldn't find any tractors matching your exact filter criteria. Try adjusting or
-                clearing your filters.
+          ) : tractors.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center rounded-[2rem] border border-dashed border-[var(--border-subtle)] bg-background/50 p-12 text-center backdrop-blur-md">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] mb-4">
+                <Tractor size={32} />
+              </div>
+              <h3 className="text-lg font-black text-foreground">No Used Tractors Match Your Filters</h3>
+              <p className="text-muted text-xs max-w-md mt-1 mb-6">
+                Try widening your price range, location, or brand selection to discover more tractors.
               </p>
               <button
-                onClick={handleClearAllFilters}
-                className="rounded-xl bg-[var(--color-brand-green)] px-6 py-3 font-black text-white shadow-md transition-transform hover:-translate-y-0.5 hover:bg-[var(--color-brand-green)]/90"
+                onClick={clearAllFilters}
+                className="bg-[var(--color-brand-green)] text-black rounded-xl px-5 py-2.5 text-xs font-bold hover:opacity-90 transition-all"
               >
                 Reset All Filters
               </button>
             </div>
-          ) : viewMode === 'grid' ? (
-            /* ---------------- GRID VIEW ---------------- */
-            <div className="animate-fade-in grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {paginatedTractors.map((tractor) => {
-                const imgUrl = getListingImageUrl(tractor);
-                return (
-                  <div
-                    key={tractor.id}
-                    className="group relative flex flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--card-bg)] shadow-[var(--card-shadow)] backdrop-blur-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--color-brand-green)]/10 hover:shadow-xl"
-                  >
-                    {/* Badge Overlay */}
-                    <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5">
-                      {tractor.isCertified && (
-                        <span className="flex items-center gap-1 rounded-lg bg-[var(--color-brand-green)] px-2.5 py-1 text-[10px] font-black tracking-wider text-white uppercase shadow-md">
-                          <ShieldCheck size={12} /> Certified
-                        </span>
-                      )}
-                      {tractor.financeAvailable && (
-                        <span className="rounded-lg bg-blue-600 px-2.5 py-1 text-[10px] font-black tracking-wider text-white uppercase shadow-md">
-                          Finance
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Quick View Floating Button */}
-                    <button
-                      onClick={() => handleOpenQuickView(tractor.id)}
-                      className="bg-background/80 text-foreground hover:bg-background absolute top-3 right-3 z-10 rounded-full p-2 opacity-0 shadow-md backdrop-blur-md transition-all group-hover:opacity-100 hover:text-[var(--color-brand-green)]"
-                      title="Quick Preview API"
-                    >
-                      <Eye size={16} />
-                    </button>
-
-                    {/* Tractor Image */}
-                    <div className="bg-foreground/5 relative h-52 w-full overflow-hidden">
-                      <img
-                        src={imgUrl}
-                        alt={`${tractor.tractorBrand} ${tractor.tractorModel}`}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute bottom-3 left-3">
-                        <span className="bg-background/90 text-foreground rounded-md border border-[var(--border-subtle)] px-2.5 py-0.5 text-[11px] font-black shadow-sm backdrop-blur-md">
-                          {tractor.viewsCount || 0} Views
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Card Content */}
-                    <div className="flex flex-1 flex-col justify-between gap-4 p-5">
-                      <div>
-                        <div className="mb-2 flex items-start justify-between gap-2">
-                          <div>
-                            <h2 className="text-foreground line-clamp-1 text-xl font-black transition-colors group-hover:text-[var(--color-brand-green)]">
-                              {tractor.tractorBrand} {tractor.tractorModel}
-                            </h2>
-                            <div className="text-muted mt-1 flex items-center gap-1.5 text-xs font-bold">
-                              <MapPin
-                                size={13}
-                                className="shrink-0 text-[var(--color-brand-green)]"
-                              />
-                              <span className="truncate">
-                                {tractor.villageCity ? `${tractor.villageCity}, ` : ''}
-                                {tractor.district}, {tractor.state}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Price */}
-                        <div className="my-3 flex items-baseline justify-between">
-                          <span className="text-2xl font-black text-[var(--color-brand-green)]">
-                            {formatPrice(tractor.askingPrice)}
-                          </span>
-                          {tractor.negotiable && (
-                            <span className="text-muted bg-foreground/5 rounded px-2 py-0.5 text-[10px] font-black tracking-wider uppercase">
-                              Negotiable
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Quick Spec Pills Grid */}
-                        <div className="bg-foreground/5 mb-2 grid grid-cols-3 gap-2 rounded-2xl p-3 text-center">
-                          <div>
-                            <div className="text-muted text-[9px] font-black tracking-wider uppercase">
-                              Year
-                            </div>
-                            <div className="text-foreground text-xs font-black">
-                              {tractor.yearOfManufacture}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-muted text-[9px] font-black tracking-wider uppercase">
-                              Hours
-                            </div>
-                            <div className="text-foreground text-xs font-black">
-                              {tractor.hoursUsed ? `${tractor.hoursUsed} hrs` : 'N/A'}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-muted text-[9px] font-black tracking-wider uppercase">
-                              Owner
-                            </div>
-                            <div className="text-foreground text-xs font-black">
-                              {tractor.ownership}
-                              {tractor.ownership === 1
-                                ? 'st'
-                                : tractor.ownership === 2
-                                  ? 'nd'
-                                  : 'rd'}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Card Action Buttons */}
-                      <div className="flex items-center gap-2 border-t border-[var(--border-subtle)] pt-2">
-                        <button
-                          onClick={() => {
-                            setEnquiryModalOpen(tractor);
-                            setEnquirySuccess(false);
-                          }}
-                          className="bg-background flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--color-brand-green)] px-3 py-2.5 text-xs font-black text-[var(--color-brand-green)] transition-colors hover:bg-[var(--color-brand-green)]/10"
-                        >
-                          <MessageCircle size={14} /> Contact
-                        </button>
-
-                        <Link
-                          href={`/used-tractors/details/${tractor.id}`}
-                          className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-[var(--color-brand-green)] px-3 py-2.5 text-xs font-black text-white shadow-[var(--color-brand-green)]/20 shadow-md transition-all hover:bg-[var(--color-brand-green)]/90"
-                        >
-                          Details <ChevronRight size={14} />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           ) : (
-            /* ---------------- LIST VIEW ---------------- */
-            <div className="animate-fade-in flex flex-col gap-4">
-              {paginatedTractors.map((tractor) => {
-                const imgUrl = getListingImageUrl(tractor);
-                return (
-                  <div
-                    key={tractor.id}
-                    className="group relative flex flex-col gap-6 rounded-3xl border border-[var(--border-subtle)] bg-[var(--card-bg)] p-5 shadow-[var(--card-shadow)] backdrop-blur-3xl transition-all hover:-translate-y-0.5 hover:shadow-xl md:flex-row"
-                  >
-                    {/* Image */}
-                    <div className="bg-foreground/5 relative h-48 w-full shrink-0 overflow-hidden rounded-2xl md:h-auto md:w-64">
-                      <img
-                        src={imgUrl}
-                        alt={`${tractor.tractorBrand} ${tractor.tractorModel}`}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      {tractor.isCertified && (
-                        <div className="absolute top-2 left-2 rounded bg-[var(--color-brand-green)] px-2 py-0.5 text-[10px] font-black tracking-wider text-white uppercase shadow">
-                          Certified
-                        </div>
-                      )}
-                    </div>
+            <div className="space-y-8">
+              <div
+                className={
+                  viewMode === 'grid'
+                    ? 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3'
+                    : 'flex flex-col gap-4'
+                }
+              >
+                {tractors.map((listing) => (
+                  <PublicUsedTractorCard
+                    key={listing.id}
+                    listing={listing}
+                    viewMode={viewMode}
+                    onQuickView={(id) => setQuickViewId(id)}
+                    onEnquiry={(item) => setEnquiryListing(item)}
+                  />
+                ))}
+              </div>
 
-                    {/* Information */}
-                    <div className="flex flex-1 flex-col justify-between">
-                      <div>
-                        <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
-                          <div>
-                            <h2 className="text-foreground text-2xl font-black transition-colors group-hover:text-[var(--color-brand-green)]">
-                              {tractor.tractorBrand} {tractor.tractorModel}
-                            </h2>
-                            <div className="text-muted mt-1 flex items-center gap-1.5 text-xs font-bold">
-                              <MapPin size={14} className="text-[var(--color-brand-green)]" />
-                              {tractor.villageCity ? `${tractor.villageCity}, ` : ''}
-                              {tractor.district}, {tractor.state}
-                            </div>
-                          </div>
-
-                          <div className="text-right">
-                            <div className="text-2xl font-black text-[var(--color-brand-green)]">
-                              {formatPrice(tractor.askingPrice)}
-                            </div>
-                            {tractor.negotiable && (
-                              <div className="text-muted text-[10px] font-bold uppercase">
-                                Negotiable
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Details pill bar */}
-                        <div className="my-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
-                          <div className="bg-foreground/5 rounded-xl p-2 text-center">
-                            <span className="text-muted block text-[10px] font-black uppercase">
-                              Year
-                            </span>
-                            <span className="text-xs font-black">{tractor.yearOfManufacture}</span>
-                          </div>
-                          <div className="bg-foreground/5 rounded-xl p-2 text-center">
-                            <span className="text-muted block text-[10px] font-black uppercase">
-                              Hours
-                            </span>
-                            <span className="text-xs font-black">
-                              {tractor.hoursUsed ? `${tractor.hoursUsed} hrs` : 'N/A'}
-                            </span>
-                          </div>
-                          <div className="bg-foreground/5 rounded-xl p-2 text-center">
-                            <span className="text-muted block text-[10px] font-black uppercase">
-                              Owner
-                            </span>
-                            <span className="text-xs font-black">
-                              {tractor.ownership}
-                              {tractor.ownership === 1 ? 'st' : 'nd'}
-                            </span>
-                          </div>
-                          <div className="bg-foreground/5 rounded-xl p-2 text-center">
-                            <span className="text-muted block text-[10px] font-black uppercase">
-                              Condition
-                            </span>
-                            <span className="text-xs font-black capitalize">
-                              {(tractor.conditionGrade || 'GOOD').toLowerCase()}
-                            </span>
-                          </div>
-                          <div className="bg-foreground/5 rounded-xl p-2 text-center">
-                            <span className="text-muted block text-[10px] font-black uppercase">
-                              Engine
-                            </span>
-                            <span className="text-xs font-black text-[var(--color-brand-green)]">
-                              {tractor.engineConditionPct
-                                ? `${tractor.engineConditionPct}%`
-                                : 'Good'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-3">
-                        <div className="text-muted flex flex-wrap gap-2 text-xs font-bold">
-                          {tractor.rcAvailable && (
-                            <span className="bg-foreground/5 rounded border border-[var(--border-subtle)] px-2 py-0.5">
-                              RC Available
-                            </span>
-                          )}
-                          {tractor.loanClearanceStatus === 'CLEAR' && (
-                            <span className="bg-foreground/5 rounded border border-[var(--border-subtle)] px-2 py-0.5">
-                              Loan Cleared
-                            </span>
-                          )}
-                          {tractor.financeAvailable && (
-                            <span className="rounded border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-blue-600">
-                              Finance Available
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleOpenQuickView(tractor.id)}
-                            className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-black transition-colors"
-                          >
-                            <Eye size={14} /> Quick View
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              setEnquiryModalOpen(tractor);
-                              setEnquirySuccess(false);
-                            }}
-                            className="bg-background flex items-center gap-1 rounded-xl border border-[var(--color-brand-green)] px-4 py-2 text-xs font-black text-[var(--color-brand-green)] transition-colors hover:bg-[var(--color-brand-green)]/10"
-                          >
-                            <MessageCircle size={14} /> Contact
-                          </button>
-
-                          <Link
-                            href={`/used-tractors/details/${tractor.id}`}
-                            className="flex items-center gap-1 rounded-xl bg-[var(--color-brand-green)] px-4 py-2 text-xs font-black text-white shadow-md transition-all hover:bg-[var(--color-brand-green)]/90"
-                          >
-                            Details <ChevronRight size={14} />
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* ---------------------------------------------------- */}
-          {/* PAGINATION COMPONENT */}
-          {/* ---------------------------------------------------- */}
-          {!loading && tractors.length > 0 && (
-            <div className="mt-8 flex justify-center">
+              {/* Shared Pagination Component */}
               <Pagination
                 page={page}
                 limit={limit}
-                totalCount={totalCount}
-                totalPages={Math.ceil(totalCount / limit)}
-                onPageChange={setPage}
+                totalCount={totalTractors}
+                totalPages={totalPages}
+                onPageChange={(p) => setPage(p)}
                 onLimitChange={(l) => {
                   setLimit(l);
                   setPage(1);
@@ -1318,297 +785,35 @@ export default function UsedTractorsPage() {
               />
             </div>
           )}
-        </main>
+        </div>
       </div>
 
-      {/* ---------------------------------------------------- */}
-      {/* QUICK VIEW INSPECTION MODAL (using getUsedTractorListingById API) */}
-      {/* ---------------------------------------------------- */}
-      {quickViewModalId !== null && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-          <div
-            className="bg-background/80 absolute inset-0 backdrop-blur-xl"
-            onClick={() => setQuickViewModalId(null)}
-          />
+      {/* QUICK VIEW INSPECTION MODAL */}
+      <PublicUsedQuickViewModal
+        listingId={quickViewId}
+        onClose={() => setQuickViewId(null)}
+        onContactSeller={(item) => setEnquiryListing(item)}
+      />
 
-          <div className="bg-background custom-scrollbar animate-slide-up relative max-h-[90vh] w-full max-w-2xl overflow-hidden overflow-y-auto rounded-3xl border border-[var(--border-subtle)] p-6 shadow-2xl sm:p-8">
-            <button
-              onClick={() => setQuickViewModalId(null)}
-              className="bg-foreground/5 hover:bg-foreground/10 absolute top-5 right-5 z-10 rounded-full p-2 transition-colors"
-            >
-              <X size={18} />
-            </button>
-
-            {quickViewLoading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <TractorLoader size={48} className="mb-4 text-[var(--color-brand-green)]" />
-                <p className="text-muted text-sm font-bold">Fetching inspection data from API...</p>
-              </div>
-            ) : quickViewDetails ? (
-              <div className="space-y-6">
-                {/* Header */}
-                <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--border-subtle)] pb-4">
-                  <div>
-                    <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black text-[var(--color-brand-green)]">
-                      <ShieldCheck size={14} /> API Verified Inspection Data
-                    </div>
-                    <h3 className="text-foreground text-2xl font-black">
-                      {quickViewDetails.tractorBrand} {quickViewDetails.tractorModel}
-                    </h3>
-                    <p className="text-muted mt-1 flex items-center gap-1 text-xs font-bold">
-                      <MapPin size={13} className="text-[var(--color-brand-green)]" />
-                      {quickViewDetails.villageCity ? `${quickViewDetails.villageCity}, ` : ''}
-                      {quickViewDetails.district}, {quickViewDetails.state}
-                    </p>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-2xl font-black text-[var(--color-brand-green)]">
-                      {formatPrice(quickViewDetails.askingPrice)}
-                    </div>
-                    {quickViewDetails.negotiable && (
-                      <span className="text-muted bg-foreground/5 rounded px-2 py-0.5 text-[10px] font-black uppercase">
-                        Negotiable
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Inspection Components Grid */}
-                <div>
-                  <h4 className="text-muted mb-3 flex items-center gap-1.5 text-xs font-black tracking-widest uppercase">
-                    <Sparkles size={14} className="text-[var(--color-brand-green)]" /> Inspection
-                    Scorecard & Component Status
-                  </h4>
-
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-3">
-                      <div className="text-muted text-[10px] font-black uppercase">
-                        Engine Condition
-                      </div>
-                      <div className="mt-0.5 text-base font-black text-[var(--color-brand-green)]">
-                        {quickViewDetails.engineConditionPct
-                          ? `${quickViewDetails.engineConditionPct}% Rating`
-                          : '90% Tested'}
-                      </div>
-                    </div>
-
-                    <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-3">
-                      <div className="text-muted text-[10px] font-black uppercase">
-                        Tyre Condition
-                      </div>
-                      <div className="text-foreground mt-0.5 text-base font-black capitalize">
-                        {(quickViewDetails.tyreCondition || 'GOOD').toLowerCase()}
-                      </div>
-                    </div>
-
-                    <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-3">
-                      <div className="text-muted text-[10px] font-black uppercase">
-                        Body & Paint
-                      </div>
-                      <div className="text-foreground mt-0.5 text-base font-black capitalize">
-                        {(quickViewDetails.bodyCondition || 'GOOD').toLowerCase()}
-                      </div>
-                    </div>
-
-                    <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-3">
-                      <div className="text-muted text-[10px] font-black uppercase">Hydraulics</div>
-                      <div className="text-foreground mt-0.5 text-base font-black capitalize">
-                        {(quickViewDetails.hydraulicsCondition || 'GOOD').toLowerCase()}
-                      </div>
-                    </div>
-
-                    <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-3">
-                      <div className="text-muted text-[10px] font-black uppercase">
-                        Clutch Condition
-                      </div>
-                      <div className="text-foreground mt-0.5 text-base font-black capitalize">
-                        {(quickViewDetails.clutchCondition || 'GOOD').toLowerCase()}
-                      </div>
-                    </div>
-
-                    <div className="bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-3">
-                      <div className="text-muted text-[10px] font-black uppercase">RC Status</div>
-                      <div className="mt-0.5 flex items-center gap-1 text-base font-black text-emerald-600">
-                        <CheckCircle2 size={14} />{' '}
-                        {quickViewDetails.rcAvailable ? 'Verified RC' : 'In Process'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Description */}
-                {quickViewDetails.description && (
-                  <div>
-                    <h4 className="text-muted mb-1.5 text-xs font-black tracking-widest uppercase">
-                      Seller Notes
-                    </h4>
-                    <p className="text-foreground bg-foreground/5 rounded-2xl p-3 text-xs leading-relaxed font-bold">
-                      {quickViewDetails.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Seller & Action Footer */}
-                <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--border-subtle)] pt-4">
-                  <div className="text-muted text-xs font-bold">
-                    ID: #{quickViewDetails.id} • Views: {quickViewDetails.viewsCount || 0}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => {
-                        setQuickViewModalId(null);
-                        setEnquiryModalOpen(quickViewDetails);
-                        setEnquirySuccess(false);
-                      }}
-                      className="bg-background flex items-center gap-1.5 rounded-xl border border-[var(--color-brand-green)] px-5 py-2.5 text-xs font-black text-[var(--color-brand-green)] transition-colors hover:bg-[var(--color-brand-green)]/10"
-                    >
-                      <MessageCircle size={15} /> Contact Seller
-                    </button>
-
-                    <Link
-                      href={`/used-tractors/details/${quickViewDetails.id}`}
-                      className="flex items-center gap-1 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-black text-white shadow-md transition-all hover:bg-[var(--color-brand-green)]/90"
-                    >
-                      Full Details <ChevronRight size={15} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-muted py-12 text-center">Failed to load detail preview.</div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ---------------------------------------------------- */}
-      {/* SELLER ENQUIRY LEAD MODAL (using createEnquiry API) */}
-      {/* ---------------------------------------------------- */}
-      {enquiryModalOpen && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-          <div
-            className="bg-background/80 absolute inset-0 backdrop-blur-xl"
-            onClick={() => setEnquiryModalOpen(null)}
-          />
-
-          <div className="bg-background animate-slide-up relative w-full max-w-lg overflow-hidden rounded-3xl border border-[var(--border-subtle)] p-6 shadow-2xl sm:p-8">
-            <button
-              onClick={() => setEnquiryModalOpen(null)}
-              className="bg-foreground/5 hover:bg-foreground/10 absolute top-5 right-5 z-10 rounded-full p-2 transition-colors"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="mb-6 pr-10">
-              <h3 className="text-foreground mb-1 text-2xl font-black">Contact Seller</h3>
-              <p className="text-muted text-xs font-bold">
-                Inquiring about{' '}
-                <span className="font-black text-[var(--color-brand-green)]">
-                  {enquiryModalOpen.tractorBrand} {enquiryModalOpen.tractorModel}
-                </span>
-              </p>
-            </div>
-
-            {enquirySuccess ? (
-              <div className="animate-fade-in flex flex-col items-center justify-center py-8 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                  <CheckCircle2 size={36} />
-                </div>
-                <h4 className="text-foreground mb-2 text-xl font-black">
-                  Enquiry Sent Successfully!
-                </h4>
-                <p className="text-muted mb-6 max-w-xs text-xs font-bold">
-                  The seller will receive your message and contact details directly.
-                </p>
-                <button
-                  onClick={() => setEnquiryModalOpen(null)}
-                  className="rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-black text-white shadow-md"
-                >
-                  Close Window
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleEnquirySubmit} className="space-y-4">
-                {enquiryError && (
-                  <div className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs font-bold text-red-600">
-                    <AlertCircle size={16} /> {enquiryError}
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-muted mb-1 block text-[10px] font-black tracking-widest uppercase">
-                    Full Name *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="Enter your name"
-                    value={enquiryForm.name}
-                    onChange={(e) => setEnquiryForm({ ...enquiryForm, name: e.target.value })}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-muted mb-1 block text-[10px] font-black tracking-widest uppercase">
-                    Mobile Number *
-                  </label>
-                  <input
-                    required
-                    type="tel"
-                    placeholder="+91 XXXXX XXXXX"
-                    value={enquiryForm.mobile}
-                    onChange={(e) => setEnquiryForm({ ...enquiryForm, mobile: e.target.value })}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-muted mb-1 block text-[10px] font-black tracking-widest uppercase">
-                    Your Price Offer (INR Optional)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder={`Asking price: ₹${enquiryModalOpen.askingPrice}`}
-                    value={enquiryForm.offerPrice}
-                    onChange={(e) => setEnquiryForm({ ...enquiryForm, offerPrice: e.target.value })}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-muted mb-1 block text-[10px] font-black tracking-widest uppercase">
-                    Message / Note
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Hi, I am interested in viewing this tractor..."
-                    value={enquiryForm.message}
-                    onChange={(e) => setEnquiryForm({ ...enquiryForm, message: e.target.value })}
-                    className="bg-foreground/5 text-foreground w-full resize-none rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={submittingEnquiry}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] py-3.5 text-xs font-black text-white shadow-[var(--color-brand-green)]/20 shadow-lg transition-all hover:bg-[var(--color-brand-green)]/90 disabled:opacity-50"
-                >
-                  {submittingEnquiry ? (
-                    <TractorLoader size={18} className="text-white" />
-                  ) : (
-                    <>
-                      <MessageCircle size={16} /> Send Direct Enquiry
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      {/* SECURE ENQUIRY / CONTACT SELLER MODAL */}
+      <PublicUsedEnquiryModal
+        listing={enquiryListing}
+        onClose={() => setEnquiryListing(null)}
+      />
     </div>
+  );
+}
+
+export default function UsedTractorsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-96 items-center justify-center">
+          <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={40} />
+        </div>
+      }
+    >
+      <UsedTractorsListingContent />
+    </Suspense>
   );
 }

@@ -4,6 +4,16 @@ import type { ImplementImportReport } from '@/types/api/implement-import';
 import { EquipmentBrand } from './equipmentBrands';
 import { ImplementCategory } from './implementCategories';
 
+export interface ImplementFamilySummary {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  logoUrl?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+}
+
 export interface Implement {
   id: number;
   categoryId: number;
@@ -55,6 +65,7 @@ export interface Implement {
 
   category?: ImplementCategory;
   brand?: EquipmentBrand;
+  family?: ImplementFamilySummary | null;
   compatibleTractors?: any[];
 }
 
@@ -87,6 +98,7 @@ export const implementAPI = {
     search?: string;
     brandId?: number;
     categoryId?: number;
+    familyId?: number;
     hpMin?: number;
     hpMax?: number;
     priceMin?: number;

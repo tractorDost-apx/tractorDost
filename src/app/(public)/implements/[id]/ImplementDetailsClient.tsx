@@ -23,6 +23,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { Implement } from '@/lib/api/implements';
+import ImplementFamilyPopover from '@/components/implements/ImplementFamilyPopover';
 
 export interface ExtraSpecItem {
   name: string;
@@ -230,6 +231,12 @@ export default function ImplementDetailsClient({
               >
                 {implement.brand.name}
               </Link>
+            </>
+          )}
+          {implement.family?.name && (
+            <>
+              <ChevronRight size={12} />
+              <span className="text-muted">{implement.family.name}</span>
             </>
           )}
           <ChevronRight size={12} />
@@ -496,11 +503,19 @@ export default function ImplementDetailsClient({
         <div className="flex w-full flex-col gap-8 lg:w-[42%]">
           {/* PRICE & HEADER SUMMARY CARD */}
           <div className="spatial-panel relative flex flex-col gap-6 overflow-hidden rounded-[2.5rem] p-8">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {implement.brand?.name && (
                 <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
                   {implement.brand.name}
                 </span>
+              )}
+              {implement.family && (
+                <ImplementFamilyPopover
+                  family={implement.family}
+                  brandName={implement.brand?.name}
+                  brandSlug={implement.brand?.slug}
+                  brandId={implement.brand?.id}
+                />
               )}
               {implement.category?.name && (
                 <span className="bg-foreground/5 text-muted rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs font-bold tracking-wider uppercase">

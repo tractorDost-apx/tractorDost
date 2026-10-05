@@ -189,11 +189,10 @@ export function InventoryTable({
                         <div className="text-foreground flex items-center gap-2 font-black tracking-tight">
                           <span>{title}</span>
                           <span
-                            className={`rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase ${
-                              isCatalog
+                            className={`rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase ${isCatalog
                                 ? 'border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
                                 : 'border-purple-500/20 bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                            }`}
+                              }`}
                           >
                             {isCatalog ? 'Catalog' : 'Custom'}
                           </span>
@@ -246,11 +245,10 @@ export function InventoryTable({
                             ? 'Click to disable availability'
                             : 'Click to enable availability'
                         }
-                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase transition-colors ${
-                          item.isAvailable
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase transition-colors ${item.isAvailable
                             ? 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                             : 'bg-foreground/10 text-muted border border-[var(--border-subtle)]'
-                        }`}
+                          }`}
                       >
                         {item.isAvailable ? 'Active' : 'Disabled'}
                       </button>
@@ -325,11 +323,10 @@ export function InventoryTable({
                         {item.brand || 'No Brand'}
                       </span>
                       <span
-                        className={`py-0.2 rounded border px-1.5 font-mono text-[9px] uppercase ${
-                          isCatalog
+                        className={`py-0.2 rounded border px-1.5 font-mono text-[9px] uppercase ${isCatalog
                             ? 'border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
                             : 'border-purple-500/20 bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                        }`}
+                          }`}
                       >
                         {isCatalog ? 'Catalog' : 'Custom'}
                       </span>
@@ -367,11 +364,10 @@ export function InventoryTable({
               <div className="flex items-center justify-between pt-1">
                 <button
                   onClick={() => onToggleAvailability(item)}
-                  className={`rounded-lg px-3 py-1 text-xs font-bold transition-colors ${
-                    item.isAvailable
+                  className={`rounded-lg px-3 py-1 text-xs font-bold transition-colors ${item.isAvailable
                       ? 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                       : 'bg-foreground/10 text-muted border border-[var(--border-subtle)]'
-                  }`}
+                    }`}
                 >
                   {item.isAvailable ? 'Availability Active' : 'Availability Disabled'}
                 </button>
