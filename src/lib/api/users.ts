@@ -89,6 +89,51 @@ export const usersAPI = {
   },
 
   /**
+   * Update the current authenticated user's profile
+   */
+  updateMe: async (data: Partial<User>) => {
+    const response = await apiClient.patch<{ success: boolean; data: User; message: string }>(
+      '/users/me',
+      data
+    );
+    return response.data;
+  },
+
+  /**
+   * Upload profile photo for current user
+   */
+  uploadProfilePhoto: async (formData: FormData) => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: { profilePhoto: string };
+      message: string;
+    }>('/users/me/profile-photo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Delete profile photo for current user
+   */
+  deleteProfilePhoto: async () => {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(
+      '/users/me/profile-photo'
+    );
+    return response.data;
+  },
+
+  /**
+   * Delete current user's account
+   */
+  deleteMyAccount: async () => {
+    const response = await apiClient.delete<{ success: boolean; message: string }>('/users/me');
+    return response.data;
+  },
+
+  /**
    * Delete a user (Super Admin only)
    */
   deleteUserById: async (id: number) => {
@@ -98,3 +143,4 @@ export const usersAPI = {
     return response.data;
   },
 };
+

@@ -7,30 +7,16 @@ import { useAuth } from '@/store/AuthContext';
 import {
   LayoutDashboard,
   User,
-  Tractor,
-  Heart,
-  Landmark,
   MessageSquareText,
-  Calculator,
-  Search,
-  History,
-  Bell,
+  Wrench,
   LogOut,
-  Inbox,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Profile', href: '/dashboard/profile', icon: User },
-  { label: 'My Listings', href: '/dashboard/my-listings', icon: Tractor },
-  { label: 'Received Enquiries', href: '/dashboard/listing-enquiries', icon: Inbox },
-  { label: 'Favorites', href: '/dashboard/favorites', icon: Heart },
-  { label: 'Loans', href: '/dashboard/loans', icon: Landmark },
   { label: 'Enquiries', href: '/dashboard/my-enquiries', icon: MessageSquareText },
-  { label: 'Valuations', href: '/dashboard/my-valuations', icon: Calculator },
-  { label: 'Saved Searches', href: '/dashboard/saved-searches', icon: Search },
-  { label: 'Compare History', href: '/dashboard/compare-history', icon: History },
-  { label: 'Notifications', href: '/dashboard/notifications', icon: Bell },
+  { label: 'Tractor Repair', href: '/dashboard/tractor-repair', icon: Wrench },
 ];
 
 export default function DashboardSidebar() {

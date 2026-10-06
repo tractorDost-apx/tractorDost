@@ -12,6 +12,7 @@ import { CreateDealerModal } from './components/CreateDealerModal';
 import { EditDealerModal } from './components/EditDealerModal';
 import { DealerModerationModal } from './components/DealerModerationModal';
 import { DealerBrandManagementModal } from './components/DealerBrandManagementModal';
+import { DealerServiceCenterModal } from './components/DealerServiceCenterModal';
 import Pagination from '@/components/shared/Pagination';
 
 export default function AdminDealersPage() {
@@ -43,6 +44,7 @@ export default function AdminDealersPage() {
   const [editingDealer, setEditingDealer] = useState<Dealer | null>(null);
   const [moderatingDealer, setModeratingDealer] = useState<Dealer | null>(null);
   const [assigningBrandDealer, setAssigningBrandDealer] = useState<Dealer | null>(null);
+  const [serviceCenterDealer, setServiceCenterDealer] = useState<Dealer | null>(null);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -133,6 +135,11 @@ export default function AdminDealersPage() {
     setAssigningBrandDealer(dealer);
   };
 
+  const handleOpenServiceCenter = (dealer: Dealer, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setServiceCenterDealer(dealer);
+  };
+
   return (
     <div className="animate-fade-in flex h-full w-full max-w-full flex-col gap-6 overflow-x-hidden pb-12">
       {/* Header section with KPIs */}
@@ -198,6 +205,7 @@ export default function AdminDealersPage() {
           onEditDealer={handleOpenEdit}
           onModerateDealer={handleOpenModeration}
           onAssignBrandDealer={handleOpenAssignBrand}
+          onManageServiceCenter={handleOpenServiceCenter}
         />
 
         {/* Pagination controls */}
@@ -274,6 +282,18 @@ export default function AdminDealersPage() {
           onClose={() => setAssigningBrandDealer(null)}
           onSuccess={() => {
             setAssigningBrandDealer(null);
+            fetchDealers();
+          }}
+        />
+      )}
+
+      {/* Service Center Modal */}
+      {serviceCenterDealer && (
+        <DealerServiceCenterModal
+          dealer={serviceCenterDealer}
+          onClose={() => setServiceCenterDealer(null)}
+          onSuccess={() => {
+            setServiceCenterDealer(null);
             fetchDealers();
           }}
         />

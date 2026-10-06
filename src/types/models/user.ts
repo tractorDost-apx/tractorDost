@@ -6,15 +6,31 @@ export interface Role {
 
 export interface User {
   id: number;
-  fullName?: string;
-  mobile: number; // BigInt from backend might come as string or number, but we type it generally
-  email?: string;
+  fullName?: string | null;
+  mobile: number | string;
+  email?: string | null;
   roleId: number;
   role: Role;
-  profilePhoto?: string;
+  profilePhoto?: string | null;
+  profileId?: string | null;
   isEmailVerified: boolean;
   isMobileVerified: boolean;
   isActive: boolean;
-  preferredLanguage: string;
+  preferredLanguage?: string;
+  state?: string | null;
+  district?: string | null;
+  villageCity?: string | null;
+  pincode?: string | null;
+  preferredBrand?: string | null;
+  farmingType?: string | null;
+  landSize?: number | null;
+  budgetRange?: string | null;
+  sellerType?: string | null;
+  aadhaarRef?: string | null;
+  panRef?: string | null;
+  kycStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  createdAt?: string;
+  updatedAt?: string;
   dealer?: any;
 }
+

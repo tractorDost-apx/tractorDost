@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import {
   Tractor,
   Plus,
@@ -171,13 +172,6 @@ export default function DealerUsedListingsPage() {
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             <span>Refresh</span>
           </button>
-          <SpatialButton
-            onClick={() => setIsCreateModalOpen(true)}
-            variant="primary"
-            className="gap-2 whitespace-nowrap shadow-lg shadow-lime-400/10"
-          >
-            <Plus size={18} /> List Used Tractor
-          </SpatialButton>
         </div>
       </div>
 
@@ -279,11 +273,13 @@ export default function DealerUsedListingsPage() {
           <p className="text-xs text-muted max-w-md mt-1 mb-6">
             {searchQuery
               ? `No pre-owned tractors match "${searchQuery}". Try adjusting your filters.`
-              : 'You have not listed any used tractors in this category yet. List pre-owned tractors directly to receive buyer inquiries.'}
+              : 'You have not listed any used tractors in this category yet. List tractors for sale directly from your inventory.'}
           </p>
-          <SpatialButton onClick={() => setIsCreateModalOpen(true)} variant="primary" className="gap-2">
-            <Plus size={16} /> List Your First Used Tractor
-          </SpatialButton>
+          <Link href="/dealer/inventory">
+            <SpatialButton variant="primary" className="gap-2">
+              <Tractor size={16} /> Go to Inventory
+            </SpatialButton>
+          </Link>
         </div>
       ) : (
         <div className="space-y-6">
