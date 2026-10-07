@@ -2,6 +2,13 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/store/AuthContext';
+import { useDealerServices } from '@/hooks/dealers/use-dealer-services';
+import {
+  ServiceBookingStatus,
+  AdminServiceBookingItem,
+  AdminServiceBookingDetail,
+  CreateServiceBookingPayload,
+} from '@/lib/api/serviceBookings';
 import {
   Wrench,
   Search,
@@ -19,117 +26,315 @@ import {
   Building2,
   X,
   Truck,
-  Check,
+  MapPin,
+  ExternalLink,
+  Loader2,
+  AlertTriangle,
+  Navigation,
 } from 'lucide-react';
 
-interface ServiceBooking {
-  id: string;
-  customerName: string;
-  phone: string;
-  tractorModel: string;
-  serviceType: 'PERIODIC_MAINTENANCE' | 'ENGINE_OVERHAUL' | 'WARRANTY_CLAIM' | 'EMERGENCY_REPAIR';
-  scheduledDate: string;
-  pickupRequired: boolean;
-  status: 'PENDING' | 'IN_WORKSHOP' | 'COMPLETED' | 'CANCELLED';
-  estimatedCost: string;
-  mechanicAssigned?: string;
+const SERVICE_TYPE_LABELS: Record<string, string> = {
+  oil_change: 'Oil & Filter Change',
+  engine_overhaul: 'Engine Overhaul',
+  tyre_fitting: 'Tyre Fitting & Alignment',
+  hydraulics_repair: 'Hydraulics Repair',
+  spare_parts: 'Spare Parts Replacement',
+  body_work: 'Body Work & Paint',
+  electrical: 'Electrical System Repair',
+  transmission_repair: 'Transmission Repair',
+  general_maintenance: 'General Maintenance',
+  PERIODIC_MAINTENANCE: 'Periodic Maintenance',
+  ENGINE_OVERHAUL: 'Engine Overhaul',
+  WARRANTY_CLAIM: 'Warranty Claim',
+  EMERGENCY_REPAIR: 'Emergency Repair',
+};
+
+function formatServiceType(type: string): string {
+  if (!type) return 'General Service';
+  return (
+    SERVICE_TYPE_LABELS[type] ||
+    type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  );
+}
+
+function getGoogleMapsUrl(
+  latitude?: number | null,
+  longitude?: number | null,
+  address?: string | null
+): string | null {
+  if (
+    latitude !== null &&
+    latitude !== undefined &&
+    longitude !== null &&
+    longitude !== undefined &&
+    (latitude !== 0 || longitude !== 0)
+  ) {
+    return `https://www.google.com/maps?q=${latitude},${longitude}`;
+  }
+  if (address && address.trim()) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      address.trim()
+    )}`;
+  }
+  return null;
 }
 
 export default function ServicesPage() {
   const { user } = useAuth();
-  const [bookings, setBookings] = useState<ServiceBooking[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {
+    dealerName,
+    serviceCenter,
+    serviceCenterId,
+    bookings,
+    pagination,
+    loadingDealer,
+    loadingBookings,
+    isUpdating,
+    isCreating,
+    error,
+    searchQuery,
+    setSearchQuery,
+    statusFilter,
+    setStatusFilter,
+    page,
+    setPage,
+    sortBy,
+    setSortBy,
+    refetch,
+    updateStatus,
+    cancelBooking,
+    createBooking,
+    getBookingDetail,
+  } = useDealerServices();
 
-  const dealerPhone =
+  // Toast feedback state
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const showToast = (type: 'success' | 'error', text: string) => {
+    setToast({ type, text });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  // Modals state
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [detailModalBooking, setDetailModalBooking] = useState<AdminServiceBookingDetail | null>(
+    null
+  );
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
+  // Status update notes modal state
+  const [statusChangeTarget, setStatusChangeTarget] = useState<{
+    bookingId: number;
+    newStatus: ServiceBookingStatus;
+    notes: string;
+  } | null>(null);
+
+  // New Booking Form State
+  const [formName, setFormName] = useState('');
+  const [formMobile, setFormMobile] = useState('');
+  const [formTractorBrand, setFormTractorBrand] = useState('');
+  const [formTractorModel, setFormTractorModel] = useState('');
+  const [formServiceType, setFormServiceType] = useState('general_maintenance');
+  const [formDescription, setFormDescription] = useState('');
+  const [formDate, setFormDate] = useState('');
+  const [formAddress, setFormAddress] = useState('');
+  const [formLatitude, setFormLatitude] = useState<number>(serviceCenter?.latitude || 18.5204);
+  const [formLongitude, setFormLongitude] = useState<number>(serviceCenter?.longitude || 73.8567);
+  const [formNotes, setFormNotes] = useState('');
+
+  // Contact / Center details
+  const helplinePhone =
+    serviceCenter?.phone ||
     user?.dealer?.phone ||
     user?.dealer?.contactPersonPhone ||
     (user?.mobile ? String(user.mobile) : null) ||
     'Contact Support';
-  const dealerName = user?.dealer?.businessName || '';
 
-  // New Booking Form State
-  const [newCustomerName, setNewCustomerName] = useState('');
-  const [newPhone, setNewPhone] = useState('');
-  const [newTractorModel, setNewTractorModel] = useState('');
-  const [newServiceType, setNewServiceType] =
-    useState<ServiceBooking['serviceType']>('PERIODIC_MAINTENANCE');
-  const [newDate, setNewDate] = useState('');
-  const [newPickup, setNewPickup] = useState(false);
-
+  // Client-side filtering for immediate responsive search
   const filteredBookings = bookings.filter((b) => {
-    const matchesSearch =
-      b.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.phone.includes(searchQuery) ||
-      b.tractorModel.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus = statusFilter === 'ALL' || b.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+    return (
+      b.name.toLowerCase().includes(query) ||
+      b.mobile.includes(query) ||
+      b.tractorModel.toLowerCase().includes(query) ||
+      b.tractorBrand.toLowerCase().includes(query) ||
+      (b.address && b.address.toLowerCase().includes(query)) ||
+      String(b.bookingId).includes(query)
+    );
   });
 
-  const totalBookings = bookings.length;
-  const pendingCount = bookings.filter((b) => b.status === 'PENDING').length;
-  const inWorkshopCount = bookings.filter((b) => b.status === 'IN_WORKSHOP').length;
+  // KPI Metrics
+  const totalCount = pagination.total || bookings.length;
+  const scheduledCount = bookings.filter((b) => b.status === 'SCHEDULED').length;
+  const inProgressCount = bookings.filter((b) => b.status === 'IN_PROGRESS').length;
   const completedCount = bookings.filter((b) => b.status === 'COMPLETED').length;
+  const cancelledCount = bookings.filter((b) => b.status === 'CANCELLED').length;
 
-  const handleCreateBooking = (e: React.FormEvent) => {
+  const handleOpenDetailModal = async (bookingId: number) => {
+    setLoadingDetail(true);
+    const detail = await getBookingDetail(bookingId);
+    setLoadingDetail(false);
+    if (detail) {
+      setDetailModalBooking(detail);
+    } else {
+      showToast('error', 'Failed to load booking details');
+    }
+  };
+
+  const handleStatusSelectChange = (
+    bookingId: number,
+    currentStatus: ServiceBookingStatus,
+    selectedStatus: ServiceBookingStatus
+  ) => {
+    if (selectedStatus === currentStatus) return;
+
+    // Prompt with notes modal for smooth updates
+    setStatusChangeTarget({
+      bookingId,
+      newStatus: selectedStatus,
+      notes: '',
+    });
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!statusChangeTarget) return;
+    const { bookingId, newStatus, notes } = statusChangeTarget;
+
+    const res = await updateStatus(bookingId, newStatus, notes.trim() || undefined);
+    if (res.success) {
+      showToast('success', res.message);
+      if (detailModalBooking && detailModalBooking.bookingId === bookingId) {
+        setDetailModalBooking({
+          ...detailModalBooking,
+          status: newStatus,
+          notes: notes || detailModalBooking.notes,
+        });
+      }
+    } else {
+      showToast('error', res.message);
+    }
+    setStatusChangeTarget(null);
+  };
+
+  const handleCreateBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCustomerName || !newPhone || !newTractorModel) return;
+    if (
+      !formName ||
+      !formMobile ||
+      !formTractorBrand ||
+      !formTractorModel ||
+      !formDescription ||
+      !formDate ||
+      !formAddress
+    ) {
+      showToast('error', 'Please fill in all required fields');
+      return;
+    }
 
-    const newBooking: ServiceBooking = {
-      id: `SRV-${Math.floor(100 + Math.random() * 900)}`,
-      customerName: newCustomerName,
-      phone: newPhone,
-      tractorModel: newTractorModel,
-      serviceType: newServiceType,
-      scheduledDate: newDate || new Date().toISOString().split('T')[0],
-      pickupRequired: newPickup,
-      status: 'PENDING',
-      estimatedCost: '₹3,000 (Est.)',
-      mechanicAssigned: 'Auto Assigned',
+    const payload: CreateServiceBookingPayload = {
+      name: formName.trim(),
+      mobile: formMobile.trim(),
+      tractorBrand: formTractorBrand.trim(),
+      tractorModel: formTractorModel.trim(),
+      serviceType: formServiceType,
+      description: formDescription.trim(),
+      preferredDate: new Date(formDate).toISOString(),
+      address: formAddress.trim(),
+      latitude: Number(formLatitude) || 18.5204,
+      longitude: Number(formLongitude) || 73.8567,
+      notes: formNotes.trim() || undefined,
     };
 
-    setBookings([newBooking, ...bookings]);
-    setIsModalOpen(false);
-
-    // Reset Form
-    setNewCustomerName('');
-    setNewPhone('');
-    setNewTractorModel('');
-    setNewDate('');
-    setNewPickup(false);
+    const res = await createBooking(payload);
+    if (res.success) {
+      showToast('success', res.message);
+      setIsCreateModalOpen(false);
+      // Reset form
+      setFormName('');
+      setFormMobile('');
+      setFormTractorBrand('');
+      setFormTractorModel('');
+      setFormServiceType('general_maintenance');
+      setFormDescription('');
+      setFormDate('');
+      setFormAddress('');
+      setFormNotes('');
+    } else {
+      showToast('error', res.message);
+    }
   };
 
-  const handleUpdateStatus = (bookingId: string, newStatus: ServiceBooking['status']) => {
-    setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b)));
-  };
-
-  const getStatusBadge = (status: ServiceBooking['status']) => {
+  const getStatusBadge = (status: ServiceBookingStatus) => {
     switch (status) {
-      case 'PENDING':
+      case 'SCHEDULED':
         return {
-          label: 'Pending Audit',
+          label: 'Scheduled',
           color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+          dot: 'bg-amber-500',
         };
-      case 'IN_WORKSHOP':
+      case 'IN_PROGRESS':
         return {
-          label: 'In Workshop',
+          label: 'In Progress',
           color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+          dot: 'bg-blue-500',
         };
       case 'COMPLETED':
         return {
-          label: 'Completed & Delivered',
+          label: 'Completed',
           color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+          dot: 'bg-emerald-500',
         };
       case 'CANCELLED':
-        return { label: 'Cancelled', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' };
+        return {
+          label: 'Cancelled',
+          color: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
+          dot: 'bg-rose-500',
+        };
+      default:
+        return {
+          label: status,
+          color: 'bg-foreground/10 text-muted border-[var(--border-subtle)]',
+          dot: 'bg-muted',
+        };
+    }
+  };
+
+  const getAllowedTransitions = (currentStatus: ServiceBookingStatus): ServiceBookingStatus[] => {
+    switch (currentStatus) {
+      case 'SCHEDULED':
+        return ['SCHEDULED', 'IN_PROGRESS', 'CANCELLED'];
+      case 'IN_PROGRESS':
+        return ['IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+      case 'COMPLETED':
+        return ['COMPLETED'];
+      case 'CANCELLED':
+        return ['CANCELLED'];
+      default:
+        return [currentStatus];
     }
   };
 
   return (
     <div className="animate-fade-in space-y-8 pb-12">
-      {/* Sleek Admin Header Banner */}
+      {/* Toast Feedback */}
+      {toast && (
+        <div
+          className={`fixed top-5 right-5 z-50 flex items-center gap-3 rounded-2xl border px-5 py-3 shadow-xl backdrop-blur-md transition-all ${
+            toast.type === 'success'
+              ? 'border-emerald-500/30 bg-emerald-950/80 text-emerald-200'
+              : 'border-rose-500/30 bg-rose-950/80 text-rose-200'
+          }`}
+        >
+          {toast.type === 'success' ? (
+            <CheckCircle2 size={18} className="text-emerald-400" />
+          ) : (
+            <AlertCircle size={18} className="text-rose-400" />
+          )}
+          <span className="text-xs font-bold">{toast.text}</span>
+        </div>
+      )}
+
+      {/* Header Banner */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <div className="shrink-0 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
@@ -140,125 +345,179 @@ export default function ServicesPage() {
               <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
                 Service & Workshop Management
               </h1>
-              <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
-                3S Facility Active
-              </span>
+              {serviceCenter ? (
+                <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-black tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
+                  {serviceCenter.serviceName || 'Service Center Active'}
+                </span>
+              ) : (
+                <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-black tracking-wider text-amber-600 uppercase dark:text-amber-400">
+                  No Center Linked
+                </span>
+              )}
             </div>
             <p className="text-muted mt-0.5 text-xs font-bold sm:text-sm">
-              Manage tractor maintenance requests, workshop bookings, and spare parts service logs.
+              Live customer service requests, workshop maintenance jobs, and status tracking.
             </p>
           </div>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 sm:self-auto"
-        >
-          <Plus size={18} className="stroke-[3]" /> Book Service Request
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <button
+            onClick={() => refetch()}
+            disabled={loadingBookings || !serviceCenterId}
+            className="flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold text-foreground transition-all hover:bg-foreground/10 disabled:opacity-50"
+            title="Refresh Bookings"
+          >
+            <RefreshCw size={15} className={loadingBookings ? 'animate-spin' : ''} />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            disabled={!serviceCenterId}
+            className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 disabled:opacity-50"
+          >
+            <Plus size={18} className="stroke-[3]" /> Book Service Request
+          </button>
+        </div>
       </div>
 
+      {/* Dealer or Center Missing Warning Banner */}
+      {!loadingDealer && !serviceCenterId && (
+        <div className="flex items-start gap-4 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-700 dark:text-amber-300">
+          <AlertTriangle size={24} className="shrink-0 text-amber-500" />
+          <div className="space-y-1 text-xs">
+            <h4 className="text-sm font-black">No Service Center Linked to Dealership</h4>
+            <p className="font-medium">
+              To receive and manage customer service requests, your dealership profile must have an
+              active Service Center. Please contact the platform administrator or update your
+              dealership profile settings.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* KPI Stat Strip Layout */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
-          <div className="shrink-0 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-3 text-[var(--color-brand-green)]">
-            <Wrench size={22} />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+          <div className="shrink-0 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
+            <Wrench size={20} />
           </div>
           <div>
-            <div className="text-foreground text-2xl font-black tracking-tight">
-              {totalBookings}
-            </div>
-            <div className="text-muted text-xs font-bold tracking-wider uppercase">
+            <div className="text-foreground text-xl font-black tracking-tight">{totalCount}</div>
+            <div className="text-muted text-[11px] font-bold tracking-wider uppercase">
               Total Bookings
             </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
-          <div className="shrink-0 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-amber-500">
-            <Clock size={22} />
+        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+          <div className="shrink-0 rounded-xl border border-amber-500/20 bg-amber-500/10 p-2.5 text-amber-500">
+            <Clock size={20} />
           </div>
           <div>
-            <div className="text-foreground text-2xl font-black tracking-tight">{pendingCount}</div>
-            <div className="text-muted text-xs font-bold tracking-wider uppercase">
-              Pending Service
+            <div className="text-foreground text-xl font-black tracking-tight">{scheduledCount}</div>
+            <div className="text-muted text-[11px] font-bold tracking-wider uppercase">Scheduled</div>
+          </div>
+        </div>
+
+        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+          <div className="shrink-0 rounded-xl border border-blue-500/20 bg-blue-500/10 p-2.5 text-blue-500">
+            <Tractor size={20} />
+          </div>
+          <div>
+            <div className="text-foreground text-xl font-black tracking-tight">{inProgressCount}</div>
+            <div className="text-muted text-[11px] font-bold tracking-wider uppercase">
+              In Progress
             </div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
-          <div className="shrink-0 rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 text-blue-500">
-            <Tractor size={22} />
+        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+          <div className="shrink-0 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-2.5 text-emerald-500">
+            <CheckCircle2 size={20} />
           </div>
           <div>
-            <div className="text-foreground text-2xl font-black tracking-tight">
-              {inWorkshopCount}
-            </div>
-            <div className="text-muted text-xs font-bold tracking-wider uppercase">In Workshop</div>
+            <div className="text-foreground text-xl font-black tracking-tight">{completedCount}</div>
+            <div className="text-muted text-[11px] font-bold tracking-wider uppercase">Completed</div>
           </div>
         </div>
 
-        <div className="bg-foreground/5 flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 sm:p-5">
-          <div className="shrink-0 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-emerald-500">
-            <CheckCircle2 size={22} />
+        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4 col-span-2 lg:col-span-1">
+          <div className="shrink-0 rounded-xl border border-rose-500/20 bg-rose-500/10 p-2.5 text-rose-500">
+            <X size={20} />
           </div>
           <div>
-            <div className="text-foreground text-2xl font-black tracking-tight">
-              {completedCount}
-            </div>
-            <div className="text-muted text-xs font-bold tracking-wider uppercase">Delivered</div>
+            <div className="text-foreground text-xl font-black tracking-tight">{cancelledCount}</div>
+            <div className="text-muted text-[11px] font-bold tracking-wider uppercase">Cancelled</div>
           </div>
         </div>
       </div>
 
       {/* Facility Operational Info Grid */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="glass-panel space-y-3 rounded-3xl p-5">
-          <div className="flex items-center justify-between">
-            <h3 className="flex items-center gap-2 text-sm font-black tracking-wider text-[var(--color-brand-green)] uppercase">
-              <Building2 size={16} /> Dealership Service Center
-            </h3>
-            <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-black text-emerald-600 uppercase dark:text-emerald-400">
-              Open (9 AM - 7 PM)
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-1 text-xs">
-            <div>
-              <span className="text-muted block font-bold">Helpline Number</span>
-              <span className="text-foreground font-mono font-bold">{dealerPhone}</span>
-            </div>
-            <div>
-              <span className="text-muted block font-bold">Tractor Pickup Facility</span>
-              <span className="flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400">
-                <Truck size={12} /> Available
+      {serviceCenter && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="glass-panel space-y-3 rounded-3xl p-5">
+            <div className="flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-sm font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+                <Building2 size={16} /> {serviceCenter.serviceName || dealerName}
+              </h3>
+              <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-black text-emerald-600 uppercase dark:text-emerald-400">
+                {serviceCenter.is24x7 ? '24x7 Operational' : 'Open (9 AM - 7 PM)'}
               </span>
             </div>
+            <div className="grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-2 text-xs">
+              <div>
+                <span className="text-muted block font-bold">Helpline Number</span>
+                <span className="text-foreground font-mono font-bold">{helplinePhone}</span>
+              </div>
+              <div>
+                <span className="text-muted block font-bold">Pickup Facility</span>
+                <span
+                  className={`flex items-center gap-1 font-bold ${
+                    serviceCenter.hasPickupService
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-muted'
+                  }`}
+                >
+                  <Truck size={12} /> {serviceCenter.hasPickupService ? 'Available' : 'Not Available'}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="glass-panel space-y-3 rounded-3xl p-5">
-          <div className="flex items-center justify-between">
-            <h3 className="flex items-center gap-2 text-sm font-black tracking-wider text-[var(--color-brand-green)] uppercase">
-              <ShieldCheck size={16} /> OEM Spare Parts Availability
-            </h3>
-            <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-[10px] font-black text-[var(--color-brand-green)] uppercase">
-              Certified Stock
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-1 text-xs">
-            <div>
-              <span className="text-muted block font-bold">Parts Support</span>
-              <span className="text-foreground font-bold">OEM Genuine Parts</span>
-            </div>
-            <div>
-              <span className="text-muted block font-bold">Warranty Claims</span>
-              <span className="font-bold text-[var(--color-brand-green)]">
-                Direct Dealer Processing
+          <div className="glass-panel space-y-3 rounded-3xl p-5">
+            <div className="flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-sm font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+                <ShieldCheck size={16} /> Certified Service Station
+              </h3>
+              <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-[10px] font-black text-[var(--color-brand-green)] uppercase">
+                {serviceCenter.sparePartsAvailable ? 'OEM Spares In Stock' : 'Verified Station'}
               </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-2 text-xs">
+              <div>
+                <span className="text-muted block font-bold">Center Location</span>
+                <span className="text-foreground font-bold truncate block">
+                  {serviceCenter.address || 'Address provided'}
+                </span>
+              </div>
+              <div>
+                <span className="text-muted block font-bold">Emergency Support</span>
+                <span
+                  className={`font-bold ${
+                    serviceCenter.hasEmergencySupport ? 'text-[var(--color-brand-green)]' : 'text-muted'
+                  }`}
+                >
+                  {serviceCenter.hasEmergencySupport
+                    ? '24/7 Breakdown Assistance'
+                    : 'Standard Hours'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="flex flex-col items-stretch justify-between gap-4 md:flex-row md:items-center">
@@ -266,14 +525,14 @@ export default function ServicesPage() {
           <Search size={18} className="text-muted absolute top-3 left-3.5" />
           <input
             type="text"
-            placeholder="Search by customer name, phone, or tractor model..."
+            placeholder="Search customer name, contact phone, tractor model, or booking #..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] py-2 pr-4 pl-10 text-xs font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs">
             <Filter size={14} className="text-muted shrink-0" />
             <select
@@ -282,10 +541,22 @@ export default function ServicesPage() {
               className="text-foreground cursor-pointer bg-transparent font-bold focus:outline-none"
             >
               <option value="ALL">All Statuses</option>
-              <option value="PENDING">Pending Audit</option>
-              <option value="IN_WORKSHOP">In Workshop</option>
+              <option value="SCHEDULED">Scheduled</option>
+              <option value="IN_PROGRESS">In Progress</option>
               <option value="COMPLETED">Completed</option>
               <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+
+          <div className="bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs">
+            <span className="text-muted font-bold">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="text-foreground cursor-pointer bg-transparent font-bold focus:outline-none"
+            >
+              <option value="createdAt">Booking Date</option>
+              <option value="preferredDate">Preferred Service Date</option>
             </select>
           </div>
         </div>
@@ -293,7 +564,12 @@ export default function ServicesPage() {
 
       {/* Service Bookings Table */}
       <div className="bg-foreground/5 rounded-3xl border border-[var(--border-subtle)] p-4 sm:p-6">
-        {filteredBookings.length === 0 ? (
+        {loadingBookings ? (
+          <div className="flex flex-col items-center justify-center py-16 space-y-3">
+            <Loader2 size={32} className="animate-spin text-[var(--color-brand-green)]" />
+            <p className="text-muted text-xs font-bold">Loading customer service requests...</p>
+          </div>
+        ) : filteredBookings.length === 0 ? (
           <div className="mx-auto my-6 max-w-md space-y-4 py-8 text-center">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
               <Wrench size={28} />
@@ -304,16 +580,18 @@ export default function ServicesPage() {
               </h4>
               <p className="text-muted text-xs leading-relaxed font-medium">
                 {searchQuery || statusFilter !== 'ALL'
-                  ? 'No workshop requests match your search or filter criteria.'
-                  : 'You have not logged any service requests yet. Click "Book Service Request" to schedule a maintenance or repair job.'}
+                  ? 'No service requests match your search or filter criteria.'
+                  : 'You have not received any customer service bookings yet. Click "Book Service Request" to schedule a job.'}
               </p>
             </div>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-4 py-2 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90"
-            >
-              <Plus size={16} /> Book Service Request
-            </button>
+            {serviceCenterId && (
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-4 py-2 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90"
+              >
+                <Plus size={16} /> Book Service Request
+              </button>
+            )}
           </div>
         ) : (
           <>
@@ -322,23 +600,27 @@ export default function ServicesPage() {
                 <thead>
                   <tr className="text-muted border-b border-[var(--border-subtle)] text-xs font-bold tracking-wider uppercase">
                     <th className="w-12 px-4 py-3.5 text-center">#</th>
-                    <th className="px-4 py-3.5">Booking ID & Customer</th>
+                    <th className="px-4 py-3.5">Customer & Phone</th>
                     <th className="px-4 py-3.5">Tractor Model</th>
                     <th className="px-4 py-3.5">Service Type</th>
-                    <th className="px-4 py-3.5">Scheduled Date</th>
-                    <th className="px-4 py-3.5">Pickup</th>
+                    <th className="px-4 py-3.5">Preferred Date</th>
+                    <th className="px-4 py-3.5">Customer Location & Map</th>
                     <th className="px-4 py-3.5">Status</th>
                     <th className="px-4 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
-                  {filteredBookings.map((b, index) => {
+                  {filteredBookings.map((b) => {
                     const statusBadge = getStatusBadge(b.status);
+                    const allowed = getAllowedTransitions(b.status);
+                    const isFinal = b.status === 'COMPLETED' || b.status === 'CANCELLED';
+                    const mapUrl = getGoogleMapsUrl(b.latitude, b.longitude, b.address);
+
                     return (
-                      <tr key={b.id} className="hover:bg-foreground/5 group transition-colors">
+                      <tr key={b.bookingId} className="hover:bg-foreground/5 group transition-colors">
                         <td className="px-4 py-4 text-center">
                           <span className="text-muted/80 font-mono text-xs font-bold">
-                            {String(index + 1).padStart(2, '0')}
+                            #{b.bookingId}
                           </span>
                         </td>
 
@@ -349,11 +631,16 @@ export default function ServicesPage() {
                             </div>
                             <div>
                               <div className="text-foreground text-sm font-black tracking-tight">
-                                {b.customerName}
+                                {b.name}
                               </div>
-                              <div className="text-muted mt-0.5 font-mono text-xs">
-                                {b.id} • {b.phone}
-                              </div>
+                              <a
+                                href={`tel:${b.mobile}`}
+                                className="text-foreground hover:text-[var(--color-brand-green)] mt-0.5 font-mono text-xs font-bold flex items-center gap-1.5 transition-colors"
+                                title="Click to Call Customer"
+                              >
+                                <Phone size={11} className="text-[var(--color-brand-green)] shrink-0" />
+                                <span>{b.mobile}</span>
+                              </a>
                             </div>
                           </div>
                         </td>
@@ -364,50 +651,100 @@ export default function ServicesPage() {
                               size={14}
                               className="shrink-0 text-[var(--color-brand-green)]"
                             />
-                            {b.tractorModel}
+                            {b.tractorBrand} {b.tractorModel}
                           </div>
                         </td>
 
                         <td className="px-4 py-4">
-                          <span className="bg-foreground/5 text-foreground/80 rounded-md border border-[var(--border-subtle)] px-2.5 py-1 text-[10px] font-black tracking-wider uppercase">
-                            {b.serviceType.replace('_', ' ')}
+                          <span className="bg-foreground/5 text-foreground/90 rounded-md border border-[var(--border-subtle)] px-2.5 py-1 text-[11px] font-bold">
+                            {formatServiceType(b.serviceType)}
                           </span>
                         </td>
 
                         <td className="px-4 py-4">
                           <div className="text-muted flex items-center gap-1 font-mono text-xs">
                             <Calendar size={13} className="text-muted/70" />
-                            {b.scheduledDate}
+                            {b.preferredDate
+                              ? new Date(b.preferredDate).toLocaleDateString()
+                              : 'N/A'}
                           </div>
                         </td>
 
-                        <td className="px-4 py-4">
-                          <span
-                            className={`text-xs font-bold ${b.pickupRequired ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted'}`}
+                        <td className="px-4 py-4 max-w-[240px]">
+                          <div
+                            className="text-foreground truncate text-xs font-medium"
+                            title={b.address || 'Location provided'}
                           >
-                            {b.pickupRequired ? 'Yes (Pickup)' : 'Self Drive'}
-                          </span>
+                            {b.address ||
+                              (b.latitude && b.longitude
+                                ? `Lat: ${b.latitude.toFixed(4)}, Lng: ${b.longitude.toFixed(4)}`
+                                : 'On-site')}
+                          </div>
+                          {mapUrl && (
+                            <a
+                              href={mapUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-1.5 inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-2.5 py-1 text-[11px] font-bold text-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/20 transition-all shadow-xs"
+                              title="Open Customer Location in Google Maps"
+                            >
+                              <MapPin size={12} className="shrink-0" />
+                              <span>Google Maps</span>
+                              <ExternalLink size={10} className="shrink-0 opacity-80" />
+                            </a>
+                          )}
                         </td>
 
                         <td className="px-4 py-4">
                           <span
-                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold ${statusBadge.color}`}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold ${statusBadge.color}`}
                           >
+                            <span className={`h-1.5 w-1.5 rounded-full ${statusBadge.dot}`} />
                             {statusBadge.label}
                           </span>
                         </td>
 
                         <td className="px-4 py-4 text-right">
-                          <select
-                            value={b.status}
-                            onChange={(e) => handleUpdateStatus(b.id, e.target.value as any)}
-                            className="bg-foreground/5 text-foreground cursor-pointer rounded-xl border border-[var(--border-subtle)] px-2.5 py-1 text-xs font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
-                          >
-                            <option value="PENDING">Pending</option>
-                            <option value="IN_WORKSHOP">In Workshop</option>
-                            <option value="COMPLETED">Completed</option>
-                            <option value="CANCELLED">Cancelled</option>
-                          </select>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleOpenDetailModal(b.bookingId)}
+                              className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-2.5 py-1 text-xs font-bold text-foreground hover:bg-foreground/10 transition-colors"
+                              title="View Details"
+                            >
+                              Details
+                            </button>
+
+                            {!isFinal ? (
+                              <select
+                                value={b.status}
+                                onChange={(e) =>
+                                  handleStatusSelectChange(
+                                    b.bookingId,
+                                    b.status,
+                                    e.target.value as ServiceBookingStatus
+                                  )
+                                }
+                                disabled={isUpdating}
+                                className="bg-foreground/5 text-foreground cursor-pointer rounded-xl border border-[var(--border-subtle)] px-2.5 py-1 text-xs font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
+                              >
+                                {allowed.map((st) => (
+                                  <option key={st} value={st}>
+                                    {st === 'SCHEDULED'
+                                      ? 'Scheduled'
+                                      : st === 'IN_PROGRESS'
+                                      ? 'In Progress'
+                                      : st === 'COMPLETED'
+                                      ? 'Completed'
+                                      : 'Cancelled'}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span className="text-muted text-xs italic px-1 font-medium">
+                                Final
+                              </span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -418,81 +755,403 @@ export default function ServicesPage() {
 
             {/* Mobile View */}
             <div className="space-y-4 md:hidden">
-              {filteredBookings.map((b, index) => {
+              {filteredBookings.map((b) => {
                 const statusBadge = getStatusBadge(b.status);
+                const allowed = getAllowedTransitions(b.status);
+                const isFinal = b.status === 'COMPLETED' || b.status === 'CANCELLED';
+                const mapUrl = getGoogleMapsUrl(b.latitude, b.longitude, b.address);
+
                 return (
                   <div
-                    key={b.id}
+                    key={b.bookingId}
                     className="bg-foreground/5 space-y-3 rounded-2xl border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-green)]/30"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-muted font-mono text-xs font-bold">
-                            #{index + 1}
+                            #{b.bookingId}
                           </span>
                           <h4 className="text-foreground text-sm leading-tight font-black">
-                            {b.customerName}
+                            {b.name}
                           </h4>
                         </div>
-                        <p className="text-muted mt-0.5 font-mono text-xs">
-                          {b.id} • {b.phone}
-                        </p>
+                        <a
+                          href={`tel:${b.mobile}`}
+                          className="text-foreground hover:text-[var(--color-brand-green)] mt-1 font-mono text-xs font-bold flex items-center gap-1.5 transition-colors"
+                        >
+                          <Phone size={12} className="text-[var(--color-brand-green)] shrink-0" />
+                          <span>{b.mobile}</span>
+                        </a>
                       </div>
 
                       <span
-                        className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusBadge.color}`}
+                        className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusBadge.color}`}
                       >
+                        <span className={`h-1 w-1 rounded-full ${statusBadge.dot}`} />
                         {statusBadge.label}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 border-y border-[var(--border-subtle)] py-2 text-xs">
+                    <div className="grid grid-cols-2 gap-2 border-y border-[var(--border-subtle)] py-2.5 text-xs">
                       <div>
                         <span className="text-muted block text-[10px] font-bold uppercase">
-                          Model
+                          Tractor
                         </span>
-                        <span className="text-foreground font-bold">{b.tractorModel}</span>
+                        <span className="text-foreground font-bold">
+                          {b.tractorBrand} {b.tractorModel}
+                        </span>
                       </div>
                       <div>
                         <span className="text-muted block text-[10px] font-bold uppercase">
-                          Scheduled
+                          Service Type
                         </span>
-                        <span className="text-foreground font-medium">{b.scheduledDate}</span>
+                        <span className="text-foreground font-medium">
+                          {formatServiceType(b.serviceType)}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted block text-[10px] font-bold uppercase">
+                          Preferred Date
+                        </span>
+                        <span className="text-foreground font-medium">
+                          {b.preferredDate
+                            ? new Date(b.preferredDate).toLocaleDateString()
+                            : 'N/A'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted block text-[10px] font-bold uppercase">
+                          Location
+                        </span>
+                        <span className="text-foreground truncate block font-medium">
+                          {b.address || 'On-site'}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-muted text-xs">
-                        Est. Cost:{' '}
-                        <span className="font-bold text-[var(--color-brand-green)]">
-                          {b.estimatedCost}
-                        </span>
-                      </span>
+                    {mapUrl && (
+                      <div className="pt-0.5">
+                        <a
+                          href={mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 rounded-xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 py-2 px-3 text-xs font-bold text-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/20 transition-all"
+                        >
+                          <MapPin size={14} /> Open Customer Location in Google Maps{' '}
+                          <ExternalLink size={12} />
+                        </a>
+                      </div>
+                    )}
 
-                      <select
-                        value={b.status}
-                        onChange={(e) => handleUpdateStatus(b.id, e.target.value as any)}
-                        className="bg-foreground/5 text-foreground rounded-xl border border-[var(--border-subtle)] px-2 py-1 text-xs font-bold focus:outline-none"
+                    <div className="flex items-center justify-between pt-1">
+                      <button
+                        onClick={() => handleOpenDetailModal(b.bookingId)}
+                        className="text-xs font-bold text-[var(--color-brand-green)] hover:underline"
                       >
-                        <option value="PENDING">Pending</option>
-                        <option value="IN_WORKSHOP">In Workshop</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="CANCELLED">Cancelled</option>
-                      </select>
+                        View Full Details →
+                      </button>
+
+                      {!isFinal ? (
+                        <select
+                          value={b.status}
+                          onChange={(e) =>
+                            handleStatusSelectChange(
+                              b.bookingId,
+                              b.status,
+                              e.target.value as ServiceBookingStatus
+                            )
+                          }
+                          disabled={isUpdating}
+                          className="bg-foreground/5 text-foreground rounded-xl border border-[var(--border-subtle)] px-2 py-1 text-xs font-bold focus:outline-none"
+                        >
+                          {allowed.map((st) => (
+                            <option key={st} value={st}>
+                              {st === 'SCHEDULED'
+                                ? 'Scheduled'
+                                : st === 'IN_PROGRESS'
+                                ? 'In Progress'
+                                : st === 'COMPLETED'
+                                ? 'Completed'
+                                : 'Cancelled'}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-muted text-xs italic font-medium">Closed</span>
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
+
+            {/* Pagination Controls */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-4 mt-4 text-xs font-bold">
+                <span className="text-muted">
+                  Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage(Math.max(1, page - 1))}
+                    disabled={page <= 1 || loadingBookings}
+                    className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-1.5 hover:bg-foreground/10 disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setPage(page + 1)}
+                    disabled={!pagination.hasNextPage || loadingBookings}
+                    className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-1.5 hover:bg-foreground/10 disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
 
+      {/* Booking Detail Modal */}
+      {detailModalBooking && (
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm">
+          <div className="text-foreground relative my-8 flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
+            <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
+                  <Wrench size={22} />
+                </div>
+                <div>
+                  <h3 className="text-foreground text-lg font-black tracking-tight">
+                    Booking #{detailModalBooking.bookingId} Details
+                  </h3>
+                  <p className="text-muted mt-0.5 text-xs font-medium">
+                    Requested for {detailModalBooking.serviceCenterName || 'Service Station'}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setDetailModalBooking(null)}
+                className="text-muted hover:text-foreground hover:bg-foreground/10 rounded-xl p-2 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4 p-6 text-xs max-h-[75vh] overflow-y-auto">
+              {/* Status Header Strip */}
+              <div className="flex items-center justify-between rounded-2xl bg-foreground/5 p-4 border border-[var(--border-subtle)]">
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Current Status
+                  </span>
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold mt-1 ${
+                      getStatusBadge(detailModalBooking.status).color
+                    }`}
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        getStatusBadge(detailModalBooking.status).dot
+                      }`}
+                    />
+                    {getStatusBadge(detailModalBooking.status).label}
+                  </span>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-muted block text-[10px] font-bold uppercase">Created At</span>
+                  <span className="text-foreground font-mono font-bold">
+                    {new Date(detailModalBooking.createdAt).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Customer & Tractor Info Grid */}
+              <div className="grid grid-cols-2 gap-4 rounded-2xl bg-foreground/5 p-4 border border-[var(--border-subtle)]">
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Customer Name
+                  </span>
+                  <span className="text-foreground font-black text-sm">{detailModalBooking.name}</span>
+                </div>
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Customer Contact Phone
+                  </span>
+                  <a
+                    href={`tel:${detailModalBooking.mobile}`}
+                    className="text-foreground hover:text-[var(--color-brand-green)] font-mono font-bold text-sm flex items-center gap-1.5 mt-0.5 transition-colors"
+                  >
+                    <Phone size={13} className="text-[var(--color-brand-green)]" />
+                    <span>{detailModalBooking.mobile}</span>
+                  </a>
+                </div>
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Tractor Brand & Model
+                  </span>
+                  <span className="text-foreground font-bold">
+                    {detailModalBooking.tractorBrand} {detailModalBooking.tractorModel}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Preferred Service Date
+                  </span>
+                  <span className="text-foreground font-mono font-bold">
+                    {detailModalBooking.preferredDate
+                      ? new Date(detailModalBooking.preferredDate).toLocaleDateString()
+                      : 'N/A'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Service Type & Issue Description */}
+              <div className="space-y-3 rounded-2xl bg-foreground/5 p-4 border border-[var(--border-subtle)]">
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Service Requested
+                  </span>
+                  <span className="text-[var(--color-brand-green)] font-bold text-sm">
+                    {formatServiceType(detailModalBooking.serviceType)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Customer Description / Problem
+                  </span>
+                  <p className="text-foreground text-xs leading-relaxed mt-1 whitespace-pre-wrap font-medium">
+                    {detailModalBooking.description || 'No detailed description provided.'}
+                  </p>
+                </div>
+                {detailModalBooking.notes && (
+                  <div>
+                    <span className="text-muted block text-[10px] font-bold uppercase">
+                      Workshop / Internal Notes
+                    </span>
+                    <p className="text-foreground text-xs leading-relaxed mt-1 font-medium bg-foreground/5 p-2 rounded-xl border border-[var(--border-subtle)]">
+                      {detailModalBooking.notes}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Location & Google Maps Redirection Button */}
+              <div className="rounded-2xl bg-foreground/5 p-4 border border-[var(--border-subtle)] space-y-3">
+                <div>
+                  <span className="text-muted block text-[10px] font-bold uppercase">
+                    Customer Breakdown Location / Address
+                  </span>
+                  <p className="text-foreground font-medium mt-1">
+                    {detailModalBooking.address || 'No physical address specified'}
+                  </p>
+                  {detailModalBooking.latitude && detailModalBooking.longitude && (
+                    <p className="text-muted font-mono text-[11px] mt-0.5">
+                      Coordinates: {detailModalBooking.latitude.toFixed(5)},{' '}
+                      {detailModalBooking.longitude.toFixed(5)}
+                    </p>
+                  )}
+                </div>
+
+                {getGoogleMapsUrl(
+                  detailModalBooking.latitude,
+                  detailModalBooking.longitude,
+                  detailModalBooking.address
+                ) && (
+                  <a
+                    href={
+                      getGoogleMapsUrl(
+                        detailModalBooking.latitude,
+                        detailModalBooking.longitude,
+                        detailModalBooking.address
+                      )!
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-4 py-3 text-xs font-bold text-white uppercase tracking-wider shadow-md hover:opacity-90 transition-all"
+                  >
+                    <Navigation size={16} /> Open Customer Location in Google Maps{' '}
+                    <ExternalLink size={14} />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end border-t border-[var(--border-subtle)] p-4">
+              <button
+                onClick={() => setDetailModalBooking(null)}
+                className="rounded-xl bg-foreground/10 px-5 py-2 text-xs font-bold text-foreground transition-colors hover:bg-foreground/20"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status Transition & Notes Prompt Modal */}
+      {statusChangeTarget && (
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm">
+          <div className="text-foreground relative flex w-full max-w-md flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-black">Confirm Status Update</h3>
+              <button
+                onClick={() => setStatusChangeTarget(null)}
+                className="text-muted hover:text-foreground rounded-lg p-1"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-muted leading-relaxed">
+              Are you sure you want to update Booking #{statusChangeTarget.bookingId} status to{' '}
+              <strong className="text-foreground">{statusChangeTarget.newStatus}</strong>?
+            </p>
+
+            <div className="space-y-1 text-xs">
+              <label className="text-muted block font-bold">
+                Workshop Notes / Reason (Optional)
+              </label>
+              <textarea
+                rows={3}
+                placeholder="e.g. Tractor inspected, spare parts ordered, or ready for customer pickup..."
+                value={statusChangeTarget.notes}
+                onChange={(e) =>
+                  setStatusChangeTarget({ ...statusChangeTarget, notes: e.target.value })
+                }
+                className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] p-3 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setStatusChangeTarget(null)}
+                className="text-muted hover:text-foreground rounded-xl px-4 py-2 text-xs font-bold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmStatusChange}
+                disabled={isUpdating}
+                className="rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-bold text-white uppercase shadow-md transition-all hover:opacity-90 disabled:opacity-50"
+              >
+                {isUpdating ? 'Updating...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Book Service Modal */}
-      {isModalOpen && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/25 p-4 dark:bg-black/60">
-          <div className="text-foreground relative my-8 flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl [backdrop-filter:none]">
+      {isCreateModalOpen && (
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm">
+          <div className="text-foreground relative my-8 flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl max-h-[90vh]">
             <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
@@ -503,42 +1162,56 @@ export default function ServicesPage() {
                     Book New Service Request
                   </h3>
                   <p className="text-muted mt-0.5 text-xs font-medium">
-                    Log maintenance booking for customer tractor.
+                    Log a maintenance or repair job for customer tractor.
                   </p>
                 </div>
               </div>
 
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setIsCreateModalOpen(false)}
                 className="text-muted hover:text-foreground hover:bg-foreground/10 rounded-xl p-2 transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleCreateBooking} className="space-y-4 p-6 text-xs">
-              <div className="space-y-1">
-                <label className="text-muted block font-bold">Customer Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Prakash Patil"
-                  value={newCustomerName}
-                  onChange={(e) => setNewCustomerName(e.target.value)}
-                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
-                />
+            <form onSubmit={handleCreateBookingSubmit} className="space-y-4 p-6 text-xs overflow-y-auto">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-muted block font-bold">Customer Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Rajesh Kumar"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-muted block font-bold">Customer Mobile *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="e.g. 9876543210"
+                    value={formMobile}
+                    onChange={(e) => setFormMobile(e.target.value)}
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-muted block font-bold">Phone Number *</label>
+                  <label className="text-muted block font-bold">Tractor Brand *</label>
                   <input
                     type="text"
                     required
-                    placeholder="+91 98220..."
-                    value={newPhone}
-                    onChange={(e) => setNewPhone(e.target.value)}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
+                    placeholder="e.g. Mahindra / Swaraj"
+                    value={formTractorBrand}
+                    onChange={(e) => setFormTractorBrand(e.target.value)}
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
                   />
                 </div>
 
@@ -547,62 +1220,88 @@ export default function ServicesPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Swaraj 855 FE"
-                    value={newTractorModel}
-                    onChange={(e) => setNewTractorModel(e.target.value)}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-sm font-medium transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
+                    placeholder="e.g. 575 DI / 855 FE"
+                    value={formTractorModel}
+                    onChange={(e) => setFormTractorModel(e.target.value)}
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-muted block font-bold">Service Type</label>
+                  <label className="text-muted block font-bold">Service Type *</label>
                   <select
-                    value={newServiceType}
-                    onChange={(e) => setNewServiceType(e.target.value as any)}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-sm font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
+                    value={formServiceType}
+                    onChange={(e) => setFormServiceType(e.target.value)}
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
                   >
-                    <option value="PERIODIC_MAINTENANCE">Periodic Maintenance</option>
-                    <option value="ENGINE_OVERHAUL">Engine Overhaul</option>
-                    <option value="WARRANTY_CLAIM">Warranty Claim</option>
-                    <option value="EMERGENCY_REPAIR">Emergency Repair</option>
+                    <option value="general_maintenance">General Maintenance</option>
+                    <option value="oil_change">Oil & Filter Change</option>
+                    <option value="engine_overhaul">Engine Overhaul</option>
+                    <option value="tyre_fitting">Tyre Fitting & Alignment</option>
+                    <option value="hydraulics_repair">Hydraulics Repair</option>
+                    <option value="spare_parts">Spare Parts Replacement</option>
+                    <option value="body_work">Body Work & Denting</option>
+                    <option value="electrical">Electrical System Repair</option>
+                    <option value="transmission_repair">Transmission Repair</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-muted block font-bold">Scheduled Date</label>
+                  <label className="text-muted block font-bold">Preferred Date *</label>
                   <input
                     type="date"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-sm font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
+                    required
+                    min={new Date().toISOString().split('T')[0]}
+                    value={formDate}
+                    onChange={(e) => setFormDate(e.target.value)}
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="bg-foreground/5 flex items-center justify-between rounded-xl border border-[var(--border-subtle)] p-3">
-                <div>
-                  <div className="text-foreground font-bold">Pickup & Drop Required</div>
-                  <div className="text-muted text-[11px]">Vehicle towing / doorstep pickup</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setNewPickup(!newPickup)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-bold uppercase transition-all ${
-                    newPickup
-                      ? 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-foreground/10 text-muted border border-[var(--border-subtle)]'
-                  }`}
-                >
-                  {newPickup ? 'Yes' : 'No'}
-                </button>
+              <div className="space-y-1">
+                <label className="text-muted block font-bold">Breakdown Address / Location *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Village Farm, Taluka, District, State"
+                  value={formAddress}
+                  onChange={(e) => setFormAddress(e.target.value)}
+                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-muted block font-bold">
+                  Description of Issue / Work Needed *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Describe the symptoms, repair needed, or routine maintenance scope (min 5 characters)..."
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] p-3 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-muted block font-bold">Workshop Internal Notes (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Customer requested morning slot"
+                  value={formNotes}
+                  onChange={(e) => setFormNotes(e.target.value)}
+                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-2 text-xs font-medium focus:border-[var(--color-brand-green)] focus:outline-none"
+                />
               </div>
 
               <div className="flex items-center justify-end gap-3 border-t border-[var(--border-subtle)] pt-4">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => setIsCreateModalOpen(false)}
                   className="text-muted hover:text-foreground hover:bg-foreground/10 rounded-xl px-5 py-2.5 text-xs font-bold transition-colors"
                 >
                   Cancel
@@ -610,9 +1309,10 @@ export default function ServicesPage() {
 
                 <button
                   type="submit"
-                  className="rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90"
+                  disabled={isCreating}
+                  className="rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 disabled:opacity-50"
                 >
-                  Confirm Booking
+                  {isCreating ? 'Booking...' : 'Confirm Booking'}
                 </button>
               </div>
             </form>
