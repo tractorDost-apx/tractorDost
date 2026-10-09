@@ -437,7 +437,7 @@ export default function TractorRepairPage() {
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-muted">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] bg-foreground/5 px-3 py-1 text-xs font-bold text-muted">
             {status}
           </span>
         );
@@ -450,7 +450,7 @@ export default function TractorRepairPage() {
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h1 className="text-foreground flex items-center gap-3 text-3xl font-black tracking-tight">
-            <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 p-2.5 text-lime-400">
+            <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
               <Wrench size={26} />
             </div>
             Tractor Repair & Service
@@ -461,12 +461,12 @@ export default function TractorRepairPage() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex rounded-2xl border border-white/10 bg-white/5 p-1.5">
+        <div className="flex rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-1.5">
           <button
             onClick={() => setActiveTab('centers')}
             className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
               activeTab === 'centers'
-                ? 'bg-[var(--color-brand-green)] text-black shadow-lg shadow-lime-400/20'
+                ? 'bg-[var(--color-brand-green)] text-black shadow-lg shadow-[var(--color-brand-green)]/20'
                 : 'text-muted hover:text-foreground'
             }`}
           >
@@ -479,7 +479,7 @@ export default function TractorRepairPage() {
             }}
             className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
               activeTab === 'my-bookings'
-                ? 'bg-[var(--color-brand-green)] text-black shadow-lg shadow-lime-400/20'
+                ? 'bg-[var(--color-brand-green)] text-black shadow-lg shadow-[var(--color-brand-green)]/20'
                 : 'text-muted hover:text-foreground'
             }`}
           >
@@ -488,7 +488,7 @@ export default function TractorRepairPage() {
             {myBookings.length > 0 && (
               <span
                 className={`rounded-full px-1.5 py-0.2 text-[10px] font-black ${
-                  activeTab === 'my-bookings' ? 'bg-black text-lime-400' : 'bg-lime-400/20 text-lime-400'
+                  activeTab === 'my-bookings' ? 'bg-black text-[var(--color-brand-green)]' : 'bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)]'
                 }`}
               >
                 {myBookings.length}
@@ -502,7 +502,7 @@ export default function TractorRepairPage() {
       {activeTab === 'centers' && (
         <div className="space-y-6">
           {/* Search & Filters */}
-          <div className="glass-panel grid grid-cols-1 gap-4 rounded-3xl border border-white/5 p-5 md:grid-cols-3">
+          <div className="glass-panel grid grid-cols-1 gap-4 rounded-3xl  p-5 md:grid-cols-3">
             <div className="relative md:col-span-2">
               <Search
                 size={18}
@@ -513,7 +513,7 @@ export default function TractorRepairPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by dealership, workshop name, district, state, or brand..."
-                className="text-foreground w-full rounded-2xl border border-white/10 bg-white/5 py-3 pr-4 pl-11 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 py-3 pr-4 pl-11 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
               />
             </div>
 
@@ -521,11 +521,11 @@ export default function TractorRepairPage() {
               <select
                 value={selectedServiceFilter}
                 onChange={(e) => setSelectedServiceFilter(e.target.value)}
-                className="text-foreground w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-3 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
               >
-                <option value="" className="bg-zinc-900">All Repair & Service Types</option>
+                <option value="" className="bg-foreground/5">All Repair & Service Types</option>
                 {SERVICE_TYPE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-zinc-900">
+                  <option key={opt.value} value={opt.value} className="bg-foreground/5">
                     {opt.label}
                   </option>
                 ))}
@@ -536,20 +536,20 @@ export default function TractorRepairPage() {
           {/* Service Centers Grid */}
           {loadingCenters ? (
             <div className="flex flex-1 items-center justify-center py-24">
-              <Loader2 className="animate-spin text-lime-400" size={36} />
+              <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={36} />
             </div>
           ) : filteredCenters.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {filteredCenters.map((center) => (
                 <div
                   key={center.serviceCenterId}
-                  className="glass-panel group flex flex-col justify-between rounded-3xl border border-white/5 p-6 transition-all duration-300 hover:border-lime-400/30 hover:shadow-2xl hover:shadow-lime-400/5"
+                  className="glass-panel group flex flex-col justify-between rounded-3xl  p-6 transition-all duration-300 hover:border-[var(--color-brand-green)]/30 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5"
                 >
                   <div className="space-y-4">
                     {/* Header: Title & Badges */}
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-foreground text-base font-black tracking-tight transition-colors group-hover:text-lime-400">
+                        <h3 className="text-foreground text-base font-black tracking-tight transition-colors group-hover:text-[var(--color-brand-green)]">
                           {center.serviceName}
                         </h3>
                         <p className="text-muted mt-0.5 text-xs font-bold">
@@ -565,7 +565,7 @@ export default function TractorRepairPage() {
                     {/* Location & Contact */}
                     <div className="space-y-1.5 text-xs">
                       <div className="text-foreground/90 flex items-center gap-2 font-bold">
-                        <MapPin size={14} className="shrink-0 text-lime-400" />
+                        <MapPin size={14} className="shrink-0 text-[var(--color-brand-green)]" />
                         <span>{center.district}, {center.state}</span>
                         {center.distanceKm && (
                           <span className="text-muted text-[10px] font-medium">
@@ -584,7 +584,7 @@ export default function TractorRepairPage() {
                     {/* Amenities tags */}
                     <div className="flex flex-wrap gap-1.5">
                       {center.hasPickupService && (
-                        <span className="inline-flex items-center gap-1 rounded-lg border border-lime-400/20 bg-lime-400/10 px-2 py-0.5 text-[10px] font-bold text-lime-400">
+                        <span className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2 py-0.5 text-[10px] font-bold text-[var(--color-brand-green)]">
                           <Truck size={10} /> Pickup & Drop
                         </span>
                       )}
@@ -602,7 +602,7 @@ export default function TractorRepairPage() {
 
                     {/* Supported Brands */}
                     {center.supportedBrands && center.supportedBrands.length > 0 && (
-                      <div className="border-t border-white/5 pt-3">
+                      <div className="border-t border-[var(--border-subtle)] pt-3">
                         <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
                           Supported Brands:
                         </span>
@@ -610,7 +610,7 @@ export default function TractorRepairPage() {
                           {center.supportedBrands.map((b, idx) => (
                             <span
                               key={idx}
-                              className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-foreground/80"
+                              className="rounded-md border border-[var(--border-subtle)] bg-foreground/5 px-2 py-0.5 text-[10px] font-bold text-foreground/80"
                             >
                               {b}
                             </span>
@@ -621,10 +621,10 @@ export default function TractorRepairPage() {
                   </div>
 
                   {/* Action Button */}
-                  <div className="mt-6 border-t border-white/5 pt-4">
+                  <div className="mt-6 border-t border-[var(--border-subtle)] pt-4">
                     <button
                       onClick={() => handleOpenBooking(center)}
-                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-4 py-3 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-lime-400/10 transition-all duration-200 hover:opacity-95"
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-4 py-3 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-[var(--color-brand-green)]/10 transition-all duration-200 hover:opacity-95"
                     >
                       <Wrench size={15} /> Request Repair
                     </button>
@@ -649,24 +649,24 @@ export default function TractorRepairPage() {
                 {dealers.map((dealer) => (
                   <div
                     key={dealer.id}
-                    className="glass-panel group flex flex-col justify-between rounded-3xl border border-white/5 p-6 transition-all hover:border-lime-400/30"
+                    className="glass-panel group flex flex-col justify-between rounded-3xl  p-6 transition-all hover:border-[var(--color-brand-green)]/30"
                   >
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h3 className="text-foreground text-base font-black tracking-tight group-hover:text-lime-400">
+                          <h3 className="text-foreground text-base font-black tracking-tight group-hover:text-[var(--color-brand-green)]">
                             {dealer.businessName}
                           </h3>
                           <span className="text-muted text-[11px] font-bold">
                             {dealer.dealerType} • Certified
                           </span>
                         </div>
-                        <ShieldCheck size={18} className="text-lime-400" />
+                        <ShieldCheck size={18} className="text-[var(--color-brand-green)]" />
                       </div>
 
                       <div className="space-y-1 text-xs">
                         <div className="text-foreground/90 flex items-center gap-1.5 font-bold">
-                          <MapPin size={13} className="text-lime-400" />
+                          <MapPin size={13} className="text-[var(--color-brand-green)]" />
                           {dealer.district}, {dealer.state}
                         </div>
                         {dealer.phone && (
@@ -678,10 +678,10 @@ export default function TractorRepairPage() {
                       </div>
                     </div>
 
-                    <div className="mt-6 border-t border-white/5 pt-4">
+                    <div className="mt-6 border-t border-[var(--border-subtle)] pt-4">
                       <button
                         onClick={() => handleOpenBooking(undefined, dealer)}
-                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-4 py-3 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-lime-400/10 transition-all hover:opacity-95"
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-4 py-3 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-[var(--color-brand-green)]/10 transition-all hover:opacity-95"
                       >
                         <Wrench size={15} /> Book Repair Request
                       </button>
@@ -699,14 +699,14 @@ export default function TractorRepairPage() {
         <div className="space-y-4">
           {loadingBookings ? (
             <div className="flex flex-1 items-center justify-center py-24">
-              <Loader2 className="animate-spin text-lime-400" size={36} />
+              <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={36} />
             </div>
           ) : bookingError ? (
             <div className="glass-panel p-8 text-center">
               <p className="text-rose-400 mb-4 text-xs font-bold">{bookingError}</p>
               <button
                 onClick={loadMyBookings}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white hover:bg-white/10"
+                className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2 text-xs font-bold text-white hover:bg-foreground/10"
               >
                 Try Again
               </button>
@@ -720,7 +720,7 @@ export default function TractorRepairPage() {
               </p>
               <button
                 onClick={() => setActiveTab('centers')}
-                className="mt-6 flex items-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-6 py-3 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-lime-400/10 transition-all hover:opacity-90"
+                className="mt-6 flex items-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-6 py-3 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-[var(--color-brand-green)]/10 transition-all hover:opacity-90"
               >
                 <Sparkles size={14} /> Find Dealers & Book Now
               </button>
@@ -730,7 +730,7 @@ export default function TractorRepairPage() {
               {myBookings.map((b) => (
                 <div
                   key={b.bookingId}
-                  className="glass-panel flex flex-col justify-between gap-4 rounded-3xl border border-white/5 p-6 md:flex-row md:items-center"
+                  className="glass-panel flex flex-col justify-between gap-4 rounded-3xl  p-6 md:flex-row md:items-center"
                 >
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -738,7 +738,7 @@ export default function TractorRepairPage() {
                         {b.tractorBrand} {b.tractorModel}
                       </span>
                       <span className="text-muted text-xs font-bold">•</span>
-                      <span className="text-lime-400 text-xs font-bold uppercase">
+                      <span className="text-[var(--color-brand-green)] text-xs font-bold uppercase">
                         {b.serviceType.replace(/_/g, ' ')}
                       </span>
                     </div>
@@ -754,7 +754,7 @@ export default function TractorRepairPage() {
                       </span>
                       {b.address && (
                         <span className="text-muted flex items-center gap-1.5">
-                          <MapPin size={13} className="text-lime-400" />
+                          <MapPin size={13} className="text-[var(--color-brand-green)]" />
                           <span className="text-foreground/90 font-medium truncate max-w-xs">{b.address}</span>
                         </span>
                       )}
@@ -771,7 +771,7 @@ export default function TractorRepairPage() {
                         href={b.mapUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-muted hover:text-foreground rounded-xl border border-white/10 bg-white/5 p-2.5 transition-colors"
+                        className="text-muted hover:text-foreground rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-2.5 transition-colors"
                         title="View Location on Google Maps"
                       >
                         <ExternalLink size={15} />
@@ -787,12 +787,12 @@ export default function TractorRepairPage() {
 
       {/* MODAL: SUBMIT REPAIR REQUEST */}
       {selectedCenter && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-md sm:p-6">
-          <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/25 dark:bg-black/80 p-4 backdrop-blur-md sm:p-6">
+          <div className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
             {/* Modal Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-zinc-900/50 p-6">
+            <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 p-2.5 text-lime-400">
+                <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
                   <Wrench size={20} />
                 </div>
                 <div>
@@ -807,7 +807,7 @@ export default function TractorRepairPage() {
 
               <button
                 onClick={() => setSelectedCenter(null)}
-                className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
+                className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10"
               >
                 <X size={20} />
               </button>
@@ -834,7 +834,7 @@ export default function TractorRepairPage() {
                   <div className="mb-1 flex items-center justify-between">
                     <label className="text-muted block text-xs font-bold">Your Full Name *</label>
                     {user?.fullName && (
-                      <span className="text-lime-400 text-[10px] font-bold">Auto-filled</span>
+                      <span className="text-[var(--color-brand-green)] text-[10px] font-bold">Auto-filled</span>
                     )}
                   </div>
                   <input
@@ -843,7 +843,7 @@ export default function TractorRepairPage() {
                     value={bookingForm.name}
                     onChange={(e) => setBookingForm({ ...bookingForm, name: e.target.value })}
                     placeholder="e.g. Ramesh Kumar"
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
 
@@ -851,7 +851,7 @@ export default function TractorRepairPage() {
                   <div className="mb-1 flex items-center justify-between">
                     <label className="text-muted block text-xs font-bold">Mobile Number *</label>
                     {user?.mobile && (
-                      <span className="text-lime-400 text-[10px] font-bold">Auto-filled</span>
+                      <span className="text-[var(--color-brand-green)] text-[10px] font-bold">Auto-filled</span>
                     )}
                   </div>
                   <input
@@ -860,7 +860,7 @@ export default function TractorRepairPage() {
                     value={bookingForm.mobile}
                     onChange={(e) => setBookingForm({ ...bookingForm, mobile: e.target.value })}
                     placeholder="10-digit mobile number"
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
 
@@ -872,7 +872,7 @@ export default function TractorRepairPage() {
                     value={bookingForm.tractorBrand}
                     onChange={(e) => setBookingForm({ ...bookingForm, tractorBrand: e.target.value })}
                     placeholder="e.g. Mahindra, Swaraj, John Deere"
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
 
@@ -884,7 +884,7 @@ export default function TractorRepairPage() {
                     value={bookingForm.tractorModel}
                     onChange={(e) => setBookingForm({ ...bookingForm, tractorModel: e.target.value })}
                     placeholder="e.g. 575 DI, 744 FE"
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
 
@@ -893,7 +893,7 @@ export default function TractorRepairPage() {
                   <select
                     value={bookingForm.serviceType}
                     onChange={(e) => setBookingForm({ ...bookingForm, serviceType: e.target.value })}
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   >
                     {SERVICE_TYPE_OPTIONS.map((opt) => {
                       const isOffered =
@@ -901,7 +901,7 @@ export default function TractorRepairPage() {
                         selectedCenter.servicesAvailable.length === 0 ||
                         selectedCenter.servicesAvailable.includes(opt.value);
                       return (
-                        <option key={opt.value} value={opt.value} className="bg-zinc-900">
+                        <option key={opt.value} value={opt.value} className="bg-foreground/5">
                           {opt.label} {isOffered ? '' : '(Custom Request)'}
                         </option>
                       );
@@ -917,14 +917,14 @@ export default function TractorRepairPage() {
                     min={minBookingDate}
                     value={bookingForm.preferredDate}
                     onChange={(e) => setBookingForm({ ...bookingForm, preferredDate: e.target.value })}
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
 
                 {/* MANDATORY BREAKDOWN LOCATION ADDRESS */}
                 <div className="sm:col-span-2">
                   <label className="text-muted mb-1 flex items-center gap-1.5 text-xs font-bold">
-                    <MapPin size={13} className="text-lime-400" />
+                    <MapPin size={13} className="text-[var(--color-brand-green)]" />
                     Breakdown / Service Location Address *
                   </label>
                   <input
@@ -933,7 +933,7 @@ export default function TractorRepairPage() {
                     value={bookingForm.address}
                     onChange={(e) => setBookingForm({ ...bookingForm, address: e.target.value })}
                     placeholder="Enter breakdown landmark, farm field, village, district..."
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
 
@@ -947,7 +947,7 @@ export default function TractorRepairPage() {
                     value={bookingForm.description}
                     onChange={(e) => setBookingForm({ ...bookingForm, description: e.target.value })}
                     placeholder="Describe the tractor symptoms, breakdown location, or maintenance requirements in detail..."
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
 
@@ -958,19 +958,19 @@ export default function TractorRepairPage() {
                     value={bookingForm.notes}
                     onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })}
                     placeholder="e.g. Please bring towing van / field pickup required"
-                    className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                    className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
                 </div>
               </div>
             </form>
 
             {/* Modal Footer */}
-            <div className="flex shrink-0 items-center justify-end gap-3 border-t border-white/10 bg-zinc-900/50 p-4">
+            <div className="flex shrink-0 items-center justify-end gap-3 border-t border-[var(--border-subtle)] bg-foreground/5 p-4">
               <button
                 type="button"
                 onClick={() => setSelectedCenter(null)}
                 disabled={submittingBooking}
-                className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-white/10"
+                className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-foreground/10"
               >
                 Cancel
               </button>
@@ -978,7 +978,7 @@ export default function TractorRepairPage() {
                 type="button"
                 onClick={handleSubmitBooking}
                 disabled={submittingBooking}
-                className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-lime-400/10 transition-all hover:opacity-90 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-[var(--color-brand-green)]/10 transition-all hover:opacity-90 disabled:opacity-50"
               >
                 {submittingBooking ? (
                   <>

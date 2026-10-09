@@ -261,15 +261,15 @@ export default function LeadsPage() {
               <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="text-muted border-b border-[var(--border-subtle)] text-xs font-bold tracking-wider uppercase">
-                    <th className="px-4 py-3.5">Customer Info</th>
-                    <th className="px-4 py-3.5">Target Model</th>
-                    <th className="px-4 py-3.5">Location</th>
-                    <th className="px-4 py-3.5">Lead Status</th>
-                    <th className="px-4 py-3.5">Date Logged</th>
-                    <th className="px-4 py-3.5 text-right">Actions</th>
+                    <th className="px-2 lg:px-3 py-3">Customer Info</th>
+                    <th className="px-2 lg:px-3 py-3">Target Model</th>
+                    <th className="px-2 lg:px-3 py-3">Location</th>
+                    <th className="px-2 lg:px-3 py-3">Lead Status</th>
+                    <th className="px-2 lg:px-3 py-3">Date Logged</th>
+                    <th className="px-2 lg:px-3 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
+                <tbody className="divide-y divide-[var(--border-subtle)] text-xs font-medium">
                   {filteredEnquiries.map((enquiry) => {
                     const statusBadge = getStatusBadge(enquiry.status);
                     const location = [enquiry.city, enquiry.state].filter(Boolean).join(', ');
@@ -279,7 +279,7 @@ export default function LeadsPage() {
                         onClick={() => setSelectedEnquiry(enquiry)}
                         className="hover:bg-foreground/5 group cursor-pointer transition-colors"
                       >
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <div className="flex items-center gap-3">
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 font-bold text-[var(--color-brand-green)]">
                               <User size={18} />
@@ -295,20 +295,20 @@ export default function LeadsPage() {
                           </div>
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <div className="text-foreground flex items-center gap-1.5 text-xs font-bold">
                             <Tractor size={14} className="shrink-0 text-[var(--color-brand-green)]" />
                             {enquiry.listing.tractorBrand} {enquiry.listing.tractorModel}
                           </div>
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <span className="text-foreground/80 text-xs">
                             {location || 'Location not shared'}
                           </span>
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <span
                             className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold ${statusBadge.color}`}
                           >
@@ -316,13 +316,13 @@ export default function LeadsPage() {
                           </span>
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <div className="text-muted font-mono text-xs">
                             {new Date(enquiry.createdAt).toLocaleDateString()}
                           </div>
                         </td>
 
-                        <td className="px-4 py-4 text-right">
+                        <td className="px-2 lg:px-3 py-3 text-right">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -392,9 +392,9 @@ export default function LeadsPage() {
 
       {/* Lead Detail & Disposition Modal */}
       {selectedEnquiry && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/25 p-4 dark:bg-black/60">
-          <div className="text-foreground relative my-8 flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl [backdrop-filter:none]">
-            <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/25 dark:bg-black/60 backdrop-blur-sm">
+          <div className="text-foreground relative flex w-full max-h-[80vh] max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl [backdrop-filter:none]">
+            <div className="bg-foreground/5 shrink-0 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
                   <User size={22} />
@@ -415,7 +415,7 @@ export default function LeadsPage() {
               </button>
             </div>
 
-            <div className="space-y-6 p-6">
+            <div className="flex-1 overflow-y-auto space-y-6 p-6">
               {/* Contact Details Grid */}
               <div className="bg-foreground/5 grid grid-cols-2 gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 text-xs">
                 <div>

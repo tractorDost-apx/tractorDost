@@ -126,7 +126,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
   };
 
   const SectionTitle = ({ icon: Icon, title }: { icon: any; title: string }) => (
-    <div className="text-foreground border-foreground/10 mb-4 flex items-center gap-2 border-b pb-2">
+    <div className="text-foreground border-[var(--border-subtle)] mb-4 flex items-center gap-2 border-b pb-2">
       <Icon size={18} className="text-[var(--color-brand-green)]" />
       <h3 className="text-sm font-black tracking-wider uppercase">{title}</h3>
     </div>
@@ -135,11 +135,11 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
   return (
     <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
       <div
-        className="animate-fade-in border-foreground/10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
+        className="animate-fade-in border-[var(--border-subtle)] flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
         style={{ background: 'var(--background)' }}
       >
         {/* Sticky Header */}
-        <div className="border-foreground/10 bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
+        <div className="border-[var(--border-subtle)] bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
           <h2 className="text-foreground text-2xl font-black tracking-tight">
             {isEditing ? 'Edit Brand Master' : 'Create New Brand'}
           </h2>
@@ -172,7 +172,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
                     Brand Logo
                   </label>
                   <div
-                    className="border-foreground/20 bg-foreground/5 group relative flex aspect-square w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-colors hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5"
+                    className="border-[var(--border-brand)] bg-foreground/5 group relative flex aspect-square w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-colors hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {logoPreview ? (
@@ -300,7 +300,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
                     value={formData.seoTitle}
                     onChange={handleChange}
                     maxLength={60}
-                    className="bg-background border-foreground/10 text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
+                    className="bg-background border-[var(--border-subtle)] text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="e.g. Mahindra Tractors - Best Price & Specs | TractorDost"
                   />
                   <div className="text-muted mt-1 text-right text-[10px] font-bold">
@@ -318,7 +318,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
                     onChange={handleChange}
                     maxLength={160}
                     rows={2}
-                    className="bg-background border-foreground/10 text-foreground w-full resize-none rounded-xl border px-4 py-3 text-sm font-medium transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
+                    className="bg-background border-[var(--border-subtle)] text-foreground w-full resize-none rounded-xl border px-4 py-3 text-sm font-medium transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="Discover all Mahindra tractor models, specifications, reviews, and latest on-road prices in India..."
                   />
                   <div className="text-muted mt-1 text-right text-[10px] font-bold">
@@ -356,7 +356,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
                         onChange={handleChange}
                         className="peer sr-only"
                       />
-                      <div className="border-foreground/20 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-green)] peer-checked:bg-[var(--color-brand-green)]">
+                      <div className="border-[var(--border-brand)] flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-green)] peer-checked:bg-[var(--color-brand-green)]">
                         <Check
                           size={14}
                           className="scale-50 text-white opacity-0 transition-all peer-checked:scale-100 peer-checked:opacity-100"
@@ -379,7 +379,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
                         onChange={handleChange}
                         className="peer sr-only"
                       />
-                      <div className="border-foreground/20 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-orange)] peer-checked:bg-[var(--color-brand-orange)]">
+                      <div className="border-[var(--border-brand)] flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-orange)] peer-checked:bg-[var(--color-brand-orange)]">
                         <Check
                           size={14}
                           className="scale-50 text-white opacity-0 transition-all peer-checked:scale-100 peer-checked:opacity-100"
@@ -399,7 +399,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
         </div>
 
         {/* Sticky Footer */}
-        <div className="border-foreground/10 bg-background z-10 flex shrink-0 justify-end gap-3 border-t px-6 py-4">
+        <div className="border-[var(--border-subtle)] bg-background z-10 flex shrink-0 justify-end gap-3 border-t px-6 py-4">
           <button
             type="button"
             onClick={onClose}

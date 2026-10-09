@@ -226,7 +226,7 @@ export function CreateDealerModal({ onClose, onSuccess }: CreateDealerModalProps
 
   return (
     <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-md sm:p-6">
-      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
+      <div className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
         {/* Modal Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--card-bg)] p-6">
           <div className="flex items-center gap-3">

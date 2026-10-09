@@ -78,8 +78,8 @@ export default function PublicHomePage() {
           </div>
 
           {/* Smart Tractor Matcher Wizard */}
-          <div className="bg-background/20 flex w-full max-w-4xl flex-col items-center gap-4 rounded-3xl border border-white/10 p-4 shadow-2xl backdrop-blur-xl md:flex-row md:p-6">
-            <div className="bg-background/50 flex w-full flex-1 items-center rounded-2xl border border-white/5 px-4 py-3 transition-colors focus-within:border-[var(--color-brand-green)]/50">
+          <div className="bg-background/20 flex w-full max-w-4xl flex-col items-center gap-4 rounded-3xl border border-[var(--border-subtle)] p-4 shadow-2xl backdrop-blur-xl md:flex-row md:p-6">
+            <div className="bg-background/50 flex w-full flex-1 items-center rounded-2xl border border-[var(--border-subtle)] px-4 py-3 transition-colors focus-within:border-[var(--color-brand-green)]/50">
               <Search className="mr-3 text-[var(--color-brand-green)]" size={20} />
               <input
                 type="text"
@@ -89,7 +89,7 @@ export default function PublicHomePage() {
             </div>
 
             <div className="flex w-full gap-4 md:w-auto">
-              <select className="bg-background/50 appearance-none rounded-2xl border border-white/5 px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50">
+              <select className="bg-background/50 appearance-none rounded-2xl border border-[var(--border-subtle)] px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50">
                 <option value="" className="bg-background text-foreground">
                   Any Budget
                 </option>
@@ -104,7 +104,7 @@ export default function PublicHomePage() {
                 </option>
               </select>
 
-              <select className="bg-background/50 appearance-none rounded-2xl border border-white/5 px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50">
+              <select className="bg-background/50 appearance-none rounded-2xl border border-[var(--border-subtle)] px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50">
                 <option value="" className="bg-background text-foreground">
                   Any HP
                 </option>

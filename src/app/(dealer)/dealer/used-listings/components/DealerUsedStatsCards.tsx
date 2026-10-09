@@ -80,7 +80,7 @@ export function DealerUsedStatsCards({
         return (
           <div
             key={i}
-            className={`rounded-2xl border ${c.border} bg-slate-950/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:translate-y-[-2px]`}
+            className={`rounded-2xl border ${c.border} bg-[var(--background)] p-4 shadow-sm backdrop-blur-sm transition-all hover:translate-y-[-2px]`}
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-muted uppercase tracking-wider">{c.label}</span>

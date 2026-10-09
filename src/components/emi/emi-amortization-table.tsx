@@ -225,36 +225,36 @@ export const EmiAmortizationTable: React.FC<EmiAmortizationTableProps> = ({
         /* MONTH-WISE PAGINATED TABLE */
         <div className="flex flex-col gap-4">
           <div className="bg-foreground/5 overflow-x-auto rounded-2xl border border-[var(--border-subtle)]">
-            <table className="w-full border-collapse text-left text-sm">
+            <table className="w-full border-collapse text-left text-xs">
               <thead>
                 <tr className="text-muted bg-background/50 border-b border-[var(--border-subtle)] text-[10px] font-black tracking-wider uppercase">
-                  <th className="px-4 py-4">Month</th>
-                  <th className="px-4 py-4 text-right">Starting Balance</th>
-                  <th className="px-4 py-4 text-right">Monthly EMI</th>
-                  <th className="px-4 py-4 text-right">Principal Paid</th>
-                  <th className="px-4 py-4 text-right text-[var(--color-brand-orange)]">
+                  <th className="px-2 lg:px-3 py-3">Month</th>
+                  <th className="px-2 lg:px-3 py-3 text-right">Starting Balance</th>
+                  <th className="px-2 lg:px-3 py-3 text-right">Monthly EMI</th>
+                  <th className="px-2 lg:px-3 py-3 text-right">Principal Paid</th>
+                  <th className="px-2 lg:px-3 py-3 text-right text-[var(--color-brand-orange)]">
                     Interest Paid
                   </th>
-                  <th className="px-4 py-4 text-right">Ending Balance</th>
+                  <th className="px-2 lg:px-3 py-3 text-right">Ending Balance</th>
                 </tr>
               </thead>
-              <tbody className="divide-foreground/5 text-foreground/85 divide-y text-sm font-semibold">
+              <tbody className="divide-foreground/5 text-foreground/85 divide-y text-xs font-semibold">
                 {currentRows.map((row) => (
                   <tr key={row.month} className="hover:bg-foreground/5 transition-colors">
-                    <td className="text-foreground px-4 py-3 font-black">Month {row.month}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="text-foreground px-2 lg:px-3 py-3 font-black">Month {row.month}</td>
+                    <td className="px-2 lg:px-3 py-3 text-right">
                       {formatIndianCurrency(row.startingBalance)}
                     </td>
-                    <td className="text-foreground px-4 py-3 text-right font-black">
+                    <td className="text-foreground px-2 lg:px-3 py-3 text-right font-black">
                       {formatIndianCurrency(row.emi)}
                     </td>
-                    <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400">
+                    <td className="px-2 lg:px-3 py-3 text-right text-emerald-600 dark:text-emerald-400">
                       +{formatIndianCurrency(row.principalPaid)}
                     </td>
-                    <td className="px-4 py-3 text-right text-[var(--color-brand-orange)]">
+                    <td className="px-2 lg:px-3 py-3 text-right text-[var(--color-brand-orange)]">
                       -{formatIndianCurrency(row.interestPaid)}
                     </td>
-                    <td className="text-foreground px-4 py-3 text-right font-bold">
+                    <td className="text-foreground px-2 lg:px-3 py-3 text-right font-bold">
                       {formatIndianCurrency(row.endingBalance)}
                     </td>
                   </tr>

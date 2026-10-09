@@ -168,7 +168,7 @@ function InspectionRow({ inspection }: { inspection: any }) {
                         setCurrentImageIndex(idx);
                       }}
                       className={`h-1 w-1 rounded-full transition-all ${
-                        idx === currentImageIndex ? 'w-2 bg-white' : 'bg-white/50'
+                        idx === currentImageIndex ? 'w-2 bg-white' : 'bg-foreground/50'
                       }`}
                     />
                   ))}

@@ -354,11 +354,11 @@ export default function BulkImportModal<R extends ImportReport>({
         aria-modal="true"
         aria-labelledby="bulk-import-title"
         tabIndex={-1}
-        className="animate-fade-in border-foreground/10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border shadow-2xl focus:outline-none"
+        className="animate-fade-in border-[var(--border-subtle)] flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border shadow-2xl focus:outline-none"
         style={{ background: 'var(--background)' }}
       >
         {/* Header */}
-        <div className="border-foreground/10 bg-background flex shrink-0 items-center justify-between gap-4 border-b px-6 py-5">
+        <div className="border-[var(--border-subtle)] bg-background flex shrink-0 items-center justify-between gap-4 border-b px-6 py-5">
           <div className="min-w-0">
             <h2
               id="bulk-import-title"
@@ -397,7 +397,7 @@ export default function BulkImportModal<R extends ImportReport>({
         </div>
 
         {/* Footer */}
-        <div className="border-foreground/10 bg-background flex shrink-0 flex-wrap justify-end gap-3 border-t px-6 py-4">
+        <div className="border-[var(--border-subtle)] bg-background flex shrink-0 flex-wrap justify-end gap-3 border-t px-6 py-4">
           {phase === 'completed' ? (
             <>
               <button type="button" onClick={onChooseFile} className={btnSecondary}>

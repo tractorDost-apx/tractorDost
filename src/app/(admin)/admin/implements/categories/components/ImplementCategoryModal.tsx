@@ -134,7 +134,7 @@ export default function ImplementCategoryModal({
 
   return (
     <div className="bg-background/80 animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-background flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-2xl">
+      <div className="bg-background flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-2xl">
         {/* Header */}
         <div className="bg-foreground/[0.02] flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
           <div>

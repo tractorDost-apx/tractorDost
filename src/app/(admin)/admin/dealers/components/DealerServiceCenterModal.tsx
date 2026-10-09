@@ -267,9 +267,9 @@ export function DealerServiceCenterModal({
 
   return (
     <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-md sm:p-6">
-      <div className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl">
+      <div className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-zinc-900/50 p-6">
+        <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6">
           <div className="flex items-center gap-3">
             <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-2.5 text-amber-400">
               <Wrench size={20} />
@@ -291,7 +291,7 @@ export function DealerServiceCenterModal({
 
           <button
             onClick={onClose}
-            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
+            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10"
           >
             <X size={20} />
           </button>
@@ -336,7 +336,7 @@ export function DealerServiceCenterModal({
                       value={formData.serviceName}
                       onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
                       placeholder="e.g. Kisan Mahindra Authorized Service Center"
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
 
@@ -350,7 +350,7 @@ export function DealerServiceCenterModal({
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="Full street address of the workshop"
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
 
@@ -361,7 +361,7 @@ export function DealerServiceCenterModal({
                       required
                       value={formData.state}
                       onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
 
@@ -372,7 +372,7 @@ export function DealerServiceCenterModal({
                       required
                       value={formData.district}
                       onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
 
@@ -385,7 +385,7 @@ export function DealerServiceCenterModal({
                       value={formData.pincode}
                       onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                       placeholder="6-digit pincode"
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
 
@@ -397,7 +397,7 @@ export function DealerServiceCenterModal({
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="e.g. 9876543210"
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
 
@@ -408,7 +408,7 @@ export function DealerServiceCenterModal({
                       value={formData.whatsapp}
                       onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                       placeholder="Optional WhatsApp contact"
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
 
@@ -419,7 +419,7 @@ export function DealerServiceCenterModal({
                       value={formData.emergencyPhone}
                       onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
                       placeholder="24x7 helpline number"
-                      className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
+                      className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-amber-400/50 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -430,7 +430,7 @@ export function DealerServiceCenterModal({
                 <label className="block text-xs font-black tracking-wider text-amber-400 uppercase">
                   Supported Tractor Brands * ({selectedBrands.length} selected)
                 </label>
-                <div className="flex flex-wrap gap-2 rounded-2xl border border-white/5 bg-white/5 p-3">
+                <div className="flex flex-wrap gap-2 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                   {availableBrands.map((brand) => {
                     const isSelected = selectedBrands.includes(brand.id);
                     return (
@@ -441,14 +441,14 @@ export function DealerServiceCenterModal({
                         className={`flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all ${
                           isSelected
                             ? 'border border-amber-400/40 bg-amber-400/20 text-amber-300'
-                            : 'text-muted border border-white/5 bg-white/5 hover:text-white'
+                            : 'text-muted border border-[var(--border-subtle)] bg-foreground/5 hover:text-white'
                         }`}
                       >
                         <div
                           className={`flex h-4 w-4 items-center justify-center rounded border text-[10px] ${
                             isSelected
                               ? 'border-amber-400 bg-amber-400 text-black'
-                              : 'border-white/20 bg-white/5'
+                              : 'border-white/20 bg-foreground/5'
                           }`}
                         >
                           {isSelected && <Check size={12} className="stroke-[3]" />}
@@ -475,14 +475,14 @@ export function DealerServiceCenterModal({
                         className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition-all select-none ${
                           isSelected
                             ? 'border-lime-400/30 bg-lime-400/10 text-foreground'
-                            : 'border-white/5 bg-white/5 text-muted hover:border-white/10 hover:text-foreground'
+                            : 'border-[var(--border-subtle)] bg-foreground/5 text-muted hover:border-[var(--border-subtle)] hover:text-foreground'
                         }`}
                       >
                         <div
                           className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
                             isSelected
                               ? 'border-lime-400 bg-lime-400 text-black'
-                              : 'border-white/20 bg-white/5'
+                              : 'border-white/20 bg-foreground/5'
                           }`}
                         >
                           {isSelected && <Check size={12} className="stroke-[3]" />}
@@ -505,7 +505,7 @@ export function DealerServiceCenterModal({
                   Workshop Amenities & Facilities
                 </label>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-3.5 transition-colors hover:bg-white/[0.07]">
+                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5 transition-colors hover:bg-foreground/10">
                     <div className="flex items-center gap-3">
                       <Truck size={18} className="text-lime-400" />
                       <div>
@@ -527,7 +527,7 @@ export function DealerServiceCenterModal({
                     />
                   </label>
 
-                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-3.5 transition-colors hover:bg-white/[0.07]">
+                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5 transition-colors hover:bg-foreground/10">
                     <div className="flex items-center gap-3">
                       <Zap size={18} className="text-amber-400" />
                       <div>
@@ -549,7 +549,7 @@ export function DealerServiceCenterModal({
                     />
                   </label>
 
-                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-3.5 transition-colors hover:bg-white/[0.07]">
+                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5 transition-colors hover:bg-foreground/10">
                     <div className="flex items-center gap-3">
                       <Package size={18} className="text-blue-400" />
                       <div>
@@ -571,7 +571,7 @@ export function DealerServiceCenterModal({
                     />
                   </label>
 
-                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-3.5 transition-colors hover:bg-white/[0.07]">
+                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5 transition-colors hover:bg-foreground/10">
                     <div className="flex items-center gap-3">
                       <Clock size={18} className="text-emerald-400" />
                       <div>
@@ -597,12 +597,12 @@ export function DealerServiceCenterModal({
         </form>
 
         {/* Footer */}
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-white/10 bg-zinc-900/50 p-4">
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-[var(--border-subtle)] bg-foreground/5 p-4">
           <button
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-white/10"
+            className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-foreground/10"
           >
             Cancel
           </button>

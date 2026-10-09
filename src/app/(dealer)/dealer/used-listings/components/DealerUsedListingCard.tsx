@@ -47,10 +47,10 @@ export function DealerUsedListingCard({
   const fullTitle = `${listing.tractorBrand} ${listing.tractorModel}`;
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70 p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-lime-400/30 hover:shadow-lg hover:shadow-lime-400/5">
+    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--background)] p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-lime-400/30 hover:shadow-lg hover:shadow-lime-400/5">
       {/* Top Media & Tags */}
       <div>
-        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-900 flex items-center justify-center">
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-foreground/5 flex items-center justify-center">
           {cover ? (
             <img
               src={cover}
@@ -68,7 +68,7 @@ export function DealerUsedListingCard({
           <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
             <ListingStatusBadge status={listing.listingStatus} />
             {listing.isCertified && (
-              <span className="flex items-center gap-1 rounded-full border border-lime-400/30 bg-slate-950/80 px-2 py-0.5 text-[10px] font-bold text-lime-400 backdrop-blur-sm">
+              <span className="flex items-center gap-1 rounded-full border border-lime-400/30 bg-[var(--background)] px-2 py-0.5 text-[10px] font-bold text-lime-400 backdrop-blur-sm">
                 <ShieldCheck size={12} /> Dealer Certified
               </span>
             )}
@@ -78,14 +78,14 @@ export function DealerUsedListingCard({
           <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
             <button
               onClick={() => onOpenPhotos(listing.id, fullTitle)}
-              className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-950/80 px-2 py-1 text-[11px] font-bold text-foreground opacity-90 backdrop-blur-sm hover:bg-lime-400 hover:text-black transition-all"
+              className="flex items-center gap-1 rounded-lg border border-[var(--border-brand)] bg-[var(--background)] px-2 py-1 text-[11px] font-bold text-foreground opacity-90 backdrop-blur-sm hover:bg-lime-400 hover:text-black transition-all"
               title="Manage Photos & Papers"
             >
               <Camera size={12} /> Photos
             </button>
             <button
               onClick={() => onQuickView(listing.id)}
-              className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-950/80 px-2.5 py-1 text-xs font-bold text-foreground opacity-90 backdrop-blur-sm hover:bg-lime-400 hover:text-black transition-all"
+              className="flex items-center gap-1 rounded-lg border border-[var(--border-brand)] bg-[var(--background)] px-2.5 py-1 text-xs font-bold text-foreground opacity-90 backdrop-blur-sm hover:bg-lime-400 hover:text-black transition-all"
             >
               <Eye size={13} /> Specs
             </button>
@@ -115,12 +115,12 @@ export function DealerUsedListingCard({
           </div>
 
           {/* Specs grid */}
-          <div className="mt-3 grid grid-cols-3 gap-1.5 rounded-xl border border-slate-800/80 bg-slate-900/50 p-2 text-center text-xs">
+          <div className="mt-3 grid grid-cols-3 gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-2 text-center text-xs">
             <div>
               <span className="text-[10px] font-bold text-muted block">Year</span>
               <span className="font-black text-foreground">{listing.yearOfManufacture}</span>
             </div>
-            <div className="border-x border-slate-800">
+            <div className="border-x border-[var(--border-subtle)]">
               <span className="text-[10px] font-bold text-muted block">Owner</span>
               <span className="font-black text-foreground">{listing.ownership}st</span>
             </div>
@@ -131,7 +131,7 @@ export function DealerUsedListingCard({
           </div>
 
           {/* Views & Leads Bar */}
-          <div className="mt-2.5 flex items-center justify-between border-t border-slate-800/60 pt-2 text-xs text-muted font-medium">
+          <div className="mt-2.5 flex items-center justify-between border-t border-[var(--border-subtle)] pt-2 text-xs text-muted font-medium">
             <span className="flex items-center gap-1">
               <Eye size={13} /> {listing.viewsCount ?? 0} views
             </span>
@@ -148,7 +148,7 @@ export function DealerUsedListingCard({
       </div>
 
       {/* Bottom Actions */}
-      <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-800 pt-3">
+      <div className="mt-4 flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] pt-3">
         {/* Toggle Active Button */}
         {canToggle && (
           <button
@@ -176,7 +176,7 @@ export function DealerUsedListingCard({
           {/* Manage / Photos link */}
           <Link
             href={`/dealer/used-listings/${listing.id}`}
-            className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-200 hover:border-lime-400/40 hover:text-lime-400 transition-all"
+            className="flex items-center gap-1 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-1.5 text-xs font-bold text-slate-200 hover:border-lime-400/40 hover:text-lime-400 transition-all"
           >
             <Settings2 size={13} /> Details
           </Link>
@@ -184,7 +184,7 @@ export function DealerUsedListingCard({
           {/* Delete Button */}
           <button
             onClick={() => onDelete(listing)}
-            className="rounded-xl border border-slate-800 bg-slate-900/60 p-1.5 text-slate-400 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400 transition-all"
+            className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-1.5 text-muted hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400 transition-all"
             title="Delete Listing"
           >
             <Trash2 size={14} />

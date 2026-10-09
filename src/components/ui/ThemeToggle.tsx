@@ -19,6 +19,21 @@ export function ThemeToggle() {
   }, []);
 
   const toggleTheme = () => {
+    // Add a class to disable transitions globally during the swap
+    const css = document.createElement('style');
+    css.appendChild(
+      document.createTextNode(
+        `* {
+       -webkit-transition: none !important;
+       -moz-transition: none !important;
+       -o-transition: none !important;
+       -ms-transition: none !important;
+       transition: none !important;
+    }`
+      )
+    );
+    document.head.appendChild(css);
+
     if (isDark) {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
@@ -28,6 +43,13 @@ export function ThemeToggle() {
       localStorage.setItem('theme', 'dark');
       setIsDark(true);
     }
+
+    // Force a reflow
+    const _ = window.getComputedStyle(css).opacity;
+    // Remove the style tag after a tiny delay
+    setTimeout(() => {
+      document.head.removeChild(css);
+    }, 10);
   };
 
   // Render a placeholder if not mounted to prevent hydration mismatch
@@ -38,7 +60,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-black/5 shadow-sm transition-all duration-300 hover:scale-110 hover:bg-black/10 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-black/5 shadow-sm transition-all duration-300 hover:scale-110 hover:bg-black/10 dark:border-[var(--border-subtle)] dark:bg-foreground/10 dark:hover:bg-foreground/10"
       aria-label="Toggle Dark Mode"
       title="Toggle Dark Mode"
     >

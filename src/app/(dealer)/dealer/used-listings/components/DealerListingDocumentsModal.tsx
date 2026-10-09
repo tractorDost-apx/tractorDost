@@ -152,10 +152,10 @@ export function DealerListingDocumentsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative my-8 w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-slate-950 p-6 shadow-2xl md:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative max-h-[80vh] overflow-y-auto w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-[var(--background)] p-6 shadow-2xl md:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-lime-400/10 text-lime-400">
               <Camera size={24} />
@@ -171,7 +171,7 @@ export function DealerListingDocumentsModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-muted hover:bg-slate-900 hover:text-foreground transition-colors"
+            className="rounded-lg p-2 text-muted hover:bg-foreground/5 hover:text-foreground transition-colors"
           >
             <X size={20} />
           </button>
@@ -195,7 +195,7 @@ export function DealerListingDocumentsModal({
           {/* Upload Form */}
           <form
             onSubmit={handleUpload}
-            className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4 space-y-4"
+            className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-4 space-y-4"
           >
             <h3 className="text-xs font-black uppercase tracking-wider text-lime-400 flex items-center gap-1.5">
               <Upload size={14} /> Upload New Photo or Document
@@ -203,13 +203,13 @@ export function DealerListingDocumentsModal({
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-end">
               <div className="sm:col-span-4">
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                <label className="block text-[11px] font-bold text-muted mb-1">
                   Document Classification
                 </label>
                 <select
                   value={docType}
                   onChange={(e) => setDocType(e.target.value as DocType)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-semibold text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-2 text-xs font-semibold text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <optgroup label="Tractor Photos (Public Marketplace)">
                     {PHOTO_DOC_TYPES.map((t) => (
@@ -229,7 +229,7 @@ export function DealerListingDocumentsModal({
               </div>
 
               <div className="sm:col-span-5">
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                <label className="block text-[11px] font-bold text-muted mb-1">
                   Select Files (Max 5MB each)
                 </label>
                 <input
@@ -263,7 +263,7 @@ export function DealerListingDocumentsModal({
 
           {/* Existing Photos Grid */}
           <div className="space-y-3">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center justify-between">
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <ImagePlus size={14} className="text-lime-400" /> Public Tractor Photos ({photos.length})
               </span>
@@ -275,7 +275,7 @@ export function DealerListingDocumentsModal({
                 <Loader2 className="animate-spin text-lime-400" size={24} />
               </div>
             ) : photos.length === 0 ? (
-              <p className="rounded-xl border border-slate-800/80 bg-slate-900/30 p-6 text-center text-xs text-muted">
+              <p className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-6 text-center text-xs text-muted">
                 No tractor photos uploaded yet. Upload front, rear, and meter photos to increase buyer trust.
               </p>
             ) : (
@@ -283,19 +283,19 @@ export function DealerListingDocumentsModal({
                 {photos.map((doc) => (
                   <div
                     key={doc.id}
-                    className="group relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
+                    className="group relative overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-foreground/5"
                   >
-                    <div className="aspect-[4/3] w-full bg-slate-950">
+                    <div className="aspect-[4/3] w-full bg-[var(--background)]">
                       <img src={doc.url} alt={docTypeLabel(doc.docType)} className="h-full w-full object-cover" />
                     </div>
                     <div className="p-2 flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-300 truncate max-w-[100px]">
+                      <span className="text-[10px] font-bold text-muted truncate max-w-[100px]">
                         {docTypeLabel(doc.docType)}
                       </span>
                       <button
                         onClick={() => handleDelete(doc.id)}
                         disabled={deletingId === doc.id}
-                        className="rounded-lg p-1 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                        className="rounded-lg p-1 text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors"
                         title="Delete photo"
                       >
                         {deletingId === doc.id ? (
@@ -312,8 +312,8 @@ export function DealerListingDocumentsModal({
           </div>
 
           {/* Legal / Private Documents */}
-          <div className="space-y-3 border-t border-slate-800 pt-5">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center justify-between">
+          <div className="space-y-3 border-t border-[var(--border-subtle)] pt-5">
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <FileText size={14} className="text-purple-400" /> Registration & Clearances ({papers.length})
               </span>
@@ -321,7 +321,7 @@ export function DealerListingDocumentsModal({
             </h3>
 
             {papers.length === 0 ? (
-              <p className="rounded-xl border border-slate-800/80 bg-slate-900/30 p-4 text-center text-xs text-muted">
+              <p className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-4 text-center text-xs text-muted">
                 No private papers (RC / Insurance / NOC) uploaded.
               </p>
             ) : (
@@ -329,7 +329,7 @@ export function DealerListingDocumentsModal({
                 {papers.map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/60 p-3"
+                    className="flex items-center justify-between rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
@@ -350,7 +350,7 @@ export function DealerListingDocumentsModal({
                     <button
                       onClick={() => handleDelete(doc.id)}
                       disabled={deletingId === doc.id}
-                      className="rounded-lg p-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors ml-2"
+                      className="rounded-lg p-1.5 text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors ml-2"
                       title="Delete document"
                     >
                       {deletingId === doc.id ? (
@@ -367,10 +367,10 @@ export function DealerListingDocumentsModal({
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex justify-end border-t border-slate-800 pt-4">
+        <div className="mt-6 flex justify-end border-t border-[var(--border-subtle)] pt-4">
           <button
             onClick={onClose}
-            className="rounded-xl bg-slate-800 px-5 py-2 text-xs font-bold text-foreground hover:bg-slate-700 transition-colors"
+            className="rounded-xl bg-foreground/10 px-5 py-2 text-xs font-bold text-foreground hover:bg-slate-700 transition-colors"
           >
             Done
           </button>

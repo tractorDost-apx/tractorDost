@@ -319,7 +319,7 @@ export default function ServicesPage() {
       {/* Toast Feedback */}
       {toast && (
         <div
-          className={`fixed top-5 right-5 z-50 flex items-center gap-3 rounded-2xl border px-5 py-3 shadow-xl backdrop-blur-md transition-all ${
+          className={`fixed top-5 right-5 z-50 flex items-center gap-2 lg:gap-3 rounded-2xl border px-5 py-3 shadow-xl backdrop-blur-md transition-all ${
             toast.type === 'success'
               ? 'border-emerald-500/30 bg-emerald-950/80 text-emerald-200'
               : 'border-rose-500/30 bg-rose-950/80 text-rose-200'
@@ -336,12 +336,12 @@ export default function ServicesPage() {
 
       {/* Header Banner */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 lg:gap-3">
           <div className="shrink-0 rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
             <Wrench size={26} />
           </div>
           <div>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-3">
               <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
                 Service & Workshop Management
               </h1>
@@ -398,8 +398,8 @@ export default function ServicesPage() {
       )}
 
       {/* KPI Stat Strip Layout */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+      <div className="grid grid-cols-2 gap-2 lg:gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="bg-foreground/5 flex items-center gap-2 lg:gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
           <div className="shrink-0 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
             <Wrench size={20} />
           </div>
@@ -411,7 +411,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+        <div className="bg-foreground/5 flex items-center gap-2 lg:gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
           <div className="shrink-0 rounded-xl border border-amber-500/20 bg-amber-500/10 p-2.5 text-amber-500">
             <Clock size={20} />
           </div>
@@ -421,7 +421,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+        <div className="bg-foreground/5 flex items-center gap-2 lg:gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
           <div className="shrink-0 rounded-xl border border-blue-500/20 bg-blue-500/10 p-2.5 text-blue-500">
             <Tractor size={20} />
           </div>
@@ -433,7 +433,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
+        <div className="bg-foreground/5 flex items-center gap-2 lg:gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4">
           <div className="shrink-0 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-2.5 text-emerald-500">
             <CheckCircle2 size={20} />
           </div>
@@ -443,7 +443,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="bg-foreground/5 flex items-center gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4 col-span-2 lg:col-span-1">
+        <div className="bg-foreground/5 flex items-center gap-2 lg:gap-3.5 rounded-2xl border border-[var(--border-subtle)] p-4 col-span-2 lg:col-span-1">
           <div className="shrink-0 rounded-xl border border-rose-500/20 bg-rose-500/10 p-2.5 text-rose-500">
             <X size={20} />
           </div>
@@ -466,7 +466,7 @@ export default function ServicesPage() {
                 {serviceCenter.is24x7 ? '24x7 Operational' : 'Open (9 AM - 7 PM)'}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-2 text-xs">
+            <div className="grid grid-cols-2 gap-2 lg:gap-3 border-t border-[var(--border-subtle)] pt-2 text-xs">
               <div>
                 <span className="text-muted block font-bold">Helpline Number</span>
                 <span className="text-foreground font-mono font-bold">{helplinePhone}</span>
@@ -495,7 +495,7 @@ export default function ServicesPage() {
                 {serviceCenter.sparePartsAvailable ? 'OEM Spares In Stock' : 'Verified Station'}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-2 text-xs">
+            <div className="grid grid-cols-2 gap-2 lg:gap-3 border-t border-[var(--border-subtle)] pt-2 text-xs">
               <div>
                 <span className="text-muted block font-bold">Center Location</span>
                 <span className="text-foreground font-bold truncate block">
@@ -532,7 +532,7 @@ export default function ServicesPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 lg:gap-3">
           <div className="bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-3 py-1.5 text-xs">
             <Filter size={14} className="text-muted shrink-0" />
             <select
@@ -599,17 +599,17 @@ export default function ServicesPage() {
               <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="text-muted border-b border-[var(--border-subtle)] text-xs font-bold tracking-wider uppercase">
-                    <th className="w-12 px-4 py-3.5 text-center">#</th>
-                    <th className="px-4 py-3.5">Customer & Phone</th>
-                    <th className="px-4 py-3.5">Tractor Model</th>
-                    <th className="px-4 py-3.5">Service Type</th>
-                    <th className="px-4 py-3.5">Preferred Date</th>
-                    <th className="px-4 py-3.5">Customer Location & Map</th>
-                    <th className="px-4 py-3.5">Status</th>
-                    <th className="px-4 py-3.5 text-right">Actions</th>
+                    <th className="w-8 px-2 lg:px-3 py-3 text-center">#</th>
+                    <th className="px-2 lg:px-3 py-3">Customer & Phone</th>
+                    <th className="px-2 lg:px-3 py-3">Tractor Model</th>
+                    <th className="px-2 lg:px-3 py-3">Service Type</th>
+                    <th className="px-2 lg:px-3 py-3">Preferred Date</th>
+                    <th className="px-2 lg:px-3 py-3">Customer Location & Map</th>
+                    <th className="px-2 lg:px-3 py-3">Status</th>
+                    <th className="px-2 lg:px-3 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
+                <tbody className="divide-y divide-[var(--border-subtle)] text-xs font-medium">
                   {filteredBookings.map((b) => {
                     const statusBadge = getStatusBadge(b.status);
                     const allowed = getAllowedTransitions(b.status);
@@ -618,14 +618,14 @@ export default function ServicesPage() {
 
                     return (
                       <tr key={b.bookingId} className="hover:bg-foreground/5 group transition-colors">
-                        <td className="px-4 py-4 text-center">
+                        <td className="px-2 lg:px-3 py-3 text-center">
                           <span className="text-muted/80 font-mono text-xs font-bold">
                             #{b.bookingId}
                           </span>
                         </td>
 
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
+                        <td className="px-2 lg:px-3 py-3">
+                          <div className="flex items-center gap-2 lg:gap-3">
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 font-bold text-[var(--color-brand-green)]">
                               <User size={18} />
                             </div>
@@ -645,7 +645,7 @@ export default function ServicesPage() {
                           </div>
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <div className="text-foreground flex items-center gap-1.5 text-xs font-bold">
                             <Tractor
                               size={14}
@@ -655,13 +655,13 @@ export default function ServicesPage() {
                           </div>
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <span className="bg-foreground/5 text-foreground/90 rounded-md border border-[var(--border-subtle)] px-2.5 py-1 text-[11px] font-bold">
                             {formatServiceType(b.serviceType)}
                           </span>
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <div className="text-muted flex items-center gap-1 font-mono text-xs">
                             <Calendar size={13} className="text-muted/70" />
                             {b.preferredDate
@@ -670,7 +670,7 @@ export default function ServicesPage() {
                           </div>
                         </td>
 
-                        <td className="px-4 py-4 max-w-[240px]">
+                        <td className="px-2 lg:px-3 py-3 max-w-[140px] lg:max-w-[200px]">
                           <div
                             className="text-foreground truncate text-xs font-medium"
                             title={b.address || 'Location provided'}
@@ -695,7 +695,7 @@ export default function ServicesPage() {
                           )}
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-3 py-3">
                           <span
                             className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold ${statusBadge.color}`}
                           >
@@ -704,7 +704,7 @@ export default function ServicesPage() {
                           </span>
                         </td>
 
-                        <td className="px-4 py-4 text-right">
+                        <td className="px-2 lg:px-3 py-3 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => handleOpenDetailModal(b.bookingId)}
@@ -766,7 +766,7 @@ export default function ServicesPage() {
                     key={b.bookingId}
                     className="bg-foreground/5 space-y-3 rounded-2xl border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-green)]/30"
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start justify-between gap-2 lg:gap-3">
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-muted font-mono text-xs font-bold">
@@ -916,10 +916,10 @@ export default function ServicesPage() {
 
       {/* Booking Detail Modal */}
       {detailModalBooking && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm">
-          <div className="text-foreground relative my-8 flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div className="text-foreground relative max-h-[80vh] overflow-y-auto flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
             <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 lg:gap-3">
                 <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
                   <Wrench size={22} />
                 </div>
@@ -1072,7 +1072,7 @@ export default function ServicesPage() {
                     }
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-4 py-3 text-xs font-bold text-white uppercase tracking-wider shadow-md hover:opacity-90 transition-all"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-2 lg:px-3 py-3 text-xs font-bold text-white uppercase tracking-wider shadow-md hover:opacity-90 transition-all"
                   >
                     <Navigation size={16} /> Open Customer Location in Google Maps{' '}
                     <ExternalLink size={14} />
@@ -1095,7 +1095,7 @@ export default function ServicesPage() {
 
       {/* Status Transition & Notes Prompt Modal */}
       {statusChangeTarget && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <div className="text-foreground relative flex w-full max-w-md flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-black">Confirm Status Update</h3>
@@ -1127,7 +1127,7 @@ export default function ServicesPage() {
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-2 lg:gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setStatusChangeTarget(null)}
@@ -1150,10 +1150,10 @@ export default function ServicesPage() {
 
       {/* Book Service Modal */}
       {isCreateModalOpen && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm">
-          <div className="text-foreground relative my-8 flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl max-h-[90vh]">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div className="text-foreground relative max-h-[80vh] overflow-y-auto flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl max-h-[80vh]">
             <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 lg:gap-3">
                 <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">
                   <Wrench size={22} />
                 </div>
@@ -1298,7 +1298,7 @@ export default function ServicesPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 border-t border-[var(--border-subtle)] pt-4">
+              <div className="flex items-center justify-end gap-2 lg:gap-3 border-t border-[var(--border-subtle)] pt-4">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}

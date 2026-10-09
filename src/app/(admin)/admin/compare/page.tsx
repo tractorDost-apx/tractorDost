@@ -136,7 +136,7 @@ export default function CompareAnalyticsPage() {
       </div>
 
       {/* Tab Selector */}
-      <div className="border-foreground/10 mt-2 flex gap-6 border-b">
+      <div className="border-[var(--border-subtle)] mt-2 flex gap-6 border-b">
         <button
           onClick={() => setActiveTab('analytics')}
           className={`border-b-2 pb-3 text-sm font-black tracking-wider uppercase transition-all ${
@@ -250,7 +250,7 @@ export default function CompareAnalyticsPage() {
 
                     {/* VS Badge */}
                     <div className="absolute top-1/2 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-                      <div className="bg-background border-foreground/10 flex h-8 w-8 items-center justify-center rounded-full border shadow-md">
+                      <div className="bg-background border-[var(--border-subtle)] flex h-8 w-8 items-center justify-center rounded-full border shadow-md">
                         <span className="text-[10px] font-black text-[var(--color-brand-orange)] italic">
                           VS
                         </span>
@@ -321,7 +321,7 @@ export default function CompareAnalyticsPage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="bg-foreground/5 border-foreground/10 text-muted border-b text-xs font-black tracking-wider uppercase">
+                <tr className="bg-foreground/5 border-[var(--border-subtle)] text-muted border-b text-xs font-black tracking-wider uppercase">
                   <th className="p-4 pl-6">Client / User Details</th>
                   <th className="p-4">Tractor VS Battle</th>
                   <th className="p-4">Date & Time</th>

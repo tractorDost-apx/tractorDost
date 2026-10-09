@@ -267,23 +267,23 @@ export default function AnalyticsPage() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="text-muted border-b border-[var(--border-subtle)] text-xs font-bold tracking-wider uppercase">
-                <th className="px-4 py-3">Tractor Model</th>
-                <th className="px-4 py-3">Brand</th>
-                <th className="px-4 py-3">Total Inquiries</th>
-                <th className="px-4 py-3">Stock Units</th>
-                <th className="px-4 py-3 text-right">Demand Index</th>
+                <th className="px-2 lg:px-3 py-3">Tractor Model</th>
+                <th className="px-2 lg:px-3 py-3">Brand</th>
+                <th className="px-2 lg:px-3 py-3">Total Inquiries</th>
+                <th className="px-2 lg:px-3 py-3">Stock Units</th>
+                <th className="px-2 lg:px-3 py-3 text-right">Demand Index</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
+            <tbody className="divide-y divide-[var(--border-subtle)] text-xs font-medium">
               {topModels.map((m, idx) => (
                 <tr key={idx} className="hover:bg-foreground/5 transition-colors">
-                  <td className="text-foreground px-4 py-4 font-black">{m.model}</td>
-                  <td className="text-muted px-4 py-4 text-xs font-bold">{m.brand}</td>
-                  <td className="px-4 py-4 font-mono font-bold text-[var(--color-brand-green)]">
+                  <td className="text-foreground px-2 lg:px-3 py-3 font-black">{m.model}</td>
+                  <td className="text-muted px-2 lg:px-3 py-3 text-xs font-bold">{m.brand}</td>
+                  <td className="px-2 lg:px-3 py-3 font-mono font-bold text-[var(--color-brand-green)]">
                     {m.inquiries}
                   </td>
-                  <td className="text-muted px-4 py-4 font-mono">{m.stock} pcs</td>
-                  <td className="px-4 py-4 text-right">
+                  <td className="text-muted px-2 lg:px-3 py-3 font-mono">{m.stock} pcs</td>
+                  <td className="px-2 lg:px-3 py-3 text-right">
                     <span
                       className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-black tracking-wider uppercase ${
                         m.demand === 'HIGH'

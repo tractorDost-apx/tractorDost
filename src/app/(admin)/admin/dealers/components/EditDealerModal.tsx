@@ -97,9 +97,9 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
 
   return (
     <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-md sm:p-6">
-      <div className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl">
+      <div className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-zinc-900/50 p-6">
+        <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6">
           <div className="flex items-center gap-3">
             <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-2.5 text-blue-400">
               <Edit2 size={20} />
@@ -116,7 +116,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
 
           <button
             onClick={onClose}
-            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
+            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10"
           >
             <X size={20} />
           </button>
@@ -138,7 +138,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -148,7 +148,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 font-mono text-sm focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 font-mono text-sm focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -157,7 +157,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
               <select
                 value={dealerType}
                 onChange={(e) => setDealerType(e.target.value as DealerType)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-zinc-900 px-3.5 py-2.5 text-sm font-bold focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-bold focus:border-lime-400/50 focus:outline-none"
               >
                 <option value="BRAND_DEALER">BRAND_DEALER</option>
                 <option value="MULTI_BRAND">MULTI_BRAND</option>
@@ -171,7 +171,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -181,7 +181,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -191,7 +191,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -201,7 +201,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -211,7 +211,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -221,7 +221,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -231,7 +231,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="text"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -241,7 +241,7 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 type="number"
                 value={serviceRadiusKm}
                 onChange={(e) => setServiceRadiusKm(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
@@ -251,16 +251,16 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
                 rows={3}
                 value={aboutDealer}
                 onChange={(e) => setAboutDealer(e.target.value)}
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium focus:border-lime-400/50 focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center justify-end gap-3 border-t border-white/10 pt-4">
+          <div className="flex shrink-0 items-center justify-end gap-3 border-t border-[var(--border-subtle)] pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-white/10"
+              className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-foreground/10"
             >
               Cancel
             </button>

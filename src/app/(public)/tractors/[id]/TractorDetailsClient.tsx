@@ -165,7 +165,7 @@ export default function TractorDetailsClient({
                   <button
                     key={idx}
                     onClick={() => setActiveMediaIndex(idx)}
-                    className={`from-foreground/5 h-24 w-24 flex-shrink-0 rounded-[1rem] border-2 bg-gradient-to-br to-transparent p-2 transition-all ${activeMediaIndex === idx ? 'border-[var(--color-brand-green)] shadow-[var(--color-brand-green)]/20 shadow-md' : 'hover:border-foreground/20 border-transparent'}`}
+                    className={`from-foreground/5 h-24 w-24 flex-shrink-0 rounded-[1rem] border-2 bg-gradient-to-br to-transparent p-2 transition-all ${activeMediaIndex === idx ? 'border-[var(--color-brand-green)] shadow-[var(--color-brand-green)]/20 shadow-md' : 'hover:border-[var(--border-brand)] border-transparent'}`}
                   >
                     {media.mediaType === 'VIDEO' ? (
                       <div className="flex h-full w-full items-center justify-center">

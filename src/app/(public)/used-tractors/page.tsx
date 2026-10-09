@@ -295,7 +295,7 @@ function UsedTractorsListingContent() {
         <aside
           className={`flex w-full flex-shrink-0 flex-col gap-6 lg:w-72 ${showFilters ? 'flex' : 'hidden lg:flex'}`}
         >
-          <div className="spatial-panel sticky top-24 flex flex-col gap-6 rounded-[2rem] p-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
+          <div className="spatial-panel sticky top-24 flex flex-col gap-6 rounded-[2rem] p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
               <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
                 <SlidersHorizontal size={18} className="text-[var(--color-brand-green)]" /> Filters

@@ -71,8 +71,8 @@ export function AddUsedTractorFlow({
       )}
 
       {/* Modal Overlay */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="relative my-8 w-full max-w-2xl rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--background)] shadow-2xl flex flex-col h-[90vh]">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="relative max-h-[80vh] overflow-y-auto w-full max-w-2xl rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--background)] shadow-2xl flex flex-col h-[90vh]">
           {/* Header */}
           <div className="border-b border-[var(--border-subtle)] px-6 py-4 flex-shrink-0">
             <div className="flex items-center justify-between">

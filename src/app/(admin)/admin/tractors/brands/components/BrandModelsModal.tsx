@@ -38,10 +38,10 @@ export default function BrandModelsModal({ brand, onClose }: BrandModelsModalPro
   return (
     <div className="bg-background/80 animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
       <div
-        className="border-foreground/10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
+        className="border-[var(--border-subtle)] flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
         style={{ background: 'var(--background)' }}
       >
-        <div className="border-foreground/10 bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
+        <div className="border-[var(--border-subtle)] bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
           <div>
             <h2 className="text-foreground flex items-center gap-2 text-2xl font-black tracking-tight">
               <TractorIcon className="text-[var(--color-brand-green)]" />

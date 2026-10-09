@@ -178,7 +178,7 @@ export default function LoginPage() {
                 placeholder="Mobile Number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                className="bg-background/50 text-foreground placeholder:text-muted/60 hover:border-foreground/20 h-14 w-full rounded-xl border border-[var(--border-subtle)] pr-5 pl-16 text-lg font-black transition-all focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
+                className="bg-background/50 text-foreground placeholder:text-muted/60 hover:border-[var(--border-brand)] h-14 w-full rounded-xl border border-[var(--border-subtle)] pr-5 pl-16 text-lg font-black transition-all focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
                 required
                 disabled={isLoading}
               />
@@ -211,7 +211,7 @@ export default function LoginPage() {
                 placeholder="0 0 0 0 0 0"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                className="bg-background/50 text-foreground placeholder:text-muted/40 hover:border-foreground/20 h-14 w-full rounded-xl border border-[var(--border-subtle)] px-5 text-center text-2xl font-black tracking-[0.5em] transition-all placeholder:tracking-widest focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
+                className="bg-background/50 text-foreground placeholder:text-muted/40 hover:border-[var(--border-brand)] h-14 w-full rounded-xl border border-[var(--border-subtle)] px-5 text-center text-2xl font-black tracking-[0.5em] transition-all placeholder:tracking-widest focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
                 required
                 disabled={isLoading || isResending}
               />

@@ -40,7 +40,7 @@ const LEAD_STATUS_CONFIG: Record<
   DEALER_ASSIGNED: { label: 'Assigned', color: 'text-teal-400', bg: 'bg-teal-400/10', border: 'border-teal-400/30' },
   CONVERTED: { label: 'Deal Closed / Sold', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/30' },
   LOST: { label: 'Lost / Not Interested', color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/30' },
-  SPAM: { label: 'Spam / Invalid', color: 'text-slate-400', bg: 'bg-slate-400/10', border: 'border-slate-400/30' },
+  SPAM: { label: 'Spam / Invalid', color: 'text-muted', bg: 'bg-slate-400/10', border: 'border-slate-400/30' },
 };
 
 export function DealerListingEnquiriesModal({
@@ -117,10 +117,10 @@ export function DealerListingEnquiriesModal({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative my-8 w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-slate-950 p-6 shadow-2xl md:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative max-h-[80vh] overflow-y-auto w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-[var(--background)] p-6 shadow-2xl md:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
               <MessageSquareText size={24} />
@@ -136,7 +136,7 @@ export function DealerListingEnquiriesModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-muted hover:bg-slate-900 hover:text-foreground transition-colors"
+            className="rounded-lg p-2 text-muted hover:bg-foreground/5 hover:text-foreground transition-colors"
           >
             <X size={20} />
           </button>
@@ -165,7 +165,7 @@ export function DealerListingEnquiriesModal({
               placeholder="Search buyer name or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-900 pl-8 pr-3 py-1.5 text-xs font-medium text-foreground focus:border-lime-400 focus:outline-none"
+              className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 pl-8 pr-3 py-1.5 text-xs font-medium text-foreground focus:border-lime-400 focus:outline-none"
             />
           </div>
 
@@ -174,7 +174,7 @@ export function DealerListingEnquiriesModal({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-bold text-foreground focus:border-lime-400 focus:outline-none"
+              className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-1.5 text-xs font-bold text-foreground focus:border-lime-400 focus:outline-none"
             >
               <option value="ALL">All Statuses ({enquiries.length})</option>
               {Object.keys(LEAD_STATUS_CONFIG).map((key) => (
@@ -194,7 +194,7 @@ export function DealerListingEnquiriesModal({
               <p className="text-xs text-muted font-medium mt-2">Loading buyer enquiries...</p>
             </div>
           ) : filteredEnquiries.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/30 p-10 text-center">
+            <div className="rounded-2xl border border-dashed border-[var(--border-subtle)] bg-foreground/5 p-10 text-center">
               <MessageSquareText size={32} className="mx-auto text-slate-600 mb-2" />
               <p className="text-sm font-bold text-foreground">No enquiries found</p>
               <p className="text-xs text-muted mt-1">
@@ -211,7 +211,7 @@ export function DealerListingEnquiriesModal({
               return (
                 <div
                   key={enq.id}
-                  className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 transition-all hover:border-slate-700"
+                  className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-4 transition-all hover:border-[var(--border-brand)]"
                 >
                   <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                     <div>
@@ -224,7 +224,7 @@ export function DealerListingEnquiriesModal({
                         </span>
                       </div>
                       <div className="mt-1 flex flex-wrap items-center gap-4 text-xs text-muted font-medium">
-                        <span className="flex items-center gap-1 text-slate-300 font-bold">
+                        <span className="flex items-center gap-1 text-muted font-bold">
                           <Phone size={12} className="text-lime-400" /> {enq.mobile}
                         </span>
                         <span className="flex items-center gap-1">
@@ -254,7 +254,7 @@ export function DealerListingEnquiriesModal({
                         disabled={isUpdating}
                         value={enq.status}
                         onChange={(e) => handleStatusChange(enq.id, e.target.value as LeadStatus)}
-                        className="rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-bold text-foreground focus:border-lime-400 focus:outline-none"
+                        className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-1.5 text-xs font-bold text-foreground focus:border-lime-400 focus:outline-none"
                       >
                         {Object.keys(LEAD_STATUS_CONFIG).map((st) => (
                           <option key={st} value={st}>
@@ -266,7 +266,7 @@ export function DealerListingEnquiriesModal({
                   </div>
 
                   {enq.message && (
-                    <p className="mt-3 rounded-xl bg-slate-950/70 p-3 text-xs text-slate-300 italic border border-slate-800/60">
+                    <p className="mt-3 rounded-xl bg-[var(--background)] p-3 text-xs text-muted italic border border-[var(--border-subtle)]">
                       &ldquo;{enq.message}&rdquo;
                     </p>
                   )}
@@ -277,10 +277,10 @@ export function DealerListingEnquiriesModal({
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex justify-end border-t border-slate-800 pt-4">
+        <div className="mt-6 flex justify-end border-t border-[var(--border-subtle)] pt-4">
           <button
             onClick={onClose}
-            className="rounded-xl bg-slate-800 px-5 py-2 text-xs font-bold text-foreground hover:bg-slate-700 transition-colors"
+            className="rounded-xl bg-foreground/10 px-5 py-2 text-xs font-bold text-foreground hover:bg-slate-700 transition-colors"
           >
             Close
           </button>

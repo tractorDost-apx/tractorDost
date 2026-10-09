@@ -97,7 +97,7 @@ export default function DealerProfilePage() {
           </p>
           <button
             onClick={() => fetchDealerData()}
-            className="text-foreground inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-xs font-bold transition-colors hover:bg-white/20"
+            className="text-foreground inline-flex items-center gap-2 rounded-xl bg-foreground/10 px-4 py-2.5 text-xs font-bold transition-colors hover:bg-foreground/10"
           >
             <RefreshCw size={14} /> Retry Loading
           </button>

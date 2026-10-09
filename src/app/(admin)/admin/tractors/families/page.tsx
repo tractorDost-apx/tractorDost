@@ -306,7 +306,7 @@ export default function TractorFamiliesPage() {
           {/* Families Table */}
           <div className="glass-panel flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl md:min-h-[530px]">
             <div className="min-h-[350px] flex-1 overflow-x-auto overflow-y-auto md:min-h-[460px]">
-              <table className="relative w-full text-left text-sm">
+              <table className="relative w-full text-left text-xs">
                 <thead className="bg-background/95 text-muted sticky top-0 z-10 border-b border-[var(--border-subtle)] text-[11px] font-black tracking-wider uppercase backdrop-blur-md">
                   <tr>
                     <th className="w-10 px-6 py-4"></th>
@@ -357,7 +357,7 @@ export default function TractorFamiliesPage() {
                                     className="max-h-full max-w-full object-contain"
                                   />
                                 ) : (
-                                  <span className="text-[10px] font-black text-gray-400 uppercase">
+                                  <span className="text-[10px] font-black text-muted uppercase">
                                     N/A
                                   </span>
                                 )}

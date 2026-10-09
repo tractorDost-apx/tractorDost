@@ -21,7 +21,7 @@ export default function AdminListingBoostsPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="bg-background border-foreground/10 flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm">
+        <div className="bg-background border-[var(--border-subtle)] flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm">
           <div className="mb-4 rounded-full bg-amber-500/10 p-4 text-amber-500">
             <Zap size={32} />
           </div>
@@ -31,7 +31,7 @@ export default function AdminListingBoostsPage() {
           </p>
           <p className="mt-auto text-4xl font-black text-amber-500">12</p>
         </div>
-        <div className="bg-background border-foreground/10 flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm">
+        <div className="bg-background border-[var(--border-subtle)] flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm">
           <div className="mb-4 rounded-full bg-[var(--color-brand-green)]/10 p-4 text-[var(--color-brand-green)]">
             <Layers size={32} />
           </div>
@@ -41,7 +41,7 @@ export default function AdminListingBoostsPage() {
           </p>
           <p className="mt-auto text-4xl font-black text-[var(--color-brand-green)]">₹48,000</p>
         </div>
-        <div className="bg-background border-foreground/10 flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm">
+        <div className="bg-background border-[var(--border-subtle)] flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm">
           <div className="mb-4 rounded-full bg-blue-500/10 p-4 text-blue-500">
             <Clock size={32} />
           </div>
@@ -53,7 +53,7 @@ export default function AdminListingBoostsPage() {
         </div>
       </div>
 
-      <div className="bg-background border-foreground/10 mt-8 rounded-3xl border p-8 text-center shadow-sm">
+      <div className="bg-background border-[var(--border-subtle)] mt-8 rounded-3xl border p-8 text-center shadow-sm">
         <Rocket className="text-foreground/20 mx-auto mb-4" size={48} />
         <h3 className="mb-2 text-2xl font-black">Listing Boost Module</h3>
         <p className="text-muted mx-auto max-w-lg font-medium">

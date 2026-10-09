@@ -143,10 +143,10 @@ export function DealerDetailsDrawer({
       {/* Inner Panel - Flex Container with strict min-h-0 */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex h-full max-h-screen w-full max-w-4xl shrink-0 flex-col overflow-hidden border-l border-white/10 bg-zinc-950 shadow-2xl"
+        className="relative flex h-full max-h-screen w-full max-w-4xl shrink-0 flex-col overflow-hidden border-l border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl"
       >
         {/* 1. DEALER HEADER (FIXED TOP, SHRINK-0) */}
-        <div className="z-20 flex shrink-0 items-center justify-between border-b border-white/10 bg-zinc-900/90 p-6 backdrop-blur-md">
+        <div className="z-20 flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6 backdrop-blur-md">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-xl font-black text-lime-400">
               {dealer?.businessName ? dealer.businessName.charAt(0).toUpperCase() : 'D'}
@@ -169,7 +169,7 @@ export function DealerDetailsDrawer({
               <>
                 <button
                   onClick={() => onOpenEdit(dealer)}
-                  className="text-foreground flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-bold transition-colors hover:bg-white/10"
+                  className="text-foreground flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2 text-xs font-bold transition-colors hover:bg-foreground/10"
                 >
                   <Edit2 size={14} /> Edit
                 </button>
@@ -186,7 +186,7 @@ export function DealerDetailsDrawer({
                 e.stopPropagation();
                 onClose();
               }}
-              className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
+              className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10"
               title="Close panel (Esc)"
             >
               <X size={20} />
@@ -195,7 +195,7 @@ export function DealerDetailsDrawer({
         </div>
 
         {/* 2. DETAILS NAVIGATION (FIXED BELOW HEADER, HORIZONTALLY SCROLLABLE ONLY) */}
-        <div className="scrollbar-thin scrollbar-thumb-lime-400/30 scrollbar-track-transparent z-10 flex w-full shrink-0 items-center gap-2 overflow-x-auto border-b border-white/10 bg-zinc-900/70 px-6 py-3 whitespace-nowrap backdrop-blur-md">
+        <div className="scrollbar-thin scrollbar-thumb-lime-400/30 scrollbar-track-transparent z-10 flex w-full shrink-0 items-center gap-2 overflow-x-auto border-b border-[var(--border-subtle)] bg-foreground/5 px-6 py-3 whitespace-nowrap backdrop-blur-md">
           {[
             { id: 'overview', label: 'Overview', icon: Info },
             { id: 'business', label: 'Business', icon: Building2 },
@@ -216,7 +216,7 @@ export function DealerDetailsDrawer({
                 className={`inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold whitespace-nowrap transition-all select-none ${
                   isActive
                     ? 'border border-lime-400/30 bg-lime-400/10 font-black text-lime-400 shadow-sm'
-                    : 'text-muted hover:text-foreground border border-transparent hover:bg-white/5'
+                    : 'text-muted hover:text-foreground border border-transparent hover:bg-foreground/5'
                 }`}
               >
                 <IconComponent size={14} className={isActive ? 'text-lime-400' : 'text-muted'} />
@@ -231,7 +231,7 @@ export function DealerDetailsDrawer({
           {loading ? (
             <div className="space-y-4 py-8">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-20 animate-pulse rounded-2xl bg-white/5" />
+                <div key={i} className="h-20 animate-pulse rounded-2xl bg-foreground/5" />
               ))}
             </div>
           ) : error ? (
@@ -244,7 +244,7 @@ export function DealerDetailsDrawer({
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   {/* Status Banner */}
-                  <div className="glass-panel flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel flex flex-wrap items-center justify-between gap-4 rounded-2xl  p-5">
                     <div className="flex items-center gap-3">
                       <VerificationBadge status={dealer.verificationStatus} />
                       <ActiveBadge isActive={dealer.isActive} />
@@ -281,7 +281,7 @@ export function DealerDetailsDrawer({
 
                   {/* Quick Summary Grid */}
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="glass-panel space-y-2 rounded-2xl border border-white/5 p-4">
+                    <div className="glass-panel space-y-2 rounded-2xl  p-4">
                       <div className="text-muted text-xs font-bold tracking-wider uppercase">
                         Contact Info
                       </div>
@@ -293,7 +293,7 @@ export function DealerDetailsDrawer({
                       </div>
                     </div>
 
-                    <div className="glass-panel space-y-2 rounded-2xl border border-white/5 p-4">
+                    <div className="glass-panel space-y-2 rounded-2xl  p-4">
                       <div className="text-muted text-xs font-bold tracking-wider uppercase">
                         Location
                       </div>
@@ -306,7 +306,7 @@ export function DealerDetailsDrawer({
 
                   {/* About Dealer */}
                   {dealer.aboutDealer && (
-                    <div className="glass-panel space-y-2 rounded-2xl border border-white/5 p-5">
+                    <div className="glass-panel space-y-2 rounded-2xl  p-5">
                       <h4 className="text-muted text-xs font-black tracking-wider uppercase">
                         About Dealership
                       </h4>
@@ -318,12 +318,12 @@ export function DealerDetailsDrawer({
 
                   {/* Profile Metrics Card if loaded */}
                   {profile && (
-                    <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5">
+                    <div className="glass-panel space-y-4 rounded-2xl  p-5">
                       <h4 className="text-xs font-black tracking-wider text-lime-400 uppercase">
                         Performance & Resolution Metrics
                       </h4>
                       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div className="rounded-xl bg-white/5 p-3 text-center">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
                           <div className="text-foreground text-xl font-black">
                             {profile.overallRating.toFixed(1)}
                           </div>
@@ -331,7 +331,7 @@ export function DealerDetailsDrawer({
                             Overall Rating
                           </div>
                         </div>
-                        <div className="rounded-xl bg-white/5 p-3 text-center">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
                           <div className="text-foreground text-xl font-black">
                             {profile.grievanceStats.totalGrievances}
                           </div>
@@ -339,7 +339,7 @@ export function DealerDetailsDrawer({
                             Total Grievances
                           </div>
                         </div>
-                        <div className="rounded-xl bg-white/5 p-3 text-center">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
                           <div className="text-xl font-black text-emerald-400">
                             {profile.grievanceStats.resolved}
                           </div>
@@ -347,7 +347,7 @@ export function DealerDetailsDrawer({
                             Resolved
                           </div>
                         </div>
-                        <div className="rounded-xl bg-white/5 p-3 text-center">
+                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
                           <div className="text-xl font-black text-lime-400">
                             {profile.grievanceStats.resolutionRate}
                           </div>
@@ -364,7 +364,7 @@ export function DealerDetailsDrawer({
               {/* TAB 2: BUSINESS */}
               {activeTab === 'business' && (
                 <div className="space-y-4">
-                  <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-4 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       Business Details
                     </h3>
@@ -377,7 +377,7 @@ export function DealerDetailsDrawer({
                       </div>
                       <div>
                         <span className="text-muted block font-bold">Slug</span>
-                        <span className="text-foreground inline-block rounded-md bg-white/5 px-2 py-1 font-mono">
+                        <span className="text-foreground inline-block rounded-md bg-foreground/5 px-2 py-1 font-mono">
                           {dealer.slug}
                         </span>
                       </div>
@@ -396,18 +396,18 @@ export function DealerDetailsDrawer({
                     </div>
                   </div>
 
-                  <div className="glass-panel space-y-3 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-3 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       Working Hours & Operations
                     </h3>
-                    <div className="text-foreground overflow-x-auto rounded-xl bg-white/5 p-3 font-mono text-xs font-medium">
+                    <div className="text-foreground overflow-x-auto rounded-xl bg-foreground/5 p-3 font-mono text-xs font-medium">
                       {dealer.workingHours
                         ? JSON.stringify(dealer.workingHours, null, 2)
                         : 'Standard business hours'}
                     </div>
                   </div>
 
-                  <div className="glass-panel space-y-3 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-3 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       SEO Metadata
                     </h3>
@@ -432,7 +432,7 @@ export function DealerDetailsDrawer({
               {/* TAB 3: CONTACT & KYC */}
               {activeTab === 'contact_kyc' && (
                 <div className="space-y-4">
-                  <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-4 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       Contact Communication
                     </h3>
@@ -471,18 +471,18 @@ export function DealerDetailsDrawer({
                     </div>
                   </div>
 
-                  <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-4 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       KYC Verification Data
                     </h3>
                     <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-2">
-                      <div className="rounded-xl border border-white/5 bg-white/5 p-4">
+                      <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-4">
                         <span className="text-muted mb-1 block font-bold">PAN Number</span>
                         <span className="text-foreground font-mono text-base font-black tracking-wider uppercase">
                           {dealer.panNumber || 'NOT PROVIDED'}
                         </span>
                       </div>
-                      <div className="rounded-xl border border-white/5 bg-white/5 p-4">
+                      <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-4">
                         <span className="text-muted mb-1 block font-bold">GSTIN Number</span>
                         <span className="text-foreground font-mono text-base font-black tracking-wider uppercase">
                           {dealer.gstNumber || 'NOT PROVIDED'}
@@ -495,7 +495,7 @@ export function DealerDetailsDrawer({
 
               {/* TAB 4: LOCATION */}
               {activeTab === 'location' && (
-                <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5">
+                <div className="glass-panel space-y-4 rounded-2xl  p-5">
                   <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                     Geographic Location
                   </h3>
@@ -540,7 +540,7 @@ export function DealerDetailsDrawer({
 
               {/* TAB 5: BRANDS */}
               {activeTab === 'brands' && (
-                <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5">
+                <div className="glass-panel space-y-4 rounded-2xl  p-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       Dealership Brands
@@ -557,7 +557,7 @@ export function DealerDetailsDrawer({
                       {dealer.brands.map((b) => (
                         <div
                           key={b.id}
-                          className="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 p-3"
+                          className="flex items-center justify-between rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3"
                         >
                           <span className="text-foreground text-sm font-bold">
                             {b.brand?.name || `Brand #${b.brandId}`}
@@ -580,7 +580,7 @@ export function DealerDetailsDrawer({
 
               {/* TAB 6: INVENTORY */}
               {activeTab === 'inventory' && (
-                <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5">
+                <div className="glass-panel space-y-4 rounded-2xl  p-5">
                   <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                     Dealership Stock Inventory
                   </h3>
@@ -589,7 +589,7 @@ export function DealerDetailsDrawer({
                       {dealer.inventory.map((inv) => (
                         <div
                           key={inv.id}
-                          className="flex items-center justify-between rounded-xl bg-white/5 p-3 text-xs"
+                          className="flex items-center justify-between rounded-xl bg-foreground/5 p-3 text-xs"
                         >
                           <div>
                             <span className="text-foreground font-bold">
@@ -624,7 +624,7 @@ export function DealerDetailsDrawer({
               {activeTab === 'facilities' && (
                 <div className="space-y-4">
                   {/* Showroom */}
-                  <div className="glass-panel space-y-3 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-3 rounded-2xl  p-5">
                     <h3 className="flex items-center gap-2 text-sm font-black tracking-wider text-lime-400 uppercase">
                       <Store size={16} /> Showroom Facility
                     </h3>
@@ -661,7 +661,7 @@ export function DealerDetailsDrawer({
                   </div>
 
                   {/* Service Center */}
-                  <div className="glass-panel space-y-3 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-3 rounded-2xl  p-5">
                     <h3 className="flex items-center gap-2 text-sm font-black tracking-wider text-lime-400 uppercase">
                       <Wrench size={16} /> Service Center Facility
                     </h3>
@@ -703,14 +703,14 @@ export function DealerDetailsDrawer({
               {activeTab === 'reviews_complaints' && (
                 <div className="space-y-4">
                   {/* Reviews Summary */}
-                  <div className="glass-panel space-y-3 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-3 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       Customer Reviews ({dealer.reviewsCount || 0})
                     </h3>
                     {profile && profile.recentReviews && profile.recentReviews.length > 0 ? (
                       <div className="space-y-3">
                         {profile.recentReviews.map((rev) => (
-                          <div key={rev.id} className="space-y-1 rounded-xl bg-white/5 p-3 text-xs">
+                          <div key={rev.id} className="space-y-1 rounded-xl bg-foreground/5 p-3 text-xs">
                             <div className="flex items-center justify-between">
                               <span className="flex items-center gap-1 font-bold text-amber-400">
                                 <Star size={12} className="fill-amber-400" /> {rev.rating} / 5
@@ -732,17 +732,17 @@ export function DealerDetailsDrawer({
                   </div>
 
                   {/* Grievances List */}
-                  <div className="glass-panel space-y-3 rounded-2xl border border-white/5 p-5">
+                  <div className="glass-panel space-y-3 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                       Filed Complaints ({dealer.complaintsCount || 0})
                     </h3>
                     {dealer.grievances && dealer.grievances.length > 0 ? (
                       <div className="space-y-2">
                         {dealer.grievances.map((g) => (
-                          <div key={g.id} className="space-y-1 rounded-xl bg-white/5 p-3 text-xs">
+                          <div key={g.id} className="space-y-1 rounded-xl bg-foreground/5 p-3 text-xs">
                             <div className="flex items-center justify-between font-bold">
                               <span className="text-foreground">{g.title}</span>
-                              <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-black text-lime-400 uppercase">
+                              <span className="rounded bg-foreground/10 px-2 py-0.5 text-[10px] font-black text-lime-400 uppercase">
                                 {g.status}
                               </span>
                             </div>
@@ -764,7 +764,7 @@ export function DealerDetailsDrawer({
 
               {/* TAB 9: METADATA */}
               {activeTab === 'metadata' && (
-                <div className="glass-panel space-y-4 rounded-2xl border border-white/5 p-5 text-xs">
+                <div className="glass-panel space-y-4 rounded-2xl  p-5 text-xs">
                   <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
                     System Metadata & Audit
                   </h3>

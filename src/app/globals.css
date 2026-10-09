@@ -10,6 +10,11 @@
   --color-brand-charcoal: #090b0a; /* Velvety deep moss-black */
   --color-brand-light: #f7f9f6; /* Soft, pristine off-white/cream instead of stark white */
 
+  /* Override tailwind default lime with brand colors globally */
+  --color-lime-300: #5d9243; /* slightly lighter brand green */
+  --color-lime-400: var(--color-brand-green);
+  --color-lime-500: var(--color-brand-green-dark);
+
   --color-spatial-bg-light: var(--color-brand-light);
   --color-spatial-bg-dark: var(--color-brand-charcoal);
 
@@ -94,7 +99,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 
-  @apply min-h-screen overflow-x-hidden transition-colors duration-1000 ease-out;
+  @apply min-h-screen overflow-x-hidden;
 }
 
 /* Ambient Glowing Orbs - Living Background */

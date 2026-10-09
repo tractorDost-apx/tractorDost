@@ -272,10 +272,10 @@ export function CreateDealerUsedListingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative my-8 w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-slate-950 p-6 shadow-2xl md:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative max-h-[80vh] overflow-y-auto w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-[var(--background)] p-6 shadow-2xl md:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-5">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-5">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-lime-400/10 text-lime-400">
               <Tractor size={26} />
@@ -296,7 +296,7 @@ export function CreateDealerUsedListingModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-muted hover:bg-slate-900 hover:text-foreground transition-colors"
+            className="rounded-lg p-2 text-muted hover:bg-foreground/5 hover:text-foreground transition-colors"
           >
             <X size={20} />
           </button>
@@ -338,7 +338,7 @@ export function CreateDealerUsedListingModal({
                     className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
                       tractorBrand === b
                         ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
-                        : 'border border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700'
+                        : 'border border-[var(--border-subtle)] bg-foreground/5 text-muted hover:border-[var(--border-brand)]'
                     }`}
                   >
                     {b}
@@ -349,7 +349,7 @@ export function CreateDealerUsedListingModal({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Brand Name <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -358,12 +358,12 @@ export function CreateDealerUsedListingModal({
                   placeholder="e.g. Mahindra"
                   value={tractorBrand}
                   onChange={(e) => setTractorBrand(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Model Name / Number <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -372,12 +372,12 @@ export function CreateDealerUsedListingModal({
                   placeholder="e.g. 575 DI XP Plus"
                   value={tractorModel}
                   onChange={(e) => setTractorModel(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Year of Manufacture <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -387,18 +387,18 @@ export function CreateDealerUsedListingModal({
                   max={currentYear}
                   value={yearOfManufacture}
                   onChange={(e) => setYearOfManufacture(parseInt(e.target.value) || currentYear)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Ownership (Owners) <span className="text-red-400">*</span>
                 </label>
                 <select
                   value={ownership}
                   onChange={(e) => setOwnership(parseInt(e.target.value))}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <option value={1}>1st Owner (Single hand)</option>
                   <option value={2}>2nd Owner</option>
@@ -408,7 +408,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Hours Used / Meter Run (hrs)
                 </label>
                 <input
@@ -418,18 +418,18 @@ export function CreateDealerUsedListingModal({
                   placeholder="e.g. 1200"
                   value={hoursUsed}
                   onChange={(e) => setHoursUsed(parseInt(e.target.value) || 0)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Overall Condition Grade <span className="text-red-400">*</span>
                 </label>
                 <select
                   value={conditionGrade}
                   onChange={(e) => setConditionGrade(e.target.value as any)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent (Like New)</option>
                   <option value="GOOD">Good (Well Maintained)</option>
@@ -441,14 +441,14 @@ export function CreateDealerUsedListingModal({
           </div>
 
           {/* Section 2: Pricing & Options */}
-          <div className="space-y-4 border-t border-slate-800 pt-5">
+          <div className="space-y-4 border-t border-[var(--border-subtle)] pt-5">
             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-lime-400">
               <IndianRupee size={16} /> 2. Pricing & Commercials
             </h3>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Asking Price (₹) <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
@@ -461,12 +461,12 @@ export function CreateDealerUsedListingModal({
                     placeholder="e.g. 450000"
                     value={askingPrice}
                     onChange={(e) => setAskingPrice(e.target.value)}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-900/90 pl-8 pr-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                    className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 pl-8 pr-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-3 mt-auto">
+              <div className="flex items-center gap-3 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3 mt-auto">
                 <input
                   type="checkbox"
                   id="negotiable"
@@ -479,7 +479,7 @@ export function CreateDealerUsedListingModal({
                 </label>
               </div>
 
-              <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-3 mt-auto">
+              <div className="flex items-center gap-3 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3 mt-auto">
                 <input
                   type="checkbox"
                   id="financeAvailable"
@@ -495,14 +495,14 @@ export function CreateDealerUsedListingModal({
           </div>
 
           {/* Section 3: Dealer Self-Inspection & Condition */}
-          <div className="space-y-4 border-t border-slate-800 pt-5">
+          <div className="space-y-4 border-t border-[var(--border-subtle)] pt-5">
             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-lime-400">
               <Wrench size={16} /> 3. Dealer Inspection & Condition Assessment
             </h3>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Engine Health Score: {engineConditionPct}%
                 </label>
                 <input
@@ -517,11 +517,11 @@ export function CreateDealerUsedListingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Tyre Condition</label>
+                <label className="block text-xs font-semibold text-muted mb-1.5">Tyre Condition</label>
                 <select
                   value={tyreCondition}
                   onChange={(e) => setTyreCondition(e.target.value as any)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent (75-100% Grip)</option>
                   <option value="GOOD">Good (50-75% Grip)</option>
@@ -531,11 +531,11 @@ export function CreateDealerUsedListingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Hydraulics Condition</label>
+                <label className="block text-xs font-semibold text-muted mb-1.5">Hydraulics Condition</label>
                 <select
                   value={hydraulicsCondition}
                   onChange={(e) => setHydraulicsCondition(e.target.value as any)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent (Smooth lifting)</option>
                   <option value="GOOD">Good (Working fine)</option>
@@ -545,11 +545,11 @@ export function CreateDealerUsedListingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Clutch & Transmission</label>
+                <label className="block text-xs font-semibold text-muted mb-1.5">Clutch & Transmission</label>
                 <select
                   value={clutchCondition}
                   onChange={(e) => setClutchCondition(e.target.value as any)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <option value="EXCELLENT">Excellent (Crisp gear shift)</option>
                   <option value="GOOD">Good (Normal play)</option>
@@ -559,11 +559,11 @@ export function CreateDealerUsedListingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Body & Paint Condition</label>
+                <label className="block text-xs font-semibold text-muted mb-1.5">Body & Paint Condition</label>
                 <select
                   value={bodyCondition}
                   onChange={(e) => setBodyCondition(e.target.value as any)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <option value="EXCELLENT">Original / Spotless Paint</option>
                   <option value="GOOD">Good / Minor Scratches</option>
@@ -575,14 +575,14 @@ export function CreateDealerUsedListingModal({
           </div>
 
           {/* Section 4: Documents & Legal Clearance (WITH DIRECT FILE UPLOAD FIELDS) */}
-          <div className="space-y-4 border-t border-slate-800 pt-5">
+          <div className="space-y-4 border-t border-[var(--border-subtle)] pt-5">
             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-lime-400">
               <FileText size={16} /> 4. Papers & Registration (Upload Documents)
             </h3>
 
             {/* Statuses and Dates */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+              <div className="flex items-center gap-3 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 <input
                   type="checkbox"
                   id="rcAvailable"
@@ -596,25 +596,25 @@ export function CreateDealerUsedListingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Insurance Validity Date
                 </label>
                 <input
                   type="date"
                   value={insuranceValidity}
                   onChange={(e) => setInsuranceValidity(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Loan / Hypothecation Status
                 </label>
                 <select
                   value={loanClearanceStatus}
                   onChange={(e) => setLoanClearanceStatus(e.target.value as any)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   <option value="CLEAR">Clear (No Loan / NOC Available)</option>
                   <option value="UNDER_HYPOTHECATION">Under Hypothecation</option>
@@ -625,7 +625,7 @@ export function CreateDealerUsedListingModal({
             {/* Document File Upload Fields */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* RC Copy Upload */}
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3.5">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5">
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                     <FileCheck size={14} className="text-lime-400" /> Registration Certificate (RC Copy)
@@ -645,7 +645,7 @@ export function CreateDealerUsedListingModal({
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
                   onChange={(e) => setRcDocumentFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs text-slate-300 file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
+                  className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {rcDocumentFile && (
                   <p className="mt-1.5 text-[11px] text-emerald-400 font-semibold truncate flex items-center gap-1">
@@ -655,7 +655,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Insurance Policy Upload */}
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3.5">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5">
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                     <Paperclip size={14} className="text-lime-400" /> Insurance Policy Copy
@@ -675,7 +675,7 @@ export function CreateDealerUsedListingModal({
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
                   onChange={(e) => setInsuranceDocumentFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs text-slate-300 file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
+                  className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {insuranceDocumentFile && (
                   <p className="mt-1.5 text-[11px] text-emerald-400 font-semibold truncate flex items-center gap-1">
@@ -685,7 +685,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Loan NOC Upload */}
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3.5">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5">
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                     <FileText size={14} className="text-purple-400" /> Bank Loan NOC / Clearance Letter
@@ -705,7 +705,7 @@ export function CreateDealerUsedListingModal({
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
                   onChange={(e) => setLoanNocDocumentFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs text-slate-300 file:mr-2 file:rounded-lg file:border-0 file:bg-purple-500/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-purple-300 hover:file:bg-purple-500/20"
+                  className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-purple-500/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-purple-300 hover:file:bg-purple-500/20"
                 />
                 {loanNocDocumentFile && (
                   <p className="mt-1.5 text-[11px] text-emerald-400 font-semibold truncate flex items-center gap-1">
@@ -715,10 +715,10 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Other Document Upload */}
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3.5">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3.5">
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                    <FileText size={14} className="text-slate-400" /> Other Verification Paperwork
+                    <FileText size={14} className="text-muted" /> Other Verification Paperwork
                   </label>
                   {otherDocumentFile && (
                     <button
@@ -735,7 +735,7 @@ export function CreateDealerUsedListingModal({
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
                   onChange={(e) => setOtherDocumentFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs text-slate-300 file:mr-2 file:rounded-lg file:border-0 file:bg-slate-800 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-slate-300 hover:file:bg-slate-700"
+                  className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-foreground/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-muted hover:file:bg-slate-700"
                 />
                 {otherDocumentFile && (
                   <p className="mt-1.5 text-[11px] text-emerald-400 font-semibold truncate flex items-center gap-1">
@@ -747,20 +747,20 @@ export function CreateDealerUsedListingModal({
           </div>
 
           {/* Section 5: Location */}
-          <div className="space-y-4 border-t border-slate-800 pt-5">
+          <div className="space-y-4 border-t border-[var(--border-subtle)] pt-5">
             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-lime-400">
               <MapPin size={16} /> 5. Location & Dealership Yard
             </h3>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   State <span className="text-red-400">*</span>
                 </label>
                 <select
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 >
                   {INDIAN_STATES.map((s) => (
                     <option key={s} value={s}>
@@ -771,7 +771,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   District / City <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -780,12 +780,12 @@ export function CreateDealerUsedListingModal({
                   placeholder="e.g. Pune"
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Tehsil / Village / Area
                 </label>
                 <input
@@ -793,25 +793,25 @@ export function CreateDealerUsedListingModal({
                   placeholder="e.g. Haveli / Hadapsar"
                   value={villageCity}
                   onChange={(e) => setVillageCity(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Pincode</label>
+                <label className="block text-xs font-semibold text-muted mb-1.5">Pincode</label>
                 <input
                   type="text"
                   placeholder="e.g. 411028"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Section 6: Photos & Description */}
-          <div className="space-y-4 border-t border-slate-800 pt-5">
+          <div className="space-y-4 border-t border-[var(--border-subtle)] pt-5">
             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-lime-400">
               <Camera size={16} /> 6. Tractor Photos (Multi-Angle Marketplace Shots)
             </h3>
@@ -819,7 +819,7 @@ export function CreateDealerUsedListingModal({
             {/* Multi-angle specific slots */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
               {/* Front View */}
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 <label className="block text-xs font-bold text-slate-200 mb-1">
                   1. Front View Photo
                 </label>
@@ -837,7 +837,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Rear View */}
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 <label className="block text-xs font-bold text-slate-200 mb-1">
                   2. Rear View Photo
                 </label>
@@ -855,7 +855,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Left Side */}
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 <label className="block text-xs font-bold text-slate-200 mb-1">
                   3. Left Side Photo
                 </label>
@@ -873,7 +873,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Right Side */}
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 <label className="block text-xs font-bold text-slate-200 mb-1">
                   4. Right Side Photo
                 </label>
@@ -891,7 +891,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Hours Meter */}
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 <label className="block text-xs font-bold text-slate-200 mb-1">
                   5. Hours Meter / Dashboard
                 </label>
@@ -909,7 +909,7 @@ export function CreateDealerUsedListingModal({
               </div>
 
               {/* Additional Gallery Photos */}
-              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 <label className="block text-xs font-bold text-slate-200 mb-1">
                   6. Extra Photos ({extraPhotos.length})
                 </label>
@@ -925,7 +925,7 @@ export function CreateDealerUsedListingModal({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Dealer Description / Highlights
                 </label>
                 <textarea
@@ -933,12 +933,12 @@ export function CreateDealerUsedListingModal({
                   placeholder="e.g. Single owner driven, serviced on time at authorized showroom, new rear tyres fitted, clean papers."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-muted mb-1.5">
                   Major Repairs / Replacement History
                 </label>
                 <textarea
@@ -946,14 +946,14 @@ export function CreateDealerUsedListingModal({
                   placeholder="e.g. Engine oil changed last month, new clutch plates installed at 1000 hrs."
                   value={majorRepairs}
                   onChange={(e) => setMajorRepairs(e.target.value)}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2.5 text-sm font-medium text-foreground focus:border-lime-400 focus:outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between border-t border-slate-800 pt-5">
+          <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-5">
             <span className="text-xs text-lime-400 font-semibold animate-pulse">
               {uploadProgressText}
             </span>
@@ -962,7 +962,7 @@ export function CreateDealerUsedListingModal({
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="rounded-xl border border-slate-800 bg-slate-900/80 px-5 py-2.5 text-sm font-bold text-slate-300 hover:bg-slate-800 transition-colors"
+                className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-5 py-2.5 text-sm font-bold text-muted hover:bg-foreground/10 transition-colors"
               >
                 Cancel
               </button>

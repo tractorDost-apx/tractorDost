@@ -138,22 +138,22 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
       {/* Existing State Prices Table */}
       {prices.length > 0 && (
         <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-xs">
             <thead className="bg-foreground/5 text-muted text-[10px] font-black tracking-wider uppercase">
               <tr>
-                <th className="px-4 py-3">State</th>
-                <th className="w-32 px-4 py-3">Ex-Showroom</th>
-                <th className="w-28 px-4 py-3">RTO Est.</th>
-                <th className="w-28 px-4 py-3">Insurance</th>
-                <th className="w-28 px-4 py-3">Dealer Chg.</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-2 lg:px-3 py-3">State</th>
+                <th className="w-32 px-2 lg:px-3 py-3">Ex-Showroom</th>
+                <th className="w-28 px-2 lg:px-3 py-3">RTO Est.</th>
+                <th className="w-28 px-2 lg:px-3 py-3">Insurance</th>
+                <th className="w-28 px-2 lg:px-3 py-3">Dealer Chg.</th>
+                <th className="px-2 lg:px-3 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-background divide-y divide-[var(--border-subtle)]">
               {prices.map((price, idx) => (
                 <tr key={idx} className="transition-colors hover:bg-[var(--border-subtle)]">
-                  <td className="text-foreground px-4 py-3 font-bold">{price.state}</td>
-                  <td className="px-4 py-3">
+                  <td className="text-foreground px-2 lg:px-3 py-3 font-bold">{price.state}</td>
+                  <td className="px-2 lg:px-3 py-3">
                     <input
                       type="number"
                       value={price.exShowroom || ''}
@@ -161,7 +161,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                       className="w-full border-b border-dashed border-[var(--border-brand)] bg-transparent px-1 py-1 text-sm font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
                     />
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 lg:px-3 py-3">
                     <input
                       type="number"
                       value={price.rtoCharges || ''}
@@ -169,7 +169,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                       className="w-full border-b border-dashed border-[var(--border-brand)] bg-transparent px-1 py-1 text-sm font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
                     />
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 lg:px-3 py-3">
                     <input
                       type="number"
                       value={price.insuranceEst || ''}
@@ -177,7 +177,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                       className="w-full border-b border-dashed border-[var(--border-brand)] bg-transparent px-1 py-1 text-sm font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
                     />
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 lg:px-3 py-3">
                     <input
                       type="number"
                       value={price.dealerCharges || ''}
@@ -185,7 +185,7 @@ export default function TractorStatePrices({ prices, onChange }: TractorStatePri
                       className="w-full border-b border-dashed border-[var(--border-brand)] bg-transparent px-1 py-1 text-sm font-bold focus:border-[var(--color-brand-green)] focus:outline-none"
                     />
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-2 lg:px-3 py-3 text-right">
                     <button
                       type="button"
                       onClick={() => handleRemovePrice(idx)}

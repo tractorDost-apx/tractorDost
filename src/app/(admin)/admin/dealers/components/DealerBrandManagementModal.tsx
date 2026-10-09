@@ -155,9 +155,9 @@ export function DealerBrandManagementModal({
 
   return (
     <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-md sm:p-6">
-      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl">
+      <div className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-zinc-900/50 p-6">
+        <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6">
           <div className="flex items-center gap-3">
             <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 p-2.5 text-lime-400">
               <Layers size={20} />
@@ -179,7 +179,7 @@ export function DealerBrandManagementModal({
 
           <button
             onClick={onClose}
-            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
+            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10"
           >
             <X size={20} />
           </button>
@@ -208,15 +208,15 @@ export function DealerBrandManagementModal({
             </label>
 
             {loading ? (
-              <div className="text-muted animate-pulse rounded-2xl bg-white/5 p-4 text-xs font-bold">
+              <div className="text-muted animate-pulse rounded-2xl bg-foreground/5 p-4 text-xs font-bold">
                 Loading dealer brand assignments...
               </div>
             ) : selectedBrandsList.length === 0 ? (
-              <div className="text-muted rounded-2xl border border-white/5 bg-white/5 p-4 text-center text-xs font-bold">
+              <div className="text-muted rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-4 text-center text-xs font-bold">
                 No brands assigned yet.
               </div>
             ) : (
-              <div className="flex flex-wrap gap-2 rounded-2xl border border-white/5 bg-white/5 p-3">
+              <div className="flex flex-wrap gap-2 rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-3">
                 {selectedBrandsList.map((b) => {
                   const isPrimary = primaryBrandId === b.id;
                   return (
@@ -225,7 +225,7 @@ export function DealerBrandManagementModal({
                       className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
                         isPrimary
                           ? 'border-amber-400/30 bg-amber-400/20 text-amber-300'
-                          : 'text-foreground border-white/10 bg-white/10'
+                          : 'text-foreground border-[var(--border-subtle)] bg-foreground/10'
                       }`}
                     >
                       {isPrimary && <Award size={12} className="text-amber-400" />}
@@ -261,12 +261,12 @@ export function DealerBrandManagementModal({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search brands..."
-                className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pr-4 pl-10 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
+                className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 py-2.5 pr-4 pl-10 text-xs font-bold focus:border-lime-400/50 focus:outline-none"
               />
             </div>
 
             {/* Multi-Select Checkbox List */}
-            <div className="scrollbar-thin scrollbar-thumb-white/10 max-h-60 space-y-1 divide-y divide-white/5 overflow-y-auto rounded-2xl border border-white/5 bg-white/5 p-2">
+            <div className="scrollbar-thin scrollbar-thumb-white/10 max-h-60 space-y-1 divide-y divide-white/5 overflow-y-auto rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-2">
               {loading ? (
                 <div className="text-muted animate-pulse p-6 text-center text-xs font-bold">
                   Loading catalog brands...
@@ -287,7 +287,7 @@ export function DealerBrandManagementModal({
                       className={`flex cursor-pointer items-center justify-between rounded-xl p-3 transition-all select-none ${
                         isChecked
                           ? 'text-foreground border border-lime-400/20 bg-lime-400/10 font-bold'
-                          : 'text-muted hover:text-foreground hover:bg-white/5'
+                          : 'text-muted hover:text-foreground hover:bg-foreground/5'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -295,7 +295,7 @@ export function DealerBrandManagementModal({
                           className={`flex h-5 w-5 items-center justify-center rounded-md border transition-all ${
                             isChecked
                               ? 'border-lime-400 bg-lime-400 text-black'
-                              : 'border-white/20 bg-white/5'
+                              : 'border-white/20 bg-foreground/5'
                           }`}
                         >
                           {isChecked && <Check size={14} className="stroke-[3]" />}
@@ -305,10 +305,10 @@ export function DealerBrandManagementModal({
                           <img
                             src={brand.logoUrl}
                             alt={brand.name}
-                            className="h-7 w-7 shrink-0 rounded border border-white/5 bg-white/5 object-contain p-0.5"
+                            className="h-7 w-7 shrink-0 rounded border border-[var(--border-subtle)] bg-foreground/5 object-contain p-0.5"
                           />
                         ) : (
-                          <div className="text-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded bg-white/10 text-xs font-black">
+                          <div className="text-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded bg-foreground/10 text-xs font-black">
                             {brand.name.charAt(0)}
                           </div>
                         )}
@@ -334,7 +334,7 @@ export function DealerBrandManagementModal({
                           className={`rounded px-2.5 py-1 text-[10px] font-black tracking-wider uppercase transition-all ${
                             isPrimary
                               ? 'border border-amber-400/30 bg-amber-400/20 text-amber-300'
-                              : 'text-muted hover:text-foreground bg-white/5 hover:bg-white/10'
+                              : 'text-muted hover:text-foreground bg-foreground/5 hover:bg-foreground/10'
                           }`}
                         >
                           {isPrimary ? 'Primary Brand' : 'Set as Primary'}
@@ -349,12 +349,12 @@ export function DealerBrandManagementModal({
         </form>
 
         {/* Footer */}
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-white/10 bg-zinc-900/50 p-4">
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-[var(--border-subtle)] bg-foreground/5 p-4">
           <button
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-white/10"
+            className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-foreground/10"
           >
             Cancel
           </button>

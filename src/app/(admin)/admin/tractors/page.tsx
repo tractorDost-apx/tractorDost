@@ -150,7 +150,7 @@ export default function TractorsPage() {
       {/* Table */}
       <div className="glass-panel flex flex-1 flex-col overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-xs">
             <thead className="bg-foreground/5 text-muted text-[11px] font-black tracking-wider uppercase">
               <tr>
                 <th className="px-6 py-4">Tractor Profile</th>

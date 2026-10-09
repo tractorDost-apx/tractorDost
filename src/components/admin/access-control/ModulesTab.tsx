@@ -212,7 +212,7 @@ export default function ModulesTab() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="glass-panel animate-fade-in relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl p-6">
+          <div className="glass-panel animate-fade-in relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl p-6">
             <h2 className="mb-6 text-2xl font-black">
               {editingModule ? 'Edit Module' : 'Create New Module'}
             </h2>

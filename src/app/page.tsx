@@ -474,7 +474,7 @@ export default function HomePage() {
               <div className="pointer-events-none absolute top-0 right-0 h-[300px] w-[300px] rounded-full bg-[var(--color-brand-green)]/10 blur-[80px]" />
 
               <div className="z-10 flex items-center justify-between">
-                <div className="rounded-xl border border-white/5 bg-white/10 p-2.5 backdrop-blur-md">
+                <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/10 p-2.5 backdrop-blur-md">
                   <Landmark strokeWidth={2} className="h-5 w-5 text-white" />
                 </div>
                 <div className="rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/20 px-3 py-1 text-[10px] font-bold text-[var(--color-brand-green)]">
@@ -492,7 +492,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="z-10 flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-5">
+              <div className="z-10 flex items-center justify-between rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-5">
                 <div>
                   <span className="mb-1 block text-[10px] font-medium tracking-wider text-white/50 uppercase">
                     Starting At
@@ -501,7 +501,7 @@ export default function HomePage() {
                     8.5<span className="text-base text-white/70">%</span>
                   </span>
                 </div>
-                <div className="h-8 w-[1px] bg-white/10"></div>
+                <div className="h-8 w-[1px] bg-foreground/10"></div>
                 <div>
                   <span className="mb-1 block text-[10px] font-medium tracking-wider text-white/50 uppercase">
                     Max Tenure

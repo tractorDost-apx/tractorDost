@@ -97,7 +97,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
     title: string;
     colorClass?: string;
   }) => (
-    <div className="text-foreground border-foreground/10 mb-4 flex items-center gap-2 border-b pb-2">
+    <div className="text-foreground border-[var(--border-subtle)] mb-4 flex items-center gap-2 border-b pb-2">
       <Icon size={18} className={colorClass} />
       <h3 className="text-sm font-black tracking-wider uppercase">{title}</h3>
     </div>
@@ -106,11 +106,11 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
   return (
     <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
       <div
-        className="animate-fade-in border-foreground/10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
+        className="animate-fade-in border-[var(--border-subtle)] flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
         style={{ background: 'var(--background)' }}
       >
         {/* Sticky Header */}
-        <div className="border-foreground/10 bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
+        <div className="border-[var(--border-subtle)] bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
           <div>
             <h2 className="text-foreground text-2xl font-black tracking-tight">Edit User Master</h2>
             <p className="text-muted mt-1 text-sm font-bold">ID: #{user.id}</p>
@@ -147,7 +147,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
-                    className="bg-background border-foreground/10 text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
+                    className="bg-background border-[var(--border-subtle)] text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="Enter full name"
                   />
                 </div>
@@ -161,7 +161,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="bg-background border-foreground/10 text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
+                    className="bg-background border-[var(--border-subtle)] text-foreground w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                     placeholder="Enter email address"
                   />
                 </div>
@@ -174,7 +174,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                     type="text"
                     value={user.mobile?.toString() || ''}
                     disabled
-                    className="bg-background border-foreground/10 text-foreground w-full cursor-not-allowed rounded-xl border px-4 py-3 text-sm font-bold opacity-60"
+                    className="bg-background border-[var(--border-subtle)] text-foreground w-full cursor-not-allowed rounded-xl border px-4 py-3 text-sm font-bold opacity-60"
                   />
                 </div>
 
@@ -186,7 +186,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                     name="roleId"
                     value={formData.roleId}
                     onChange={handleChange}
-                    className="bg-background border-foreground/10 text-foreground w-full appearance-none rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
+                    className="bg-background border-[var(--border-subtle)] text-foreground w-full appearance-none rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                   >
                     <option value="">Select a role...</option>
                     {roles.map((role) => (
@@ -199,7 +199,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                 </div>
 
                 <div className="pt-2 md:col-span-2">
-                  <label className="bg-background border-foreground/10 flex max-w-sm cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors hover:border-[var(--color-brand-green)]/50">
+                  <label className="bg-background border-[var(--border-subtle)] flex max-w-sm cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors hover:border-[var(--color-brand-green)]/50">
                     <div className="relative flex items-center justify-center">
                       <input
                         type="checkbox"
@@ -208,7 +208,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                         onChange={handleChange}
                         className="peer sr-only"
                       />
-                      <div className="border-foreground/20 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-green)] peer-checked:bg-[var(--color-brand-green)]">
+                      <div className="border-[var(--border-brand)] flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all peer-checked:border-[var(--color-brand-green)] peer-checked:bg-[var(--color-brand-green)]">
                         <Check
                           size={14}
                           className="scale-50 text-white opacity-0 transition-all peer-checked:scale-100 peer-checked:opacity-100"
@@ -241,14 +241,14 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                  <div className="bg-foreground/[0.02] border-[var(--border-subtle)] flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
                     <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <ShoppingBag size={14} className="text-[var(--color-brand-green)]" /> Listings
                     </div>
                     <div className="text-foreground text-3xl font-black">{stats.totalListings}</div>
                   </div>
 
-                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                  <div className="bg-foreground/[0.02] border-[var(--border-subtle)] flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
                     <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <MessageSquare size={14} className="text-blue-500" /> Enquiries
                     </div>
@@ -257,14 +257,14 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                     </div>
                   </div>
 
-                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                  <div className="bg-foreground/[0.02] border-[var(--border-subtle)] flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
                     <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <Phone size={14} className="text-rose-500" /> Leads
                     </div>
                     <div className="text-foreground text-3xl font-black">{stats.totalLeads}</div>
                   </div>
 
-                  <div className="bg-foreground/[0.02] border-foreground/10 flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
+                  <div className="bg-foreground/[0.02] border-[var(--border-subtle)] flex flex-col gap-2 rounded-2xl border p-5 shadow-sm transition-colors hover:border-[var(--color-brand-green)]/30">
                     <div className="text-muted flex items-center gap-2 text-[10px] font-black tracking-wider uppercase">
                       <FileText size={14} className="text-purple-500" /> Loans
                     </div>
@@ -273,7 +273,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
                     </div>
                   </div>
 
-                  <div className="bg-background border-foreground/10 text-muted col-span-2 flex items-center justify-center gap-3 rounded-xl border p-4 text-sm font-bold shadow-sm md:col-span-4">
+                  <div className="bg-background border-[var(--border-subtle)] text-muted col-span-2 flex items-center justify-center gap-3 rounded-xl border p-4 text-sm font-bold shadow-sm md:col-span-4">
                     <Calendar size={16} className="text-[var(--color-brand-orange)]" />
                     Member Since:{' '}
                     <span className="text-foreground">
@@ -291,7 +291,7 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
         </div>
 
         {/* Sticky Footer */}
-        <div className="border-foreground/10 bg-background z-10 flex shrink-0 justify-end gap-3 border-t px-6 py-4">
+        <div className="border-[var(--border-subtle)] bg-background z-10 flex shrink-0 justify-end gap-3 border-t px-6 py-4">
           <button
             type="button"
             onClick={onClose}

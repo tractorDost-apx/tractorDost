@@ -123,7 +123,7 @@ function DealerActionMenu({
               left: `${menuPos.left}px`,
               zIndex: 99999,
             }}
-            className="w-56 rounded-2xl border border-white/10 bg-[#16191e]/95 p-1.5 shadow-2xl backdrop-blur-2xl ring-1 ring-black/50 animate-in fade-in zoom-in-95 duration-100"
+            className="nav-dropdown-glass w-56 rounded-2xl p-1.5 animate-in fade-in zoom-in-95 duration-100"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col gap-0.5">
@@ -134,7 +134,7 @@ function DealerActionMenu({
                   onClose();
                   onSelectDealer(dealer);
                 }}
-                className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-white/10 hover:text-white"
+                className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-black/5 dark:hover:bg-foreground/10 hover:text-foreground"
               >
                 <Eye
                   size={15}
@@ -150,11 +150,11 @@ function DealerActionMenu({
                   onClose();
                   onEditDealer(dealer, e);
                 }}
-                className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-blue-500/10 hover:text-blue-400"
+                className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400"
               >
                 <Edit2
                   size={15}
-                  className="text-muted group-hover:text-blue-400 shrink-0 transition-colors"
+                  className="text-muted group-hover:text-blue-600 dark:group-hover:text-blue-400 shrink-0 transition-colors"
                 />
                 <span>Edit Dealer Details</span>
               </button>
@@ -167,11 +167,11 @@ function DealerActionMenu({
                     onClose();
                     onAssignBrandDealer(dealer, e);
                   }}
-                  className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-amber-400/10 hover:text-amber-400"
+                  className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400"
                 >
                   <Layers
                     size={15}
-                    className="text-muted group-hover:text-amber-400 shrink-0 transition-colors"
+                    className="text-muted group-hover:text-amber-600 dark:group-hover:text-amber-400 shrink-0 transition-colors"
                   />
                   <span>Assign Brand</span>
                 </button>
@@ -185,17 +185,17 @@ function DealerActionMenu({
                     onClose();
                     onManageServiceCenter(dealer, e);
                   }}
-                  className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-orange-500/10 hover:text-orange-400"
+                  className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400"
                 >
                   <Wrench
                     size={15}
-                    className="text-muted group-hover:text-orange-400 shrink-0 transition-colors"
+                    className="text-muted group-hover:text-orange-600 dark:group-hover:text-orange-400 shrink-0 transition-colors"
                   />
                   <span>Service Center</span>
                 </button>
               )}
 
-              <div className="my-1 border-t border-white/5" />
+              <div className="my-1 border-t border-[var(--border-subtle)]" />
 
               <button
                 type="button"
@@ -204,11 +204,11 @@ function DealerActionMenu({
                   onClose();
                   onModerateDealer(dealer, e);
                 }}
-                className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-lime-400/10 hover:text-lime-400"
+                className="group flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold text-foreground/90 transition-colors hover:bg-[#4a7635]/10 hover:text-[#4a7635]"
               >
                 <ShieldCheck
                   size={15}
-                  className="text-muted group-hover:text-lime-400 shrink-0 transition-colors"
+                  className="text-muted group-hover:text-[#4a7635] shrink-0 transition-colors"
                 />
                 <span>Moderate / Verify Dealer</span>
               </button>
@@ -229,8 +229,8 @@ function DealerActionMenu({
         }}
         className={`inline-flex items-center justify-center rounded-xl p-2 transition-all duration-200 focus:outline-none ${
           isOpen
-            ? 'bg-white/15 text-foreground ring-2 ring-white/10'
-            : 'text-muted hover:bg-white/10 hover:text-foreground'
+            ? 'bg-foreground/10 text-foreground ring-2 ring-foreground/10'
+            : 'text-muted hover:bg-foreground/10 hover:text-foreground'
         }`}
         title="Actions Menu"
         aria-expanded={isOpen}
@@ -255,10 +255,10 @@ export function DealerTable({
 
   if (loading) {
     return (
-      <div className="glass-panel w-full rounded-2xl border border-white/5 p-8">
+      <div className="glass-panel w-full rounded-2xl  p-8">
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-white/5" />
+            <div key={i} className="h-16 animate-pulse rounded-xl bg-foreground/5" />
           ))}
         </div>
       </div>
@@ -267,8 +267,8 @@ export function DealerTable({
 
   if (dealers.length === 0) {
     return (
-      <div className="glass-panel flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/5 p-12 text-center">
-        <div className="text-muted rounded-2xl bg-white/5 p-4">
+      <div className="glass-panel flex w-full flex-col items-center justify-center gap-3 rounded-2xl  p-12 text-center">
+        <div className="text-muted rounded-2xl bg-foreground/5 p-4">
           <Building2 size={36} />
         </div>
         <h3 className="text-foreground text-lg font-bold">No dealers found</h3>
@@ -281,19 +281,19 @@ export function DealerTable({
   }
 
   return (
-    <div className="glass-panel flex w-full max-w-full flex-1 flex-col overflow-hidden rounded-2xl border border-white/5 shadow-xl">
-      {/* Horizontal Scroll Container */}
-      <div className="scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent min-h-[320px] w-full overflow-x-auto pb-16">
-        <table className="w-full min-w-[1000px] text-left text-sm whitespace-nowrap">
-          <thead className="text-muted sticky top-0 z-10 border-b border-white/5 bg-white/5 text-[11px] font-black tracking-wider uppercase backdrop-blur-md">
+    <div className="glass-panel flex w-full max-w-full flex-1 flex-col overflow-hidden rounded-2xl">
+      {/* Horizontal Scroll Container removed as requested */}
+      <div className="min-h-[320px] w-full overflow-hidden">
+        <table className="w-full text-left text-xs whitespace-nowrap">
+          <thead className="text-muted sticky top-0 z-10 border-b border-[var(--border-subtle)] bg-foreground/5 text-[10px] font-black tracking-wider uppercase backdrop-blur-md">
             <tr>
-              <th className="min-w-[240px] px-6 py-4">Dealer & Type</th>
-              <th className="min-w-[180px] px-6 py-4">Location</th>
-              <th className="min-w-[200px] px-6 py-4">Contact</th>
-              <th className="min-w-[160px] px-6 py-4">Verification</th>
-              <th className="min-w-[180px] px-6 py-4">Rating & Feedback</th>
-              <th className="min-w-[120px] px-6 py-4">Status</th>
-              <th className="min-w-[90px] px-6 py-4 text-right">Actions</th>
+              <th className="px-2 lg:px-3 py-3">Dealer & Type</th>
+              <th className="px-2 lg:px-3 py-3">Location</th>
+              <th className="px-2 lg:px-3 py-3">Contact</th>
+              <th className="px-2 lg:px-3 py-3">Verification</th>
+              <th className="px-2 lg:px-3 py-3">Rating & Feedback</th>
+              <th className="px-2 lg:px-3 py-3">Status</th>
+              <th className="px-2 lg:px-3 py-3 text-right">Actions</th>
             </tr>
           </thead>
 
@@ -310,13 +310,13 @@ export function DealerTable({
                 <tr
                   key={dealer.id}
                   onClick={() => onSelectDealer(dealer)}
-                  className="group cursor-pointer transition-colors hover:bg-white/[0.03]"
+                  className="group cursor-pointer transition-[background-color] hover:bg-foreground/5"
                 >
                   {/* Dealer & Type */}
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col gap-1.5 whitespace-normal">
+                  <td className="px-2 lg:px-3 py-3">
+                    <div className="flex flex-col gap-1 whitespace-normal">
                       <div className="flex items-center gap-2">
-                        <span className="text-foreground text-base font-black tracking-tight transition-colors group-hover:text-lime-400">
+                        <span className="text-foreground text-[13px] font-black tracking-tight">
                           {dealer.businessName}
                         </span>
                         <CertifiedBadge isCertified={dealer.isCertified} />
@@ -324,7 +324,7 @@ export function DealerTable({
 
                       <div className="flex items-center gap-2">
                         <DealerTypeBadge dealerType={dealer.dealerType} />
-                        <span className="text-muted text-[10px] font-bold">
+                        <span className="text-muted text-[9px] font-bold">
                           Joined {formattedDate}
                         </span>
                       </div>
@@ -332,14 +332,14 @@ export function DealerTable({
                   </td>
 
                   {/* Location */}
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col gap-0.5 text-xs whitespace-normal">
+                  <td className="px-2 lg:px-3 py-3">
+                    <div className="flex flex-col gap-0.5 text-[11px] whitespace-normal">
                       <span className="text-foreground/90 flex items-center gap-1 font-bold">
-                        <MapPin size={13} className="shrink-0 text-lime-400" />
+                        <MapPin size={12} className="shrink-0 text-muted" />
                         {dealer.district}, {dealer.state}
                       </span>
                       {dealer.pincode && (
-                        <span className="text-muted pl-4 text-[11px] font-medium">
+                        <span className="text-muted pl-4 text-[10px] font-medium">
                           PIN: {dealer.pincode}
                         </span>
                       )}
@@ -347,17 +347,17 @@ export function DealerTable({
                   </td>
 
                   {/* Contact */}
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col gap-1 text-xs">
+                  <td className="px-2 lg:px-3 py-3">
+                    <div className="flex flex-col gap-1 text-[11px]">
                       {dealer.phone && (
                         <span className="text-foreground/80 flex items-center gap-1.5 font-bold">
-                          <Phone size={12} className="text-muted shrink-0" />
+                          <Phone size={11} className="text-muted shrink-0" />
                           {dealer.phone}
                         </span>
                       )}
                       {dealer.email && (
-                        <span className="text-muted flex max-w-[180px] items-center gap-1.5 truncate font-medium">
-                          <Mail size={12} className="shrink-0" />
+                        <span className="text-muted flex max-w-[140px] items-center gap-1.5 truncate font-medium">
+                          <Mail size={11} className="shrink-0" />
                           {dealer.email}
                         </span>
                       )}
@@ -365,12 +365,12 @@ export function DealerTable({
                   </td>
 
                   {/* Verification */}
-                  <td className="px-6 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="flex flex-col items-start gap-1">
                       <VerificationBadge status={dealer.verificationStatus} />
                       {dealer.verificationStatus === 'REJECTED' && dealer.rejectionReason && (
                         <span
-                          className="max-w-[150px] truncate text-[10px] font-semibold text-rose-400/80"
+                          className="max-w-[120px] truncate text-[9px] font-semibold text-rose-400/80"
                           title={dealer.rejectionReason}
                         >
                           Reason: {dealer.rejectionReason}
@@ -380,23 +380,23 @@ export function DealerTable({
                   </td>
 
                   {/* Rating & Feedback */}
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col gap-1 text-xs">
+                  <td className="px-2 lg:px-3 py-3">
+                    <div className="flex flex-col gap-1 text-[11px]">
                       <div className="text-foreground flex items-center gap-1 font-bold">
-                        <Star size={13} className="shrink-0 fill-amber-400 text-amber-400" />
+                        <Star size={11} className="shrink-0 fill-amber-400 text-amber-400" />
                         <span>{ratingVal.toFixed(1)}</span>
-                        <span className="text-muted text-[11px] font-normal">
+                        <span className="text-muted text-[9px] font-normal">
                           ({dealer.reviewsCount ?? 0} reviews)
                         </span>
                       </div>
 
                       {(dealer.complaintsCount ?? 0) > 0 ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400">
-                          <AlertTriangle size={12} />
+                        <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-400">
+                          <AlertTriangle size={10} />
                           {dealer.complaintsCount} complaints
                         </span>
                       ) : (
-                        <span className="text-muted text-[11px] font-medium">
+                        <span className="text-muted text-[9px] font-medium">
                           No active complaints
                         </span>
                       )}
@@ -404,12 +404,12 @@ export function DealerTable({
                   </td>
 
                   {/* Status */}
-                  <td className="px-6 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <ActiveBadge isActive={dealer.isActive} />
                   </td>
 
                   {/* Actions */}
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-2 lg:px-3 py-3 text-right">
                     <DealerActionMenu
                       dealer={dealer}
                       isOpen={openMenuId === dealer.id}

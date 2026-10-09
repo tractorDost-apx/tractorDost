@@ -143,7 +143,7 @@ export default function CategoryModal({ category, categories, onClose }: Categor
   return (
     <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
       <div
-        className="animate-fade-in flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-2xl"
+        className="animate-fade-in flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-2xl"
         style={{ background: 'var(--background)' }}
       >
         {/* Sticky Header */}

@@ -111,7 +111,7 @@ export default function ImplementsPage() {
       {/* Table */}
       <div className="glass-panel flex flex-1 flex-col overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-xs">
             <thead className="bg-foreground/5 text-muted text-[11px] font-black tracking-wider uppercase">
               <tr>
                 <th className="px-6 py-4">Implement Name</th>
@@ -140,7 +140,7 @@ export default function ImplementsPage() {
                   <tr key={item.id} className="hover:bg-foreground/5 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="bg-foreground/5 border-foreground/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border">
+                        <div className="bg-foreground/5 border-[var(--border-subtle)] flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border">
                           <Wrench size={20} className="text-muted" />
                         </div>
                         <div>

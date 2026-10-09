@@ -26,7 +26,7 @@ export function DealerHeader({
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 p-2.5 text-lime-400">
+            <div className="rounded-2xl border border-[#4a7635]/20 bg-[#4a7635]/10 p-2.5 text-[#4a7635]">
               <Store size={26} />
             </div>
             <div>
@@ -42,15 +42,15 @@ export function DealerHeader({
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="glass-panel text-muted hover:text-foreground flex items-center justify-center rounded-xl p-2.5 transition-all hover:border-lime-400/30 disabled:opacity-50"
+            className="glass-panel text-muted hover:text-foreground flex items-center justify-center rounded-xl p-2.5 transition-all hover:border-[#4a7635]/30 disabled:opacity-50"
             title="Refresh Data"
           >
-            <RefreshCw size={18} className={loading ? 'animate-spin text-lime-400' : ''} />
+            <RefreshCw size={18} className={loading ? 'animate-spin text-[#4a7635]' : ''} />
           </button>
 
           <button
             onClick={onCreateOpen}
-            className="flex items-center gap-2 rounded-xl bg-lime-400 px-5 py-2.5 text-sm font-black tracking-wider text-black uppercase shadow-lg shadow-lime-400/20 transition-all hover:bg-lime-300"
+            className="flex items-center gap-2 rounded-xl bg-[#4a7635] px-5 py-2.5 text-sm font-black tracking-wider text-white uppercase shadow-lg shadow-[#4a7635]/20 transition-all hover:bg-[#375926]"
           >
             <Plus size={18} className="stroke-[3]" />
             Add New Dealer
@@ -60,8 +60,8 @@ export function DealerHeader({
 
       {/* KPI Stats Strip */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div className="glass-panel flex items-center gap-4 rounded-2xl border border-white/5 p-4">
-          <div className="shrink-0 rounded-xl bg-lime-400/10 p-3 text-lime-400">
+        <div className="glass-panel flex items-center gap-4 rounded-2xl  p-4">
+          <div className="shrink-0 rounded-xl bg-[#4a7635]/10 p-3 text-[#4a7635]">
             <Store size={20} />
           </div>
           <div>
@@ -72,7 +72,7 @@ export function DealerHeader({
           </div>
         </div>
 
-        <div className="glass-panel flex items-center gap-4 rounded-2xl border border-white/5 p-4">
+        <div className="glass-panel flex items-center gap-4 rounded-2xl  p-4">
           <div className="shrink-0 rounded-xl bg-emerald-500/10 p-3 text-emerald-400">
             <CheckCircle2 size={20} />
           </div>
@@ -84,7 +84,7 @@ export function DealerHeader({
           </div>
         </div>
 
-        <div className="glass-panel flex items-center gap-4 rounded-2xl border border-white/5 p-4">
+        <div className="glass-panel flex items-center gap-4 rounded-2xl  p-4">
           <div className="shrink-0 rounded-xl bg-amber-500/10 p-3 text-amber-400">
             <Clock size={20} />
           </div>
@@ -96,7 +96,7 @@ export function DealerHeader({
           </div>
         </div>
 
-        <div className="glass-panel flex items-center gap-4 rounded-2xl border border-white/5 p-4">
+        <div className="glass-panel flex items-center gap-4 rounded-2xl  p-4">
           <div className="shrink-0 rounded-xl bg-amber-400/10 p-3 text-amber-300">
             <Award size={20} />
           </div>

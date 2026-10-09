@@ -54,9 +54,9 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
 
   return (
     <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-md sm:p-6">
-      <div className="flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl">
+      <div className="flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 bg-zinc-900/50 p-6">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6">
           <div className="flex items-center gap-3">
             <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 p-2.5 text-lime-400">
               <ShieldCheck size={22} />
@@ -74,7 +74,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
 
           <button
             onClick={onClose}
-            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-white/10"
+            className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10"
           >
             <X size={20} />
           </button>
@@ -102,7 +102,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
                 className={`flex flex-col items-center gap-2 rounded-2xl border p-3 text-xs font-black transition-all ${
                   verificationStatus === 'VERIFIED'
                     ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400 shadow-lg shadow-emerald-500/10'
-                    : 'text-muted border-white/10 bg-white/5 hover:bg-white/10'
+                    : 'text-muted border-[var(--border-subtle)] bg-foreground/5 hover:bg-foreground/10'
                 }`}
               >
                 <CheckCircle2 size={20} />
@@ -115,7 +115,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
                 className={`flex flex-col items-center gap-2 rounded-2xl border p-3 text-xs font-black transition-all ${
                   verificationStatus === 'PENDING'
                     ? 'border-amber-500/50 bg-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10'
-                    : 'text-muted border-white/10 bg-white/5 hover:bg-white/10'
+                    : 'text-muted border-[var(--border-subtle)] bg-foreground/5 hover:bg-foreground/10'
                 }`}
               >
                 <ShieldCheck size={20} />
@@ -128,7 +128,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
                 className={`flex flex-col items-center gap-2 rounded-2xl border p-3 text-xs font-black transition-all ${
                   verificationStatus === 'REJECTED'
                     ? 'border-rose-500/50 bg-rose-500/20 text-rose-400 shadow-lg shadow-rose-500/10'
-                    : 'text-muted border-white/10 bg-white/5 hover:bg-white/10'
+                    : 'text-muted border-[var(--border-subtle)] bg-foreground/5 hover:bg-foreground/10'
                 }`}
               >
                 <XCircle size={20} />
@@ -153,7 +153,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
             )}
           </div>
 
-          <hr className="border-white/10" />
+          <hr className="border-[var(--border-subtle)]" />
 
           {/* Certified Status */}
           <div className="space-y-3">
@@ -173,7 +173,7 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider transition-all ${
                   isCertified
                     ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20'
-                    : 'text-muted border border-white/10 bg-white/5 hover:bg-white/10'
+                    : 'text-muted border border-[var(--border-subtle)] bg-foreground/5 hover:bg-foreground/10'
                 }`}
               >
                 <Award size={16} />
@@ -191,13 +191,13 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
                   placeholder="Reason or criteria met for certification..."
                   value={certificationReason}
                   onChange={(e) => setCertificationReason(e.target.value)}
-                  className="text-foreground w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-medium focus:border-lime-400/50 focus:outline-none"
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2 text-xs font-medium focus:border-lime-400/50 focus:outline-none"
                 />
               </div>
             )}
           </div>
 
-          <hr className="border-white/10" />
+          <hr className="border-[var(--border-subtle)]" />
 
           {/* Operational Active Toggle */}
           <div className="space-y-3">
@@ -228,11 +228,11 @@ export function DealerModerationModal({ dealer, onClose, onSuccess }: DealerMode
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-white/10 bg-zinc-900/30 p-6">
+        <div className="flex items-center justify-end gap-3 border-t border-[var(--border-subtle)] bg-foreground/5 p-6">
           <button
             type="button"
             onClick={onClose}
-            className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-white/10"
+            className="text-muted hover:text-foreground rounded-xl px-5 py-2.5 text-xs font-bold transition-colors hover:bg-foreground/10"
           >
             Cancel
           </button>

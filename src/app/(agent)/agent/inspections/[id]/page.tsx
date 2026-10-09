@@ -278,7 +278,7 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
                           setCurrentImageIndex(idx);
                         }}
                         className={`h-1.5 w-1.5 rounded-full transition-all ${
-                          idx === currentImageIndex ? 'w-3 bg-white' : 'bg-white/50'
+                          idx === currentImageIndex ? 'w-3 bg-white' : 'bg-foreground/50'
                         }`}
                       />
                     ))}
@@ -687,7 +687,7 @@ export default function AgentInspectionDetailPage({ params }: { params: Promise<
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
+              <tbody className="divide-y divide-[var(--border-subtle)] text-xs font-medium">
                 {listing.media.map((mediaItem: any) => {
                   const fileSizeFriendly = mediaItem.fileSize
                     ? `${(mediaItem.fileSize / (1024 * 1024)).toFixed(2)} MB`

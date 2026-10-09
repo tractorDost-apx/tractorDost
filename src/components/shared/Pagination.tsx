@@ -21,8 +21,8 @@ export default function Pagination({
   if (totalCount === 0) return null;
 
   return (
-    <div className="bg-background relative z-10 mt-auto flex flex-col items-center justify-between gap-4 border-t border-[var(--border-subtle)] p-4 sm:flex-row">
-      <div className="text-muted flex w-full flex-col items-center justify-between gap-3 text-sm font-medium sm:w-auto sm:flex-row sm:justify-start">
+    <div className="relative z-10 mt-auto flex flex-col items-center justify-between gap-4 p-2 sm:flex-row sm:p-4">
+      <div className="text-muted flex w-full flex-col items-center justify-between gap-4 text-xs font-bold sm:w-auto sm:flex-row sm:justify-start sm:text-sm">
         <div className="flex items-center gap-2">
           <span>Show</span>
           <select

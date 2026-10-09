@@ -828,7 +828,7 @@ export default function EmiCalculationsAdminPage() {
       ) : (
         <div className="glass-panel flex flex-col overflow-hidden rounded-2xl">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-sm">
+            <table className="w-full border-collapse text-left text-xs">
               <thead>
                 <tr className="text-muted bg-foreground/5 border-b border-[var(--border-subtle)] text-[10px] font-black tracking-wider uppercase">
                   <th className="px-6 py-4">Customer</th>
@@ -933,7 +933,7 @@ export default function EmiCalculationsAdminPage() {
       {/* VIEW DETAILS MODAL */}
       {detailRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="animate-fade-in relative flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-2xl">
+          <div className="animate-fade-in relative flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-2xl">
             <button
               onClick={() => setDetailRecord(null)}
               className="bg-foreground/5 text-muted absolute top-4 right-4 z-10 rounded-full p-2 transition-all hover:bg-red-500/10 hover:text-red-500"
@@ -1138,7 +1138,7 @@ export default function EmiCalculationsAdminPage() {
                   type="number"
                   value={editPrice}
                   onChange={(e) => setEditPrice(parseInt(e.target.value, 10))}
-                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
+                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-2 lg:px-3 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
                   required
                 />
               </div>
@@ -1152,7 +1152,7 @@ export default function EmiCalculationsAdminPage() {
                   type="number"
                   value={editDownPayment}
                   onChange={(e) => setEditDownPayment(parseInt(e.target.value, 10))}
-                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
+                  className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-2 lg:px-3 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
                   required
                 />
               </div>
@@ -1168,7 +1168,7 @@ export default function EmiCalculationsAdminPage() {
                     step="0.1"
                     value={editInterest}
                     onChange={(e) => setEditInterest(parseFloat(e.target.value))}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-2 lg:px-3 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
                     required
                   />
                 </div>
@@ -1182,7 +1182,7 @@ export default function EmiCalculationsAdminPage() {
                     type="number"
                     value={editTenure}
                     onChange={(e) => setEditTenure(parseInt(e.target.value, 10))}
-                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
+                    className="bg-foreground/5 text-foreground w-full rounded-xl border border-[var(--border-subtle)] px-2 lg:px-3 py-3 text-sm font-bold transition-colors focus:border-[var(--color-brand-green)]/60 focus:outline-none"
                     required
                   />
                 </div>

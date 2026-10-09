@@ -678,7 +678,7 @@ export default function UsedTractorDetailPage({
                 <div className="mt-1 flex items-baseline gap-3">
                   <h2 className="text-3xl sm:text-4xl font-black">{formatINR(tractor.askingPrice)}</h2>
                   {tractor.negotiable && (
-                    <span className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-black tracking-wider uppercase">
+                    <span className="rounded-md bg-foreground/10 px-2 py-0.5 text-[10px] font-black tracking-wider uppercase">
                       Negotiable
                     </span>
                   )}

@@ -197,7 +197,7 @@ export default function AdminDealersPage() {
       />
 
       {/* Main Dealer Data Table */}
-      <div className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-1 flex-col gap-8">
         <DealerTable
           dealers={dealers}
           loading={loading}
@@ -209,7 +209,7 @@ export default function AdminDealersPage() {
         />
 
         {/* Pagination controls */}
-        <div className="glass-panel rounded-2xl border border-white/5 p-2">
+        <div className="glass-panel rounded-2xl p-2">
           <Pagination
             page={page}
             limit={limit}

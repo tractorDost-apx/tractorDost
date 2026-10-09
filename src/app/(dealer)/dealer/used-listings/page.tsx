@@ -166,7 +166,7 @@ export default function DealerUsedListingsPage() {
           <button
             onClick={reload}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-bold text-slate-300 hover:border-slate-700 hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-2 text-xs font-bold text-muted hover:border-[var(--border-brand)] hover:text-foreground transition-colors"
             title="Refresh Listings"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -199,7 +199,7 @@ export default function DealerUsedListingsPage() {
       />
 
       {/* Search, Sort & Status Tabs Bar */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-4 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--background)] p-4 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
         {/* Status Tabs */}
         <div className="flex flex-wrap gap-1.5">
           {MY_LISTING_TABS.map((t, idx) => (
@@ -212,7 +212,7 @@ export default function DealerUsedListingsPage() {
               className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
                 tabIndex === idx
                   ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
-                  : 'border border-slate-800/80 bg-slate-900/60 text-slate-300 hover:border-slate-700 hover:text-foreground'
+                  : 'border border-[var(--border-subtle)] bg-foreground/5 text-muted hover:border-[var(--border-brand)] hover:text-foreground'
               }`}
             >
               {t.label}
@@ -229,7 +229,7 @@ export default function DealerUsedListingsPage() {
               placeholder="Search brand, model, city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-900/90 pl-9 pr-3 py-2 text-xs font-medium text-foreground focus:border-lime-400 focus:outline-none"
+              className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 pl-9 pr-3 py-2 text-xs font-medium text-foreground focus:border-lime-400 focus:outline-none"
             />
           </div>
 
@@ -238,7 +238,7 @@ export default function DealerUsedListingsPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-900/90 pl-8 pr-3 py-2 text-xs font-medium text-foreground focus:border-lime-400 focus:outline-none"
+              className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 pl-8 pr-3 py-2 text-xs font-medium text-foreground focus:border-lime-400 focus:outline-none"
             >
               <option value="newest">Newest First</option>
               <option value="price_asc">Price: Low to High</option>
@@ -257,7 +257,7 @@ export default function DealerUsedListingsPage() {
           <p className="text-xs font-semibold text-muted mt-3">Loading your used tractor listings...</p>
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-red-500/20 bg-slate-950/60 p-8 text-center backdrop-blur-sm">
+        <div className="rounded-2xl border border-red-500/20 bg-[var(--background)] p-8 text-center backdrop-blur-sm">
           <AlertCircle className="mx-auto text-red-400 mb-3" size={36} />
           <p className="font-bold text-red-400 mb-2">{error}</p>
           <SpatialButton onClick={reload} variant="glass" className="mt-2">
@@ -265,7 +265,7 @@ export default function DealerUsedListingsPage() {
           </SpatialButton>
         </div>
       ) : filteredListings.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-800 bg-slate-950/40 p-12 text-center backdrop-blur-sm">
+        <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-subtle)] bg-[var(--background)] p-12 text-center backdrop-blur-sm">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-lime-400/10 text-lime-400 mb-4">
             <Tractor size={32} />
           </div>
@@ -301,11 +301,11 @@ export default function DealerUsedListingsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 border-t border-slate-800 pt-6">
+            <div className="flex items-center justify-center gap-2 border-t border-[var(--border-subtle)] pt-6">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-foreground disabled:opacity-40"
+                className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-1.5 text-xs font-bold text-foreground disabled:opacity-40"
               >
                 Previous
               </button>
@@ -315,7 +315,7 @@ export default function DealerUsedListingsPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-foreground disabled:opacity-40"
+                className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-1.5 text-xs font-bold text-foreground disabled:opacity-40"
               >
                 Next
               </button>

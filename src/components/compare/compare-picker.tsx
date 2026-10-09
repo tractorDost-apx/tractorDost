@@ -120,7 +120,7 @@ export default function ComparePicker({ onCompare, initialIds = [] }: ComparePic
                   className={`flex h-full min-h-[180px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed transition-all ${
                     index === 0 || selectedTractors.length === index
                       ? 'border-[var(--color-brand-green)]/50 bg-[var(--color-brand-green)]/5 text-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/10'
-                      : 'border-foreground/10 bg-foreground/5 text-muted hover:bg-foreground/10 opacity-50'
+                      : 'border-[var(--border-subtle)] bg-foreground/5 text-muted hover:bg-foreground/10 opacity-50'
                   }`}
                   onClick={() => {
                     if (index === 0 || selectedTractors.length === index) setIsOpen(true);

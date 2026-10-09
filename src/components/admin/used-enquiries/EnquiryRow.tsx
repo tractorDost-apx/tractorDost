@@ -100,7 +100,7 @@ const getStatusBadge = (status: string) => {
       );
     default:
       return (
-        <span className="bg-foreground/10 text-foreground border-foreground/20 rounded-lg border px-2.5 py-1 text-xs font-black uppercase">
+        <span className="bg-foreground/10 text-foreground border-[var(--border-brand)] rounded-lg border px-2.5 py-1 text-xs font-black uppercase">
           {status}
         </span>
       );

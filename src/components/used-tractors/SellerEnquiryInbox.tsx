@@ -220,7 +220,7 @@ export default function SellerEnquiryInbox({
       {/* Details Modal */}
       {selectedEnquiry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="glass-inner relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2rem] p-6 sm:p-8">
+          <div className="glass-inner relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-[2rem] p-6 sm:p-8">
             {/* Close Button */}
             <button
               onClick={() => setSelectedEnquiry(null)}

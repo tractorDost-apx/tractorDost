@@ -454,7 +454,7 @@ export default function AdminListingModerationPage({
                                       setCurrentImageIndex(idx);
                                     }}
                                     className={`h-1.5 w-1.5 rounded-full transition-all ${
-                                      idx === currentImageIndex ? 'w-3.5 bg-white' : 'bg-white/50'
+                                      idx === currentImageIndex ? 'w-3.5 bg-white' : 'bg-foreground/50'
                                     }`}
                                   />
                                 ))}

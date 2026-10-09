@@ -87,34 +87,34 @@ export function InventoryTable({
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="text-muted border-b border-[var(--border-subtle)] text-xs tracking-wider uppercase">
-                <th className="px-4 py-3">Tractor / Model</th>
-                <th className="px-4 py-3">Brand</th>
-                <th className="px-4 py-3">Stock</th>
-                <th className="px-4 py-3">Availability</th>
-                <th className="px-4 py-3">Expected Arrival</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-2 lg:px-3 py-3">Tractor / Model</th>
+                <th className="px-2 lg:px-3 py-3">Brand</th>
+                <th className="px-2 lg:px-3 py-3">Stock</th>
+                <th className="px-2 lg:px-3 py-3">Availability</th>
+                <th className="px-2 lg:px-3 py-3">Expected Arrival</th>
+                <th className="px-2 lg:px-3 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {[...Array(5)].map((_, i) => (
                 <tr key={i} className="animate-pulse border-b border-[var(--border-subtle)]">
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="bg-foreground/10 mb-1 h-4 w-48 rounded" />
                     <div className="bg-foreground/5 h-3 w-24 rounded" />
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="bg-foreground/10 h-4 w-20 rounded" />
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="bg-foreground/10 h-6 w-16 rounded-full" />
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="bg-foreground/10 h-6 w-24 rounded-full" />
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="bg-foreground/10 h-4 w-24 rounded" />
                   </td>
-                  <td className="px-4 py-4 text-right">
+                  <td className="px-2 lg:px-3 py-3 text-right">
                     <div className="bg-foreground/10 ml-auto h-8 w-20 rounded-xl" />
                   </td>
                 </tr>
@@ -159,15 +159,15 @@ export function InventoryTable({
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="text-muted border-b border-[var(--border-subtle)] text-xs font-bold tracking-wider uppercase">
-              <th className="px-4 py-3.5">Tractor / Model</th>
-              <th className="px-4 py-3.5">Brand / Specs</th>
-              <th className="px-4 py-3.5">Stock Count</th>
-              <th className="px-4 py-3.5">Status</th>
-              <th className="px-4 py-3.5">Expected Arrival</th>
-              <th className="px-4 py-3.5 text-right">Actions</th>
+              <th className="px-2 lg:px-3 py-3">Tractor / Model</th>
+              <th className="px-2 lg:px-3 py-3">Brand / Specs</th>
+              <th className="px-2 lg:px-3 py-3">Stock Count</th>
+              <th className="px-2 lg:px-3 py-3">Status</th>
+              <th className="px-2 lg:px-3 py-3">Expected Arrival</th>
+              <th className="px-2 lg:px-3 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--border-subtle)] text-sm font-medium">
+          <tbody className="divide-y divide-[var(--border-subtle)] text-xs font-medium">
             {items.map((item) => {
               const status = getStockStatus(item);
               const StatusIcon = status.icon;
@@ -180,7 +180,7 @@ export function InventoryTable({
                   className="hover:bg-foreground/5 group transition-colors"
                 >
                   {/* Model Name */}
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
                         <Tractor size={20} />
@@ -205,7 +205,7 @@ export function InventoryTable({
                   </td>
 
                   {/* Brand / Specs */}
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="space-y-0.5">
                       <div className="text-foreground flex items-center gap-1.5 text-xs font-bold">
                         <Layers size={13} className="text-muted" />
@@ -221,7 +221,7 @@ export function InventoryTable({
                   </td>
 
                   {/* Stock Count */}
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="bg-foreground/5 text-foreground inline-flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] px-3 py-1 font-mono font-black">
                       <span className="text-[var(--color-brand-green)]">{item.stockCount}</span>
                       <span className="text-muted text-xs font-normal">units</span>
@@ -229,7 +229,7 @@ export function InventoryTable({
                   </td>
 
                   {/* Status & Availability Toggle */}
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="flex items-center gap-3">
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold ${status.color}`}
@@ -256,7 +256,7 @@ export function InventoryTable({
                   </td>
 
                   {/* Expected Arrival */}
-                  <td className="px-4 py-4">
+                  <td className="px-2 lg:px-3 py-3">
                     <div className="text-muted flex items-center gap-1.5 text-xs">
                       <Calendar size={13} className="text-muted/70" />
                       <span>{formatDate(item.expectedArrival)}</span>
@@ -264,7 +264,7 @@ export function InventoryTable({
                   </td>
 
                   {/* Actions */}
-                  <td className="px-4 py-4 text-right">
+                  <td className="px-2 lg:px-3 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
                       {isCatalog && onListForSale && (
                         <button

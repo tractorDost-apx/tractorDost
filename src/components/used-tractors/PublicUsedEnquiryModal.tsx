@@ -80,8 +80,8 @@ export function PublicUsedEnquiryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative my-8 w-full max-w-lg rounded-3xl border border-[var(--border-subtle)] bg-background p-6 shadow-2xl md:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative max-h-[80vh] overflow-y-auto w-full max-w-lg rounded-3xl border border-[var(--border-subtle)] bg-background p-6 shadow-2xl md:p-8">
         {/* Close button */}
         <button
           onClick={onClose}
