@@ -651,11 +651,10 @@ function NavDropdownMenu({
                                 key={brand.id}
                                 href={`/tractors?brand=${brand.id}`}
                                 onMouseEnter={() => handleBrandHover(brand.id)}
-                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
-                                  isBrandActive
+                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isBrandActive
                                     ? 'bg-foreground/5 text-[var(--color-brand-green)]'
                                     : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                }`}
+                                  }`}
                               >
                                 {displayName}
                               </Link>
@@ -677,11 +676,10 @@ function NavDropdownMenu({
 
                       {/* Family Dropdown Panel (renders nested next to Brands panel) */}
                       <div
-                        className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                          activeBrandId
+                        className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeBrandId
                             ? 'pointer-events-auto scale-100 opacity-100'
                             : 'pointer-events-none scale-95 opacity-0'
-                        }`}
+                          }`}
                       >
                         <div className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5">
                           {loadingBrandId === activeBrandId ? (
@@ -789,11 +787,10 @@ function NavDropdownMenu({
                                 key={brand.id}
                                 href={`/implements?brand=${brand.slug}`}
                                 onMouseEnter={() => handleEqBrandHover(brand.id)}
-                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
-                                  isBrandActive
+                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isBrandActive
                                     ? 'bg-foreground/5 text-[var(--color-brand-green)]'
                                     : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                }`}
+                                  }`}
                               >
                                 {displayName}
                               </Link>
@@ -816,11 +813,10 @@ function NavDropdownMenu({
                       {/* Category Dropdown Panel (renders nested next to Brands panel) */}
                       <div
                         ref={categoryPanelRef}
-                        className={`absolute ${positionRightCategory ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                          activeEqBrandId
+                        className={`absolute ${positionRightCategory ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeEqBrandId
                             ? 'pointer-events-auto scale-100 opacity-100'
                             : 'pointer-events-none scale-95 opacity-0'
-                        }`}
+                          }`}
                       >
                         <div
                           className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5"
@@ -871,11 +867,10 @@ function NavDropdownMenu({
                                                 onMouseEnter={() =>
                                                   handleCategoryHover(activeEqBrandId, child.id)
                                                 }
-                                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2 pl-5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
-                                                  isChildActive
+                                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2 pl-5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isChildActive
                                                     ? 'bg-foreground/5 text-[var(--color-brand-green)]'
                                                     : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                                }`}
+                                                  }`}
                                               >
                                                 {child.name}
                                               </Link>
@@ -892,11 +887,10 @@ function NavDropdownMenu({
                                           onMouseEnter={() =>
                                             handleCategoryHover(activeEqBrandId, parent.id)
                                           }
-                                          className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
-                                            isParentActive
+                                          className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isParentActive
                                               ? 'bg-foreground/5 text-[var(--color-brand-green)]'
                                               : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                          }`}
+                                            }`}
                                         >
                                           {parent.name}
                                         </Link>
@@ -917,11 +911,10 @@ function NavDropdownMenu({
                           {/* Implement Models Dropdown Panel (renders nested next to Category panel) */}
                           <div
                             ref={implementsPanelRef}
-                            className={`absolute ${positionRightImplement ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[80] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                              activeCategoryId
+                            className={`absolute ${positionRightImplement ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[80] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeCategoryId
                                 ? 'pointer-events-auto scale-100 opacity-100'
                                 : 'pointer-events-none scale-95 opacity-0'
-                            }`}
+                              }`}
                           >
                             <div className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5">
                               {loadingCategoryId === activeCategoryId ? (

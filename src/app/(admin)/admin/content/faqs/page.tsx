@@ -1,16 +1,11 @@
-'use client';
 import React from 'react';
-import { Construction } from 'lucide-react';
+import FaqManagement from '@/components/cms/faqs/FaqManagement';
+
+export const metadata = {
+  title: 'FAQ Management | TractorDost Admin',
+  description: 'Manage frequently asked questions, answers, and target categories across TractorDost',
+};
 
 export default function FaqsAdminPage() {
-  return (
-    <div className="flex h-[70vh] flex-col items-center justify-center p-8 text-center">
-      <Construction size={64} className="text-muted mb-4 opacity-50" />
-      <h1 className="text-foreground mb-2 text-2xl font-black">FAQs Management</h1>
-      <p className="text-muted max-w-md">
-        This admin module is currently being built. It will provide full management capabilities for
-        FAQs.
-      </p>
-    </div>
-  );
+  return <FaqManagement />;
 }

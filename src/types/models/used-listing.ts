@@ -269,3 +269,13 @@ export interface MetaPage<T> {
   data: T[];
   meta: { total: number; page: number; limit: number; totalPages: number };
 }
+
+/** A staff note on a CRM lead; the author's name comes back with it */
+export interface LeadNote {
+  id: number;
+  leadId: number;
+  agentId: number;
+  noteText: string;
+  createdAt: string;
+  agent: { id: number; fullName: string | null };
+}

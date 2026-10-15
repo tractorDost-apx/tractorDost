@@ -517,13 +517,13 @@ function ImplementsListingContent() {
                 selectedUsage !== '' ||
                 selectedPrice !== '' ||
                 searchQuery !== '') && (
-                <button
-                  onClick={handleResetFilters}
-                  className="text-xs font-bold text-[var(--color-brand-orange)] hover:underline"
-                >
-                  Clear All
-                </button>
-              )}
+                  <button
+                    onClick={handleResetFilters}
+                    className="text-xs font-bold text-[var(--color-brand-orange)] hover:underline"
+                  >
+                    Clear All
+                  </button>
+                )}
             </div>
 
             {/* Filter: Search */}
@@ -805,135 +805,135 @@ function ImplementsListingContent() {
                 selectedUsage !== '' ||
                 selectedPrice !== '' ||
                 searchQuery !== '') && (
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {searchQuery !== '' && (
-                    <span className="bg-foreground/5 text-foreground inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs font-bold">
-                      Search: "{searchQuery}"
-                      <button
-                        onClick={() => {
-                          setSearchQuery('');
-                          setPage(1);
-                          updateUrlParams({ search: null, page: 1 });
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedFamily !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-500">
-                      Series Filter
-                      <button
-                        onClick={() => {
-                          setSelectedFamily('');
-                          setPage(1);
-                          updateUrlParams({ family: null, page: 1 });
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedBrand !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      Brand:{' '}
-                      {equipmentBrands.find((b) => b.id === selectedBrand)?.name || 'Selected'}
-                      <button
-                        onClick={() => {
-                          setSelectedBrand('');
-                          setActiveBrandDetails(null);
-                          setPage(1);
-                          updateUrlParams({ brand: null, page: 1 });
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedCategory !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      Category:{' '}
-                      {categories.find((c) => c.id === selectedCategory)?.name || 'Selected'}
-                      <button
-                        onClick={() => {
-                          setSelectedCategory('');
-                          setPage(1);
-                          updateUrlParams({ category: null, page: 1 });
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedHp !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      HP:{' '}
-                      {selectedHp === 'under30'
-                        ? 'Under 30 HP'
-                        : selectedHp === '30to50'
-                          ? '30 - 50 HP'
-                          : 'Above 50 HP'}
-                      <button
-                        onClick={() => {
-                          setSelectedHp('');
-                          setPage(1);
-                          updateUrlParams({ hp: null, page: 1 });
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedUsage !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      Usage: {selectedUsage}
-                      <button
-                        onClick={() => {
-                          setSelectedUsage('');
-                          setPage(1);
-                          updateUrlParams({ usage: null, page: 1 });
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedPrice !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      Price:{' '}
-                      {selectedPrice === 'under50k'
-                        ? '< ₹50k'
-                        : selectedPrice === '50kto1L'
-                          ? '₹50k - ₹1L'
-                          : selectedPrice === '1Lto2L'
-                            ? '₹1L - ₹2L'
-                            : '> ₹2L'}
-                      <button
-                        onClick={() => {
-                          setSelectedPrice('');
-                          setPage(1);
-                          updateUrlParams({ price: null, page: 1 });
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  <button
-                    onClick={handleResetFilters}
-                    className="text-muted hover:text-foreground ml-2 text-xs font-bold underline underline-offset-2"
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {searchQuery !== '' && (
+                      <span className="bg-foreground/5 text-foreground inline-flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs font-bold">
+                        Search: "{searchQuery}"
+                        <button
+                          onClick={() => {
+                            setSearchQuery('');
+                            setPage(1);
+                            updateUrlParams({ search: null, page: 1 });
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedFamily !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-500">
+                        Series Filter
+                        <button
+                          onClick={() => {
+                            setSelectedFamily('');
+                            setPage(1);
+                            updateUrlParams({ family: null, page: 1 });
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedBrand !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        Brand:{' '}
+                        {equipmentBrands.find((b) => b.id === selectedBrand)?.name || 'Selected'}
+                        <button
+                          onClick={() => {
+                            setSelectedBrand('');
+                            setActiveBrandDetails(null);
+                            setPage(1);
+                            updateUrlParams({ brand: null, page: 1 });
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedCategory !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        Category:{' '}
+                        {categories.find((c) => c.id === selectedCategory)?.name || 'Selected'}
+                        <button
+                          onClick={() => {
+                            setSelectedCategory('');
+                            setPage(1);
+                            updateUrlParams({ category: null, page: 1 });
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedHp !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        HP:{' '}
+                        {selectedHp === 'under30'
+                          ? 'Under 30 HP'
+                          : selectedHp === '30to50'
+                            ? '30 - 50 HP'
+                            : 'Above 50 HP'}
+                        <button
+                          onClick={() => {
+                            setSelectedHp('');
+                            setPage(1);
+                            updateUrlParams({ hp: null, page: 1 });
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedUsage !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        Usage: {selectedUsage}
+                        <button
+                          onClick={() => {
+                            setSelectedUsage('');
+                            setPage(1);
+                            updateUrlParams({ usage: null, page: 1 });
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedPrice !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        Price:{' '}
+                        {selectedPrice === 'under50k'
+                          ? '< ₹50k'
+                          : selectedPrice === '50kto1L'
+                            ? '₹50k - ₹1L'
+                            : selectedPrice === '1Lto2L'
+                              ? '₹1L - ₹2L'
+                              : '> ₹2L'}
+                        <button
+                          onClick={() => {
+                            setSelectedPrice('');
+                            setPage(1);
+                            updateUrlParams({ price: null, page: 1 });
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    <button
+                      onClick={handleResetFilters}
+                      className="text-muted hover:text-foreground ml-2 text-xs font-bold underline underline-offset-2"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                )}
             </div>
 
             {/* Right Controls: Sort & View Mode */}

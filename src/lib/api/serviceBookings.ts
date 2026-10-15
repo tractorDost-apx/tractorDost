@@ -18,6 +18,8 @@ export interface CreateServiceBookingPayload {
 
 export interface ServiceBookingItem {
   bookingId: number;
+  serviceCenterId?: number;
+  dealerId?: number;
   serviceCenterName: string;
   dealerName: string;
   tractorBrand: string;

@@ -3,6 +3,30 @@ import { createBulkImportApi } from './bulk-import';
 import type { ImplementImportReport } from '@/types/api/implement-import';
 import { EquipmentBrand } from './equipmentBrands';
 import { ImplementCategory } from './implementCategories';
+import { detailAccessHeaders } from '@/lib/utils/detail-access';
+
+/** Fields returned before the detail page is unlocked (card fields plus SEO text) */
+export interface ImplementTeaser {
+  id: number;
+  modelName: string;
+  slug: string;
+  priceMin: number | null;
+  priceMax: number | null;
+  compatibleHpMin: number | null;
+  compatibleHpMax: number | null;
+  usageType: string | null;
+  description: string | null;
+  brochureUrl: string | null;
+  videoUrl: string | null;
+  videoThumbnailUrl: string | null;
+  additionalSpecs: Implement['additionalSpecs'];
+  category: { id: number; name: string; slug: string };
+  brand: { id: number; name: string; slug: string; logoUrl?: string | null } | null;
+  family?: { id: number; name: string; slug: string } | null;
+  isActive: boolean;
+  seoTitle: string | null;
+  seoDescription: string | null;
+}
 
 export interface ImplementFamilySummary {
   id: number;
@@ -115,11 +139,23 @@ export const implementAPI = {
   },
 
   /**
-   * Fetch a single implement by ID or slug
+   * Fetch the full detail of one implement by ID or slug. Needs a login or a lead grant for this
+   * implement, otherwise the API answers 403 with code LEAD_REQUIRED.
    */
-  getImplementById: async (id: number | string) => {
+  getImplementById: async (id: number | string, detailAccessToken?: string) => {
     const response = await apiClient.get<{ success: boolean; data: Implement }>(
-      `/implements/${id}`
+      `/implements/${id}`,
+      { headers: detailAccessHeaders(detailAccessToken) }
+    );
+    return response.data;
+  },
+
+  /**
+   * Public summary shown before the detail page is unlocked
+   */
+  getImplementTeaser: async (id: number | string) => {
+    const response = await apiClient.get<{ success: boolean; data: ImplementTeaser }>(
+      `/implements/${id}/teaser`
     );
     return response.data;
   },

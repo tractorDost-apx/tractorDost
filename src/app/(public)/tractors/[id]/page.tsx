@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
 
   try {
-    const res = await tractorAPI.getTractorById(Number(id));
+    const res = await tractorAPI.getTractorTeaser(Number(id));
     if (res.success && res.data) {
       const tractor = res.data;
       return {
@@ -47,8 +47,9 @@ export default async function TractorDetailsPage({ params }: Props) {
   let rivals: any[] = [];
 
   try {
+    // Only the public teaser is fetched here. Full details load in the browser, after the lead gate.
     const [tractorRes, compareRes] = await Promise.all([
-      tractorAPI.getTractorById(Number(id)),
+      tractorAPI.getTractorTeaser(Number(id)),
       compareAPI
         .getFrequencyOfCompare({ limit: 10, sort: 'desc' })
         .catch(() => ({ success: false, data: [] })),
@@ -96,6 +97,6 @@ export default async function TractorDetailsPage({ params }: Props) {
   }
 
   return (
-    <TractorDetailsClient tractor={tractor} similarTractors={similarTractors} rivals={rivals} />
+    <TractorDetailsClient key={tractor.id} teaser={tractor} similarTractors={similarTractors} rivals={rivals} />
   );
 }

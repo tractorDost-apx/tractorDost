@@ -1,16 +1,21 @@
 import React from 'react';
+import { Metadata } from 'next';
+import BlogListClient from '@/components/blogs/BlogListClient';
+
+export const metadata: Metadata = {
+  title: 'Tractor Blogs, News & Buying Guides | TractorDost',
+  description:
+    'Read the latest farming insights, tractor comparisons, news, and maintenance guides crafted for Indian agriculture and farmers.',
+  keywords:
+    'tractor blogs, farming tips, tractor news, tractor comparison, agricultural guides, TractorDost',
+  openGraph: {
+    title: 'Tractor Blogs, News & Buying Guides | TractorDost',
+    description:
+      'Explore expert guides, reviews, and agriculture tips crafted for Indian farmers.',
+    type: 'website',
+  },
+};
 
 export default function BlogsPage() {
-  return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Blogs</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
-      </div>
-    </div>
-  );
+  return <BlogListClient />;
 }

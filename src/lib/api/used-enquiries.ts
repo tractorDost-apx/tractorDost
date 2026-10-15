@@ -3,6 +3,7 @@ import { toErrorResult, toResult } from './axios/result';
 import type { ApiResult } from '@/types/api/responses';
 import type {
   CreateEnquiryInput,
+  LeadNote,
   LeadStatus,
   MetaPage,
   UsedEnquiry,
@@ -103,6 +104,52 @@ export const usedTractorEnquiryAPI = {
       return toResult(response, 'Enquiry deleted');
     } catch (error) {
       return toErrorResult(error, 'Failed to delete enquiry');
+    }
+  },
+
+  /** Notes on a CRM lead, newest first */
+  getLeadNotes: async (params: {
+    leadId?: number;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResult<MetaPage<LeadNote>>> => {
+    try {
+      const response = await apiClient.get('/used-tractor-enquiries/getAllLeadNote', { params });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch lead notes');
+    }
+  },
+
+  createLeadNote: async (leadId: number, noteText: string): Promise<ApiResult<LeadNote>> => {
+    try {
+      const response = await apiClient.post('/used-tractor-enquiries/createLeadNote', {
+        leadId,
+        noteText,
+      });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to add note');
+    }
+  },
+
+  getLeadNoteById: async (id: number | string): Promise<ApiResult<LeadNote>> => {
+    try {
+      const response = await apiClient.get(`/used-tractor-enquiries/getLeadNote/${id}`);
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to fetch lead note');
+    }
+  },
+
+  updateLeadNote: async (id: number, noteText: string): Promise<ApiResult<LeadNote>> => {
+    try {
+      const response = await apiClient.patch(`/used-tractor-enquiries/updateLeadNote/${id}`, {
+        noteText,
+      });
+      return toResult(response);
+    } catch (error) {
+      return toErrorResult(error, 'Failed to update note');
     }
   },
 };

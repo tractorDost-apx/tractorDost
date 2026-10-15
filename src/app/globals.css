@@ -2,26 +2,34 @@
 
 @theme inline {
   /* Brand Colors from User's CMYK Image */
-  --color-brand-green: #4a7635; /* Primary */
+  --color-brand-green: #4a7635;
+  /* Primary */
   --color-brand-green-dark: #375926;
-  --color-brand-orange: #ba5b34; /* Accent */
+  --color-brand-orange: #ba5b34;
+  /* Accent */
   --color-brand-orange-light: #d46b3f;
 
-  --color-brand-charcoal: #090b0a; /* Velvety deep moss-black */
-  --color-brand-light: #f7f9f6; /* Soft, pristine off-white/cream instead of stark white */
+  --color-brand-charcoal: #090b0a;
+  /* Velvety deep moss-black */
+  --color-brand-light: #f7f9f6;
+  /* Soft, pristine off-white/cream instead of stark white */
 
   /* Override tailwind default lime with brand colors globally */
-  --color-lime-300: #5d9243; /* slightly lighter brand green */
+  --color-lime-300: #5d9243;
+  /* slightly lighter brand green */
   --color-lime-400: var(--color-brand-green);
   --color-lime-500: var(--color-brand-green-dark);
 
   --color-spatial-bg-light: var(--color-brand-light);
   --color-spatial-bg-dark: var(--color-brand-charcoal);
 
-  --color-spatial-text-light: #1a221e; /* Rich dark slate for better reading contrast */
-  --color-spatial-text-dark: #e8ebe6; /* Warm, soft off-white */
+  --color-spatial-text-light: #1a221e;
+  /* Rich dark slate for better reading contrast */
+  --color-spatial-text-dark: #e8ebe6;
+  /* Warm, soft off-white */
 
-  --color-spatial-muted-light: #5a6961; /* Clean, modern gray with slight green tint */
+  --color-spatial-muted-light: #5a6961;
+  /* Clean, modern gray with slight green tint */
   --color-spatial-muted-dark: #829379;
 
   /* We map the previous spatial variables to the new brand colors so we don't have to rewrite the whole app */
@@ -141,14 +149,17 @@ body::after {
     transform: scale(1) translate(0, 0) rotate(0deg);
     opacity: 0.6;
   }
+
   33% {
     transform: scale(1.1) translate(2%, 4%) rotate(2deg);
     opacity: 1;
   }
+
   66% {
     transform: scale(0.9) translate(-2%, 2%) rotate(-1deg);
     opacity: 0.8;
   }
+
   100% {
     transform: scale(1.05) translate(-4%, -2%) rotate(1deg);
     opacity: 0.6;
@@ -160,14 +171,17 @@ body::after {
     transform: scale(1) translate(0, 0) rotate(0deg);
     opacity: 0.6;
   }
+
   33% {
     transform: scale(0.9) translate(-4%, -2%) rotate(-2deg);
     opacity: 0.9;
   }
+
   66% {
     transform: scale(1.1) translate(2%, -4%) rotate(1deg);
     opacity: 0.7;
   }
+
   100% {
     transform: scale(0.95) translate(4%, 2%) rotate(-1deg);
     opacity: 1;
@@ -183,7 +197,8 @@ body::after {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   box-shadow: var(--panel-shadow);
-  border-radius: 1.5rem; /* 3xl */
+  border-radius: 1.5rem;
+  /* 3xl */
 }
 
 @utility glass-inner {
@@ -192,7 +207,8 @@ body::after {
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
-  border-radius: 1rem; /* 2xl */
+  border-radius: 1rem;
+  /* 2xl */
 }
 
 @utility glass-button {
@@ -201,7 +217,8 @@ body::after {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
-  border-radius: 9999px; /* full */
+  border-radius: 9999px;
+  /* full */
   transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 
   &:hover {
@@ -279,9 +296,11 @@ body::after {
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-12px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -299,16 +318,19 @@ body::after {
     opacity: 0;
     filter: blur(4px);
   }
+
   12% {
     transform: perspective(600px) rotateX(0deg) translateY(0px);
     opacity: 1;
     filter: blur(0px);
   }
+
   88% {
     transform: perspective(600px) rotateX(0deg) translateY(0px);
     opacity: 1;
     filter: blur(0px);
   }
+
   100% {
     transform: perspective(600px) rotateX(90deg) translateY(-20px);
     opacity: 0;
@@ -327,6 +349,7 @@ body::after {
 .logo-light {
   display: block;
 }
+
 .logo-dark {
   display: none;
 }
@@ -334,6 +357,7 @@ body::after {
 .dark .logo-light {
   display: none;
 }
+
 .dark .logo-dark {
   display: block;
 }
@@ -342,9 +366,12 @@ body::after {
 ::-webkit-scrollbar {
   display: none;
 }
+
 * {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Custom brand list scrollbar */
@@ -352,19 +379,25 @@ body::after {
   display: block !important;
   width: 4px !important;
 }
+
 .brand-scrollbar::-webkit-scrollbar-track {
   background: transparent !important;
 }
+
 .brand-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.15) !important;
   border-radius: 9999px !important;
 }
+
 .dark .brand-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15) !important;
 }
+
 .brand-scrollbar {
-  -ms-overflow-style: auto !important; /* IE and Edge */
-  scrollbar-width: thin !important; /* Firefox */
+  -ms-overflow-style: auto !important;
+  /* IE and Edge */
+  scrollbar-width: thin !important;
+  /* Firefox */
 }
 
 /* Fix native select options visibility in dark mode across the app */

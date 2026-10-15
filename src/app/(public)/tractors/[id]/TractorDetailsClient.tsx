@@ -22,8 +22,11 @@ import {
   XCircle,
   FileText,
 } from 'lucide-react';
-import { Tractor as TractorModel } from '@/lib/api/tractors';
+import { Tractor as TractorModel, TractorTeaser, tractorAPI } from '@/lib/api/tractors';
 import { CompareFrequencyRecord } from '@/lib/api/compare';
+import { useDetailAccess } from '@/hooks/leads/use-detail-access';
+import { DetailAccessGate, DetailGateSummary } from '@/components/leads/detail-access-gate';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 const formatEnum = (val: string | undefined | null) => {
   if (!val) return '';
@@ -33,7 +36,79 @@ const formatEnum = (val: string | undefined | null) => {
     .replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
+const formatLakh = (price: number) =>
+  price >= 100000 ? `${(price / 100000).toFixed(2)} Lakh` : price.toLocaleString('en-IN');
+
+/** What the lead gate shows about the tractor. Only teaser fields, so nothing gated is shown. */
+function tractorGateSummary(teaser: TractorTeaser): DetailGateSummary {
+  const isImage = (m: { mediaType: string }) => m.mediaType !== 'VIDEO' && m.mediaType !== 'PDF';
+  const image = teaser.media?.find((m) => m.isPrimary && isImage(m)) ?? teaser.media?.find(isImage);
+  const price = Number(teaser.exShowroomPriceMin);
+  const driveLabel = teaser.driveType === 'FOUR_WD' ? '4WD' : teaser.driveType === 'TWO_WD' ? '2WD' : null;
+
+  return {
+    eyebrow: teaser.brand?.name,
+    title: teaser.modelName,
+    imageUrl: image?.url ?? null,
+    priceLabel: price ? `Ex-showroom from ₹ ${formatLakh(price)}` : 'Price on request',
+    chips: [teaser.hp ? `${teaser.hp} HP` : null, driveLabel].filter((chip): chip is string => Boolean(chip)),
+  };
+}
+
+/**
+ * Full tractor details, behind the lead gate. The teaser is public. The full record loads from the API,
+ * which answers 403 until the visitor is signed in or has submitted the enquiry for this tractor.
+ */
 export default function TractorDetailsClient({
+  teaser,
+  rivals,
+  similarTractors,
+}: {
+  teaser: TractorTeaser;
+  rivals: CompareFrequencyRecord[];
+  similarTractors: TractorModel[];
+}) {
+  const { state, unlock } = useDetailAccess(teaser.id, tractorAPI.getTractorById, 'TRACTOR');
+
+  if (state.status === 'granted') {
+    return <TractorDetailsView tractor={state.data} rivals={rivals} similarTractors={similarTractors} />;
+  }
+
+  return (
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pt-6 pb-24 sm:px-6 lg:px-8">
+      <Link
+        href="/tractors"
+        className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
+      >
+        <ArrowLeft size={16} /> Back to Catalog
+      </Link>
+
+      {state.status === 'loading' && (
+        <div className="flex justify-center py-24">
+          <TractorLoader size={48} />
+        </div>
+      )}
+      {state.status === 'locked' && (
+        <DetailAccessGate
+          targetType="TRACTOR"
+          targetId={teaser.id}
+          summary={tractorGateSummary(teaser)}
+          onUnlock={unlock}
+        />
+      )}
+      {state.status === 'unavailable' && (
+        <p className="text-muted py-24 text-center font-bold">This tractor is no longer available.</p>
+      )}
+      {state.status === 'error' && (
+        <p className="text-muted py-24 text-center font-bold">
+          We could not load this tractor. Please refresh the page and try again.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function TractorDetailsView({
   tractor,
   rivals,
   similarTractors,
@@ -98,19 +173,19 @@ export default function TractorDetailsClient({
                 </button>
                 {(tractor.brochurePdf ||
                   tractor.media?.find((m: any) => m.mediaType === 'PDF')?.url) && (
-                  <a
-                    href={
-                      tractor.brochurePdf ||
-                      tractor.media?.find((m: any) => m.mediaType === 'PDF')?.url
-                    }
-                    target="_blank"
-                    rel="noreferrer"
-                    className="bg-background/80 text-foreground flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-colors hover:bg-[var(--color-brand-green)] hover:text-white"
-                    title="Download Brochure"
-                  >
-                    <Download size={18} />
-                  </a>
-                )}
+                    <a
+                      href={
+                        tractor.brochurePdf ||
+                        tractor.media?.find((m: any) => m.mediaType === 'PDF')?.url
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="bg-background/80 text-foreground flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-colors hover:bg-[var(--color-brand-green)] hover:text-white"
+                      title="Download Brochure"
+                    >
+                      <Download size={18} />
+                    </a>
+                  )}
                 {tractor.videoUrl && (
                   <a
                     href={tractor.videoUrl}
@@ -393,19 +468,19 @@ export default function TractorDetailsClient({
                   tractor.spec?.motorKw ||
                   tractor.spec?.chargingTimeHours ||
                   tractor.spec?.rangePerChargeKm) && (
-                  <AccordionSection title="Electric Tractor" titleColorClass="text-lime-500">
-                    <SpecRow
-                      label="Battery Capacity (kWh)"
-                      value={tractor.spec?.batteryCapacityKwh}
-                    />
-                    <SpecRow label="Motor kW" value={tractor.spec?.motorKw} />
-                    <SpecRow
-                      label="Charging Time (Hours)"
-                      value={tractor.spec?.chargingTimeHours}
-                    />
-                    <SpecRow label="Range per Charge (km)" value={tractor.spec?.rangePerChargeKm} />
-                  </AccordionSection>
-                )}
+                    <AccordionSection title="Electric Tractor" titleColorClass="text-lime-500">
+                      <SpecRow
+                        label="Battery Capacity (kWh)"
+                        value={tractor.spec?.batteryCapacityKwh}
+                      />
+                      <SpecRow label="Motor kW" value={tractor.spec?.motorKw} />
+                      <SpecRow
+                        label="Charging Time (Hours)"
+                        value={tractor.spec?.chargingTimeHours}
+                      />
+                      <SpecRow label="Range per Charge (km)" value={tractor.spec?.rangePerChargeKm} />
+                    </AccordionSection>
+                  )}
 
                 <AccordionSection title="Maintenance & Service" titleColorClass="text-slate-500">
                   <SpecRow label="Warranty Years" value={tractor.spec?.warrantyYears} />
@@ -446,56 +521,56 @@ export default function TractorDetailsClient({
             {((tractor.pros && tractor.pros.length > 0) ||
               (tractor.cons && tractor.cons.length > 0) ||
               tractor.whyBuy) && (
-              <div className="flex flex-col gap-8">
-                {tractor.pros && Array.isArray(tractor.pros) && tractor.pros.length > 0 && (
-                  <div className="flex flex-col gap-4">
-                    <h3 className="text-foreground text-xl font-black">Pros</h3>
-                    <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      {tractor.pros.map((pro: string, i: number) => (
-                        <li
-                          key={i}
-                          className="bg-background flex items-start gap-3 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
-                        >
-                          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                            <CheckCircle2 size={16} />
-                          </div>
-                          <span className="text-foreground leading-snug font-bold">{pro}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <div className="flex flex-col gap-8">
+                  {tractor.pros && Array.isArray(tractor.pros) && tractor.pros.length > 0 && (
+                    <div className="flex flex-col gap-4">
+                      <h3 className="text-foreground text-xl font-black">Pros</h3>
+                      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {tractor.pros.map((pro: string, i: number) => (
+                          <li
+                            key={i}
+                            className="bg-background flex items-start gap-3 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
+                          >
+                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                              <CheckCircle2 size={16} />
+                            </div>
+                            <span className="text-foreground leading-snug font-bold">{pro}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                {tractor.cons && Array.isArray(tractor.cons) && tractor.cons.length > 0 && (
-                  <div className="mt-2 flex flex-col gap-4">
-                    <h3 className="text-foreground text-xl font-black">Cons</h3>
-                    <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      {tractor.cons.map((con: string, i: number) => (
-                        <li
-                          key={i}
-                          className="bg-background flex items-start gap-3 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
-                        >
-                          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500">
-                            <XCircle size={16} />
-                          </div>
-                          <span className="text-foreground leading-snug font-bold">{con}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                  {tractor.cons && Array.isArray(tractor.cons) && tractor.cons.length > 0 && (
+                    <div className="mt-2 flex flex-col gap-4">
+                      <h3 className="text-foreground text-xl font-black">Cons</h3>
+                      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {tractor.cons.map((con: string, i: number) => (
+                          <li
+                            key={i}
+                            className="bg-background flex items-start gap-3 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
+                          >
+                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500">
+                              <XCircle size={16} />
+                            </div>
+                            <span className="text-foreground leading-snug font-bold">{con}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                {tractor.whyBuy && (
-                  <div className="mt-2 flex flex-col gap-4">
-                    <h3 className="text-foreground text-xl font-black">Why Buy This Tractor?</h3>
-                    <div
-                      className="text-muted bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-6 font-medium"
-                      dangerouslySetInnerHTML={{ __html: tractor.whyBuy }}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+                  {tractor.whyBuy && (
+                    <div className="mt-2 flex flex-col gap-4">
+                      <h3 className="text-foreground text-xl font-black">Why Buy This Tractor?</h3>
+                      <div
+                        className="text-muted bg-foreground/5 rounded-2xl border border-[var(--border-subtle)] p-6 font-medium"
+                        dangerouslySetInnerHTML={{ __html: tractor.whyBuy }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
           </div>
         </div>
 

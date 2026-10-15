@@ -30,9 +30,9 @@ export interface Showroom {
 
   brand?: ShowroomBrand;
 
-  // Virtual properties for UI
-  rating: number;
-  reviewsCount: number;
+  // Derived from approved reviews; undefined until the backend provides a showroom aggregate
+  rating?: number;
+  reviewsCount?: number;
 }
 
 // ----------------------------------------------------------------------
@@ -59,8 +59,6 @@ const MOCK_SHOWROOMS: Showroom[] = [
       'Experience the full range of Mahindra tractors in our state-of-the-art showroom. We offer dedicated test drive tracks and expert consultation.',
     isActive: true,
     brand: { id: 1, name: 'Mahindra' },
-    rating: 4.8,
-    reviewsCount: 124,
   },
   {
     id: 2,
@@ -76,8 +74,6 @@ const MOCK_SHOWROOMS: Showroom[] = [
     testDriveAvailable: true,
     isActive: true,
     brand: { id: 2, name: 'Swaraj' },
-    rating: 4.2,
-    reviewsCount: 45,
   },
   {
     id: 3,
@@ -96,8 +92,6 @@ const MOCK_SHOWROOMS: Showroom[] = [
       'The largest John Deere experience center in central India. Fully AC showroom with a dedicated lounge for farmers.',
     isActive: true,
     brand: { id: 4, name: 'John Deere' },
-    rating: 4.9,
-    reviewsCount: 210,
   },
   {
     id: 4,
@@ -113,8 +107,6 @@ const MOCK_SHOWROOMS: Showroom[] = [
     testDriveAvailable: false,
     isActive: true,
     brand: { id: 5, name: 'Escorts' },
-    rating: 4.6,
-    reviewsCount: 89,
   },
   {
     id: 5,
@@ -130,8 +122,6 @@ const MOCK_SHOWROOMS: Showroom[] = [
     testDriveAvailable: true,
     isActive: true,
     brand: { id: 3, name: 'Sonalika' },
-    rating: 4.5,
-    reviewsCount: 156,
   },
 ];
 

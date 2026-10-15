@@ -25,6 +25,8 @@ import {
   Navigation,
 } from 'lucide-react';
 import { useAuth } from '@/store/AuthContext';
+import { MyReviewAction } from '@/components/reviews/my-review-action';
+import { ReviewList } from '@/components/reviews/review-list';
 import { serviceCenterAPI, NearbyServiceCenter } from '@/lib/api/serviceCenters';
 import { serviceBookingAPI, ServiceBookingItem, CreateServiceBookingPayload } from '@/lib/api/serviceBookings';
 import { dealerAPI, Dealer } from '@/lib/api/dealers';
@@ -68,6 +70,8 @@ export default function TractorRepairPage() {
     servicesAvailable?: string[];
   } | null>(null);
   const [submittingBooking, setSubmittingBooking] = useState(false);
+  // Read-only reviews viewer for a service center
+  const [reviewsCenter, setReviewsCenter] = useState<{ serviceCenterId: number; serviceName: string } | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
@@ -558,7 +562,7 @@ export default function TractorRepairPage() {
                       </div>
                       <span className="flex shrink-0 items-center gap-1 rounded-xl border border-amber-400/20 bg-amber-400/10 px-2 py-1 text-xs font-bold text-amber-400">
                         <Star size={12} className="fill-amber-400 text-amber-400" />
-                        {center.rating ? Number(center.rating).toFixed(1) : '4.5'}
+                        {center.rating ? Number(center.rating).toFixed(1) : 'New'}
                       </span>
                     </div>
 
@@ -621,12 +625,18 @@ export default function TractorRepairPage() {
                   </div>
 
                   {/* Action Button */}
-                  <div className="mt-6 border-t border-[var(--border-subtle)] pt-4">
+                  <div className="mt-6 space-y-2 border-t border-[var(--border-subtle)] pt-4">
                     <button
                       onClick={() => handleOpenBooking(center)}
                       className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] px-4 py-3 text-xs font-black tracking-wider text-black uppercase shadow-lg shadow-[var(--color-brand-green)]/10 transition-all duration-200 hover:opacity-95"
                     >
                       <Wrench size={15} /> Request Repair
+                    </button>
+                    <button
+                      onClick={() => setReviewsCenter({ serviceCenterId: center.serviceCenterId, serviceName: center.serviceName })}
+                      className="text-muted hover:text-foreground flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-2 text-xs font-bold transition-colors"
+                    >
+                      <Star size={13} /> View reviews
                     </button>
                   </div>
                 </div>
@@ -766,6 +776,14 @@ export default function TractorRepairPage() {
 
                   <div className="flex items-center gap-3">
                     {getStatusBadge(b.status)}
+                    {b.status === 'COMPLETED' && b.serviceCenterId && (
+                      <MyReviewAction
+                        targetType="SERVICE_CENTER"
+                        targetId={b.serviceCenterId}
+                        targetName={b.serviceCenterName}
+                        canRate
+                      />
+                    )}
                     {b.mapUrl && (
                       <a
                         href={b.mapUrl}
@@ -782,6 +800,25 @@ export default function TractorRepairPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* MODAL: SERVICE CENTER REVIEWS (read-only) */}
+      {reviewsCenter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="glass-panel max-h-[85vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-3xl p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-foreground text-lg font-black">{reviewsCenter.serviceName} · Reviews</h2>
+              <button onClick={() => setReviewsCenter(null)} className="glass-button p-2" aria-label="Close">
+                <X size={14} />
+              </button>
+            </div>
+            <ReviewList
+              targetType="SERVICE_CENTER"
+              targetId={reviewsCenter.serviceCenterId}
+              currentUserId={user?.id}
+            />
+          </div>
         </div>
       )}
 

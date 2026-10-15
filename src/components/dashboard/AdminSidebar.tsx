@@ -32,7 +32,24 @@ import {
   FolderOpen,
 } from 'lucide-react';
 
-const NAV_GROUPS = [
+interface NavSubItem {
+  label: string;
+  href: string;
+}
+
+interface NavItem {
+  label: string;
+  href?: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  subItems?: NavSubItem[];
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
   {
     title: 'Core',
     items: [{ label: 'Overview', href: '/admin/dashboard', icon: LayoutDashboard }],
@@ -93,8 +110,15 @@ const NAV_GROUPS = [
   {
     title: 'Content & Support',
     items: [
-      { label: 'CMS (Blogs/News)', href: '/admin/content', icon: FileText },
-      { label: 'FAQs', href: '/admin/content/faqs', icon: MessageSquareText },
+      {
+        label: 'CMS',
+        icon: FileText,
+        subItems: [
+          { label: 'Categories', href: '/admin/cms/categories' },
+          { label: 'Blog Posts', href: '/admin/cms/posts' },
+          { label: 'FAQs', href: '/admin/content/faqs' },
+        ],
+      },
       { label: 'Grievances', href: '/admin/grievances', icon: AlertTriangle },
       { label: 'Reviews', href: '/admin/reviews', icon: FileCheck },
     ],
@@ -116,22 +140,50 @@ export default function AdminSidebar() {
 
   // By default, open 'Core' and the group containing the active link
   const [openGroups, setOpenGroups] = useState<string[]>([]);
+  const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const activeGroup = NAV_GROUPS.find((group) =>
-      group.items.some((item) => pathname === item.href || pathname.startsWith(item.href + '/'))
+      group.items.some((item) =>
+        item.subItems
+          ? item.subItems.some(
+              (sub) => pathname === sub.href || pathname.startsWith(sub.href + '/')
+            )
+          : item.href
+            ? pathname === item.href || pathname.startsWith(item.href + '/')
+            : false
+      )
     );
     if (activeGroup) {
       setOpenGroups((prev) => Array.from(new Set([...prev, activeGroup.title, 'Core'])));
     } else {
       setOpenGroups(['Core']);
     }
+
+    // Auto open dropdown if child is active
+    NAV_GROUPS.forEach((group) => {
+      group.items.forEach((item) => {
+        if (
+          item.subItems?.some(
+            (sub) => pathname === sub.href || pathname.startsWith(sub.href + '/')
+          )
+        ) {
+          setOpenDropdowns((prev) => Array.from(new Set([...prev, item.label])));
+        }
+      });
+    });
   }, [pathname]);
 
   const toggleGroup = (title: string) => {
     setOpenGroups((prev) =>
       prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
+  const toggleDropdown = (label: string) => {
+    setOpenDropdowns((prev) =>
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
     );
   };
 
@@ -159,8 +211,14 @@ export default function AdminSidebar() {
         <div className="flex flex-col gap-2">
           {NAV_GROUPS.map((group) => {
             const isOpen = openGroups.includes(group.title);
-            const hasActiveChild = group.items.some(
-              (item) => pathname === item.href || pathname.startsWith(item.href + '/')
+            const hasActiveChild = group.items.some((item) =>
+              item.subItems
+                ? item.subItems.some(
+                    (sub) => pathname === sub.href || pathname.startsWith(sub.href + '/')
+                  )
+                : item.href
+                  ? pathname === item.href || pathname.startsWith(item.href + '/')
+                  : false
             );
 
             return (
@@ -202,12 +260,118 @@ export default function AdminSidebar() {
                     className={`flex flex-col gap-1 overflow-hidden ${isCollapsed ? 'px-0' : 'px-2'}`}
                   >
                     {group.items.map((item) => {
-                      const isActive = pathname === item.href;
                       const Icon = item.icon;
+
+                      // Item with subItems (dropdown)
+                      if (item.subItems && item.subItems.length > 0) {
+                        const isSubActive = item.subItems.some(
+                          (sub) => pathname === sub.href || pathname.startsWith(sub.href + '/')
+                        );
+                        const isDropdownOpen = openDropdowns.includes(item.label);
+
+                        if (isCollapsed) {
+                          // Collapsed mode: direct link to first subitem or icon
+                          return (
+                            <Link
+                              key={item.label}
+                              href={item.subItems[0].href}
+                              title={item.label}
+                              className={`flex items-center justify-center rounded-xl py-2.5 text-sm font-bold transition-all ${
+                                isSubActive
+                                  ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner'
+                                  : 'text-muted hover:bg-foreground/5 hover:text-foreground'
+                              }`}
+                            >
+                              <Icon
+                                size={18}
+                                className={
+                                  isSubActive
+                                    ? 'shrink-0 text-[var(--color-brand-green)]'
+                                    : 'shrink-0 opacity-70'
+                                }
+                              />
+                            </Link>
+                          );
+                        }
+
+                        return (
+                          <div key={item.label} className="flex flex-col">
+                            <button
+                              type="button"
+                              onClick={() => toggleDropdown(item.label)}
+                              className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-bold transition-all ${
+                                isSubActive
+                                  ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+                                  : 'text-muted hover:bg-foreground/5 hover:text-foreground'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Icon
+                                  size={18}
+                                  className={
+                                    isSubActive
+                                      ? 'shrink-0 text-[var(--color-brand-green)]'
+                                      : 'shrink-0 opacity-70'
+                                  }
+                                />
+                                <span className="overflow-hidden whitespace-nowrap">
+                                  {item.label}
+                                </span>
+                              </div>
+                              <ChevronDown
+                                size={14}
+                                className={`transition-transform duration-200 ${
+                                  isDropdownOpen ? 'rotate-180' : ''
+                                }`}
+                              />
+                            </button>
+
+                            <div
+                              className={`grid transition-all duration-200 ease-in-out ${
+                                isDropdownOpen
+                                  ? 'mt-1 mb-1 grid-rows-[1fr] opacity-100'
+                                  : 'grid-rows-[0fr] opacity-0'
+                              }`}
+                            >
+                              <div className="flex flex-col gap-1 overflow-hidden border-l border-white/10 ml-5 pl-2">
+                                {item.subItems.map((sub) => {
+                                  const isCurrent =
+                                    pathname === sub.href || pathname.startsWith(sub.href + '/');
+                                  return (
+                                    <Link
+                                      key={sub.href}
+                                      href={sub.href}
+                                      className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
+                                        isCurrent
+                                          ? 'bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)] font-bold shadow-sm'
+                                          : 'text-muted hover:bg-foreground/5 hover:text-foreground'
+                                      }`}
+                                    >
+                                      <span
+                                        className={`h-1.5 w-1.5 rounded-full ${
+                                          isCurrent
+                                            ? 'bg-[var(--color-brand-green)]'
+                                            : 'bg-muted/50'
+                                        }`}
+                                      />
+                                      <span className="overflow-hidden whitespace-nowrap">
+                                        {sub.label}
+                                      </span>
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // Standard single link
+                      const isActive = item.href ? pathname === item.href : false;
                       return (
                         <Link
-                          key={item.href}
-                          href={item.href}
+                          key={item.href || item.label}
+                          href={item.href || '#'}
                           title={isCollapsed ? item.label : undefined}
                           className={`flex items-center gap-3 rounded-xl py-2.5 text-sm font-bold transition-all ${
                             isActive

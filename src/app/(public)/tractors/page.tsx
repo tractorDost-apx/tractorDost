@@ -281,22 +281,22 @@ function TractorsListingContent() {
                 selectedFuel !== '' ||
                 selectedPrice !== '' ||
                 searchQuery !== '') && (
-                <button
-                  onClick={() => {
-                    setSelectedBrand('');
-                    setSelectedFamily('');
-                    setSelectedHp('');
-                    setSelectedDrive('');
-                    setSelectedFuel('');
-                    setSelectedPrice('');
-                    setSearchQuery('');
-                    setPage(1);
-                  }}
-                  className="text-xs font-bold text-[var(--color-brand-orange)] hover:underline"
-                >
-                  Clear All
-                </button>
-              )}
+                  <button
+                    onClick={() => {
+                      setSelectedBrand('');
+                      setSelectedFamily('');
+                      setSelectedHp('');
+                      setSelectedDrive('');
+                      setSelectedFuel('');
+                      setSelectedPrice('');
+                      setSearchQuery('');
+                      setPage(1);
+                    }}
+                    className="text-xs font-bold text-[var(--color-brand-orange)] hover:underline"
+                  >
+                    Clear All
+                  </button>
+                )}
             </div>
 
             {/* Filter: Search */}
@@ -543,105 +543,105 @@ function TractorsListingContent() {
                 selectedDrive !== '' ||
                 selectedFuel !== '' ||
                 selectedPrice !== '') && (
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {selectedBrand !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      {brands.find((b) => b.id === selectedBrand)?.name || 'Brand'}
-                      <button
-                        onClick={() => {
-                          setSelectedBrand('');
-                          setPage(1);
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedHp !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      {selectedHp === 'under30'
-                        ? 'Under 30 HP'
-                        : selectedHp === '30to50'
-                          ? '30 - 50 HP'
-                          : 'Above 50 HP'}
-                      <button
-                        onClick={() => {
-                          setSelectedHp('');
-                          setPage(1);
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedDrive !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      {selectedDrive === 'TWO_WD' ? '2WD' : '4WD'}
-                      <button
-                        onClick={() => {
-                          setSelectedDrive('');
-                          setPage(1);
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedFuel !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      {selectedFuel === 'DIESEL'
-                        ? 'Diesel'
-                        : selectedFuel === 'ELECTRIC'
-                          ? 'Electric'
-                          : 'CNG'}
-                      <button
-                        onClick={() => {
-                          setSelectedFuel('');
-                          setPage(1);
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  {selectedPrice !== '' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
-                      {selectedPrice === 'under5'
-                        ? 'Under ₹ 5L'
-                        : selectedPrice === '5to10'
-                          ? '₹ 5L - 10L'
-                          : 'Above ₹ 10L'}
-                      <button
-                        onClick={() => {
-                          setSelectedPrice('');
-                          setPage(1);
-                        }}
-                        className="hover:text-[var(--color-brand-orange)]"
-                      >
-                        <X size={12} strokeWidth={3} />
-                      </button>
-                    </span>
-                  )}
-                  <button
-                    onClick={() => {
-                      setSelectedBrand('');
-                      setSelectedHp('');
-                      setSelectedDrive('');
-                      setSelectedFuel('');
-                      setSelectedPrice('');
-                      setSearchQuery('');
-                      setPage(1);
-                    }}
-                    className="text-muted hover:text-foreground ml-2 text-xs font-bold underline underline-offset-2"
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {selectedBrand !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        {brands.find((b) => b.id === selectedBrand)?.name || 'Brand'}
+                        <button
+                          onClick={() => {
+                            setSelectedBrand('');
+                            setPage(1);
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedHp !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        {selectedHp === 'under30'
+                          ? 'Under 30 HP'
+                          : selectedHp === '30to50'
+                            ? '30 - 50 HP'
+                            : 'Above 50 HP'}
+                        <button
+                          onClick={() => {
+                            setSelectedHp('');
+                            setPage(1);
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedDrive !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        {selectedDrive === 'TWO_WD' ? '2WD' : '4WD'}
+                        <button
+                          onClick={() => {
+                            setSelectedDrive('');
+                            setPage(1);
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedFuel !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        {selectedFuel === 'DIESEL'
+                          ? 'Diesel'
+                          : selectedFuel === 'ELECTRIC'
+                            ? 'Electric'
+                            : 'CNG'}
+                        <button
+                          onClick={() => {
+                            setSelectedFuel('');
+                            setPage(1);
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    {selectedPrice !== '' && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold text-[var(--color-brand-green)]">
+                        {selectedPrice === 'under5'
+                          ? 'Under ₹ 5L'
+                          : selectedPrice === '5to10'
+                            ? '₹ 5L - 10L'
+                            : 'Above ₹ 10L'}
+                        <button
+                          onClick={() => {
+                            setSelectedPrice('');
+                            setPage(1);
+                          }}
+                          className="hover:text-[var(--color-brand-orange)]"
+                        >
+                          <X size={12} strokeWidth={3} />
+                        </button>
+                      </span>
+                    )}
+                    <button
+                      onClick={() => {
+                        setSelectedBrand('');
+                        setSelectedHp('');
+                        setSelectedDrive('');
+                        setSelectedFuel('');
+                        setSelectedPrice('');
+                        setSearchQuery('');
+                        setPage(1);
+                      }}
+                      className="text-muted hover:text-foreground ml-2 text-xs font-bold underline underline-offset-2"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                )}
             </div>
             <div className="flex items-center gap-2">
               <button

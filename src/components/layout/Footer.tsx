@@ -69,6 +69,7 @@ export function Footer() {
             <h3 className="text-foreground text-lg font-bold">Company</h3>
             <FooterLink href="/about">About Us</FooterLink>
             <FooterLink href="/contact">Contact Support</FooterLink>
+            <FooterLink href="/faqs">FAQs & Help</FooterLink>
             <FooterLink href="/privacy">Privacy Policy</FooterLink>
             <FooterLink href="/terms">Terms of Service</FooterLink>
           </div>

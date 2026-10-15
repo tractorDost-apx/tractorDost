@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Loader2, MessageSquareText, Phone, Tractor, MapPin, Eye, X } from 'lucide-react';
+import { Loader2, MessageSquareText, Phone, Tractor, MapPin, Eye, X, StickyNote } from 'lucide-react';
 import { SpatialButton } from '@/components/ui/spatial-button';
 import { LeadStatusBadge } from '@/components/used-tractors/status-badges';
+import LeadNotesPanel from '@/components/used-tractors/LeadNotesPanel';
 import { useReceivedEnquiries } from '@/hooks/leads/use-my-enquiries';
 import { useLeadStatusUpdate } from '@/hooks/leads/use-lead-actions';
 import {
@@ -37,6 +38,7 @@ export default function SellerEnquiryInbox({
   const [page, setPage] = useState(1);
   const [rowError, setRowError] = useState<{ id: number; text: string } | null>(null);
   const [selectedEnquiry, setSelectedEnquiry] = useState<UsedEnquiry | null>(null);
+  const [notesEnquiry, setNotesEnquiry] = useState<UsedEnquiry | null>(null);
 
   const { data, loading, error, reload } = useReceivedEnquiries({ listingId, status, page });
   const { pendingId, updateStatus } = useLeadStatusUpdate();
@@ -162,6 +164,12 @@ export default function SellerEnquiryInbox({
                     className="glass-button px-3 py-1.5 text-xs font-bold text-foreground hover:text-lime-400 flex items-center gap-1"
                   >
                     <Eye size={13} /> View Details
+                  </button>
+                  <button
+                    onClick={() => setNotesEnquiry(enquiry)}
+                    className="glass-button px-3 py-1.5 text-xs font-bold text-foreground hover:text-lime-400 flex items-center gap-1"
+                  >
+                    <StickyNote size={13} className="text-lime-400" /> Lead Notes
                   </button>
                   {nextStatuses.length === 0 ? (
                     <span className="text-muted text-xs font-medium">Closed lead</span>
@@ -330,12 +338,69 @@ export default function SellerEnquiryInbox({
               </p>
             </div>
 
+            {/* Lead Notes Section */}
+            <div className="mt-6 pt-6 border-t border-border">
+              <LeadNotesPanel leadId={selectedEnquiry.id} />
+            </div>
+
             {/* Close Button */}
             <button
               onClick={() => setSelectedEnquiry(null)}
               className="mt-6 w-full bg-lime-400 hover:bg-lime-500 text-black rounded-xl py-2.5 text-xs font-black transition-colors"
             >
-              Close
+              Close Details
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Dedicated Lead Notes Modal */}
+      {notesEnquiry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="glass-inner relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-[2rem] p-6 sm:p-8">
+            {/* Close Button */}
+            <button
+              onClick={() => setNotesEnquiry(null)}
+              className="absolute top-4 right-4 text-muted hover:text-foreground transition-colors p-2"
+              aria-label="Close"
+            >
+              <X size={22} />
+            </button>
+
+            {/* Header */}
+            <div className="mb-6 pb-4 border-b border-border">
+              <div className="flex items-center gap-2 mb-1">
+                <StickyNote size={20} className="text-lime-400" />
+                <h3 className="text-xl font-black text-foreground">
+                  Lead Notes — {notesEnquiry.name}
+                </h3>
+              </div>
+              <p className="text-muted text-xs font-medium">
+                Record customer discussions, negotiations, and next follow-up milestones for this enquiry.
+              </p>
+              <div className="flex flex-wrap items-center gap-3 mt-3">
+                <a
+                  href={`tel:${notesEnquiry.mobile}`}
+                  className="flex items-center gap-1 text-xs font-bold text-lime-400 hover:text-lime-300"
+                >
+                  <Phone size={13} /> {notesEnquiry.mobile}
+                </a>
+                <span className="text-muted text-xs">•</span>
+                <span className="text-foreground text-xs font-semibold">
+                  {notesEnquiry.listing.tractorBrand} {notesEnquiry.listing.tractorModel}
+                </span>
+                <span className="text-muted text-xs">•</span>
+                <LeadStatusBadge status={notesEnquiry.status} />
+              </div>
+            </div>
+
+            <LeadNotesPanel leadId={notesEnquiry.id} />
+
+            <button
+              onClick={() => setNotesEnquiry(null)}
+              className="mt-6 w-full bg-secondary/30 hover:bg-secondary/50 text-foreground border border-border/50 rounded-xl py-2.5 text-xs font-bold transition-colors"
+            >
+              Close Notes
             </button>
           </div>
         </div>

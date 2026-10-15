@@ -1,5 +1,6 @@
 import { apiClient } from './axios/axios';
 import { Brand } from './brands';
+import { detailAccessHeaders } from '@/lib/utils/detail-access';
 import type { AxiosProgressEvent } from 'axios';
 import type { BulkImportResponse, ImportProgress } from '@/types/api/tractor-import';
 
@@ -234,6 +235,32 @@ export interface Tractor {
   categories?: any[] | null;
 }
 
+/** Fields returned before the detail page is unlocked (see TRACTOR_TEASER_SELECT on the backend) */
+export type TractorTeaser = Pick<
+  Tractor,
+  | 'id'
+  | 'brandId'
+  | 'familyId'
+  | 'modelName'
+  | 'slug'
+  | 'launchStatus'
+  | 'fuelType'
+  | 'driveType'
+  | 'isActive'
+  | 'isFeatured'
+  | 'financeAvailable'
+  | 'hp'
+  | 'exShowroomPriceMin'
+  | 'exShowroomPriceMax'
+  | 'seoTitle'
+  | 'seoDescription'
+  | 'metaKeywords'
+> & {
+  brand?: Pick<Brand, 'id' | 'name'> | null;
+  family?: { id: number; name: string } | null;
+  media?: Tractor['media'];
+};
+
 export interface PaginatedResponse<T> {
   success: boolean;
   message: string;
@@ -271,11 +298,23 @@ export const tractorAPI = {
   },
 
   /**
-   * Fetch a single tractor by ID
+   * Fetch the full detail of one tractor. Needs a login or a lead grant for this tractor, otherwise
+   * the API answers 403 with code LEAD_REQUIRED.
    */
-  getTractorById: async (id: number) => {
+  getTractorById: async (id: number, detailAccessToken?: string) => {
     const response = await apiClient.get<{ success: boolean; data: Tractor }>(
-      `/tractor/getById/${id}`
+      `/tractor/getById/${id}`,
+      { headers: detailAccessHeaders(detailAccessToken) }
+    );
+    return response.data;
+  },
+
+  /**
+   * Public summary shown before the detail page is unlocked
+   */
+  getTractorTeaser: async (id: number) => {
+    const response = await apiClient.get<{ success: boolean; data: TractorTeaser }>(
+      `/tractor/getTeaser/${id}`
     );
     return response.data;
   },

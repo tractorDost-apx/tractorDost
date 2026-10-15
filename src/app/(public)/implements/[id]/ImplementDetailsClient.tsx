@@ -22,8 +22,11 @@ import {
   Zap,
   Settings,
 } from 'lucide-react';
-import { Implement } from '@/lib/api/implements';
+import { Implement, ImplementTeaser, implementAPI } from '@/lib/api/implements';
 import ImplementFamilyPopover from '@/components/implements/ImplementFamilyPopover';
+import { useDetailAccess } from '@/hooks/leads/use-detail-access';
+import { DetailAccessGate, DetailGateSummary } from '@/components/leads/detail-access-gate';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export interface ExtraSpecItem {
   name: string;
@@ -147,7 +150,77 @@ function SpecCard({
   );
 }
 
+const formatLakh = (price: number) =>
+  price >= 100000 ? `${(price / 100000).toFixed(2)} Lakh` : price.toLocaleString('en-IN');
+
+/** What the lead gate shows about the implement. Only teaser fields, so nothing gated is shown. */
+function implementGateSummary(teaser: ImplementTeaser): DetailGateSummary {
+  const hpRange =
+    teaser.compatibleHpMin && teaser.compatibleHpMax
+      ? `${teaser.compatibleHpMin}-${teaser.compatibleHpMax} HP`
+      : null;
+
+  return {
+    eyebrow: teaser.brand?.name ?? teaser.category.name,
+    title: teaser.modelName,
+    imageUrl: teaser.brand?.logoUrl ?? null,
+    priceLabel: teaser.priceMin ? `Estimated price from ₹ ${formatLakh(teaser.priceMin)}` : 'Price on request',
+    chips: [hpRange, teaser.usageType, teaser.category.name].filter((chip): chip is string => Boolean(chip)),
+  };
+}
+
+/**
+ * Full implement details, behind the lead gate. The teaser is public. The full record loads from the API,
+ * which answers 403 until the visitor is signed in or has submitted the enquiry for this implement.
+ */
 export default function ImplementDetailsClient({
+  teaser,
+  similarImplements = [],
+}: {
+  teaser: ImplementTeaser;
+  similarImplements?: Implement[];
+}) {
+  const { state, unlock } = useDetailAccess(teaser.id, implementAPI.getImplementById, 'IMPLEMENT');
+
+  if (state.status === 'granted') {
+    return <ImplementDetailsView implement={state.data} similarImplements={similarImplements} />;
+  }
+
+  return (
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pt-6 pb-24 sm:px-6 lg:px-8">
+      <Link
+        href="/implements"
+        className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
+      >
+        <ArrowLeft size={16} /> Back to Implements
+      </Link>
+
+      {state.status === 'loading' && (
+        <div className="flex justify-center py-24">
+          <TractorLoader size={48} />
+        </div>
+      )}
+      {state.status === 'locked' && (
+        <DetailAccessGate
+          targetType="IMPLEMENT"
+          targetId={teaser.id}
+          summary={implementGateSummary(teaser)}
+          onUnlock={unlock}
+        />
+      )}
+      {state.status === 'unavailable' && (
+        <p className="text-muted py-24 text-center font-bold">This implement is no longer available.</p>
+      )}
+      {state.status === 'error' && (
+        <p className="text-muted py-24 text-center font-bold">
+          We could not load this implement. Please refresh the page and try again.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ImplementDetailsView({
   implement,
   similarImplements = [],
 }: {

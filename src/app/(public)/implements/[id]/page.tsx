@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
 
   try {
-    const res = await implementAPI.getImplementById(id);
+    const res = await implementAPI.getImplementTeaser(id);
     if (res.success && res.data) {
       const impl = res.data;
       return {
@@ -42,16 +42,19 @@ export default async function ImplementDetailsPage({ params }: Props) {
   let similarImplements: any[] = [];
 
   try {
-    const res = await implementAPI.getImplementById(id);
+    // Only the public teaser is fetched here. Full details load in the browser, after the lead gate.
+    const res = await implementAPI.getImplementTeaser(id);
     if (res.success && res.data) {
       implement = res.data;
 
-      // Fetch similar implements by brandId or categoryId if available
-      if (implement.brandId || implement.categoryId) {
+      // Fetch similar implements by brand or category if available
+      const brandId = implement.brand?.id;
+      const categoryId = implement.category?.id;
+      if (brandId || categoryId) {
         try {
           const simRes = await implementAPI.getAllImplements({
-            brandId: implement.brandId || undefined,
-            categoryId: implement.categoryId || undefined,
+            brandId: brandId || undefined,
+            categoryId: categoryId || undefined,
             limit: 4,
           });
           if (simRes.success && simRes.data) {
@@ -71,5 +74,5 @@ export default async function ImplementDetailsPage({ params }: Props) {
     notFound();
   }
 
-  return <ImplementDetailsClient implement={implement} similarImplements={similarImplements} />;
+  return <ImplementDetailsClient key={implement.id} teaser={implement} similarImplements={similarImplements} />;
 }

@@ -69,9 +69,9 @@ export default function ShowroomsPage() {
 
           // Apply Frontend Sort
           if (sortBy === 'rating') {
-            data = data.sort((a, b) => b.rating - a.rating);
+            data = data.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
           } else {
-            data = data.sort((a, b) => b.reviewsCount - a.reviewsCount);
+            data = data.sort((a, b) => (b.reviewsCount ?? 0) - (a.reviewsCount ?? 0));
           }
 
           // Apply Boolean filters
@@ -361,10 +361,14 @@ export default function ShowroomsPage() {
                           </div>
                         )}
 
-                        <div className="flex items-center gap-1 rounded-lg border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-black text-amber-600">
-                          <Star size={14} className="fill-amber-500" /> {showroom.rating} (
-                          {showroom.reviewsCount})
-                        </div>
+                        {showroom.reviewsCount ? (
+                          <div className="flex items-center gap-1 rounded-lg border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-black text-amber-600">
+                            <Star size={14} className="fill-amber-500" /> {showroom.rating} (
+                            {showroom.reviewsCount})
+                          </div>
+                        ) : (
+                          <div className="text-muted rounded-lg px-2.5 py-1 text-xs font-bold">No reviews yet</div>
+                        )}
                       </div>
 
                       <div className="text-muted mb-4 flex max-w-lg items-start gap-3 text-sm font-bold">

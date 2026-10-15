@@ -16,6 +16,7 @@ import {
   Layers,
   Store,
   Inbox,
+  Star,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { label: 'Used Tractor Leads', href: '/dealer/used-leads', icon: Inbox },
   { label: 'Leads & Enquiries', href: '/dealer/leads', icon: MessageSquareText },
   { label: 'Services', href: '/dealer/services', icon: Wrench },
+  { label: 'Reviews', href: '/dealer/reviews', icon: Star },
   { label: 'Analytics', href: '/dealer/analytics', icon: BarChart },
 ];
 
