@@ -4,6 +4,9 @@ import { Tractor } from './tractors';
 export interface CompareFrequencyRecord {
   tractorLeft: Tractor;
   tractorRight: Tractor;
+  tractor3?: Tractor | null;
+  tractor4?: Tractor | null;
+  tractors?: Tractor[];
   frequency: number;
 }
 
@@ -25,6 +28,8 @@ export interface CompareHistoryRecord {
   userId: number;
   tractorLeftId: number;
   tractorRightId: number;
+  tractor3Id?: number | null;
+  tractor4Id?: number | null;
   shareUrl: string | null;
   createdAt: string;
   user?: {
@@ -34,6 +39,9 @@ export interface CompareHistoryRecord {
   } | null;
   tractorLeft: Tractor;
   tractorRight: Tractor;
+  tractor3?: Tractor | null;
+  tractor4?: Tractor | null;
+  tractors?: Tractor[];
 }
 
 export interface CompareHistoryResponse {

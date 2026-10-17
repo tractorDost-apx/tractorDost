@@ -15,12 +15,23 @@ function CompareContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const idsParam = searchParams.get('ids');
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [tractors, setTractors] = useState<Tractor[]>([]);
   const [comparisons, setComparisons] = useState<CompareFrequencyRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Redirect to login if user is not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      const currentUrl =
+        typeof window !== 'undefined'
+          ? window.location.pathname + window.location.search
+          : '/compare';
+      router.push(`/login?callbackUrl=${encodeURIComponent(currentUrl)}`);
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const ids = idsParam
     ? idsParam
@@ -31,6 +42,8 @@ function CompareContent() {
 
   useEffect(() => {
     const fetchComparison = async () => {
+      if (!isAuthenticated) return;
+
       if (ids.length >= 2) {
         setLoading(true);
         setError(null);
@@ -42,6 +55,14 @@ function CompareContent() {
             setError('Failed to fetch tractor comparison data.');
           }
         } catch (err: any) {
+          if (err.response?.status === 401) {
+            const currentUrl =
+              typeof window !== 'undefined'
+                ? window.location.pathname + window.location.search
+                : '/compare';
+            router.push(`/login?callbackUrl=${encodeURIComponent(currentUrl)}`);
+            return;
+          }
           setError(err.response?.data?.message || 'An error occurred while comparing tractors.');
         } finally {
           setLoading(false);
@@ -51,8 +72,10 @@ function CompareContent() {
       }
     };
 
-    fetchComparison();
-  }, [idsParam, user]);
+    if (isAuthenticated) {
+      fetchComparison();
+    }
+  }, [idsParam, user, isAuthenticated]);
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -77,6 +100,17 @@ function CompareContent() {
   const handleClear = () => {
     router.push('/compare');
   };
+
+  if (authLoading || !isAuthenticated) {
+    return (
+      <div className="flex min-h-[80vh] flex-col items-center justify-center gap-4 p-6 text-center">
+        <TractorLoader className="text-[var(--color-brand-green)]" size={64} />
+        <h2 className="text-muted text-sm font-black tracking-widest uppercase">
+          Verifying access...
+        </h2>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

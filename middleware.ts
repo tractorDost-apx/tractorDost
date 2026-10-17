@@ -10,6 +10,7 @@ const protectedRoutes = [
   '/profile',
   '/wishlist',
   '/sell-used-tractor',
+  '/compare',
 ];
 
 // Define the routes that should not be accessed if the user is already authenticated
@@ -32,7 +33,7 @@ export function middleware(request: NextRequest) {
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
     // Optional: add a callback URL so they return to the page they tried to access
-    loginUrl.searchParams.set('callbackUrl', encodeURIComponent(pathname));
+    loginUrl.searchParams.set('callbackUrl', encodeURIComponent(pathname + request.nextUrl.search));
     return NextResponse.redirect(loginUrl);
   }
 

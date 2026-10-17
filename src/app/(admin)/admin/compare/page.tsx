@@ -93,12 +93,20 @@ export default function CompareAnalyticsPage() {
   // Find max frequency to normalize progress bars
   const maxFreq = records.length > 0 ? Math.max(...records.map((r) => r.frequency)) : 1;
 
-  const TractorPortrait = ({ tractor, side }: { tractor: any; side: 'left' | 'right' }) => {
+  const TractorPortrait = ({
+    tractor,
+    compact = false,
+  }: {
+    tractor: any;
+    compact?: boolean;
+  }) => {
     return (
-      <div
-        className={`flex w-1/2 flex-col items-center gap-3 text-center ${side === 'left' ? 'pr-4' : 'pl-4'}`}
-      >
-        <div className="bg-foreground/5 group relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-transparent p-2 shadow-inner transition-all hover:border-[var(--color-brand-green)] sm:h-28 sm:w-28">
+      <div className="flex flex-col items-center gap-2 text-center flex-1 min-w-0">
+        <div
+          className={`bg-foreground/5 group relative flex items-center justify-center overflow-hidden rounded-full border-2 border-transparent p-2 shadow-inner transition-all hover:border-[var(--color-brand-green)] ${
+            compact ? 'h-16 w-16 sm:h-18 sm:w-18' : 'h-24 w-24 sm:h-28 sm:w-28'
+          }`}
+        >
           {tractor?.primaryMedia?.url ? (
             <img
               src={tractor.primaryMedia.url}
@@ -107,16 +115,16 @@ export default function CompareAnalyticsPage() {
             />
           ) : (
             <div className="text-muted/50 flex flex-col items-center gap-1">
-              <ImageIcon size={24} />
-              <span className="text-[9px] font-black tracking-widest uppercase">No IMG</span>
+              <ImageIcon size={compact ? 18 : 24} />
+              <span className="text-[8px] font-black tracking-widest uppercase">No IMG</span>
             </div>
           )}
         </div>
-        <div className="flex flex-col">
-          <span className="mb-0.5 text-[10px] font-black tracking-wider text-[var(--color-brand-orange)] uppercase">
+        <div className="flex flex-col max-w-[130px]">
+          <span className="mb-0.5 text-[9px] font-black tracking-wider text-[var(--color-brand-orange)] uppercase truncate">
             {tractor?.brand?.name || 'Unknown Brand'}
           </span>
-          <span className="text-foreground text-sm leading-tight font-black">
+          <span className="text-foreground text-xs leading-tight font-black line-clamp-2">
             {tractor?.modelName || 'Unknown Model'}
           </span>
         </div>
@@ -245,23 +253,58 @@ export default function CompareAnalyticsPage() {
                   </div>
 
                   {/* VS Arena */}
-                  <div className="relative flex items-center justify-between py-2">
-                    <TractorPortrait tractor={item.tractorLeft} side="left" />
+                  {(() => {
+                    const allTractors =
+                      item.tractors && item.tractors.length > 0
+                        ? item.tractors
+                        : [item.tractorLeft, item.tractorRight, item.tractor3, item.tractor4].filter(
+                            Boolean
+                          );
 
-                    {/* VS Badge */}
-                    <div className="absolute top-1/2 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-                      <div className="bg-background border-[var(--border-subtle)] flex h-8 w-8 items-center justify-center rounded-full border shadow-md">
-                        <span className="text-[10px] font-black text-[var(--color-brand-orange)] italic">
-                          VS
-                        </span>
+                    if (allTractors.length <= 2) {
+                      return (
+                        <div className="relative flex items-center justify-between py-2">
+                          <TractorPortrait tractor={allTractors[0]} />
+
+                          {/* VS Badge */}
+                          <div className="absolute top-1/2 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+                            <div className="bg-background border-[var(--border-subtle)] flex h-8 w-8 items-center justify-center rounded-full border shadow-md">
+                              <span className="text-[10px] font-black text-[var(--color-brand-orange)] italic">
+                                VS
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Connecting Line */}
+                          <div className="via-foreground/20 absolute top-1/2 right-1/4 left-1/4 -z-0 h-[1px] -translate-y-1/2 bg-gradient-to-r from-transparent to-transparent"></div>
+
+                          <TractorPortrait tractor={allTractors[1]} />
+                        </div>
+                      );
+                    }
+
+                    // 3 or 4 tractors: 2x2 grid layout
+                    return (
+                      <div className="relative py-2">
+                        <div className="grid grid-cols-2 gap-3">
+                          {allTractors.map((t: any, tIdx: number) => (
+                            <div key={t?.id || tIdx} className="flex justify-center">
+                              <TractorPortrait tractor={t} compact />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Center VS Badge */}
+                        <div className="absolute top-1/2 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center pointer-events-none">
+                          <div className="bg-background border-[var(--border-subtle)] flex h-7 w-7 items-center justify-center rounded-full border shadow-md">
+                            <span className="text-[9px] font-black text-[var(--color-brand-orange)] italic">
+                              VS
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Connecting Line */}
-                    <div className="via-foreground/20 absolute top-1/2 right-1/4 left-1/4 -z-0 h-[1px] -translate-y-1/2 bg-gradient-to-r from-transparent to-transparent"></div>
-
-                    <TractorPortrait tractor={item.tractorRight} side="right" />
-                  </div>
+                    );
+                  })()}
 
                   {/* Popularity Bar */}
                   <div className="flex flex-col gap-2 pt-2">
@@ -278,24 +321,57 @@ export default function CompareAnalyticsPage() {
                   </div>
 
                   {/* Actions overlay */}
-                  <div className="bg-background/95 absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-                    <span className="text-foreground mb-2 text-sm font-black tracking-widest uppercase">
-                      View Details
+                  <div className="bg-background/95 absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 p-4 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+                    <span className="text-foreground mb-1 text-xs font-black tracking-widest uppercase">
+                      View Details (
+                      {(() => {
+                        const all =
+                          item.tractors && item.tractors.length > 0
+                            ? item.tractors
+                            : [item.tractorLeft, item.tractorRight, item.tractor3, item.tractor4].filter(
+                                Boolean
+                              );
+                        return all.length;
+                      })()}{' '}
+                      Tractors)
                     </span>
-                    <div className="flex items-center gap-4">
-                      <Link
-                        href={`/admin/tractors/${item.tractorLeft?.id}`}
-                        className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-4 py-2 text-xs font-black tracking-wider text-white uppercase shadow-lg transition-colors hover:bg-[var(--color-brand-orange)]"
-                      >
-                        <Eye size={14} /> Left Tractor
-                      </Link>
-                      <Link
-                        href={`/admin/tractors/${item.tractorRight?.id}`}
-                        className="bg-foreground/10 text-foreground hover:bg-foreground/20 flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider uppercase shadow-sm transition-colors"
-                      >
-                        <Eye size={14} /> Right Tractor
-                      </Link>
+                    <div className="flex flex-wrap items-center justify-center gap-2 max-h-40 overflow-y-auto px-2">
+                      {(() => {
+                        const all =
+                          item.tractors && item.tractors.length > 0
+                            ? item.tractors
+                            : [item.tractorLeft, item.tractorRight, item.tractor3, item.tractor4].filter(
+                                Boolean
+                              );
+                        return all.map((t: any, tIdx: number) => (
+                          <Link
+                            key={t?.id || tIdx}
+                            href={`/admin/tractors/${t?.id}`}
+                            className="flex items-center gap-1.5 rounded-lg bg-foreground/10 px-3 py-1.5 text-[11px] font-black tracking-wider uppercase text-foreground hover:bg-[var(--color-brand-green)] hover:text-white transition-colors"
+                          >
+                            <Eye size={12} /> {t?.modelName || `Tractor #${tIdx + 1}`}
+                          </Link>
+                        ));
+                      })()}
                     </div>
+                    <Link
+                      href={`/compare?ids=${(() => {
+                        const all =
+                          item.tractors && item.tractors.length > 0
+                            ? item.tractors
+                            : [item.tractorLeft, item.tractorRight, item.tractor3, item.tractor4].filter(
+                                Boolean
+                              );
+                        return all
+                          .map((t: any) => t?.id)
+                          .filter(Boolean)
+                          .join(',');
+                      })()}`}
+                      target="_blank"
+                      className="mt-1 flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-4 py-2 text-xs font-black tracking-wider uppercase text-white shadow-lg hover:bg-[var(--color-brand-orange)] transition-colors"
+                    >
+                      <ArrowRightLeft size={14} /> View in Compare Arena
+                    </Link>
                   </div>
                 </div>
               );
@@ -347,7 +423,7 @@ export default function CompareAnalyticsPage() {
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="text-xs font-black text-[var(--color-brand-orange)] uppercase">
                           {log.tractorLeft?.modelName || 'Deleted Tractor'}
                         </span>
@@ -355,6 +431,22 @@ export default function CompareAnalyticsPage() {
                         <span className="text-xs font-black text-[var(--color-brand-green)] uppercase">
                           {log.tractorRight?.modelName || 'Deleted Tractor'}
                         </span>
+                        {log.tractor3 && (
+                          <>
+                            <span className="text-muted text-[10px] font-black italic">VS</span>
+                            <span className="text-xs font-black text-blue-500 uppercase">
+                              {log.tractor3.modelName}
+                            </span>
+                          </>
+                        )}
+                        {log.tractor4 && (
+                          <>
+                            <span className="text-muted text-[10px] font-black italic">VS</span>
+                            <span className="text-xs font-black text-purple-500 uppercase">
+                              {log.tractor4.modelName}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </td>
                     <td className="text-muted p-4 text-sm font-bold">
@@ -368,7 +460,10 @@ export default function CompareAnalyticsPage() {
                     </td>
                     <td className="p-4 pr-6 text-right">
                       <Link
-                        href={`/compare?ids=${log.tractorLeftId},${log.tractorRightId}`}
+                        href={
+                          log.shareUrl ||
+                          `/compare?ids=${[log.tractorLeftId, log.tractorRightId, log.tractor3Id, log.tractor4Id].filter(Boolean).join(',')}`
+                        }
                         target="_blank"
                         className="bg-foreground/5 inline-flex items-center gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-xs font-black tracking-wider uppercase transition-colors hover:border-[var(--color-brand-green)]/20 hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)]"
                       >

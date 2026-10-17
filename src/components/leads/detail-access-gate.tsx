@@ -132,7 +132,7 @@ export function DetailAccessGate({
       const res = await leadAPI.createDetailAccessLead(payload);
       const grant = res.data.detailAccess;
 
-      saveDetailAccess(grant);
+      saveDetailAccess(grant, targetType, targetId);
       onUnlock?.(grant);
 
       const targetUrl = targetType === 'TRACTOR' ? `/tractors/${targetId}` : `/implements/${targetId}`;

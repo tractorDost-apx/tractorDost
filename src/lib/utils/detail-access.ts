@@ -67,35 +67,56 @@ export function captureLocation(timeoutMs = 2500): Promise<Coordinates | null> {
   });
 }
 
-export function getDetailAccessToken(): string | undefined {
-  if (typeof window !== 'undefined') {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // Storage unavailable or disabled
-    }
+const STORAGE_PREFIX = 'tractordost:lead-access';
+
+function getStorageKey(targetType?: string, targetId?: number): string {
+  if (targetType && targetId) {
+    return `${STORAGE_PREFIX}:${targetType}:${targetId}`;
   }
-  return undefined;
+  return STORAGE_PREFIX;
 }
 
-export function saveDetailAccess(_grant: DetailAccessGrant): void {
-  // Grants are not saved to localStorage so every subsequent card click requires the lead form for guests.
-  if (typeof window !== 'undefined') {
+export function getDetailAccessToken(targetType?: string, targetId?: number): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const key = getStorageKey(targetType, targetId);
+    const raw = window.sessionStorage.getItem(key) || window.localStorage.getItem(key);
+    if (!raw) return undefined;
     try {
-      window.localStorage.removeItem(STORAGE_KEY);
+      const parsed = JSON.parse(raw);
+      if (parsed.expiresAt && new Date(parsed.expiresAt).getTime() < Date.now()) {
+        clearDetailAccess(targetType, targetId);
+        return undefined;
+      }
+      return parsed.token || raw;
     } catch {
-      // Storage unavailable or disabled
+      return raw;
     }
+  } catch {
+    return undefined;
   }
 }
 
-export function clearDetailAccess(): void {
-  if (typeof window !== 'undefined') {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // Nothing stored to clear
-    }
+export function saveDetailAccess(grant: DetailAccessGrant, targetType?: string, targetId?: number): void {
+  if (typeof window === 'undefined' || !grant?.token) return;
+  try {
+    const key = getStorageKey(targetType, targetId);
+    const value = JSON.stringify(grant);
+    window.sessionStorage.setItem(key, value);
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Storage unavailable or quota exceeded
+  }
+}
+
+export function clearDetailAccess(targetType?: string, targetId?: number): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const key = getStorageKey(targetType, targetId);
+    window.sessionStorage.removeItem(key);
+    window.localStorage.removeItem(key);
+  } catch {
+    // Storage unavailable
   }
 }
 

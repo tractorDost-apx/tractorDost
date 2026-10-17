@@ -4,7 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/store/AuthContext';
 import { leadAPI, type DetailAccessGrant, type DetailTargetType } from '@/lib/api/leads';
-import { captureLocation, clearDetailAccess } from '@/lib/utils/detail-access';
+import {
+  captureLocation,
+  clearDetailAccess,
+  getDetailAccessToken,
+  saveDetailAccess,
+} from '@/lib/utils/detail-access';
 
 export type DetailAccessState<T> =
   | { status: 'loading' }
@@ -20,8 +25,8 @@ type DetailFetcher<T> = (id: number, detailAccessToken?: string) => Promise<{ su
  * 1. Logged-in users: Automatically submit the lead information in the background using their
  *    existing access token. Location (latitude & longitude) is captured non-blockingly via
  *    the Geolocation API. Lead form is never displayed. Details unlock directly after submission.
- * 2. Guest users (not logged in): Must fill out the lead form modal every time they click a
- *    tractor or implement card to view its details.
+ * 2. Guest users (not logged in): Must fill out the lead form to view details. Once submitted,
+ *    their unlock grant is preserved so they can view the details without interruption.
  */
 export function useDetailAccess<T>(
   targetId: number,
@@ -45,7 +50,7 @@ export function useDetailAccess<T>(
           if (requestId !== requestRef.current) return;
           const status = axios.isAxiosError(error) ? error.response?.status : undefined;
           if (status === 401 || status === 403) {
-            clearDetailAccess();
+            clearDetailAccess(targetType, targetId);
             setState({ status: 'locked' });
           } else if (status === 404) {
             setState({ status: 'unavailable' });
@@ -56,7 +61,7 @@ export function useDetailAccess<T>(
         }
       );
     },
-    [fetchDetail, targetId]
+    [fetchDetail, targetId, targetType]
   );
 
   useEffect(() => {
@@ -97,17 +102,27 @@ export function useDetailAccess<T>(
         load(grantToken).catch(() => {});
       })();
     } else {
-      // Scenario 2: Guest user -> locked, lead form modal required
-      setState({ status: 'locked' });
+      // Scenario 2: Guest user (not logged in)
+      const existingToken = getDetailAccessToken(targetType, targetId);
+      if (existingToken) {
+        setState({ status: 'loading' });
+        load(existingToken).catch(() => {
+          clearDetailAccess(targetType, targetId);
+          setState({ status: 'locked' });
+        });
+      } else {
+        setState({ status: 'locked' });
+      }
     }
   }, [authLoading, isAuthenticated, load, targetId, targetType]);
 
   const unlock = useCallback(
     (grant: DetailAccessGrant) => {
+      saveDetailAccess(grant, targetType, targetId);
       setState({ status: 'loading' });
       load(grant.token);
     },
-    [load]
+    [load, targetId, targetType]
   );
 
   return { state, unlock };

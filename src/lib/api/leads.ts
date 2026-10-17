@@ -228,7 +228,7 @@ export const leadAPI = {
     const response = await apiClient.post<{
       success: boolean;
       data: { detailAccess: DetailAccessGrant };
-    }>('/leads/detail-access', input);
+    }>('/leads', input);
     return response.data;
   },
 

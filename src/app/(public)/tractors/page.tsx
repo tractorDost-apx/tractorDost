@@ -762,9 +762,9 @@ function TractorsListingContent() {
                             {tractor.fuelType === 'DIESEL' ? 'Diesel' : tractor.fuelType}
                           </span>
 
-                          <button className="ml-auto flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)]/10 px-5 py-2.5 text-sm font-black tracking-widest text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)]">
+                          <span className="ml-auto flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)]/10 px-5 py-2.5 text-sm font-black tracking-widest text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)]">
                             View Details <ChevronRight size={16} strokeWidth={3} />
-                          </button>
+                          </span>
                         </div>
                       </div>
                     </Link>
@@ -830,9 +830,9 @@ function TractorsListingContent() {
                             {formatPrice(tractor.exShowroomPriceMin)}
                           </p>
                         </div>
-                        <button className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-green)] text-white shadow-[var(--color-brand-green)]/30 shadow-lg transition-transform group-hover:scale-110 group-hover:rotate-12">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-green)] text-white shadow-[var(--color-brand-green)]/30 shadow-lg transition-transform group-hover:scale-110 group-hover:rotate-12">
                           <ChevronRight size={20} strokeWidth={3} />
-                        </button>
+                        </span>
                       </div>
                     </div>
                   </Link>
