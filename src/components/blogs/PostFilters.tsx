@@ -70,13 +70,13 @@ export default function PostFilters({
       {/* Top Filter Bar Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-muted">
-            Found <strong className="text-white">{totalResults}</strong> articles
+          <span className="text-xs font-bold text-zinc-500 dark:text-muted">
+            Found <strong className="text-zinc-900 dark:text-white">{totalResults}</strong> articles
           </span>
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-[var(--color-brand-green)] hover:bg-white/10 transition-all"
+              className="flex items-center gap-1 rounded-lg bg-zinc-100 dark:bg-white/5 px-2.5 py-1 text-[11px] font-bold text-[var(--color-brand-green)] hover:bg-zinc-200 dark:hover:bg-white/10 transition-all border border-zinc-200 dark:border-transparent"
             >
               <X size={12} />
               Reset Filters
@@ -87,7 +87,7 @@ export default function PostFilters({
         {/* Mobile Filter Toggle */}
         <button
           onClick={() => setIsOpenMobile(!isOpenMobile)}
-          className="flex items-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-white sm:hidden"
+          className="flex items-center gap-2 rounded-xl bg-zinc-100 border border-zinc-200 dark:border-transparent px-4 py-2 text-xs font-bold text-zinc-800 dark:bg-white/5 dark:text-white sm:hidden shadow-sm"
         >
           <Filter size={14} className="text-[var(--color-brand-green)]" />
           <span>Filters & Sort</span>
@@ -99,14 +99,14 @@ export default function PostFilters({
 
       {/* Filter Controls (Collapsible on mobile, always visible on sm+) */}
       <div
-        className={`glass-panel rounded-2xl p-4 shadow-xl border border-white/10 ${
+        className={`rounded-2xl p-4 shadow-sm border border-zinc-200 bg-white dark:border-white/10 dark:bg-[#121814]/60 dark:shadow-xl ${
           isOpenMobile ? 'block' : 'hidden sm:block'
         }`}
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* 1. Category Filter */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-muted uppercase tracking-wider">
+            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-zinc-600 dark:text-muted uppercase tracking-wider">
               <Tag size={13} className="text-[var(--color-brand-green)]" />
               Category
             </label>
@@ -118,11 +118,11 @@ export default function PostFilters({
                   categoryId: e.target.value === '' ? '' : Number(e.target.value),
                 })
               }
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-bold text-white focus:border-[var(--color-brand-green)] focus:outline-none"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-black/40 px-3 py-2 text-xs font-bold text-zinc-900 dark:text-white focus:border-[var(--color-brand-green)] focus:outline-none"
             >
-              <option value="" className="bg-zinc-900">All Categories</option>
+              <option value="" className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-zinc-900">
+                <option key={cat.id} value={cat.id} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">
                   {cat.name} ({cat.postType})
                 </option>
               ))}
@@ -131,7 +131,7 @@ export default function PostFilters({
 
           {/* 2. Language Filter */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-muted uppercase tracking-wider">
+            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-zinc-600 dark:text-muted uppercase tracking-wider">
               <Globe size={13} className="text-[var(--color-brand-green)]" />
               Language
             </label>
@@ -143,11 +143,11 @@ export default function PostFilters({
                   language: e.target.value as Language | '',
                 })
               }
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-bold text-white focus:border-[var(--color-brand-green)] focus:outline-none"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-black/40 px-3 py-2 text-xs font-bold text-zinc-900 dark:text-white focus:border-[var(--color-brand-green)] focus:outline-none"
             >
-              <option value="" className="bg-zinc-900">All Languages</option>
+              <option value="" className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">All Languages</option>
               {LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code} className="bg-zinc-900">
+                <option key={l.code} value={l.code} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">
                   {l.native} ({l.label})
                 </option>
               ))}
@@ -156,7 +156,7 @@ export default function PostFilters({
 
           {/* 3. Post Type Filter */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-muted uppercase tracking-wider">
+            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-zinc-600 dark:text-muted uppercase tracking-wider">
               <Layers size={13} className="text-[var(--color-brand-green)]" />
               Post Type
             </label>
@@ -168,11 +168,11 @@ export default function PostFilters({
                   postType: e.target.value as ContentType | '',
                 })
               }
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-bold text-white focus:border-[var(--color-brand-green)] focus:outline-none"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-black/40 px-3 py-2 text-xs font-bold text-zinc-900 dark:text-white focus:border-[var(--color-brand-green)] focus:outline-none"
             >
-              <option value="" className="bg-zinc-900">All Post Types</option>
+              <option value="" className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">All Post Types</option>
               {POST_TYPES.map((pt) => (
-                <option key={pt.type} value={pt.type} className="bg-zinc-900">
+                <option key={pt.type} value={pt.type} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">
                   {pt.label}
                 </option>
               ))}
@@ -181,7 +181,7 @@ export default function PostFilters({
 
           {/* 4. Sort By */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-muted uppercase tracking-wider">
+            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-zinc-600 dark:text-muted uppercase tracking-wider">
               <ArrowUpDown size={13} className="text-[var(--color-brand-green)]" />
               Sort By
             </label>
@@ -193,11 +193,11 @@ export default function PostFilters({
                   sortBy: e.target.value as SortOption,
                 })
               }
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-bold text-white focus:border-[var(--color-brand-green)] focus:outline-none"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-black/40 px-3 py-2 text-xs font-bold text-zinc-900 dark:text-white focus:border-[var(--color-brand-green)] focus:outline-none"
             >
-              <option value="latest" className="bg-zinc-900">Latest Published</option>
-              <option value="views" className="bg-zinc-900">Most Viewed</option>
-              <option value="trending" className="bg-zinc-900">Trending Now</option>
+              <option value="latest" className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">Latest Published</option>
+              <option value="views" className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">Most Viewed</option>
+              <option value="trending" className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">Trending Now</option>
             </select>
           </div>
         </div>

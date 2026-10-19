@@ -932,7 +932,7 @@ export default function EmiCalculationsAdminPage() {
 
       {/* VIEW DETAILS MODAL */}
       {detailRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="animate-fade-in relative flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-2xl">
             <button
               onClick={() => setDetailRecord(null)}
@@ -1106,7 +1106,7 @@ export default function EmiCalculationsAdminPage() {
 
       {/* EDIT MODAL */}
       {editRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="animate-fade-in relative flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-2xl md:p-8">
             <button
               onClick={() => setEditRecord(null)}
@@ -1211,7 +1211,7 @@ export default function EmiCalculationsAdminPage() {
 
       {/* DELETE CONFIRMATION MODAL */}
       {deleteId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="animate-scale-up flex w-full max-w-sm flex-col items-center rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 text-center shadow-2xl">
             <div className="mb-4 rounded-full bg-red-500/10 p-3 text-red-500">
               <AlertTriangle size={32} />

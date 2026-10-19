@@ -18,7 +18,7 @@ export function LayoutOrchestrator({ children }: { children: React.ReactNode }) 
     <div className={`flex w-full flex-1 flex-col ${isDashboardRoute ? 'spatial-background' : ''}`}>
       <Navbar />
       <main
-        className={`z-10 flex flex-1 flex-col ${isDashboardRoute ? 'px-4 pt-6 pb-6' : 'px-4 pt-28 pb-12 sm:px-8 lg:px-12'}`}
+        className={`flex flex-1 flex-col ${isDashboardRoute ? 'px-4 pt-6 pb-6' : 'px-4 pt-28 pb-12 sm:px-8 lg:px-12'}`}
       >
         {children}
       </main>

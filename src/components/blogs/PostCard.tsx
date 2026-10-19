@@ -40,7 +40,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
   return (
     <Link
       href={`/blogs/${post.slug}`}
-      className={`group glass-panel relative flex flex-col overflow-hidden rounded-2xl border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/10 ${
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm hover:shadow-xl dark:border-white/10 dark:bg-[#121814]/40 transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-[var(--color-brand-green)]/10 ${
         featured ? 'md:grid md:grid-cols-2 md:gap-6' : ''
       }`}
     >
@@ -98,7 +98,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
       <div className="flex flex-1 flex-col justify-between p-5">
         <div>
           {/* Metadata info */}
-          <div className="flex items-center gap-3 text-[11px] font-semibold text-muted mb-2.5">
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-500 dark:text-muted mb-2.5">
             <span className="flex items-center gap-1">
               <Calendar size={13} className="text-[var(--color-brand-green)]" />
               {formattedDate}
@@ -112,7 +112,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
 
           {/* Title */}
           <h3
-            className={`font-black text-white group-hover:text-[var(--color-brand-green)] transition-colors line-clamp-2 ${
+            className={`font-black text-zinc-900 dark:text-white group-hover:text-[var(--color-brand-green)] transition-colors line-clamp-2 ${
               featured ? 'text-xl md:text-2xl mb-3' : 'text-base mb-2'
             }`}
           >
@@ -121,15 +121,15 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
 
           {/* Excerpt */}
           {post.excerpt && (
-            <p className="text-xs text-white/70 line-clamp-2 leading-relaxed mb-4">
+            <p className="text-xs text-zinc-600 dark:text-white/70 line-clamp-2 leading-relaxed mb-4">
               {post.excerpt}
             </p>
           )}
         </div>
 
         {/* Author & Read More Footer */}
-        <div className="flex items-center justify-between border-t border-white/5 pt-3 mt-auto">
-          <span className="text-[11px] font-medium text-muted truncate">
+        <div className="flex items-center justify-between border-t border-zinc-100 dark:border-white/5 pt-3 mt-auto">
+          <span className="text-[11px] font-medium text-zinc-500 dark:text-muted truncate">
             By {post.author?.fullName || 'TractorDost Editorial'}
           </span>
           <span className="flex items-center gap-1 text-xs font-bold text-[var(--color-brand-green)] group-hover:translate-x-1 transition-transform">

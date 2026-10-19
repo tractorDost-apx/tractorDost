@@ -31,7 +31,7 @@ export function DeleteInventoryModal({ item, onClose, onConfirm }: DeleteInvento
   };
 
   return (
-    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/25 p-4 dark:bg-black/60">
+    <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/25 p-4 dark:bg-black/60">
       <div className="text-foreground relative w-full max-w-md space-y-6 overflow-hidden rounded-3xl border border-rose-500/20 bg-[var(--background)] p-6 text-center shadow-2xl [backdrop-filter:none]">
         <button
           onClick={onClose}

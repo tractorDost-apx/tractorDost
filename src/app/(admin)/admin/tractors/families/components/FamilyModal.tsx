@@ -123,13 +123,12 @@ export default function FamilyModal({ family, brandId, onClose }: FamilyModalPro
   );
 
   return (
-    <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm sm:p-6 dark:bg-black/75">
       <div
-        className="animate-fade-in border-[var(--border-subtle)] flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border shadow-2xl"
-        style={{ background: 'var(--background)' }}
+        className="animate-fade-in border border-zinc-200 dark:border-white/10 flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-[#121814]"
       >
         {/* Sticky Header */}
-        <div className="border-[var(--border-subtle)] bg-background z-10 flex shrink-0 items-center justify-between border-b px-6 py-5">
+        <div className="border-b border-zinc-100 bg-white z-10 flex shrink-0 items-center justify-between px-6 py-5 dark:border-white/10 dark:bg-[#121814]">
           <h2 className="text-foreground text-2xl font-black tracking-tight">
             {isEditing ? 'Edit Tractor Family' : 'Create New Tractor Family'}
           </h2>

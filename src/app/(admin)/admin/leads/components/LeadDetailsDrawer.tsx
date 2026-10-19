@@ -244,7 +244,7 @@ export function LeadDetailsDrawer({
   if (!mounted || !isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div className="fixed inset-0 z-[100] flex justify-end">
       {/* Backdrop */}
       <div
         onClick={onClose}

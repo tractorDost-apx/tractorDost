@@ -139,26 +139,26 @@ export default function CategoryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="glass-panel w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-white/15 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-150 dark:bg-black/75">
+      <div className="relative w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-white/15 dark:bg-[#121814]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+        <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-4 dark:border-white/10">
           <div className="flex items-center gap-2">
             <FolderTree size={20} className="text-[var(--color-brand-green)]" />
-            <h2 className="text-lg font-black text-white">
+            <h2 className="text-lg font-black text-zinc-900 dark:text-white">
               {category ? 'Edit Category' : 'Create Category'}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-muted hover:bg-white/10 hover:text-white transition-all"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 transition-all dark:border-transparent dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
           >
             <X size={16} />
           </button>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400">
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-500">
             <AlertCircle size={16} className="shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -166,8 +166,8 @@ export default function CategoryModal({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1 block text-xs font-bold text-white">
-              Category Name <span className="text-red-400">*</span>
+            <label className="mb-1 block text-xs font-bold text-zinc-700 dark:text-zinc-300">
+              Category Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -175,13 +175,13 @@ export default function CategoryModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Tractors Review, Tips & Guides"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-xs font-bold text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs font-bold text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
             />
           </div>
 
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-xs font-bold text-muted">URL Slug</label>
+              <label className="text-xs font-bold text-zinc-700 dark:text-zinc-400">URL Slug</label>
               <button
                 type="button"
                 onClick={generateSlug}
@@ -196,23 +196,23 @@ export default function CategoryModal({
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="tractors-review"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2 font-mono text-xs text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 font-mono text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-bold text-white">Content Type</label>
+              <label className="mb-1 block text-xs font-bold text-zinc-700 dark:text-zinc-300">Content Type</label>
               <select
                 value={postType}
                 onChange={(e) => {
                   setPostType(e.target.value as ContentType);
                   setParentId(''); // reset parent if type changed
                 }}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-bold text-white focus:border-[var(--color-brand-green)] focus:outline-none"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-bold text-zinc-900 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-white"
               >
                 {POST_TYPES.map((pt) => (
-                  <option key={pt.value} value={pt.value} className="bg-zinc-900">
+                  <option key={pt.value} value={pt.value}>
                     {pt.label}
                   </option>
                 ))}
@@ -220,17 +220,17 @@ export default function CategoryModal({
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-bold text-white">Parent Category</label>
+              <label className="mb-1 block text-xs font-bold text-zinc-700 dark:text-zinc-300">Parent Category</label>
               <select
                 value={parentId}
                 onChange={(e) => setParentId(e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-bold text-white focus:border-[var(--color-brand-green)] focus:outline-none"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-bold text-zinc-900 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-white"
               >
-                <option value="" className="bg-zinc-900 text-muted">
+                <option value="">
                   None (Top Level)
                 </option>
                 {parentCandidates.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-zinc-900">
+                  <option key={c.id} value={c.id}>
                     {c.name}
                   </option>
                 ))}
@@ -239,24 +239,24 @@ export default function CategoryModal({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-bold text-muted">Description (Optional)</label>
+            <label className="mb-1 block text-xs font-bold text-zinc-700 dark:text-zinc-400">Description (Optional)</label>
             <textarea
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description about this category..."
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2 text-xs text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3 items-center">
             <div>
-              <label className="mb-1 block text-xs font-bold text-muted">Sort Order</label>
+              <label className="mb-1 block text-xs font-bold text-zinc-700 dark:text-zinc-400">Sort Order</label>
               <input
                 type="number"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(Number(e.target.value))}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2 text-xs text-white focus:border-[var(--color-brand-green)] focus:outline-none"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs text-zinc-900 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-white"
               />
             </div>
 
@@ -268,26 +268,26 @@ export default function CategoryModal({
                 onChange={(e) => setIsActive(e.target.checked)}
                 className="h-4 w-4 rounded accent-[var(--color-brand-green)] cursor-pointer"
               />
-              <label htmlFor="cat-active" className="text-xs font-bold text-white cursor-pointer select-none">
+              <label htmlFor="cat-active" className="text-xs font-bold text-zinc-800 cursor-pointer select-none dark:text-white">
                 Active Category
               </label>
             </div>
           </div>
 
           {/* Action buttons */}
-          <div className="mt-4 flex justify-end gap-2 border-t border-white/10 pt-4">
+          <div className="mt-4 flex justify-end gap-2 border-t border-zinc-100 pt-4 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="rounded-xl px-4 py-2 text-xs font-bold text-muted hover:bg-white/10 hover:text-white transition-all disabled:opacity-50"
+              className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-all disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-bold text-white shadow-md hover:opacity-90 disabled:opacity-50 transition-all"
+              className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 disabled:opacity-50 transition-all"
             >
               <Save size={14} />
               <span>{saving ? 'Saving...' : category ? 'Update Category' : 'Create Category'}</span>

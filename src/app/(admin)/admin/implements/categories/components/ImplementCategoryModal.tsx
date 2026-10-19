@@ -133,10 +133,10 @@ export default function ImplementCategoryModal({
   };
 
   return (
-    <div className="bg-background/80 animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-background flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-2xl">
+    <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm sm:p-6 dark:bg-black/75">
+      <div className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#121814]">
         {/* Header */}
-        <div className="bg-foreground/[0.02] flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
+        <div className="flex items-center justify-between border-b border-zinc-100 p-6 dark:border-white/10">
           <div>
             <h2 className="text-foreground text-xl font-black tracking-tight">
               {category ? 'Edit Implement Category' : 'Add New Implement Category'}

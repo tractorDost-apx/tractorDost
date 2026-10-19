@@ -131,7 +131,7 @@ export function PublicUsedTractorCard({
             </button>
             <Link
               href={`/used-tractors/details/${listing.id}`}
-              className="bg-[var(--color-brand-green)] hover:opacity-90 text-black flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold shadow-md shadow-[var(--color-brand-green)]/20 transition-all"
+              className="bg-[var(--color-brand-green)] hover:opacity-90 text-white flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold shadow-md shadow-[var(--color-brand-green)]/20 transition-all"
             >
               View Details <ChevronRight size={14} />
             </Link>
@@ -241,7 +241,7 @@ export function PublicUsedTractorCard({
         </button>
         <Link
           href={`/used-tractors/details/${listing.id}`}
-          className="bg-[var(--color-brand-green)] hover:opacity-90 text-black flex items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold shadow-md shadow-[var(--color-brand-green)]/20 transition-all"
+          className="bg-[var(--color-brand-green)] hover:opacity-90 text-white flex items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold shadow-md shadow-[var(--color-brand-green)]/20 transition-all"
         >
           View Details
         </Link>

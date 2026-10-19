@@ -58,13 +58,13 @@ export default function ShareButtons({ title, url }: ShareButtonsProps) {
         onClick={handleCopyLink}
         className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all shadow-sm ${
           copied
-            ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400'
-            : 'border-white/10 bg-white/5 text-muted hover:bg-white/10 hover:text-white'
+            ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+            : 'border-zinc-200 bg-zinc-100 text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-muted dark:hover:bg-white/10 dark:hover:text-white'
         }`}
       >
         {copied ? (
           <>
-            <Check size={14} className="text-emerald-400" />
+            <Check size={14} className="text-emerald-600 dark:text-emerald-400" />
             <span>Copied!</span>
           </>
         ) : (

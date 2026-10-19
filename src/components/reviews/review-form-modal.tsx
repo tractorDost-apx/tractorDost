@@ -103,34 +103,39 @@ export function ReviewFormModal({
   };
 
   const inputClass =
-    'bg-secondary/20 border border-border/50 rounded-xl px-4 py-3 text-foreground w-full focus:outline-none focus:border-lime-400/50 focus:ring-1 focus:ring-lime-400/50 transition-all';
+    'w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-500 dark:focus:border-lime-400 dark:focus:bg-white/10 dark:focus:ring-lime-400/20';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-200 dark:bg-black/75">
       <form
         onSubmit={handleSubmit}
-        className="glass-panel max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-3xl p-6"
+        className="relative max-h-[90vh] w-full max-w-lg space-y-5 overflow-y-auto rounded-3xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#121814] sm:p-7"
       >
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-4 border-b border-zinc-100 pb-4 dark:border-white/10">
           <div>
-            <h2 className="text-foreground text-lg font-black">
+            <h2 className="text-lg font-black text-zinc-900 dark:text-white">
               {existing ? 'Edit your review' : 'Rate your experience'}
             </h2>
-            <p className="text-muted text-sm">{targetName}</p>
+            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">{targetName}</p>
           </div>
-          <button type="button" onClick={onClose} className="glass-button p-2" aria-label="Close">
-            <X size={14} />
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-zinc-200 bg-zinc-100 p-2 text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
+            aria-label="Close"
+          >
+            <X size={16} />
           </button>
         </div>
 
-        <div className="space-y-1">
-          <span className="text-muted text-xs font-bold">Overall rating *</span>
+        <div className="space-y-1.5">
+          <span className="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Overall rating *</span>
           <StarPicker value={overallRating} onChange={setOverallRating} />
         </div>
 
         {SUBSCORES[targetType].map(({ key, label }) => (
-          <div key={key} className="space-y-1">
-            <span className="text-muted text-xs font-bold">{label}</span>
+          <div key={key} className="space-y-1.5">
+            <span className="block text-xs font-bold text-zinc-700 dark:text-zinc-300">{label}</span>
             <StarPicker
               value={subscores[key] ?? 0}
               onChange={(n) => setSubscores((prev) => ({ ...prev, [key]: n }))}
@@ -138,8 +143,8 @@ export function ReviewFormModal({
           </div>
         ))}
 
-        <label className="block space-y-1">
-          <span className="text-muted text-xs font-bold">Headline</span>
+        <label className="block space-y-1.5">
+          <span className="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Headline</span>
           <input
             className={inputClass}
             maxLength={120}
@@ -149,8 +154,8 @@ export function ReviewFormModal({
           />
         </label>
 
-        <label className="block space-y-1">
-          <span className="text-muted text-xs font-bold">Your review</span>
+        <label className="block space-y-1.5">
+          <span className="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Your review</span>
           <textarea
             className={inputClass}
             rows={4}
@@ -161,16 +166,20 @@ export function ReviewFormModal({
           />
         </label>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="glass-button px-5 py-2 text-sm">
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
+          >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="rounded-full bg-lime-400 px-5 py-2 text-sm font-bold text-black disabled:opacity-50"
+            className="rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-black text-white shadow-md shadow-[var(--color-brand-green)]/30 transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
           >
             {saving ? 'Saving...' : existing ? 'Save changes' : 'Submit review'}
           </button>

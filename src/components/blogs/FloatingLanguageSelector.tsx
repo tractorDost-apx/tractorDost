@@ -156,12 +156,12 @@ export default function FloatingLanguageSelector({
     <>
       {/* Error Toast Notification */}
       {errorToast && (
-        <div className="fixed bottom-24 right-4 z-50 flex max-w-sm items-center gap-3 rounded-2xl border border-red-500/40 bg-black/90 p-4 text-xs font-semibold text-red-400 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200 sm:right-8">
-          <AlertCircle size={18} className="shrink-0 text-red-400" />
+        <div className="fixed bottom-24 right-4 z-50 flex max-w-sm items-center gap-3 rounded-2xl border border-red-300 bg-white/95 p-4 text-xs font-semibold text-red-600 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200 dark:border-red-500/40 dark:bg-black/90 dark:text-red-400 sm:right-8">
+          <AlertCircle size={18} className="shrink-0 text-red-500 dark:text-red-400" />
           <span className="flex-1 leading-relaxed">{errorToast}</span>
           <button
             onClick={() => setErrorToast(null)}
-            className="rounded-lg p-1 text-muted hover:text-white"
+            className="rounded-lg p-1 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
           >
             <X size={14} />
           </button>
@@ -172,25 +172,25 @@ export default function FloatingLanguageSelector({
       <div ref={panelRef} className="fixed bottom-6 right-4 z-50 sm:bottom-8 sm:right-8">
         {/* Language Selection Popup (Opens Upward) */}
         {isOpen && (
-          <div className="absolute bottom-16 right-0 mb-2 w-72 sm:w-80 rounded-3xl border border-white/15 bg-[#0a110d]/95 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-200">
+          <div className="absolute bottom-16 right-0 mb-2 w-72 sm:w-80 rounded-3xl border border-zinc-200 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-200 dark:border-white/15 dark:bg-[#0a110d]/95">
             {/* Popup Header */}
-            <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="mb-3 flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-white/10">
               <div className="flex items-center gap-2">
                 <Languages size={18} className="text-[var(--color-brand-green)]" />
-                <h4 className="text-xs font-black uppercase tracking-wider text-white">
+                <h4 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-white">
                   Read in your language
                 </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-white/5 text-muted hover:bg-white/10 hover:text-white transition-all"
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 transition-all dark:border-transparent dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <X size={14} />
               </button>
             </div>
 
-            <p className="mb-3 text-[11px] text-muted">
+            <p className="mb-3 text-[11px] text-zinc-500 dark:text-zinc-400">
               Choose your preferred Indian language. Translations update instantly.
             </p>
 
@@ -206,14 +206,14 @@ export default function FloatingLanguageSelector({
                     className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-bold transition-all ${
                       isSelected
                         ? 'bg-[var(--color-brand-green)] text-white shadow-md shadow-[var(--color-brand-green)]/25'
-                        : 'bg-white/5 text-muted hover:bg-white/10 hover:text-white'
+                        : 'border border-zinc-200/60 bg-zinc-100/70 text-zinc-800 hover:bg-zinc-200 hover:text-zinc-900 dark:border-transparent dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white'
                     }`}
                   >
                     <div className="flex flex-col truncate">
                       <span className="truncate">{lang.native}</span>
                       <span
                         className={`text-[10px] ${
-                          isSelected ? 'text-white/80' : 'text-muted'
+                          isSelected ? 'text-white/80' : 'text-zinc-500 dark:text-zinc-400'
                         }`}
                       >
                         {lang.name}

@@ -336,14 +336,15 @@ export default function RichTextEditor({
       </div>
 
       {/* Link Modal */}
+      {/* Link Modal */}
       {showLinkModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl border border-white/15 animate-in fade-in zoom-in-95 duration-150">
-            <h3 className="mb-2 text-lg font-black text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-150 dark:bg-black/75">
+          <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-white/15 dark:bg-[#121814]">
+            <h3 className="mb-2 text-lg font-black text-zinc-900 flex items-center gap-2 dark:text-white">
               <LinkIcon size={18} className="text-[var(--color-brand-green)]" />
               Insert Hyperlink
             </h3>
-            <p className="mb-4 text-xs text-muted">
+            <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
               Enter target web address (URL) for the highlighted text.
             </p>
             <input
@@ -358,20 +359,20 @@ export default function RichTextEditor({
                   setLink();
                 }
               }}
-              className="mb-4 w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-green)]"
+              className="mb-4 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-green)] dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
             />
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowLinkModal(false)}
-                className="rounded-xl px-4 py-2 text-xs font-bold text-muted hover:bg-white/10 hover:text-white transition-all"
+                className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-all dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={setLink}
-                className="rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-bold text-white shadow-md hover:opacity-90 transition-all"
+                className="rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 transition-all"
               >
                 Apply Link
               </button>
@@ -382,35 +383,35 @@ export default function RichTextEditor({
 
       {/* Image Modal */}
       {showImageModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl border border-white/15 animate-in fade-in zoom-in-95 duration-150">
-            <h3 className="mb-2 text-lg font-black text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-150 dark:bg-black/75">
+          <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-white/15 dark:bg-[#121814]">
+            <h3 className="mb-2 text-lg font-black text-zinc-900 flex items-center gap-2 dark:text-white">
               <ImageIcon size={18} className="text-[var(--color-brand-green)]" />
               Embed Image from URL
             </h3>
-            <p className="mb-4 text-xs text-muted">
+            <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
               Paste a public image link (e.g. Cloudinary, Unsplash, or CDN).
             </p>
             <div className="flex flex-col gap-3 mb-4">
               <div>
-                <label className="text-xs font-bold text-muted mb-1 block">Image URL</label>
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-400 mb-1 block">Image URL</label>
                 <input
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://example.com/tractor-image.jpg"
                   autoFocus
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-green)]"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-green)] dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-muted mb-1 block">Alt Description (Optional)</label>
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-400 mb-1 block">Alt Description (Optional)</label>
                 <input
                   type="text"
                   value={imageAlt}
                   onChange={(e) => setImageAlt(e.target.value)}
                   placeholder="e.g. Mahindra 575 DI in action"
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-green)]"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-green)] dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
                 />
               </div>
             </div>
@@ -418,7 +419,7 @@ export default function RichTextEditor({
               <button
                 type="button"
                 onClick={() => setShowImageModal(false)}
-                className="rounded-xl px-4 py-2 text-xs font-bold text-muted hover:bg-white/10 hover:text-white transition-all"
+                className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-all dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 Cancel
               </button>
@@ -426,7 +427,7 @@ export default function RichTextEditor({
                 type="button"
                 onClick={addImage}
                 disabled={!imageUrl.trim()}
-                className="rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-bold text-white shadow-md hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all"
+                className="rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none transition-all"
               >
                 Insert Image
               </button>

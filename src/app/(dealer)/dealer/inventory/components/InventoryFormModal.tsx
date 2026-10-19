@@ -147,7 +147,7 @@ export function InventoryFormModal({
   };
 
   return (
-    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/25 p-4 dark:bg-black/60">
+    <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/25 p-4 dark:bg-black/60">
       {/* Modal Container: 100% Solid Opaque Theme-Adaptive Background */}
       <div className="text-foreground relative max-h-[80vh] overflow-y-auto flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl [backdrop-filter:none]">
         {/* Modal Header */}

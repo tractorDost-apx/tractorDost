@@ -68,13 +68,13 @@ export default function RelatedPosts({
 
   if (loading) {
     return (
-      <div className="mt-16 border-t border-white/10 pt-10">
-        <h3 className="text-xl font-black text-white mb-6">Related Articles</h3>
+      <div className="mt-16 border-t border-zinc-200 dark:border-white/10 pt-10">
+        <h3 className="text-xl font-black text-zinc-900 dark:text-white mb-6">Related Articles</h3>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="glass-panel h-80 rounded-2xl animate-pulse bg-white/5 border border-white/5"
+              className="h-80 rounded-2xl animate-pulse bg-zinc-100 border border-zinc-200 dark:bg-white/5 dark:border-white/5"
             />
           ))}
         </div>
@@ -87,17 +87,17 @@ export default function RelatedPosts({
   }
 
   return (
-    <section className="mt-16 border-t border-white/10 pt-10">
+    <section className="mt-16 border-t border-zinc-200 dark:border-white/10 pt-10">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between mb-8">
         <div>
           <span className="text-xs font-black uppercase tracking-wider text-[var(--color-brand-green)]">
             Explore More Insights
           </span>
-          <h2 className="text-2xl font-black text-white mt-1">
+          <h2 className="text-2xl font-black text-zinc-900 dark:text-white mt-1">
             Related {categoryName ? `to ${categoryName}` : 'Articles'}
           </h2>
         </div>
-        <span className="text-xs text-muted">
+        <span className="text-xs text-zinc-500 dark:text-muted">
           Recommended reading handpicked for farmers & tractor owners
         </span>
       </div>

@@ -252,17 +252,17 @@ export default function OverridesTab() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="glass-panel animate-fade-in relative w-full max-w-md rounded-2xl p-6">
-            <h2 className="mb-6 text-2xl font-black">Add Permission Override</h2>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-150 dark:bg-black/75">
+          <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-white/10 dark:bg-[#121814]">
+            <h2 className="mb-6 text-2xl font-black text-zinc-900 dark:text-white">Add Permission Override</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
-                <label className="text-muted mb-1 block text-sm font-bold">Module</label>
+                <label className="text-zinc-700 dark:text-zinc-300 mb-1 block text-sm font-bold">Module</label>
                 <select
                   required
                   value={formData.moduleId}
                   onChange={(e) => setFormData({ ...formData, moduleId: e.target.value })}
-                  className="bg-foreground/5 h-12 w-full appearance-none rounded-xl border border-[var(--border-subtle)] px-4 font-bold outline-none focus:border-[var(--color-brand-green)]"
+                  className="h-12 w-full appearance-none rounded-xl border border-zinc-200 bg-zinc-50 px-4 font-bold text-zinc-900 outline-none focus:border-[var(--color-brand-green)] focus:bg-white dark:border-white/10 dark:bg-white/5 dark:text-white"
                 >
                   <option value="">-- Select Module --</option>
                   {modules.map((m) => (
@@ -344,7 +344,7 @@ export default function OverridesTab() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="hover:bg-foreground/10 rounded-xl px-4 py-2 text-sm font-bold transition-colors"
+                  className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-sm font-bold text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-colors dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
                 >
                   Cancel
                 </button>

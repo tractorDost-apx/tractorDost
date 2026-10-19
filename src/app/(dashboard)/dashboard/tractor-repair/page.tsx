@@ -805,7 +805,7 @@ export default function TractorRepairPage() {
 
       {/* MODAL: SERVICE CENTER REVIEWS (read-only) */}
       {reviewsCenter && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
           <div className="glass-panel max-h-[85vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-3xl p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-foreground text-lg font-black">{reviewsCenter.serviceName} · Reviews</h2>
@@ -824,7 +824,7 @@ export default function TractorRepairPage() {
 
       {/* MODAL: SUBMIT REPAIR REQUEST */}
       {selectedCenter && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/25 dark:bg-black/80 p-4 backdrop-blur-md sm:p-6">
+        <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/25 dark:bg-black/80 p-4 backdrop-blur-md sm:p-6">
           <div className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
             {/* Modal Header */}
             <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6">

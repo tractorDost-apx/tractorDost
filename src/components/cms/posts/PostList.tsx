@@ -483,22 +483,22 @@ export default function PostList() {
 
       {/* Delete Confirmation Modal */}
       {postToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl border border-red-500/20 animate-in fade-in zoom-in-95 duration-150">
-            <h3 className="mb-2 text-base font-black text-white flex items-center gap-2">
-              <AlertCircle size={18} className="text-red-400" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-150 dark:bg-black/75">
+          <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-red-500/20 dark:bg-[#121814]">
+            <h3 className="mb-2 text-base font-black text-zinc-900 flex items-center gap-2 dark:text-white">
+              <AlertCircle size={18} className="text-red-500 dark:text-red-400" />
               Delete Post Confirmation
             </h3>
-            <p className="mb-4 text-xs text-muted leading-relaxed">
+            <p className="mb-4 text-xs text-zinc-600 leading-relaxed dark:text-zinc-400">
               Are you sure you want to permanently delete{' '}
-              <span className="font-bold text-white">"{postToDelete.title}"</span>? This action cannot be undone.
+              <span className="font-bold text-zinc-900 dark:text-white">"{postToDelete.title}"</span>? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 disabled={isDeleting}
                 onClick={() => setPostToDelete(null)}
-                className="rounded-xl px-4 py-2 text-xs font-bold text-muted hover:bg-white/10 hover:text-white transition-all disabled:opacity-50"
+                className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-all disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 Cancel
               </button>

@@ -347,18 +347,17 @@ export default function BulkImportModal<R extends ImportReport>({
         : `Bulk Import ${Plural}`;
 
   return (
-    <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm sm:p-6 dark:bg-black/75">
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="bulk-import-title"
         tabIndex={-1}
-        className="animate-fade-in border-[var(--border-subtle)] flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border shadow-2xl focus:outline-none"
-        style={{ background: 'var(--background)' }}
+        className="animate-fade-in border border-zinc-200 dark:border-white/10 flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl focus:outline-none dark:bg-[#121814]"
       >
         {/* Header */}
-        <div className="border-[var(--border-subtle)] bg-background flex shrink-0 items-center justify-between gap-4 border-b px-6 py-5">
+        <div className="border-b border-zinc-100 bg-white flex shrink-0 items-center justify-between gap-4 px-6 py-5 dark:border-white/10 dark:bg-[#121814]">
           <div className="min-w-0">
             <h2
               id="bulk-import-title"

@@ -457,22 +457,22 @@ export default function DealersPage() {
 
       {/* INQUIRY MODAL */}
       {inquiryModalOpen && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+        <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
           <div
-            className="bg-background/80 absolute inset-0 backdrop-blur-xl"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-all dark:bg-black/75"
             onClick={() => setInquiryModalOpen(null)}
           />
-          <div className="bg-background animate-slide-up relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-[var(--border-subtle)] p-8 shadow-2xl">
+          <div className="animate-slide-up relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white p-8 shadow-2xl dark:border-white/10 dark:bg-[#121814]">
             <button
               onClick={() => setInquiryModalOpen(null)}
-              className="bg-foreground/5 hover:bg-foreground/10 absolute top-6 right-6 rounded-full p-2 transition-colors"
+              className="absolute top-6 right-6 rounded-full border border-zinc-200 bg-zinc-100 p-2 text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
             >
               <X size={20} />
             </button>
 
             <div className="mb-8 pr-12">
-              <h3 className="text-foreground mb-2 text-2xl font-black">Request Callback</h3>
-              <p className="text-muted text-sm font-bold">
+              <h3 className="mb-2 text-2xl font-black text-zinc-900 dark:text-white">Request Callback</h3>
+              <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400">
                 A representative from{' '}
                 <span className="text-[var(--color-brand-green)]">
                   {inquiryModalOpen.businessName}
@@ -483,43 +483,43 @@ export default function DealersPage() {
 
             <form onSubmit={handleInquirySubmit} className="flex flex-col gap-5">
               <div>
-                <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                <label className="mb-2 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
                   Your Name
                 </label>
                 <input
                   required
                   type="text"
                   placeholder="John Doe"
-                  className="bg-foreground/5 text-foreground w-full rounded-2xl border-none px-4 py-3.5 text-sm font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
+                  className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
                 />
               </div>
 
               <div>
-                <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                <label className="mb-2 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
                   Mobile Number
                 </label>
                 <input
                   required
                   type="tel"
                   placeholder="+91 XXXXX XXXXX"
-                  className="bg-foreground/5 text-foreground w-full rounded-2xl border-none px-4 py-3.5 text-sm font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
+                  className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
                 />
               </div>
 
               <div>
-                <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
+                <label className="mb-2 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
                   Interest / Query
                 </label>
                 <textarea
                   rows={3}
                   placeholder="I am interested in buying..."
-                  className="bg-foreground/5 text-foreground w-full resize-none rounded-2xl border-none px-4 py-3.5 text-sm font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
+                  className="w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
                 />
               </div>
 
               <button
                 type="submit"
-                className="mt-2 w-full rounded-2xl bg-[var(--color-brand-green)] py-4 font-black text-white shadow-[var(--color-brand-green)]/30 shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
+                className="mt-2 w-full rounded-2xl bg-[var(--color-brand-green)] py-4 font-black text-white shadow-lg shadow-[var(--color-brand-green)]/30 transition-all hover:-translate-y-1 hover:brightness-105 active:translate-y-0"
               >
                 Submit Inquiry
               </button>

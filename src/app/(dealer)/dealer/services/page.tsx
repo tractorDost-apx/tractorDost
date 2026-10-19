@@ -916,7 +916,7 @@ export default function ServicesPage() {
 
       {/* Booking Detail Modal */}
       {detailModalBooking && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+        <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <div className="text-foreground relative max-h-[80vh] overflow-y-auto flex w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
             <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
               <div className="flex items-center gap-2 lg:gap-3">
@@ -1095,7 +1095,7 @@ export default function ServicesPage() {
 
       {/* Status Transition & Notes Prompt Modal */}
       {statusChangeTarget && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+        <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <div className="text-foreground relative flex w-full max-w-md flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-black">Confirm Status Update</h3>
@@ -1150,7 +1150,7 @@ export default function ServicesPage() {
 
       {/* Book Service Modal */}
       {isCreateModalOpen && (
-        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+        <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <div className="text-foreground relative max-h-[80vh] overflow-y-auto flex w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl max-h-[80vh]">
             <div className="bg-foreground/5 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
               <div className="flex items-center gap-2 lg:gap-3">

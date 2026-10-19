@@ -746,7 +746,7 @@ function UsedTractorsListingContent() {
               </p>
               <button
                 onClick={clearAllFilters}
-                className="bg-[var(--color-brand-green)] text-black rounded-xl px-5 py-2.5 text-xs font-bold hover:opacity-90 transition-all"
+                className="bg-[var(--color-brand-green)] text-white rounded-xl px-5 py-2.5 text-xs font-bold hover:opacity-90 transition-all"
               >
                 Reset All Filters
               </button>

@@ -130,29 +130,29 @@ export default function RolesTab() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="glass-panel animate-fade-in relative w-full max-w-md rounded-2xl p-6">
-            <h2 className="mb-6 text-2xl font-black">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-150 dark:bg-black/75">
+          <div className="relative w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-white/10 dark:bg-[#121814]">
+            <h2 className="mb-6 text-2xl font-black text-zinc-900 dark:text-white">
               {editingRole ? 'Edit Role' : 'Create New Role'}
             </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
-                <label className="text-muted mb-1 block text-sm font-bold">Role Name</label>
+                <label className="text-zinc-700 dark:text-zinc-300 mb-1 block text-sm font-bold">Role Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value.toUpperCase())}
                   required
-                  className="bg-foreground/5 text-foreground h-12 w-full rounded-xl border border-[var(--border-subtle)] px-4 font-bold outline-none focus:border-[var(--color-brand-green)] focus:ring-1 focus:ring-[var(--color-brand-green)]/20"
+                  className="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 font-bold text-zinc-900 outline-none focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-1 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                   placeholder="e.g. MANAGER"
                 />
               </div>
               <div>
-                <label className="text-muted mb-1 block text-sm font-bold">Description</label>
+                <label className="text-zinc-700 dark:text-zinc-300 mb-1 block text-sm font-bold">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="bg-foreground/5 text-foreground h-24 w-full resize-none rounded-xl border border-[var(--border-subtle)] p-4 font-medium outline-none focus:border-[var(--color-brand-green)] focus:ring-1 focus:ring-[var(--color-brand-green)]/20"
+                  className="h-24 w-full resize-none rounded-xl border border-zinc-200 bg-zinc-50 p-4 font-medium text-zinc-900 outline-none focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-1 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                   placeholder="Describe the purpose of this role..."
                 />
               </div>
@@ -160,7 +160,7 @@ export default function RolesTab() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="hover:bg-foreground/10 rounded-xl px-4 py-2 text-sm font-bold transition-colors"
+                  className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-sm font-bold text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-colors dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
                 >
                   Cancel
                 </button>

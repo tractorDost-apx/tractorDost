@@ -227,14 +227,14 @@ export default function SellerEnquiryInbox({
 
       {/* Details Modal */}
       {selectedEnquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="glass-inner relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-[2rem] p-6 sm:p-8">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-200 dark:bg-black/75">
+          <div className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#121814] sm:p-8">
             {/* Close Button */}
             <button
               onClick={() => setSelectedEnquiry(null)}
-              className="absolute top-4 right-4 text-muted hover:text-foreground transition-colors"
+              className="absolute top-4 right-4 rounded-full border border-zinc-200 bg-zinc-100 p-2 text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
 
             {/* Header */}
@@ -346,7 +346,7 @@ export default function SellerEnquiryInbox({
             {/* Close Button */}
             <button
               onClick={() => setSelectedEnquiry(null)}
-              className="mt-6 w-full bg-lime-400 hover:bg-lime-500 text-black rounded-xl py-2.5 text-xs font-black transition-colors"
+              className="mt-6 w-full rounded-xl bg-[var(--color-brand-green)] py-3 text-xs font-black text-white shadow-md shadow-[var(--color-brand-green)]/30 transition-all hover:brightness-105 active:scale-95"
             >
               Close Details
             </button>
@@ -356,22 +356,22 @@ export default function SellerEnquiryInbox({
 
       {/* Dedicated Lead Notes Modal */}
       {notesEnquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="glass-inner relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-[2rem] p-6 sm:p-8">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-200 dark:bg-black/75">
+          <div className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#121814] sm:p-8">
             {/* Close Button */}
             <button
               onClick={() => setNotesEnquiry(null)}
-              className="absolute top-4 right-4 text-muted hover:text-foreground transition-colors p-2"
+              className="absolute top-4 right-4 rounded-full border border-zinc-200 bg-zinc-100 p-2 text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
               aria-label="Close"
             >
-              <X size={22} />
+              <X size={20} />
             </button>
 
             {/* Header */}
-            <div className="mb-6 pb-4 border-b border-border">
+            <div className="mb-6 pb-4 border-b border-zinc-100 dark:border-white/10">
               <div className="flex items-center gap-2 mb-1">
-                <StickyNote size={20} className="text-lime-400" />
-                <h3 className="text-xl font-black text-foreground">
+                <StickyNote size={20} className="text-lime-500 dark:text-lime-400" />
+                <h3 className="text-xl font-black text-zinc-900 dark:text-white">
                   Lead Notes — {notesEnquiry.name}
                 </h3>
               </div>
@@ -381,12 +381,12 @@ export default function SellerEnquiryInbox({
               <div className="flex flex-wrap items-center gap-3 mt-3">
                 <a
                   href={`tel:${notesEnquiry.mobile}`}
-                  className="flex items-center gap-1 text-xs font-bold text-lime-400 hover:text-lime-300"
+                  className="flex items-center gap-1 text-xs font-bold text-lime-600 hover:underline dark:text-lime-400"
                 >
                   <Phone size={13} /> {notesEnquiry.mobile}
                 </a>
                 <span className="text-muted text-xs">•</span>
-                <span className="text-foreground text-xs font-semibold">
+                <span className="text-zinc-900 text-xs font-semibold dark:text-white">
                   {notesEnquiry.listing.tractorBrand} {notesEnquiry.listing.tractorModel}
                 </span>
                 <span className="text-muted text-xs">•</span>
@@ -398,7 +398,7 @@ export default function SellerEnquiryInbox({
 
             <button
               onClick={() => setNotesEnquiry(null)}
-              className="mt-6 w-full bg-secondary/30 hover:bg-secondary/50 text-foreground border border-border/50 rounded-xl py-2.5 text-xs font-bold transition-colors"
+              className="mt-6 w-full rounded-xl border border-zinc-200 bg-zinc-100 py-3 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
             >
               Close Notes
             </button>

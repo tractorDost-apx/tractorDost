@@ -13,7 +13,7 @@ interface LeadNotesPanelProps {
 }
 
 const INPUT_CLASS =
-  'w-full bg-secondary/20 border border-border/50 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-lime-400/50 focus:ring-1 focus:ring-lime-400/50 transition-all resize-y';
+  'w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-500 dark:focus:border-lime-400 dark:focus:bg-white/10 dark:focus:ring-lime-400/20 resize-y';
 
 const QUICK_TAGS = [
   '📞 Called - Buyer interested',
@@ -121,11 +121,11 @@ export default function LeadNotesPanel({ leadId }: LeadNotesPanelProps) {
       </div>
 
       {/* Add New Note Section */}
-      <div className="rounded-2xl border border-border/50 bg-secondary/10 p-4 space-y-3">
+      <div className="rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 space-y-3 dark:border-white/10 dark:bg-white/[0.03]">
         {/* Quick Follow-up Templates */}
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1 text-[11px] font-bold text-muted uppercase tracking-wider">
-            <Sparkles size={12} className="text-lime-400" />
+          <div className="flex items-center gap-1 text-[11px] font-bold text-zinc-500 uppercase tracking-wider dark:text-zinc-400">
+            <Sparkles size={12} className="text-lime-500 dark:text-lime-400" />
             <span>Quick Templates</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -134,7 +134,7 @@ export default function LeadNotesPanel({ leadId }: LeadNotesPanelProps) {
                 key={tag}
                 type="button"
                 onClick={() => handleApplyQuickTag(tag)}
-                className="rounded-lg border border-border/60 bg-secondary/20 px-2 py-1 text-[11px] font-medium text-foreground hover:border-lime-400/50 hover:bg-lime-400/10 hover:text-lime-400 transition-all"
+                className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-800 shadow-sm transition-all hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:border-lime-400/50 dark:hover:bg-lime-400/10 dark:hover:text-lime-400"
               >
                 {tag}
               </button>

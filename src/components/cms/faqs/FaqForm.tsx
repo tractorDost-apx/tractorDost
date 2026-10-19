@@ -184,19 +184,19 @@ function FaqFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-      <div className="glass-panel my-8 w-full max-w-2xl rounded-2xl p-6 sm:p-7 shadow-2xl border border-white/15 animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200 dark:bg-black/75">
+      <div className="relative my-8 w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-6 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-white/15 dark:bg-[#121814]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
+        <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5 dark:border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/20 border border-[var(--color-brand-green)]/30 text-[var(--color-brand-green)]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/10 border border-[var(--color-brand-green)]/30 text-[var(--color-brand-green)]">
               <HelpCircle size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-black text-white">
+              <h2 className="text-lg font-black text-zinc-900 dark:text-white">
                 {faq ? 'Edit FAQ' : 'Add New FAQ'}
               </h2>
-              <p className="text-[11px] text-muted">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                 {faq
                   ? `Editing FAQ #${faq.id} • ${faq.targetType}`
                   : 'Create a new question and answer entry for users'}
@@ -205,7 +205,7 @@ function FaqFormModal({
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 text-muted hover:bg-white/10 hover:text-white transition-all"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-all dark:border-transparent dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
             title="Close dialog"
           >
             <X size={16} />
@@ -214,7 +214,7 @@ function FaqFormModal({
 
         {/* Error banner */}
         {errorMsg && (
-          <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400">
+          <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-500">
             <AlertCircle size={16} className="shrink-0" />
             <span className="flex-1 font-medium">{errorMsg}</span>
           </div>
@@ -224,10 +224,10 @@ function FaqFormModal({
           {/* Question */}
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-xs font-bold text-white">
-                Question <span className="text-red-400">*</span>
+              <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                Question <span className="text-red-500">*</span>
               </label>
-              <span className="text-[10px] text-muted font-mono">
+              <span className="text-[10px] text-zinc-500 font-mono dark:text-zinc-400">
                 {question.length}/500
               </span>
             </div>
@@ -238,17 +238,17 @@ function FaqFormModal({
               value={question}
               onChange={(e) => handleQuestionChange(e.target.value)}
               placeholder="e.g. What documents are required for a tractor loan?"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-xs font-semibold text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:ring-1 focus:ring-[var(--color-brand-green)] focus:outline-none transition-all"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-1 focus:ring-[var(--color-brand-green)] focus:outline-none transition-all dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
             />
           </div>
 
           {/* Answer */}
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-xs font-bold text-white">
-                Answer <span className="text-red-400">*</span>
+              <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                Answer <span className="text-red-500">*</span>
               </label>
-              <span className="text-[10px] text-muted font-mono">
+              <span className="text-[10px] text-zinc-500 font-mono dark:text-zinc-400">
                 {answer.length}/5000
               </span>
             </div>
@@ -259,25 +259,25 @@ function FaqFormModal({
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="Provide a thorough, informative answer. Markdown and line breaks are preserved..."
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-xs text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:ring-1 focus:ring-[var(--color-brand-green)] focus:outline-none transition-all resize-y"
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-1 focus:ring-[var(--color-brand-green)] focus:outline-none transition-all resize-y dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
             />
           </div>
 
           {/* Target Type & Target ID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label className="mb-1 block text-xs font-bold text-white">
-                Target Type <span className="text-red-400">*</span>
+              <label className="mb-1 block text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                Target Type <span className="text-red-500">*</span>
               </label>
               <select
                 value={targetType}
                 onChange={(e) =>
                   handleTargetTypeChange(e.target.value as FaqTargetType)
                 }
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-xs font-bold text-white focus:border-[var(--color-brand-green)] focus:outline-none transition-all cursor-pointer"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs font-bold text-zinc-900 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none transition-all cursor-pointer dark:border-white/10 dark:bg-black/40 dark:text-white"
               >
                 {FAQ_TARGET_TYPES.map((t) => (
-                  <option key={t.value} value={t.value} className="bg-zinc-900 text-white">
+                  <option key={t.value} value={t.value}>
                     {t.label} ({t.value})
                   </option>
                 ))}
@@ -288,10 +288,10 @@ function FaqFormModal({
             {targetType !== 'GENERAL' ? (
               <div className="animate-in fade-in duration-150">
                 <div className="mb-1 flex items-center justify-between">
-                  <label className="text-xs font-bold text-white">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                     Target ID (Optional)
                   </label>
-                  <span className="text-[10px] text-muted">Entity ID</span>
+                  <span className="text-[10px] text-zinc-500 dark:text-zinc-400">Entity ID</span>
                 </div>
                 <input
                   type="number"
@@ -301,18 +301,18 @@ function FaqFormModal({
                     setTargetId(e.target.value === '' ? '' : Number(e.target.value))
                   }
                   placeholder="e.g. 101"
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-xs font-mono text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none transition-all"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs font-mono text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none transition-all dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
                 />
                 {TARGET_TYPE_HINTS[targetType] && (
-                  <p className="mt-1 text-[10px] text-muted leading-tight">
+                  <p className="mt-1 text-[10px] text-zinc-500 leading-tight dark:text-zinc-400">
                     {TARGET_TYPE_HINTS[targetType]}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="flex items-center text-[11px] text-muted bg-white/[0.02] border border-white/5 rounded-xl px-3.5 py-2.5">
+              <div className="flex items-center text-[11px] text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 dark:text-zinc-400 dark:bg-white/[0.02] dark:border-white/5">
                 <p>
-                  <strong className="text-white/80">GENERAL type:</strong> Appears on
+                  <strong className="text-zinc-800 dark:text-white/80">GENERAL type:</strong> Appears on
                   the global FAQ knowledge base and doesn&apos;t require a Target ID.
                 </p>
               </div>
@@ -323,7 +323,7 @@ function FaqFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {/* Category */}
             <div>
-              <label className="mb-1 block text-xs font-bold text-muted">
+              <label className="mb-1 block text-xs font-bold text-zinc-700 dark:text-zinc-300">
                 Category (Optional)
               </label>
               <input
@@ -333,7 +333,7 @@ function FaqFormModal({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="e.g. Financing, Warranty, Purchasing"
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-xs text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none transition-all"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none transition-all dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
               />
               <datalist id="faq-form-category-list">
                 {availableCategories.map((c) => (
@@ -345,7 +345,7 @@ function FaqFormModal({
             {/* Slug */}
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <label className="text-xs font-bold text-muted">
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                   URL Slug (Optional)
                 </label>
                 <button
@@ -366,7 +366,7 @@ function FaqFormModal({
                   setAutoSlug(false);
                 }}
                 placeholder="documents-required-for-tractor-loan"
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 font-mono text-xs text-white placeholder-white/30 focus:border-[var(--color-brand-green)] focus:outline-none transition-all"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 font-mono text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none transition-all dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
               />
             </div>
           </div>
@@ -375,8 +375,8 @@ function FaqFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-center pt-2">
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <label className="text-xs font-bold text-muted">Sort Order</label>
-                <span className="text-[10px] text-muted">Lower shows first</span>
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Sort Order</label>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400">Lower shows first</span>
               </div>
               <input
                 type="number"
@@ -384,17 +384,17 @@ function FaqFormModal({
                 max={10000}
                 value={sortOrder}
                 onChange={(e) => setSortOrder(Number(e.target.value))}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3.5 py-2.5 text-xs font-mono text-white focus:border-[var(--color-brand-green)] focus:outline-none transition-all"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs font-mono text-zinc-900 focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none transition-all dark:border-white/10 dark:bg-black/40 dark:text-white"
               />
             </div>
 
             {/* Is Published Toggle Switch */}
-            <div className="flex items-center justify-between sm:justify-start gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3 mt-4 sm:mt-0">
+            <div className="flex items-center justify-between sm:justify-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 mt-4 sm:mt-0 dark:border-white/10 dark:bg-white/[0.02]">
               <button
                 type="button"
                 onClick={() => setIsPublished(!isPublished)}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  isPublished ? 'bg-[var(--color-brand-green)]' : 'bg-zinc-700'
+                  isPublished ? 'bg-[var(--color-brand-green)]' : 'bg-zinc-300 dark:bg-zinc-700'
                 }`}
               >
                 <span
@@ -406,11 +406,11 @@ function FaqFormModal({
               <div>
                 <label
                   onClick={() => setIsPublished(!isPublished)}
-                  className="block text-xs font-bold text-white cursor-pointer select-none"
+                  className="block text-xs font-bold text-zinc-900 cursor-pointer select-none dark:text-white"
                 >
                   {isPublished ? 'Published (Live)' : 'Draft (Unpublished)'}
                 </label>
-                <p className="text-[10px] text-muted">
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                   {isPublished
                     ? 'Visible to visitors on site'
                     : 'Only visible to admins'}
@@ -420,19 +420,19 @@ function FaqFormModal({
           </div>
 
           {/* Form Actions */}
-          <div className="mt-4 flex items-center justify-end gap-2.5 border-t border-white/10 pt-4">
+          <div className="mt-4 flex items-center justify-end gap-2.5 border-t border-zinc-100 pt-4 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="rounded-xl px-4 py-2.5 text-xs font-bold text-muted hover:bg-white/10 hover:text-white transition-all disabled:opacity-50"
+              className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2.5 text-xs font-bold text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 transition-all disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold text-white shadow-lg hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-[var(--color-brand-green)]/30 hover:brightness-110 disabled:opacity-50 transition-all cursor-pointer"
             >
               {saving ? (
                 <>

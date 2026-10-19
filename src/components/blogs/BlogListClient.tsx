@@ -105,7 +105,7 @@ export default function BlogListClient() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-8 sm:px-6 lg:px-8">
       {/* Hero Section */}
-      <div className="glass-panel relative overflow-hidden rounded-3xl p-8 sm:p-12 text-center border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 text-center border border-zinc-200 bg-white/70 dark:border-white/10 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent shadow-sm dark:shadow-2xl">
         <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-96 rounded-full bg-[var(--color-brand-green)]/15 blur-[80px]" />
 
         <div className="relative z-10 mx-auto max-w-3xl flex flex-col items-center">
@@ -114,29 +114,29 @@ export default function BlogListClient() {
             <span>TRACTORDOST KNOWLEDGE HUB</span>
           </div>
 
-          <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl leading-tight">
+          <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-5xl leading-tight">
             Farming Insights, Tractor Guides & Industry News
           </h1>
 
-          <p className="mt-4 text-sm sm:text-base text-muted leading-relaxed max-w-2xl">
+          <p className="mt-4 text-sm sm:text-base text-zinc-600 dark:text-muted leading-relaxed max-w-2xl">
             Explore trusted buying advice, tractor comparisons, maintenance guides, and agricultural
             advancements written for Indian farmers and tractor owners.
           </p>
 
           {/* Hero Search Bar */}
           <div className="mt-8 relative w-full max-w-xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={18} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-muted" size={18} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by topic, tractor model, or guide name..."
-              className="w-full rounded-2xl border border-white/15 bg-black/60 pl-12 pr-10 py-3.5 text-sm text-white placeholder-white/40 shadow-inner focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none backdrop-blur-md"
+              className="w-full rounded-2xl border border-zinc-300 bg-white pl-12 pr-10 py-3.5 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none dark:border-white/15 dark:bg-black/60 dark:text-white dark:placeholder-white/40 dark:shadow-inner backdrop-blur-md"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-white"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:text-muted dark:hover:text-white"
               >
                 <X size={16} />
               </button>
@@ -159,15 +159,15 @@ export default function BlogListClient() {
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <div
               key={n}
-              className="glass-panel h-96 rounded-2xl animate-pulse bg-white/5 border border-white/5"
+              className="h-96 rounded-2xl animate-pulse bg-zinc-100 border border-zinc-200 dark:bg-white/5 dark:border-white/5"
             />
           ))}
         </div>
       ) : posts.length === 0 ? (
-        <div className="glass-panel flex flex-col items-center justify-center rounded-2xl p-16 text-center shadow-xl border border-white/10">
+        <div className="flex flex-col items-center justify-center rounded-2xl p-16 text-center border border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#121814]/40 dark:shadow-xl">
           <BookOpen size={48} className="text-[var(--color-brand-green)]/40 mb-3" />
-          <h3 className="text-xl font-black text-white">No blog posts found</h3>
-          <p className="mt-2 text-xs text-muted max-w-md">
+          <h3 className="text-xl font-black text-zinc-900 dark:text-white">No blog posts found</h3>
+          <p className="mt-2 text-xs text-zinc-500 dark:text-muted max-w-md">
             We couldn't find any articles matching your search criteria or filters. Try adjusting your search query or reset the filters.
           </p>
           {(searchQuery || filters.categoryId || filters.language || filters.postType) && (

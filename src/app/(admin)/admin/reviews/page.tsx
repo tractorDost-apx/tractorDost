@@ -251,20 +251,24 @@ function EditReviewModal({ review, onClose, onSaved }: EditReviewModalProps) {
   };
 
   const inputClass =
-    'bg-secondary/20 border border-border/50 rounded-xl px-4 py-3 text-foreground w-full focus:outline-none focus:border-lime-400/50 focus:ring-1 focus:ring-lime-400/50 transition-all';
+    'w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-500 dark:focus:border-lime-400 dark:focus:bg-white/10 dark:focus:ring-lime-400/20';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <form onSubmit={handleSubmit} className="glass-panel w-full max-w-lg space-y-4 rounded-3xl p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-foreground text-lg font-black">Edit review #{review.id}</h2>
-          <button type="button" onClick={onClose} className="glass-button p-2">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-200 dark:bg-black/75">
+      <form onSubmit={handleSubmit} className="relative w-full max-w-lg space-y-4 rounded-3xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#121814]">
+        <div className="flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-white/10">
+          <h2 className="text-lg font-black text-zinc-900 dark:text-white">Edit review #{review.id}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-zinc-200 bg-zinc-100 p-2 text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
+          >
             <X size={14} />
           </button>
         </div>
 
         <label className="block space-y-1">
-          <span className="text-muted text-xs font-bold">Rating</span>
+          <span className="text-zinc-700 dark:text-zinc-300 text-xs font-bold">Rating</span>
           <select
             className={inputClass}
             value={overallRating}
@@ -279,7 +283,7 @@ function EditReviewModal({ review, onClose, onSaved }: EditReviewModalProps) {
         </label>
 
         <label className="block space-y-1">
-          <span className="text-muted text-xs font-bold">Headline</span>
+          <span className="text-zinc-700 dark:text-zinc-300 text-xs font-bold">Headline</span>
           <input
             className={inputClass}
             maxLength={120}
@@ -289,7 +293,7 @@ function EditReviewModal({ review, onClose, onSaved }: EditReviewModalProps) {
         </label>
 
         <label className="block space-y-1">
-          <span className="text-muted text-xs font-bold">Body</span>
+          <span className="text-zinc-700 dark:text-zinc-300 text-xs font-bold">Body</span>
           <textarea
             className={inputClass}
             rows={4}
@@ -299,26 +303,30 @@ function EditReviewModal({ review, onClose, onSaved }: EditReviewModalProps) {
           />
         </label>
 
-        <label className="flex items-center gap-2 text-sm font-bold">
+        <label className="flex items-center gap-2 text-sm font-bold text-zinc-800 dark:text-zinc-200">
           <input
             type="checkbox"
             checked={isApproved}
             onChange={(e) => setIsApproved(e.target.checked)}
-            className="accent-lime-400"
+            className="h-4 w-4 rounded accent-[var(--color-brand-green)]"
           />
           Published (visible to public)
         </label>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="glass-button px-5 py-2 text-sm">
+        <div className="flex justify-end gap-2 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
+          >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="rounded-full bg-lime-400 px-5 py-2 text-sm font-bold text-black disabled:opacity-50"
+            className="rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-[var(--color-brand-green)]/30 hover:brightness-110 active:scale-95 disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save changes'}
           </button>

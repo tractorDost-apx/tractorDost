@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   /* Brand Colors from User's CMYK Image */
   --color-brand-green: #4a7635;
@@ -36,6 +38,17 @@
   --color-spatial-accent-blue: var(--color-brand-green);
   --color-spatial-accent-yellow: var(--color-brand-orange);
   --color-spatial-accent-pink: var(--color-brand-orange);
+
+  /* Semantic Theme tokens mapped to CSS variables for Tailwind v4 */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 }
 
 :root {
@@ -43,6 +56,12 @@
   --background: var(--color-spatial-bg-light);
   --foreground: var(--color-spatial-text-light);
   --muted: var(--color-spatial-muted-light);
+  --muted-foreground: var(--color-spatial-muted-light);
+  --secondary: #eef2eb;
+  --secondary-foreground: var(--color-spatial-text-light);
+  --border: rgba(0, 0, 0, 0.08);
+  --card: #ffffff;
+  --card-foreground: var(--color-spatial-text-light);
 
   /* Borders - Soft and invisible for light mode */
   --border-subtle: rgba(0, 0, 0, 0.04);
@@ -72,6 +91,12 @@
   --background: var(--color-spatial-bg-dark);
   --foreground: var(--color-spatial-text-dark);
   --muted: var(--color-spatial-muted-dark);
+  --muted-foreground: var(--color-spatial-muted-dark);
+  --secondary: rgba(255, 255, 255, 0.07);
+  --secondary-foreground: var(--color-spatial-text-dark);
+  --border: rgba(255, 255, 255, 0.1);
+  --card: #0e120f;
+  --card-foreground: var(--color-spatial-text-dark);
 
   /* Borders - Perfectly blended for dark mode */
   --border-subtle: rgba(255, 255, 255, 0.05);

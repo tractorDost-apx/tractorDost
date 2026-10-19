@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Lock, ShieldCheck, X, Loader2, CheckCircle2, Download, Sparkles } from 'lucide-react';
-import { SpatialButton } from '@/components/ui/spatial-button';
 import { INDIAN_STATES } from '@/lib/constants/indian-states';
 import { leadAPI, type DetailAccessGrant, type DetailTargetType, type DetailAccessLeadInput } from '@/lib/api/leads';
 import { captureLocation, saveDetailAccess } from '@/lib/utils/detail-access';
@@ -39,19 +40,14 @@ interface FormValues {
   address: string;
 }
 
-interface Coordinates {
-  latitude: number;
-  longitude: number;
-}
-
 type FormErrors = Partial<Record<keyof FormValues, string>>;
 
 const EMPTY_FORM: FormValues = { name: '', mobile: '', state: '', city: '', email: '', address: '' };
 
 const inputClass =
-  'bg-secondary/20 border border-border/50 rounded-xl px-4 py-3 text-foreground w-full focus:outline-none focus:border-lime-400/50 focus:ring-1 focus:ring-lime-400/50 transition-all text-sm';
+  'w-full rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-500 dark:focus:bg-white/10';
 
-const labelClass = 'text-muted-foreground mb-2 block text-xs font-bold tracking-widest uppercase';
+const labelClass = 'text-zinc-700 dark:text-zinc-300 mb-2 block text-xs font-bold tracking-widest uppercase';
 
 function validate(values: FormValues): FormErrors {
   const errors: FormErrors = {};
@@ -69,7 +65,6 @@ function submitErrorMessage(error: unknown): string {
   return data?.error?.[0]?.message || data?.message || fallback;
 }
 
-
 export function DetailAccessGate({
   targetType,
   targetId,
@@ -80,10 +75,25 @@ export function DetailAccessGate({
 }: DetailAccessGateProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [values, setValues] = useState<FormValues>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isModal && mounted) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isModal, mounted]);
 
   const update = (field: keyof FormValues) => (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -152,36 +162,36 @@ export function DetailAccessGate({
   const dialogContent = (
     <div className="grid w-full gap-6 lg:grid-cols-12 items-stretch">
       {/* Left Column: Product Teaser & Benefits */}
-      <div className="lg:col-span-5 flex flex-col justify-between gap-5 rounded-[2rem] border border-[var(--border-subtle)] bg-secondary/15 p-5 sm:p-7 relative overflow-hidden">
+      <div className="lg:col-span-5 flex flex-col justify-between gap-5 rounded-[2rem] border border-zinc-200 bg-zinc-50/80 p-5 sm:p-7 relative overflow-hidden dark:border-white/10 dark:bg-white/[0.03]">
         {/* Ambient glow inside card */}
-        <div className="pointer-events-none absolute -top-12 -left-12 h-44 w-44 rounded-full bg-[var(--color-brand-green)]/15 blur-3xl" />
+        <div className="pointer-events-none absolute -top-12 -left-12 h-44 w-44 rounded-full bg-[var(--color-brand-green)]/10 blur-3xl dark:bg-[var(--color-brand-green)]/15" />
         
         <div className="flex flex-col gap-5">
-          <div className="glass-inner flex h-48 sm:h-56 items-center justify-center overflow-hidden rounded-2xl p-4 bg-black/25 border border-white/5">
+          <div className="flex h-48 sm:h-56 items-center justify-center overflow-hidden rounded-2xl p-4 bg-white border border-zinc-200/80 shadow-sm dark:bg-black/40 dark:border-white/10">
             {summary.imageUrl ? (
               <img src={summary.imageUrl} alt={summary.title} className="h-full w-full object-contain" loading="lazy" />
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-lime-400">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 border border-zinc-200 text-[var(--color-brand-green)] dark:bg-white/5 dark:border-white/10 dark:text-lime-400">
                   <Lock size={32} />
                 </div>
-                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Gated Details</span>
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest dark:text-zinc-400">Gated Details</span>
               </div>
             )}
           </div>
 
           <div className="flex flex-col gap-1.5">
             {summary.eyebrow && (
-              <span className="text-lime-400 text-xs font-black tracking-[0.2em] uppercase">{summary.eyebrow}</span>
+              <span className="text-[var(--color-brand-green)] dark:text-lime-400 text-xs font-black tracking-[0.2em] uppercase">{summary.eyebrow}</span>
             )}
-            <h1 className="text-foreground text-2xl sm:text-3xl leading-tight font-black tracking-tight">{summary.title}</h1>
-            <p className="text-lime-400 text-lg sm:text-xl font-black">{summary.priceLabel}</p>
+            <h1 className="text-zinc-900 dark:text-white text-2xl sm:text-3xl leading-tight font-black tracking-tight">{summary.title}</h1>
+            <p className="text-[var(--color-brand-green)] dark:text-lime-400 text-lg sm:text-xl font-black">{summary.priceLabel}</p>
           </div>
 
           {summary.chips.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {summary.chips.map((chip) => (
-                <span key={chip} className="glass-inner text-foreground rounded-full px-3 py-1.5 text-xs font-bold border border-white/5">
+                <span key={chip} className="rounded-full px-3 py-1.5 text-xs font-bold border border-zinc-200 bg-white text-zinc-800 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white">
                   {chip}
                 </span>
               ))}
@@ -190,32 +200,32 @@ export function DetailAccessGate({
         </div>
 
         {/* Benefits checklist */}
-        <div className="mt-2 flex flex-col gap-2.5 border-t border-border/40 pt-4 text-xs font-medium text-muted-foreground">
+        <div className="mt-2 flex flex-col gap-2.5 border-t border-zinc-200 dark:border-white/10 pt-4 text-xs font-semibold text-zinc-600 dark:text-zinc-400">
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={14} className="text-lime-400 shrink-0" />
+            <CheckCircle2 size={14} className="text-[var(--color-brand-green)] dark:text-lime-400 shrink-0" />
             <span>Complete engine, transmission & hydraulic specs</span>
           </div>
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={14} className="text-lime-400 shrink-0" />
+            <CheckCircle2 size={14} className="text-[var(--color-brand-green)] dark:text-lime-400 shrink-0" />
             <span>Exact on-road state pricing & estimated EMIs</span>
           </div>
           <div className="flex items-center gap-2">
-            <Download size={14} className="text-lime-400 shrink-0" />
+            <Download size={14} className="text-[var(--color-brand-green)] dark:text-lime-400 shrink-0" />
             <span>Direct official brochure downloads</span>
           </div>
         </div>
       </div>
 
       {/* Right Column: Lead Form */}
-      <div className="lg:col-span-7 flex flex-col justify-between gap-5 rounded-[2rem] border border-[var(--border-subtle)] bg-secondary/10 p-5 sm:p-7">
+      <div className="lg:col-span-7 flex flex-col justify-between gap-5 rounded-[2rem] border border-zinc-200 bg-white p-5 sm:p-7 dark:border-white/10 dark:bg-white/[0.02]">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-lime-400/10 border border-lime-400/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-lime-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-green)]/10 border border-[var(--color-brand-green)]/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-[var(--color-brand-green)] dark:bg-lime-400/10 dark:border-lime-400/20 dark:text-lime-400">
               <Sparkles size={11} /> Quick Unlock
             </span>
           </div>
-          <h2 className="text-foreground text-2xl font-black tracking-tight">Get the full details</h2>
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
+          <h2 className="text-zinc-900 dark:text-white text-2xl font-black tracking-tight">Get the full details</h2>
+          <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed">
             Share your details to unlock the complete specifications, on-road prices and brochures for this {kindLabel}.
           </p>
         </div>
@@ -236,7 +246,7 @@ export function DetailAccessGate({
               aria-invalid={Boolean(errors.name)}
               className={inputClass}
             />
-            {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+            {errors.name && <p className="mt-1 text-xs text-red-500 dark:text-red-400 font-semibold">{errors.name}</p>}
           </div>
 
           <div>
@@ -256,7 +266,7 @@ export function DetailAccessGate({
               aria-invalid={Boolean(errors.mobile)}
               className={inputClass}
             />
-            {errors.mobile && <p className="mt-1 text-xs text-red-400">{errors.mobile}</p>}
+            {errors.mobile && <p className="mt-1 text-xs text-red-500 dark:text-red-400 font-semibold">{errors.mobile}</p>}
           </div>
 
           <div>
@@ -269,16 +279,16 @@ export function DetailAccessGate({
               value={values.state}
               onChange={update('state')}
               aria-invalid={Boolean(errors.state)}
-              className={inputClass}
+              className={`${inputClass} cursor-pointer`}
             >
-              <option value="">Select your state</option>
+              <option value="" className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">Select your state</option>
               {INDIAN_STATES.map((state) => (
-                <option key={state} value={state} className="bg-background text-foreground">
+                <option key={state} value={state} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-white">
                   {state}
                 </option>
               ))}
             </select>
-            {errors.state && <p className="mt-1 text-xs text-red-400">{errors.state}</p>}
+            {errors.state && <p className="mt-1 text-xs text-red-500 dark:text-red-400 font-semibold">{errors.state}</p>}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -312,7 +322,7 @@ export function DetailAccessGate({
                 aria-invalid={Boolean(errors.email)}
                 className={inputClass}
               />
-              {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-xs text-red-500 dark:text-red-400 font-semibold">{errors.email}</p>}
             </div>
           </div>
 
@@ -334,16 +344,15 @@ export function DetailAccessGate({
           </div>
 
           {submitError && (
-            <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-xs text-red-400">
+            <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-xs font-semibold text-red-600 dark:text-red-400">
               {submitError}
             </p>
           )}
 
-          <SpatialButton
+          <button
             type="submit"
-            variant="primary"
             disabled={submitting}
-            className="w-full py-3.5 text-base font-black rounded-xl bg-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/90 text-white shadow-lg shadow-[var(--color-brand-green)]/25 flex items-center justify-center gap-2 disabled:opacity-60 transition-all hover:scale-[1.01] active:scale-[0.99]"
+            className="w-full py-3.5 text-sm sm:text-base font-black rounded-xl bg-[var(--color-brand-green)] hover:bg-[var(--color-brand-green-dark)] text-white shadow-lg shadow-[var(--color-brand-green)]/25 flex items-center justify-center gap-2 disabled:opacity-60 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
           >
             {submitting ? (
               <>
@@ -353,52 +362,57 @@ export function DetailAccessGate({
             ) : (
               'View full details'
             )}
-          </SpatialButton>
+          </button>
 
-          <p className="text-muted-foreground flex items-center justify-center gap-2 text-center text-[11px]">
-            <ShieldCheck size={14} className="text-lime-400" />
-            We use your details to contact you about this {kindLabel}.
+          <p className="text-zinc-500 dark:text-zinc-400 flex items-center justify-center gap-2 text-center text-[11px] font-medium">
+            <ShieldCheck size={14} className="text-[var(--color-brand-green)] dark:text-lime-400 shrink-0" />
+            <span>We use your details to contact you about this {kindLabel}.</span>
           </p>
         </form>
 
         {/* Logged in users bypass the form completely */}
-        <div className="border-border/40 flex flex-col gap-2 border-t pt-4">
-          <p className="text-muted-foreground text-center text-xs">Have an account?</p>
-          <SpatialButton variant="glass" href={loginHref} className="w-full py-2.5 text-xs font-bold">
+        <div className="border-t border-zinc-200 dark:border-white/10 flex flex-col gap-2 pt-4">
+          <p className="text-zinc-500 dark:text-zinc-400 text-center text-xs font-semibold">Have an account?</p>
+          <Link
+            href={loginHref}
+            className="w-full py-2.5 text-xs font-bold rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-center transition-colors dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10"
+          >
             Login for direct access to all details
-          </SpatialButton>
+          </Link>
         </div>
       </div>
     </div>
   );
 
-  // Centric PopUp with Foggy Backdrop Overlay
+  // Centric PopUp with Frosted Backdrop Overlay
   if (isModal) {
-    return (
+    if (!mounted) return null;
+
+    const modalElement = (
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="lead-modal-title"
-        className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6 md:p-8 animate-in fade-in duration-300"
+        className="fixed inset-0 z-[100] flex min-h-screen items-center justify-center overflow-y-auto p-4 sm:p-6 md:p-8 animate-in fade-in duration-300"
       >
-        {/* Foggy frosted glass backdrop overlay covering full viewport */}
+        {/* Frosted glass backdrop overlay covering full viewport including navbar */}
         <div
-          className="fixed inset-0 bg-black/75 backdrop-blur-2xl transition-all"
+          className="fixed inset-0 bg-black/50 backdrop-blur-md transition-all dark:bg-black/80 dark:backdrop-blur-2xl"
           onClick={handleClose}
           aria-hidden="true"
         />
 
         {/* Atmospheric ambient foggy glows */}
-        <div className="pointer-events-none fixed top-1/4 left-1/4 -z-10 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[140px]" />
-        <div className="pointer-events-none fixed bottom-1/4 right-1/4 -z-10 h-[30rem] w-[30rem] translate-x-1/2 translate-y-1/2 rounded-full bg-[var(--color-brand-orange)]/15 blur-[140px]" />
+        <div className="pointer-events-none fixed top-1/4 left-1/4 -z-10 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/10 blur-[140px] dark:bg-[var(--color-brand-green)]/20" />
+        <div className="pointer-events-none fixed bottom-1/4 right-1/4 -z-10 h-[30rem] w-[30rem] translate-x-1/2 translate-y-1/2 rounded-full bg-[var(--color-brand-orange)]/10 blur-[140px] dark:bg-[var(--color-brand-orange)]/15" />
 
         {/* Centric Modal Dialog */}
-        <div className="relative z-10 w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-[2.5rem] border border-[var(--border-brand)] bg-[#0d120e]/95 p-5 sm:p-8 md:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_50px_rgba(74,118,53,0.18)] backdrop-blur-3xl custom-scrollbar animate-in zoom-in-95 duration-200">
+        <div className="relative z-10 w-full max-w-4xl max-h-[88vh] my-auto overflow-y-auto rounded-[2.5rem] border border-zinc-200 bg-white p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-3xl custom-scrollbar animate-in zoom-in-95 duration-200 dark:border-white/10 dark:bg-[#0d120e] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_50px_rgba(74,118,53,0.18)]">
           <button
             type="button"
             onClick={handleClose}
             aria-label="Close dialog"
-            className="text-muted-foreground hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 absolute top-5 right-5 sm:top-7 sm:right-7 z-20 rounded-full p-2.5 transition-all hover:scale-105 active:scale-95"
+            className="text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 dark:text-zinc-300 dark:hover:text-white dark:bg-white/10 dark:hover:bg-white/20 dark:border-white/10 absolute top-5 right-5 sm:top-7 sm:right-7 z-20 rounded-full p-2.5 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
           >
             <X size={18} />
           </button>
@@ -406,10 +420,12 @@ export function DetailAccessGate({
         </div>
       </div>
     );
+
+    return createPortal(modalElement, document.body);
   }
 
   return (
-    <div className="glass-panel w-full rounded-[2.5rem] border border-[var(--border-subtle)] p-6 sm:p-8">
+    <div className="w-full rounded-[2.5rem] border border-zinc-200 bg-white p-6 sm:p-8 shadow-xl dark:border-white/10 dark:bg-[#0d120e]">
       {dialogContent}
     </div>
   );

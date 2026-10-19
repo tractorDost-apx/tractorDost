@@ -704,7 +704,7 @@ export function TractorListingDetailsForm({
 
       {/* Confirm Dialog */}
       {showConfirmDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
           <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--background)] p-6 max-w-sm shadow-xl space-y-4">
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-brand-green)]/10">
