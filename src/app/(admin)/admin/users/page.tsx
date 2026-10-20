@@ -209,13 +209,13 @@ export default function AdminUsersPage() {
         throw new Error(res?.message || 'Failed to delete user');
       }
     } catch (err: any) {
-      console.error('Failed to delete user:', err);
+      console.warn('Delete user operation warning:', err?.message || err);
       const statusCode = err?.response?.status;
       const apiMessage = err?.response?.data?.message;
 
       if (statusCode === 403 || apiMessage === 'Unauthorized') {
         setDeleteModalError(
-          'Permanent deletion requires SUPER_ADMIN privileges. As an ADMIN, you can deactivate this account instead to immediately revoke login and platform access.'
+          'Permanent deletion requires administrative privileges. You can deactivate this account instead to immediately revoke login and platform access.'
         );
       } else {
         const errorMsg =
