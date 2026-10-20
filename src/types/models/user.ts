@@ -29,6 +29,10 @@ export interface User {
   aadhaarRef?: string | null;
   panRef?: string | null;
   kycStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  listingCount?: number;
+  activeListingLimit?: number | null;
+  referralCode?: string | null;
+  referredBy?: string | null;
   createdAt?: string;
   updatedAt?: string;
   dealer?: any;

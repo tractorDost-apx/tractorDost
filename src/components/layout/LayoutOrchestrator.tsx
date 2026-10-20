@@ -13,12 +13,19 @@ export function LayoutOrchestrator({ children }: { children: React.ReactNode }) 
     pathname?.startsWith('/admin') ||
     pathname?.startsWith('/dealer') ||
     pathname?.startsWith('/agent');
+  const isHome = pathname === '/';
 
   return (
     <div className={`flex w-full flex-1 flex-col ${isDashboardRoute ? 'spatial-background' : ''}`}>
       <Navbar />
       <main
-        className={`flex flex-1 flex-col ${isDashboardRoute ? 'px-4 pt-6 pb-6' : 'px-4 pt-28 pb-12 sm:px-8 lg:px-12'}`}
+        className={`flex flex-1 flex-col ${
+          isDashboardRoute
+            ? 'px-4 pt-6 pb-6'
+            : isHome
+              ? 'pt-0 px-0 pb-0'
+              : 'px-4 pt-28 pb-12 sm:px-8 lg:px-12'
+        }`}
       >
         {children}
       </main>

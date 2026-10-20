@@ -5,10 +5,10 @@ import { createPortal } from 'react-dom';
 import axios from 'axios';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Lock, ShieldCheck, X, Loader2, CheckCircle2, Download, Sparkles } from 'lucide-react';
+import { Lock, ShieldCheck, X, Loader2, CheckCircle2, Download, Sparkles, MapPin } from 'lucide-react';
 import { INDIAN_STATES } from '@/lib/constants/indian-states';
 import { leadAPI, type DetailAccessGrant, type DetailTargetType, type DetailAccessLeadInput } from '@/lib/api/leads';
-import { captureLocation, saveDetailAccess } from '@/lib/utils/detail-access';
+import { captureLocation, geocodeLocationText, reverseGeocodeCoords, saveDetailAccess } from '@/lib/utils/detail-access';
 
 const MOBILE_RE = /^[6-9]\d{9}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -80,9 +80,18 @@ export function DetailAccessGate({
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [detectedCoords, setDetectedCoords] = useState<{ latitude: number; longitude: number; accuracy?: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    // Pre-warm high-accuracy GPS in the background so coordinates are already cached when user clicks submit
+    captureLocation(6000).then((coords) => {
+      if (coords) {
+        setDetectedCoords(coords);
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -109,6 +118,34 @@ export function DetailAccessGate({
     }
   };
 
+  const handleDetectLocation = async () => {
+    setLocating(true);
+    setLocationStatus('Pinpointing your GPS location...');
+    try {
+      const coords = await captureLocation(8000);
+      if (coords) {
+        setDetectedCoords(coords);
+        setLocationStatus(`GPS Pinpointed accurately (±${coords.accuracy ?? 10}m)`);
+        // Reverse geocode to auto-fill State and City if empty
+        const geo = await reverseGeocodeCoords(coords.latitude, coords.longitude);
+        if (geo) {
+          setValues((prev) => ({
+            ...prev,
+            state: prev.state || geo.state || prev.state,
+            city: prev.city || geo.city || prev.city,
+            address: prev.address || geo.address || prev.address,
+          }));
+        }
+      } else {
+        setLocationStatus('GPS unavailable. Your selected State and City will be used on Google Maps.');
+      }
+    } catch {
+      setLocationStatus(null);
+    } finally {
+      setLocating(false);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return;
@@ -120,8 +157,16 @@ export function DetailAccessGate({
 
     setSubmitting(true);
     try {
-      // Automatically attempt to capture user's current location without blocking submission
-      const coords = await captureLocation(4000);
+      // 1. Use pre-warmed GPS coordinates if available, or attempt high-accuracy GPS capture
+      let coords = detectedCoords;
+      if (!coords) {
+        coords = await captureLocation(4000);
+      }
+
+      // 2. If browser GPS was unavailable or blocked, fallback to geocoding selected City & State
+      if (!coords && (values.city || values.state)) {
+        coords = await geocodeLocationText(values.city, values.state);
+      }
 
       const payload: DetailAccessLeadInput = {
         targetType,
@@ -270,9 +315,30 @@ export function DetailAccessGate({
           </div>
 
           <div>
-            <label htmlFor="lead-state" className={labelClass}>
-              State *
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="lead-state" className="text-zinc-700 dark:text-zinc-300 block text-xs font-bold tracking-widest uppercase">
+                State *
+              </label>
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={locating}
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#4a7635] hover:text-[#3d622b] transition-colors cursor-pointer"
+                title="Detect precise GPS location for accurate Google Map pin"
+              >
+                {locating ? (
+                  <Loader2 size={12} className="animate-spin text-[#4a7635]" />
+                ) : (
+                  <MapPin size={12} className="text-[#4a7635]" />
+                )}
+                <span>{detectedCoords ? 'GPS Pinpointed ✓' : 'Detect Location (GPS)'}</span>
+              </button>
+            </div>
+            {locationStatus && (
+              <p className="mb-2 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                {locationStatus}
+              </p>
+            )}
             <select
               id="lead-state"
               name="state"

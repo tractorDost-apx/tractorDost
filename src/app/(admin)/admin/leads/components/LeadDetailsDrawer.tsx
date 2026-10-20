@@ -39,6 +39,11 @@ import {
   FollowupBadge,
 } from './LeadStatusBadge';
 import { LEAD_STATUSES } from './LeadFilters';
+import {
+  getLeadProductLink,
+  getLeadLocationInfo,
+  getLeadSourceInfo,
+} from '../lead-helpers';
 
 interface LeadDetailsDrawerProps {
   leadId: number | null;
@@ -263,6 +268,12 @@ export function LeadDetailsDrawer({
                 </span>
                 {lead && <LeadStatusBadge status={lead.status} />}
                 {lead && <LeadTypeBadge type={lead.leadType} />}
+                {lead?.isDuplicate && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-[10px] font-black text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-800/50">
+                    <Copy size={10} className="text-purple-700 dark:text-purple-400" />
+                    Duplicate
+                  </span>
+                )}
               </div>
               <h2 className="text-base font-black text-foreground">
                 {lead?.name || 'Customer Enquiry'}
@@ -329,7 +340,7 @@ export function LeadDetailsDrawer({
           >
             <span>Call Logs</span>
             {lead?.callLogs && lead.callLogs.length > 0 && (
-              <span className="rounded-full bg-indigo-500/20 px-1.5 py-0.2 text-[10px] font-black text-indigo-400">
+              <span className="rounded-full bg-indigo-100 dark:bg-indigo-500/20 px-1.5 py-0.2 text-[10px] font-black text-indigo-800 dark:text-indigo-300">
                 {lead.callLogs.length}
               </span>
             )}
@@ -345,7 +356,7 @@ export function LeadDetailsDrawer({
           >
             <span>Notes</span>
             {lead?.notes && lead.notes.length > 0 && (
-              <span className="rounded-full bg-amber-500/20 px-1.5 py-0.2 text-[10px] font-black text-amber-400">
+              <span className="rounded-full bg-amber-100 dark:bg-amber-500/20 px-1.5 py-0.2 text-[10px] font-black text-amber-800 dark:text-amber-300">
                 {lead.notes.length}
               </span>
             )}
@@ -414,31 +425,52 @@ export function LeadDetailsDrawer({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 sm:col-span-2">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+                      <div className="flex items-start gap-3 sm:col-span-2">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
                           <MapPin size={16} />
                         </div>
                         <div className="flex flex-col flex-1">
                           <span className="text-[10px] font-bold text-muted uppercase">
-                            Location
+                            Location & Coordinates
                           </span>
-                          <span className="text-xs font-bold text-foreground">
-                            {[lead.address, lead.city, lead.district, lead.state]
-                              .filter(Boolean)
-                              .join(', ') || 'Location not specified'}
-                          </span>
-                          {lead.latitude && lead.longitude && (
-                            <a
-                              href={`https://maps.google.com/?q=${lead.latitude},${lead.longitude}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-400 hover:underline"
-                            >
-                              <Compass size={12} />
-                              <span>View GPS Coordinates on Maps</span>
-                              <ExternalLink size={10} />
-                            </a>
-                          )}
+                          {(() => {
+                            const locationInfo = getLeadLocationInfo(lead);
+                            return (
+                              <div className="flex flex-col gap-2 mt-0.5">
+                                <span className="text-xs font-bold text-foreground">
+                                  {locationInfo.locationText}
+                                </span>
+
+                                <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                                  {locationInfo.hasCoords ? (
+                                    <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] font-mono font-bold text-emerald-400">
+                                      <Compass size={12} />
+                                      <span>GPS: {locationInfo.coordsString}</span>
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] italic text-muted">
+                                      GPS coordinates not captured
+                                    </span>
+                                  )}
+
+                                  {locationInfo.mapsUrl && (
+                                    <a
+                                      href={locationInfo.mapsUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition-colors"
+                                    >
+                                      <MapPin size={13} />
+                                      <span>
+                                        {locationInfo.hasCoords ? 'Open in Google Maps' : 'Search on Google Maps'}
+                                      </span>
+                                      <ExternalLink size={11} />
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -462,9 +494,30 @@ export function LeadDetailsDrawer({
                         <span className="text-[10px] font-bold text-muted uppercase">
                           Interested Model
                         </span>
-                        <p className="text-xs font-bold text-foreground">
-                          {lead.interestedModel || lead.tractor?.modelName || 'General Enquiry'}
-                        </p>
+                        {(() => {
+                          const productLink = getLeadProductLink(lead);
+                          if (!productLink) {
+                            return (
+                              <p className="text-xs font-bold text-muted italic mt-0.5">
+                                General Enquiry
+                              </p>
+                            );
+                          }
+                          return (
+                            <div className="mt-1">
+                              <a
+                                href={productLink.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group inline-flex items-center gap-1.5 rounded-xl border border-[#4a7635]/30 bg-[#4a7635]/10 px-3 py-1.5 text-xs font-bold text-[#4a7635] hover:bg-[#4a7635]/20 hover:border-[#4a7635]/50 transition-all shadow-sm"
+                                title={`Open ${productLink.label} details in a new tab`}
+                              >
+                                <span>{productLink.label}</span>
+                                <ExternalLink size={12} className="shrink-0 text-[#4a7635]" />
+                              </a>
+                            </div>
+                          );
+                        })()}
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-muted uppercase">
@@ -484,22 +537,50 @@ export function LeadDetailsDrawer({
                           <IntentScoreBadge score={lead.intentScore} />
                         </div>
                       </div>
-                      <div>
-                        <span className="text-[10px] font-bold text-muted uppercase">
-                          Source Page
-                        </span>
-                        <p className="text-xs font-mono font-semibold text-foreground/80">
-                          {lead.sourcePage || 'direct'}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-bold text-muted uppercase">
-                          Source Campaign
-                        </span>
-                        <p className="text-xs font-mono font-semibold text-foreground/80">
-                          {lead.sourceCampaign || 'organic'}
-                        </p>
-                      </div>
+                      {(() => {
+                        const sourceInfo = getLeadSourceInfo(lead);
+                        return (
+                          <>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-bold text-muted uppercase">
+                                Source Page (कुठून आला)
+                              </span>
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-bold text-foreground">
+                                  {sourceInfo.pageLabel}
+                                </span>
+                                {sourceInfo.originProductHref && (
+                                  <a
+                                    href={sourceInfo.originProductHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#4a7635] hover:underline"
+                                  >
+                                    <span>Origin: {sourceInfo.originProductLabel}</span>
+                                    <ExternalLink size={10} />
+                                  </a>
+                                )}
+                                <span className="text-[10px] font-mono text-muted">
+                                  ref: {sourceInfo.rawPage || 'direct'}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-bold text-muted uppercase">
+                                Source Campaign
+                              </span>
+                              <div className="flex flex-col gap-0.5">
+                                <p className="text-xs font-bold text-foreground">
+                                  {sourceInfo.campaignLabel}
+                                </p>
+                                <span className="text-[10px] font-mono text-muted">
+                                  tag: {sourceInfo.rawPage || lead.sourceCampaign || 'organic'}
+                                </span>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
 
                     {lead.message && (
@@ -542,15 +623,15 @@ export function LeadDetailsDrawer({
                       </div>
                       <div>
                         <span className="text-muted">Converted At:</span>{' '}
-                        <span className="text-lime-400">
+                        <span className="font-semibold text-emerald-700 dark:text-emerald-400">
                           {lead.convertedAt
                             ? new Date(lead.convertedAt).toLocaleString('en-IN')
                             : 'Not converted'}
                         </span>
                       </div>
                       {lead.isDuplicate && (
-                        <div className="col-span-2 flex items-center gap-2 rounded-xl bg-purple-500/10 p-2.5 text-purple-300">
-                          <Copy size={14} className="shrink-0" />
+                        <div className="col-span-2 flex items-center gap-2.5 rounded-xl bg-purple-100 dark:bg-purple-950/50 border border-purple-300 dark:border-purple-800/60 p-3 text-purple-900 dark:text-purple-200 font-semibold text-xs shadow-sm">
+                          <Copy size={15} className="shrink-0 text-purple-700 dark:text-purple-400" />
                           <span>
                             This enquiry is tagged as a duplicate submission.
                             {lead.mergedIntoId && ` Merged into original #${lead.mergedIntoId}.`}
@@ -604,12 +685,23 @@ export function LeadDetailsDrawer({
                           className="rounded-xl border border-[var(--border-subtle)] bg-background px-3 py-2.5 text-xs font-bold text-foreground focus:border-[#4a7635] focus:outline-none"
                         >
                           <option value="">-- Unassigned --</option>
+                          {lead.assignedAgent &&
+                            !agents.some((ag) => ag.id === lead.assignedAgent!.id) && (
+                              <option value={lead.assignedAgent.id}>
+                                👤 {lead.assignedAgent.fullName} (Current)
+                              </option>
+                            )}
                           {agents.map((ag) => (
                             <option key={ag.id} value={ag.id}>
                               👤 {ag.fullName}
                             </option>
                           ))}
                         </select>
+                        {lead.assignedAgent && (
+                          <span className="text-[10px] text-muted">
+                            Currently assigned to: <strong className="text-foreground">{lead.assignedAgent.fullName}</strong>
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex flex-col gap-1.5">

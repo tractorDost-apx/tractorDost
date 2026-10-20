@@ -16,7 +16,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-background relative z-10 mt-24 overflow-hidden border-t border-[var(--border-subtle)] pt-20 pb-10">
+    <footer className="bg-background relative z-10 mt-6 overflow-hidden border-t border-[var(--border-subtle)] pt-12 pb-10">
       <div className="relative z-10 mx-auto max-w-7xl px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand Column */}

@@ -89,7 +89,9 @@ export function BulkAssignModal({
               onChange={(e) => setTargetAgentId(e.target.value)}
               className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-2.5 text-xs font-bold text-foreground focus:border-[#4a7635] focus:outline-none"
             >
-              <option value="">-- Choose an Agent --</option>
+              <option value="">
+                {agents.length > 0 ? '-- Choose an Agent --' : '-- No Agents Found --'}
+              </option>
               {agents.map((ag) => (
                 <option key={ag.id} value={ag.id}>
                   👤 {ag.fullName}

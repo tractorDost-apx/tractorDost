@@ -3,19 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Search,
   ChevronRight,
   Star,
   Tractor,
   Handshake,
-  CircleDollarSign,
   Landmark,
+  CircleDollarSign,
   Wrench,
 } from 'lucide-react';
 import { tractorAPI, Tractor as TractorModel } from '@/lib/api/tractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { compareAPI, CompareFrequencyRecord } from '@/lib/api/compare';
-import { AnimatedWord } from '@/components/ui/AnimatedWord';
+import HeroSliderSection from '@/components/homepage/HeroSliderSection';
 
 interface HomePageClientProps {
   children?: React.ReactNode;
@@ -26,10 +25,6 @@ export default function HomePageClient({ children }: HomePageClientProps) {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [comparisons, setComparisons] = useState<CompareFrequencyRecord[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Smart Matcher State
-  const [budget, setBudget] = useState('');
-  const [hp, setHp] = useState('');
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -83,149 +78,16 @@ export default function HomePageClient({ children }: HomePageClientProps) {
   const maxFreq = comparisons.length > 0 ? Math.max(...comparisons.map((c) => c.frequency)) : 1;
 
   return (
-    <div className="animate-fade-in mx-auto mt-6 flex w-full max-w-[1440px] flex-col items-center justify-center gap-20 px-4 pb-24">
+    <div className="animate-fade-in flex w-full flex-col items-center justify-center">
       {/* =========================================
-          HERO & SEARCH DASHBOARD
+          HERO & SMART FINDER SLIDER SECTION (Full-Bleed, Edge-to-Edge)
           ========================================= */}
-      <section className="group relative mt-2 flex w-full flex-col items-center justify-center overflow-hidden rounded-[2.5rem] p-8 text-center md:p-16">
-        {/* Refined Ambient Glows */}
-        <div className="pointer-events-none absolute top-[-10%] right-[-5%] h-[700px] w-[700px] rounded-full bg-[var(--color-brand-green)]/15 blur-[120px] transition-all duration-1000 group-hover:bg-[var(--color-brand-green)]/20" />
-        <div className="pointer-events-none absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] rounded-full bg-[var(--color-brand-orange)]/10 blur-[100px] transition-all duration-1000 group-hover:bg-[var(--color-brand-orange)]/15" />
-
-        {/* Subtle Grid */}
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_20%,transparent_100%)] bg-[size:48px_48px]" />
-
-        <div className="relative z-10 flex w-full flex-col items-center">
-          {/* Professional Badge */}
-          <div className="mb-8 inline-flex cursor-default items-center gap-2.5 rounded-full border border-[var(--border-brand)] bg-[var(--color-brand-green)]/5 px-4 py-1.5 backdrop-blur-md transition-all duration-300 hover:bg-[var(--color-brand-green)]/10">
-            <span className="relative flex h-2 w-2">
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-brand-green)]"></span>
-            </span>
-            <span className="text-foreground/80 text-xs font-semibold tracking-widest uppercase">
-              India&apos;s Premium Tractor Network
-            </span>
-          </div>
-
-          <h1 className="text-foreground flex max-w-5xl flex-col items-center justify-center text-4xl leading-[1.1] font-bold tracking-tight md:text-[5.5rem]">
-            <span className="mb-2 md:mb-3">Find the Perfect</span>
-            <div className="flex h-[1.1em] items-center justify-center overflow-visible text-[var(--color-brand-green)]">
-              <AnimatedWord />
-            </div>
-            <span className="text-muted mt-2 text-2xl font-medium tracking-tight opacity-90 md:mt-3 md:text-5xl">
-              for Your Farm
-            </span>
-          </h1>
-          <p className="text-muted mt-8 max-w-2xl text-base leading-relaxed font-normal md:text-xl">
-            Discover, buy, and finance premium new and used tractors. Compare models and connect
-            with verified dealers instantly.
-          </p>
-
-          {/* Unified Professional Search Bar */}
-          <div className="bg-background/60 mt-12 flex w-full max-w-4xl flex-col items-center rounded-[1.5rem] border border-[var(--border-brand)] p-2 shadow-[0_8px_30px_rgba(0,0,0,0.04)] backdrop-blur-xl transition-all duration-300 focus-within:border-[var(--color-brand-green)]/40 focus-within:shadow-[0_8px_40px_rgba(74,118,53,0.08)] hover:shadow-lg md:flex-row">
-            <div className="flex w-full flex-1 items-center px-4 py-3 md:py-4">
-              <Search className="mr-3 text-[var(--color-brand-green)] opacity-80" size={20} />
-              <input
-                type="text"
-                placeholder="Search Brand, HP, Budget..."
-                className="text-foreground placeholder:text-muted/60 w-full border-none bg-transparent text-base font-medium focus:outline-none md:text-lg"
-                suppressHydrationWarning
-              />
-            </div>
-
-            <div className="bg-foreground/10 mx-2 hidden h-10 w-[1px] md:block" />
-
-            <div className="flex w-full border-t border-[var(--border-subtle)] pt-2 md:w-auto md:border-t-0 md:border-none md:pt-0">
-              <select
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                className="text-foreground flex-1 cursor-pointer appearance-none border-r border-[var(--border-subtle)] bg-transparent px-4 py-3 text-sm font-medium transition-colors outline-none md:flex-none md:border-none md:py-4 md:text-base"
-                suppressHydrationWarning
-              >
-                <option value="" className="bg-background text-foreground">
-                  Any Budget
-                </option>
-                <option value="under5" className="bg-background text-foreground">
-                  Under 5 Lakh
-                </option>
-                <option value="5to8" className="bg-background text-foreground">
-                  5 - 8 Lakh
-                </option>
-                <option value="over8" className="bg-background text-foreground">
-                  Above 8 Lakh
-                </option>
-              </select>
-
-              <div className="bg-foreground/10 mx-2 hidden h-10 w-[1px] md:block" />
-
-              <select
-                value={hp}
-                onChange={(e) => setHp(e.target.value)}
-                className="text-foreground flex-1 cursor-pointer appearance-none bg-transparent px-4 py-3 text-sm font-medium transition-colors outline-none md:flex-none md:py-4 md:text-base"
-                suppressHydrationWarning
-              >
-                <option value="" className="bg-background text-foreground">
-                  Any HP
-                </option>
-                <option value="under30" className="bg-background text-foreground">
-                  Under 30 HP
-                </option>
-                <option value="30to50" className="bg-background text-foreground">
-                  30 - 50 HP
-                </option>
-                <option value="over50" className="bg-background text-foreground">
-                  Above 50 HP
-                </option>
-              </select>
-            </div>
-
-            <button
-              className="mt-2 w-full shrink-0 rounded-[1.2rem] bg-[var(--color-brand-green)] px-10 py-4 text-sm font-semibold tracking-wider text-white uppercase transition-colors hover:bg-[var(--color-brand-green-dark)] md:mt-0 md:ml-2 md:w-auto md:text-base"
-              suppressHydrationWarning
-            >
-              Explore
-            </button>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <QuickAction
-              icon={<Tractor className="h-5 w-5" strokeWidth={2} />}
-              label="New Tractors"
-              href="/tractors"
-              brand="green"
-            />
-            <QuickAction
-              icon={<Handshake className="h-5 w-5" strokeWidth={2} />}
-              label="Used Tractors"
-              href="/used-tractors"
-              brand="orange"
-            />
-            <QuickAction
-              icon={<CircleDollarSign className="h-5 w-5" strokeWidth={2} />}
-              label="Sell Tractor"
-              href="/sell"
-              brand="green"
-            />
-            <QuickAction
-              icon={<Landmark className="h-5 w-5" strokeWidth={2} />}
-              label="Tractor Loan"
-              href="/loan"
-              brand="orange"
-            />
-            <QuickAction
-              icon={<Wrench className="h-5 w-5" strokeWidth={2} />}
-              label="Implements"
-              href="/implements"
-              brand="green"
-            />
-          </div>
-        </div>
-      </section>
+      <HeroSliderSection />
 
       {/* =========================================
           DYNAMIC MAIN CONTENT (Synced with Backend)
           ========================================= */}
-      <div className="flex w-full flex-col gap-20">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-4 pt-14 pb-4 sm:px-6 lg:px-8">
         {/* 1. TOP BRANDS CAROUSEL */}
         <section className="flex flex-col gap-8">
           <div className="flex items-end justify-between">
@@ -384,104 +246,6 @@ export default function HomePageClient({ children }: HomePageClientProps) {
                   })}
               </div>
             </section>
-
-            {/* 4. TRENDING COMPARISONS (HOT VS BATTLES) */}
-            <section className="bg-background/40 mt-4 flex flex-col gap-6 rounded-[2.5rem] border border-[var(--border-subtle)] p-8 backdrop-blur-sm md:p-10">
-              <div className="mb-2 flex items-center gap-4">
-                <div className="bg-foreground/5 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--border-subtle)]">
-                  <Handshake size={24} className="text-[var(--color-brand-orange)]" />
-                </div>
-                <div className="flex flex-col">
-                  <h2 className="text-foreground text-2xl font-bold tracking-tight">
-                    Popular Comparisons
-                  </h2>
-                  <p className="text-muted mt-1 text-sm font-medium">
-                    Data-driven insights from farmer choices.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                {loading
-                  ? Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="bg-foreground/5 h-40 animate-pulse rounded-2xl" />
-                  ))
-                  : comparisons.map((comp, idx) => {
-                    const hotness = (comp.frequency / maxFreq) * 100;
-                    return (
-                      <Link
-                        key={idx}
-                        href={`/compare?ids=${comp.tractorLeft?.id},${comp.tractorRight?.id}`}
-                        className="bg-background group flex cursor-pointer flex-col gap-4 rounded-2xl border border-[var(--border-subtle)] p-5 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--border-brand-alt)] hover:shadow-md"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex w-5/12 flex-col items-center text-center">
-                            <div className="bg-foreground/5 mb-2 flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl p-2 transition-colors">
-                              {comp.tractorLeft?.primaryMedia?.url ? (
-                                <img
-                                  src={comp.tractorLeft.primaryMedia.url}
-                                  alt="L"
-                                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                                />
-                              ) : (
-                                <Tractor size={20} className="text-muted" />
-                              )}
-                            </div>
-                            <span className="text-muted w-full truncate text-[9px] font-semibold tracking-wider uppercase">
-                              {comp.tractorLeft?.brand?.name}
-                            </span>
-                            <span className="text-foreground mt-0.5 w-full truncate text-xs leading-tight font-bold">
-                              {comp.tractorLeft?.modelName}
-                            </span>
-                          </div>
-
-                          <div className="relative flex w-2/12 flex-col items-center justify-center">
-                            <div className="bg-background text-muted z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[10px] font-bold">
-                              VS
-                            </div>
-                            <div className="bg-foreground/5 absolute z-0 h-[1px] w-full" />
-                          </div>
-
-                          <div className="flex w-5/12 flex-col items-center text-center">
-                            <div className="bg-foreground/5 mb-2 flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl p-2 transition-colors">
-                              {comp.tractorRight?.primaryMedia?.url ? (
-                                <img
-                                  src={comp.tractorRight.primaryMedia.url}
-                                  alt="R"
-                                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                                />
-                              ) : (
-                                <Tractor size={20} className="text-muted" />
-                              )}
-                            </div>
-                            <span className="text-muted w-full truncate text-[9px] font-semibold tracking-wider uppercase">
-                              {comp.tractorRight?.brand?.name}
-                            </span>
-                            <span className="text-foreground mt-0.5 w-full truncate text-xs leading-tight font-bold">
-                              {comp.tractorRight?.modelName}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="mt-2 flex flex-col gap-1.5">
-                          <div className="text-muted flex justify-between text-[10px] font-medium">
-                            <span>Match Rate</span>
-                            <span className="text-foreground font-bold">
-                              {Math.max(20, Math.round(hotness))}%
-                            </span>
-                          </div>
-                          <div className="bg-foreground/5 h-1 w-full overflow-hidden rounded-full">
-                            <div
-                              className="h-full rounded-full bg-[var(--color-brand-green)]/80 transition-all duration-1000"
-                              style={{ width: `${Math.max(20, hotness)}%` }}
-                            />
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-              </div>
-            </section>
           </div>
 
           {/* RIGHT COLUMN: Sidebar Widgets (Finance & Dealers) */}
@@ -577,6 +341,112 @@ export default function HomePageClient({ children }: HomePageClientProps) {
             </div>
           </div>
         </div>
+
+        {/* 4. TRENDING COMPARISONS (HOT VS BATTLES) - Full Width Section */}
+        <section className="bg-background/40 flex w-full flex-col gap-6 rounded-[2.5rem] border border-[var(--border-subtle)] p-6 backdrop-blur-sm sm:p-8 md:p-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-foreground/5 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--border-subtle)]">
+                <Handshake size={24} className="text-[var(--color-brand-orange)]" />
+              </div>
+              <div className="flex flex-col">
+                <h2 className="text-foreground text-2xl font-bold tracking-tight">
+                  Popular Comparisons
+                </h2>
+                <p className="text-muted mt-1 text-sm font-medium">
+                  Data-driven insights from farmer choices.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/compare"
+              className="hidden items-center gap-2 text-sm font-bold tracking-wider text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)] sm:flex"
+            >
+              Compare All <ChevronRight size={16} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {loading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-foreground/5 h-40 animate-pulse rounded-2xl" />
+              ))
+              : comparisons.map((comp, idx) => {
+                const hotness = (comp.frequency / maxFreq) * 100;
+                return (
+                  <Link
+                    key={idx}
+                    href={`/compare?ids=${comp.tractorLeft?.id},${comp.tractorRight?.id}`}
+                    className="bg-background group flex cursor-pointer flex-col gap-4 rounded-2xl border border-[var(--border-subtle)] p-5 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--border-brand-alt)] hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex w-5/12 flex-col items-center text-center">
+                        <div className="bg-foreground/5 mb-2 flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl p-2 transition-colors">
+                          {comp.tractorLeft?.primaryMedia?.url ? (
+                            <img
+                              src={comp.tractorLeft.primaryMedia.url}
+                              alt="L"
+                              className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                            />
+                          ) : (
+                            <Tractor size={20} className="text-muted" />
+                          )}
+                        </div>
+                        <span className="text-muted w-full truncate text-[9px] font-semibold tracking-wider uppercase">
+                          {comp.tractorLeft?.brand?.name}
+                        </span>
+                        <span className="text-foreground mt-0.5 w-full truncate text-xs leading-tight font-bold">
+                          {comp.tractorLeft?.modelName}
+                        </span>
+                      </div>
+
+                      <div className="relative flex w-2/12 flex-col items-center justify-center">
+                        <div className="bg-background text-muted z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[10px] font-bold">
+                          VS
+                        </div>
+                        <div className="bg-foreground/5 absolute z-0 h-[1px] w-full" />
+                      </div>
+
+                      <div className="flex w-5/12 flex-col items-center text-center">
+                        <div className="bg-foreground/5 mb-2 flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl p-2 transition-colors">
+                          {comp.tractorRight?.primaryMedia?.url ? (
+                            <img
+                              src={comp.tractorRight.primaryMedia.url}
+                              alt="R"
+                              className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                            />
+                          ) : (
+                            <Tractor size={20} className="text-muted" />
+                          )}
+                        </div>
+                        <span className="text-muted w-full truncate text-[9px] font-semibold tracking-wider uppercase">
+                          {comp.tractorRight?.brand?.name}
+                        </span>
+                        <span className="text-foreground mt-0.5 w-full truncate text-xs leading-tight font-bold">
+                          {comp.tractorRight?.modelName}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 flex flex-col gap-1.5">
+                      <div className="text-muted flex justify-between text-[10px] font-medium">
+                        <span>Match Rate</span>
+                        <span className="text-foreground font-bold">
+                          {Math.max(20, Math.round(hotness))}%
+                        </span>
+                      </div>
+                      <div className="bg-foreground/5 h-1 w-full overflow-hidden rounded-full">
+                        <div
+                          className="h-full rounded-full bg-[var(--color-brand-green)]/80 transition-all duration-1000"
+                          style={{ width: `${Math.max(20, hotness)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+          </div>
+        </section>
       </div>
 
       {/* Dynamic Sections (FAQ Section at the bottom above footer) */}
