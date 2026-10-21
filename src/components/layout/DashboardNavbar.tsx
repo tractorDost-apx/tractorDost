@@ -107,7 +107,7 @@ export function DashboardNavbar() {
                 </div>
               </div>
               <Link
-                href="/profile"
+                href="/profile?edit=true"
                 className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
               >
                 <UserIcon size={16} /> Edit Profile

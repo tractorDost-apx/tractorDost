@@ -84,7 +84,7 @@ export const usersAPI = {
     const response = await apiClient.patch<{
       success: boolean;
       data: { id: number; isActive: boolean; message: string };
-    }>(`/users/toggleUserActive/${id}`);
+    }>(`/users/toggleUserActive/${id}`, {});
     return response.data;
   },
 

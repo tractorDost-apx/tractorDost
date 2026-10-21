@@ -57,10 +57,14 @@ export function Navbar() {
   return (
     <>
       <div
-        className={`pointer-events-none fixed top-4 right-0 left-0 z-50 flex justify-center px-4 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-6 ${scrolled ? 'top-2' : 'top-6'}`}
+        className={`pointer-events-none fixed top-4 right-0 left-0 z-50 flex justify-center px-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-6 ${scrolled ? 'top-2' : 'top-5'}`}
       >
         <nav
-          className={`spatial-panel pointer-events-auto flex w-full max-w-[1380px] items-center justify-between !rounded-2xl px-6 py-2.5 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${scrolled ? 'border-[var(--border-subtle)] bg-[var(--panel-bg)] shadow-[var(--nav-shadow-scrolled)] backdrop-blur-2xl' : 'bg-background/40 border-[var(--border-subtle)] shadow-none backdrop-blur-md'}`}
+          className={`pointer-events-auto flex w-full max-w-[1380px] items-center justify-between !rounded-2xl px-6 py-2 transition-all duration-300 border backdrop-blur-2xl ${
+            scrolled
+              ? 'border-black/10 bg-white/98 shadow-[0_15px_40px_-8px_rgba(0,0,0,0.18),0_2px_4px_rgba(0,0,0,0.06)] dark:border-white/20 dark:bg-[#0c100e]/98 dark:shadow-[0_20px_50px_-8px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.1)]'
+              : 'border-black/10 bg-white/95 shadow-[0_10px_35px_-5px_rgba(0,0,0,0.14),0_1px_3px_rgba(0,0,0,0.06)] dark:border-white/15 dark:bg-[#0c100e]/95 dark:shadow-[0_15px_45px_-8px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)]'
+          }`}
         >
           {/* Logo */}
           <Link href="/" className="group mr-4 flex shrink-0 items-center gap-3 lg:mr-8">
@@ -166,20 +170,23 @@ export function Navbar() {
             {/* Primary Sell CTA */}
             <Link
               href="/sell-used-tractor"
-              className="hidden items-center gap-1.5 rounded-full border border-[var(--color-brand-orange)]/20 bg-[var(--color-brand-orange)]/10 px-4 py-1.5 text-sm font-black tracking-wide text-[var(--color-brand-orange)] uppercase transition-all duration-300 hover:bg-[var(--color-brand-orange)] hover:text-white hover:shadow-[0_10px_20px_rgba(186,91,52,0.3)] sm:flex"
+              className="hidden items-center gap-1.5 rounded-full border border-[#ba5b34]/40 bg-[#ba5b34]/10 px-4 py-1.5 text-xs font-black tracking-wider text-[#ba5b34] uppercase transition-all duration-200 hover:border-[#ba5b34] hover:bg-[#ba5b34] hover:text-white hover:shadow-[0_4px_16px_rgba(186,91,52,0.35)] active:scale-95 sm:flex dark:border-[#ea580c]/50 dark:bg-[#ea580c]/15 dark:text-[#fb923c] dark:hover:border-[#ea580c] dark:hover:bg-[#ea580c] dark:hover:text-white dark:hover:shadow-[0_4px_16px_rgba(234,88,12,0.4)]"
             >
-              <span className="mb-[2px] text-base leading-none">+</span> Sell
+              <span className="mb-[1px] text-sm leading-none font-black">+</span> SELL
             </Link>
 
             <div className="ml-1 hidden sm:block">
               <ThemeToggle />
             </div>
 
-            <button className="text-foreground/70 hover:bg-foreground/10 hover:text-foreground hidden h-9 w-9 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-95 sm:flex">
+            <button
+              aria-label="Search"
+              className="hidden h-9 w-9 items-center justify-center rounded-full text-zinc-700 transition-all duration-200 hover:scale-105 hover:bg-black/5 hover:text-black sm:flex dark:text-zinc-200 dark:hover:bg-white/10 dark:hover:text-white"
+            >
               <Search size={18} strokeWidth={2.5} />
             </button>
 
-            <div className="bg-foreground/20 mx-1 hidden h-5 w-[1px] sm:block" />
+            <div className="mx-1 hidden h-5 w-[1px] bg-black/10 sm:block dark:bg-white/15" />
 
             {isAuthenticated ? (
               <div className="ml-1 flex items-center gap-1 sm:gap-2">
@@ -257,7 +264,7 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)}
-                  className="spatial-button shrink-0 rounded-full px-6 py-2 text-sm whitespace-nowrap shadow-lg"
+                  className="shrink-0 rounded-full bg-[var(--color-brand-green)] px-6 py-2 text-sm font-bold text-white whitespace-nowrap shadow-md transition-all duration-200 hover:bg-[var(--color-brand-green-dark)] hover:shadow-lg active:scale-95"
                 >
                   Login
                 </button>
@@ -266,7 +273,7 @@ export function Navbar() {
 
             {/* Mobile Menu Toggle */}
             <button
-              className="bg-foreground/5 text-foreground hover:bg-foreground/10 flex h-10 w-10 items-center justify-center rounded-full transition-all xl:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-zinc-700 transition-all hover:bg-black/10 hover:text-black xl:hidden dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15 dark:hover:text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -361,7 +368,13 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`group relative rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${isActive ? 'text-foreground bg-foreground/10' : highlight ? 'text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10' : 'text-muted hover:text-foreground hover:bg-foreground/10'}`}
+      className={`group relative rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${
+        isActive
+          ? 'bg-black/10 text-black dark:bg-white/15 dark:text-white'
+          : highlight
+            ? 'text-[#ba5b34] hover:bg-[#ba5b34]/10 hover:text-[#9e4622] dark:text-[#fb923c] dark:hover:bg-[#fb923c]/20 dark:hover:text-[#fdba74]'
+            : 'text-zinc-800 hover:bg-black/5 hover:text-black dark:text-zinc-200 dark:hover:bg-white/10 dark:hover:text-white'
+      }`}
     >
       {label}
       {isActive && (
@@ -383,7 +396,7 @@ function DropdownLink({
   return (
     <Link
       href={href}
-      className="text-muted hover:text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all"
+      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-zinc-700 transition-all hover:bg-black/5 hover:text-black dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
     >
       <span className="opacity-70">{icon}</span>
       {label}
@@ -576,7 +589,11 @@ function NavDropdownMenu({
     <div className="group/nav relative">
       {/* Trigger */}
       <button
-        className={`relative flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${isActive ? 'text-foreground bg-foreground/10' : 'text-muted hover:text-foreground hover:bg-foreground/10'}`}
+        className={`relative flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${
+          isActive
+            ? 'bg-black/10 text-black dark:bg-white/15 dark:text-white'
+            : 'text-zinc-800 hover:bg-black/5 hover:text-black dark:text-zinc-200 dark:hover:bg-white/10 dark:hover:text-white'
+        }`}
       >
         {label}
         <svg
@@ -585,7 +602,7 @@ function NavDropdownMenu({
           viewBox="0 0 24 24"
           strokeWidth={3}
           stroke="currentColor"
-          className="h-3 w-3 opacity-50 transition-transform duration-300 group-hover/nav:rotate-180"
+          className="h-3 w-3 text-zinc-400 group-hover/nav:text-zinc-800 dark:text-zinc-500 dark:group-hover/nav:text-zinc-200 transition-transform duration-300 group-hover/nav:rotate-180"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
@@ -607,7 +624,7 @@ function NavDropdownMenu({
               return (
                 <div key={i} className="group/submenu relative flex flex-col">
                   {/* Trigger Row */}
-                  <div className="hover:bg-foreground/10 text-foreground flex cursor-pointer items-center justify-between rounded-xl px-4 py-3 transition-all hover:text-[var(--color-brand-green)]">
+                  <div className="flex cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-zinc-900 transition-all hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-100 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]">
                     <span className="text-sm font-black tracking-tight uppercase">Brands</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -615,7 +632,7 @@ function NavDropdownMenu({
                       viewBox="0 0 24 24"
                       strokeWidth={3}
                       stroke="currentColor"
-                      className="h-3.5 w-3.5 transition-transform duration-300"
+                      className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500 transition-transform duration-300"
                     >
                       <path
                         strokeLinecap="round"
@@ -637,7 +654,7 @@ function NavDropdownMenu({
                       {/* Scrollable Brands List (displays exactly 3 complete items) */}
                       <div className="brand-scrollbar flex max-h-[112px] flex-col gap-0.5 overflow-x-hidden overflow-y-auto pr-1">
                         {brands.length === 0 ? (
-                          <span className="text-muted/60 block shrink-0 px-3 py-2.5 text-xs font-bold italic">
+                          <span className="block shrink-0 px-3 py-2.5 text-xs font-bold italic text-zinc-400 dark:text-zinc-500">
                             No active brands
                           </span>
                         ) : (
@@ -651,10 +668,11 @@ function NavDropdownMenu({
                                 key={brand.id}
                                 href={`/tractors?brand=${brand.id}`}
                                 onMouseEnter={() => handleBrandHover(brand.id)}
-                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isBrandActive
-                                    ? 'bg-foreground/5 text-[var(--color-brand-green)]'
-                                    : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                  }`}
+                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                  isBrandActive
+                                    ? 'bg-black/5 text-[var(--color-brand-green)] dark:bg-white/10'
+                                    : 'text-zinc-700 hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]'
+                                }`}
                               >
                                 {displayName}
                               </Link>
@@ -664,27 +682,28 @@ function NavDropdownMenu({
                       </div>
 
                       {/* Separator / Divider */}
-                      <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
+                      <div className="my-1 h-[1px] shrink-0 bg-black/10 dark:bg-white/10" />
 
                       {/* ALL BRANDS (outside scroll) */}
                       <Link
                         href="/brands"
-                        className="text-foreground hover:bg-foreground/5 block w-full shrink-0 rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
+                        className="block w-full shrink-0 rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase text-zinc-900 transition-colors hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-100 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]"
                       >
                         All Brands
                       </Link>
 
                       {/* Family Dropdown Panel (renders nested next to Brands panel) */}
                       <div
-                        className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeBrandId
+                        className={`absolute ${positionRight ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                          activeBrandId
                             ? 'pointer-events-auto scale-100 opacity-100'
                             : 'pointer-events-none scale-95 opacity-0'
-                          }`}
+                        }`}
                       >
                         <div className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5">
                           {loadingBrandId === activeBrandId ? (
                             <div className="flex shrink-0 items-center justify-center py-6">
-                              <span className="text-muted animate-pulse text-xs font-bold">
+                              <span className="animate-pulse text-xs font-bold text-zinc-400 dark:text-zinc-500">
                                 Loading families...
                               </span>
                             </div>
@@ -696,7 +715,7 @@ function NavDropdownMenu({
                                   <Link
                                     key={family.id}
                                     href={`/tractors?brand=${activeBrandId}&family=${family.id}`}
-                                    className="text-muted hover:bg-foreground/5 block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors hover:text-[var(--color-brand-green)]"
+                                    className="block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase text-zinc-700 transition-colors hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]"
                                   >
                                     {family.name}
                                   </Link>
@@ -704,12 +723,12 @@ function NavDropdownMenu({
                               </div>
 
                               {/* Separator / Divider */}
-                              <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
+                              <div className="my-1 h-[1px] shrink-0 bg-black/10 dark:bg-white/10" />
 
                               {/* ALL FAMILIES button */}
                               <Link
                                 href={`/tractors?brand=${activeBrandId}`}
-                                className="text-foreground hover:bg-foreground/5 flex w-full shrink-0 items-center justify-between rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
+                                className="flex w-full shrink-0 items-center justify-between rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase text-zinc-900 transition-colors hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-100 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]"
                               >
                                 <span>All Families</span>
                                 <span className="text-xs leading-none">→</span>
@@ -717,7 +736,7 @@ function NavDropdownMenu({
                             </>
                           ) : (
                             <div className="flex shrink-0 items-center justify-center px-3 py-6">
-                              <span className="text-muted/60 text-xs font-bold italic">
+                              <span className="text-xs font-bold italic text-zinc-400 dark:text-zinc-500">
                                 No families available
                               </span>
                             </div>
@@ -746,7 +765,7 @@ function NavDropdownMenu({
               return (
                 <div key={i} className="group/submenu relative flex flex-col">
                   {/* Trigger Row */}
-                  <div className="hover:bg-foreground/10 text-foreground flex cursor-pointer items-center justify-between rounded-xl px-4 py-3 transition-all hover:text-[var(--color-brand-green)]">
+                  <div className="flex cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-zinc-900 transition-all hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-100 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]">
                     <span className="text-sm font-black tracking-tight uppercase">Brands</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -754,7 +773,7 @@ function NavDropdownMenu({
                       viewBox="0 0 24 24"
                       strokeWidth={3}
                       stroke="currentColor"
-                      className="h-3.5 w-3.5 transition-transform duration-300"
+                      className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500 transition-transform duration-300"
                     >
                       <path
                         strokeLinecap="round"
@@ -773,7 +792,7 @@ function NavDropdownMenu({
                       {/* Scrollable Brands List */}
                       <div className="brand-scrollbar flex max-h-[112px] flex-col gap-0.5 overflow-x-hidden overflow-y-auto pr-1">
                         {eqBrands.length === 0 ? (
-                          <span className="text-muted/60 block shrink-0 px-3 py-2.5 text-xs font-bold italic">
+                          <span className="block shrink-0 px-3 py-2.5 text-xs font-bold italic text-zinc-400 dark:text-zinc-500">
                             No active brands
                           </span>
                         ) : (
@@ -787,10 +806,11 @@ function NavDropdownMenu({
                                 key={brand.id}
                                 href={`/implements?brand=${brand.slug}`}
                                 onMouseEnter={() => handleEqBrandHover(brand.id)}
-                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isBrandActive
-                                    ? 'bg-foreground/5 text-[var(--color-brand-green)]'
-                                    : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                  }`}
+                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                  isBrandActive
+                                    ? 'bg-black/5 text-[var(--color-brand-green)] dark:bg-white/10'
+                                    : 'text-zinc-700 hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]'
+                                }`}
                               >
                                 {displayName}
                               </Link>
@@ -800,12 +820,12 @@ function NavDropdownMenu({
                       </div>
 
                       {/* Separator / Divider */}
-                      <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
+                      <div className="my-1 h-[1px] shrink-0 bg-black/10 dark:bg-white/10" />
 
                       {/* ALL BRANDS (outside scroll) */}
                       <Link
                         href="/implements"
-                        className="text-foreground hover:bg-foreground/5 block w-full shrink-0 rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
+                        className="block w-full shrink-0 rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase text-zinc-900 transition-colors hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-100 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]"
                       >
                         All Brands
                       </Link>
@@ -813,10 +833,11 @@ function NavDropdownMenu({
                       {/* Category Dropdown Panel (renders nested next to Brands panel) */}
                       <div
                         ref={categoryPanelRef}
-                        className={`absolute ${positionRightCategory ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeEqBrandId
+                        className={`absolute ${positionRightCategory ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[70] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                          activeEqBrandId
                             ? 'pointer-events-auto scale-100 opacity-100'
                             : 'pointer-events-none scale-95 opacity-0'
-                          }`}
+                        }`}
                       >
                         <div
                           className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5"
@@ -824,7 +845,7 @@ function NavDropdownMenu({
                         >
                           {loadingEqBrandId === activeEqBrandId ? (
                             <div className="flex shrink-0 items-center justify-center py-6">
-                              <span className="text-muted animate-pulse text-xs font-bold">
+                              <span className="animate-pulse text-xs font-bold text-zinc-400 dark:text-zinc-500">
                                 Loading categories...
                               </span>
                             </div>
@@ -855,7 +876,7 @@ function NavDropdownMenu({
                                           key={parent.id}
                                           className="mt-1 flex shrink-0 flex-col gap-0.5"
                                         >
-                                          <div className="text-muted/50 px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase">
+                                          <div className="px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase text-zinc-400 dark:text-zinc-500">
                                             {parent.name}
                                           </div>
                                           {children.map((child) => {
@@ -867,10 +888,11 @@ function NavDropdownMenu({
                                                 onMouseEnter={() =>
                                                   handleCategoryHover(activeEqBrandId, child.id)
                                                 }
-                                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2 pl-5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isChildActive
-                                                    ? 'bg-foreground/5 text-[var(--color-brand-green)]'
-                                                    : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                                  }`}
+                                                className={`block w-full shrink-0 truncate rounded-lg px-3 py-2 pl-5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                                  isChildActive
+                                                    ? 'bg-black/5 text-[var(--color-brand-green)] dark:bg-white/10'
+                                                    : 'text-zinc-700 hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]'
+                                                }`}
                                               >
                                                 {child.name}
                                               </Link>
@@ -887,10 +909,11 @@ function NavDropdownMenu({
                                           onMouseEnter={() =>
                                             handleCategoryHover(activeEqBrandId, parent.id)
                                           }
-                                          className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${isParentActive
-                                              ? 'bg-foreground/5 text-[var(--color-brand-green)]'
-                                              : 'text-muted hover:bg-foreground/5 hover:text-[var(--color-brand-green)]'
-                                            }`}
+                                          className={`block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors ${
+                                            isParentActive
+                                              ? 'bg-black/5 text-[var(--color-brand-green)] dark:bg-white/10'
+                                              : 'text-zinc-700 hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]'
+                                          }`}
                                         >
                                           {parent.name}
                                         </Link>
@@ -902,7 +925,7 @@ function NavDropdownMenu({
                             </>
                           ) : (
                             <div className="flex shrink-0 items-center justify-center px-3 py-6">
-                              <span className="text-muted/60 text-xs font-bold italic">
+                              <span className="text-xs font-bold italic text-zinc-400 dark:text-zinc-500">
                                 No categories available
                               </span>
                             </div>
@@ -911,15 +934,16 @@ function NavDropdownMenu({
                           {/* Implement Models Dropdown Panel (renders nested next to Category panel) */}
                           <div
                             ref={implementsPanelRef}
-                            className={`absolute ${positionRightImplement ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[80] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeCategoryId
+                            className={`absolute ${positionRightImplement ? 'left-full pl-2' : 'right-full pr-2'} top-0 z-[80] w-[328px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                              activeCategoryId
                                 ? 'pointer-events-auto scale-100 opacity-100'
                                 : 'pointer-events-none scale-95 opacity-0'
-                              }`}
+                            }`}
                           >
                             <div className="nav-dropdown-glass flex w-full flex-col gap-1 rounded-[1.5rem] p-2.5">
                               {loadingCategoryId === activeCategoryId ? (
                                 <div className="flex shrink-0 items-center justify-center py-6">
-                                  <span className="text-muted animate-pulse text-xs font-bold">
+                                  <span className="animate-pulse text-xs font-bold text-zinc-400 dark:text-zinc-500">
                                     Loading implements...
                                   </span>
                                 </div>
@@ -936,7 +960,7 @@ function NavDropdownMenu({
                                       <Link
                                         key={implement.id}
                                         href={`/implements/${implement.category?.slug}/${implement.slug}`}
-                                        className="text-muted hover:bg-foreground/5 block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase transition-colors hover:text-[var(--color-brand-green)]"
+                                        className="block w-full shrink-0 truncate rounded-lg px-3 py-2.5 text-xs leading-normal font-black whitespace-nowrap uppercase text-zinc-700 transition-colors hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]"
                                       >
                                         {implement.modelName}
                                       </Link>
@@ -944,12 +968,12 @@ function NavDropdownMenu({
                                   </div>
 
                                   {/* Separator / Divider */}
-                                  <div className="my-1 h-[1px] shrink-0 bg-[var(--border-subtle)]" />
+                                  <div className="my-1 h-[1px] shrink-0 bg-black/10 dark:bg-white/10" />
 
                                   {/* ALL ITEMS link */}
                                   <Link
                                     href={`/implements/${activeCategorySlug}?brand=${activeBrandSlug}`}
-                                    className="text-foreground hover:bg-foreground/5 flex w-full shrink-0 items-center justify-between rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase transition-colors hover:text-[var(--color-brand-green)]"
+                                    className="flex w-full shrink-0 items-center justify-between rounded-lg px-3 py-2.5 text-xs leading-normal font-black tracking-wider uppercase text-zinc-900 transition-colors hover:bg-black/5 hover:text-[var(--color-brand-green)] dark:text-zinc-100 dark:hover:bg-white/10 dark:hover:text-[var(--color-brand-green)]"
                                   >
                                     <span>All models</span>
                                     <span className="text-xs leading-none">→</span>
@@ -957,7 +981,7 @@ function NavDropdownMenu({
                                 </>
                               ) : (
                                 <div className="flex shrink-0 items-center justify-center px-3 py-6">
-                                  <span className="text-muted/60 text-xs font-bold italic">
+                                  <span className="text-xs font-bold italic text-zinc-400 dark:text-zinc-500">
                                     No implements available
                                   </span>
                                 </div>
@@ -977,13 +1001,13 @@ function NavDropdownMenu({
             <Link
               key={i}
               href={item.href}
-              className="hover:bg-foreground/10 group/item flex flex-col rounded-xl px-4 py-3 transition-colors"
+              className="group/item flex flex-col rounded-xl px-4 py-2.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
             >
-              <span className="text-foreground text-sm font-black tracking-tight transition-colors group-hover/item:text-[var(--color-brand-green)]">
+              <span className="text-sm font-bold tracking-tight text-zinc-900 transition-colors group-hover/item:text-[var(--color-brand-green)] dark:text-zinc-100 dark:group-hover/item:text-[var(--color-brand-green)]">
                 {item.title}
               </span>
               {item.desc && (
-                <span className="text-muted mt-0.5 text-[11px] leading-tight font-bold">
+                <span className="mt-0.5 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
                   {item.desc}
                 </span>
               )}

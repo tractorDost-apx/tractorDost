@@ -7,6 +7,7 @@ import { leadAPI, type DetailAccessGrant, type DetailTargetType } from '@/lib/ap
 import {
   captureLocation,
   clearDetailAccess,
+  geocodeLocationText,
   getDetailAccessToken,
   saveDetailAccess,
 } from '@/lib/utils/detail-access';
@@ -33,7 +34,7 @@ export function useDetailAccess<T>(
   fetchDetail: DetailFetcher<T>,
   targetType: DetailTargetType = 'TRACTOR'
 ) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [state, setState] = useState<DetailAccessState<T>>({ status: 'loading' });
   const requestRef = useRef(0);
   const autoSubmittedRef = useRef<number | null>(null);
@@ -80,8 +81,14 @@ export function useDetailAccess<T>(
       (async () => {
         let grantToken: string | undefined;
         try {
-          // Attempt non-blocking GPS capture (2s timeout, never mandatory)
-          const coords = await captureLocation(2000);
+          // Attempt high-accuracy GPS capture (5s timeout)
+          let coords = await captureLocation(5000);
+
+          // If GPS is unavailable/denied, fallback to geocoding user's saved city & state
+          if (!coords && (user?.villageCity || user?.state)) {
+            coords = await geocodeLocationText(user.villageCity || undefined, user.state || undefined);
+          }
+
           const payload: any = {
             targetType,
             targetId,

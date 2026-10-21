@@ -17,11 +17,11 @@ export function AnimatedWord() {
   }, []);
 
   return (
-    <span className="relative inline-flex min-w-[220px] items-center justify-center md:min-w-[320px]">
-      <span className="pointer-events-none opacity-0 select-none">Implement</span>
+    <span className="relative inline-flex items-center justify-start text-left">
+      <span className="pointer-events-none opacity-0 select-none">{words[index]}</span>
       <span
         key={key}
-        className="text-gradient-brand animate-word-flip absolute inset-x-0 mx-auto text-center drop-shadow-[0_0_15px_rgba(74,118,53,0.3)] will-change-[transform,opacity]"
+        className="text-gradient-brand animate-word-flip absolute inset-y-0 left-0 flex items-center text-left whitespace-nowrap will-change-[transform,opacity]"
       >
         {words[index]}
       </span>

@@ -43,6 +43,12 @@ import {
   IntentScoreBadge,
   FollowupBadge,
 } from '../components/LeadStatusBadge';
+import {
+  getLeadProductLink,
+  getLeadLocationInfo,
+  getLeadSourceInfo,
+  parseStaffUsers,
+} from '../lead-helpers';
 import { LEAD_STATUSES } from '../components/LeadFilters';
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
 
@@ -125,8 +131,10 @@ export default function LeadDetailPage({
 
     const fetchRefs = async () => {
       try {
-        const [usersRes, dealersRes] = await Promise.allSettled([
+        const [usersRes, agentsRes, adminsRes, dealersRes] = await Promise.allSettled([
           usersAPI.getAllUsers({ limit: 100 }),
+          usersAPI.getAllUsers({ role: 'AGENT', limit: 100 }),
+          usersAPI.getAllUsers({ role: 'ADMIN', limit: 100 }),
           dealerAPI.getAllDealers({ limit: 100 }),
         ]);
 
@@ -141,14 +149,16 @@ export default function LeadDetailPage({
           setAgents(staffUsers);
         }
 
-        if (dealersRes.status === 'fulfilled' && dealersRes.value.success) {
-          const dealerList = (dealersRes.value.data as any)?.data || [];
-          setDealers(
-            dealerList.map((d: any) => ({
-              id: d.id,
-              businessName: d.businessName,
-            }))
-          );
+        if (dealersRes.status === 'fulfilled' && dealersRes.value && dealersRes.value.success) {
+          const dealerList = (dealersRes.value.data as any)?.data || dealersRes.value.data || [];
+          if (Array.isArray(dealerList)) {
+            setDealers(
+              dealerList.map((d: any) => ({
+                id: d.id,
+                businessName: d.businessName || d.showroomName || `Dealer #${d.id}`,
+              }))
+            );
+          }
         }
       } catch (e) {
         console.error('Failed to load references', e);
@@ -156,7 +166,7 @@ export default function LeadDetailPage({
     };
 
     fetchRefs();
-  }, [leadId]);
+  }, [leadId, user]);
 
   const handleSaveActions = async () => {
     if (!lead) return;
@@ -317,8 +327,8 @@ export default function LeadDetailPage({
             <LeadStatusBadge status={lead.status} />
             <LeadTypeBadge type={lead.leadType} />
             {lead.isDuplicate && (
-              <span className="inline-flex items-center gap-0.5 rounded bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-black text-purple-400 border border-purple-500/20">
-                <Copy size={10} />
+              <span className="inline-flex items-center gap-1 rounded-md bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-[10px] font-black text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-800/50">
+                <Copy size={10} className="text-purple-700 dark:text-purple-400" />
                 Duplicate
               </span>
             )}
@@ -438,29 +448,50 @@ export default function LeadDetailPage({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
                     <MapPin size={16} />
                   </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-muted uppercase">Location</span>
-                    <p className="text-xs font-bold text-foreground">
-                      {[lead.address, lead.city, lead.district, lead.state]
-                        .filter(Boolean)
-                        .join(', ') || 'Not specified'}
-                    </p>
-                    {lead.latitude && lead.longitude && (
-                      <a
-                        href={`https://maps.google.com/?q=${lead.latitude},${lead.longitude}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-400 hover:underline"
-                      >
-                        <Compass size={12} />
-                        <span>View on Google Maps</span>
-                        <ExternalLink size={10} />
-                      </a>
-                    )}
+                  <div className="flex flex-col flex-1">
+                    <span className="text-[10px] font-bold text-muted uppercase">Location & Coordinates</span>
+                    {(() => {
+                      const locationInfo = getLeadLocationInfo(lead);
+                      return (
+                        <div className="flex flex-col gap-2 mt-0.5">
+                          <p className="text-xs font-bold text-foreground">
+                            {locationInfo.locationText}
+                          </p>
+
+                          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                            {locationInfo.hasCoords ? (
+                              <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] font-mono font-bold text-emerald-400">
+                                <Compass size={12} />
+                                <span>GPS: {locationInfo.coordsString}</span>
+                              </span>
+                            ) : (
+                              <span className="text-[10px] italic text-muted">
+                                GPS coordinates not captured
+                              </span>
+                            )}
+
+                            {locationInfo.mapsUrl && (
+                              <a
+                                href={locationInfo.mapsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition-colors"
+                              >
+                                <MapPin size={13} />
+                                <span>
+                                  {locationInfo.hasCoords ? 'Open in Google Maps' : 'Search on Google Maps'}
+                                </span>
+                                <ExternalLink size={11} />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -478,11 +509,30 @@ export default function LeadDetailPage({
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-muted uppercase">Interested Model</span>
-                  <p className="font-bold text-foreground">{lead.interestedModel || lead.tractor?.modelName || 'General Enquiry'}</p>
+                  {(() => {
+                    const productLink = getLeadProductLink(lead);
+                    if (!productLink) {
+                      return <p className="font-bold text-foreground mt-0.5">General Enquiry</p>;
+                    }
+                    return (
+                      <div className="mt-1">
+                        <a
+                          href={productLink.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group inline-flex items-center gap-1.5 rounded-xl border border-[#4a7635]/30 bg-[#4a7635]/10 px-2.5 py-1 text-xs font-bold text-[#4a7635] hover:bg-[#4a7635]/20 hover:border-[#4a7635]/50 transition-all shadow-sm"
+                          title={`Open ${productLink.label} details in a new tab`}
+                        >
+                          <span>{productLink.label}</span>
+                          <ExternalLink size={11} className="shrink-0 text-[#4a7635]" />
+                        </a>
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-muted uppercase">Budget</span>
-                  <p className="font-bold text-emerald-400">
+                  <p className="font-bold text-emerald-700 dark:text-emerald-400">
                     {lead.budget && lead.budget > 0
                       ? `₹${Number(lead.budget).toLocaleString('en-IN')}`
                       : 'Not specified'}
@@ -494,15 +544,45 @@ export default function LeadDetailPage({
                     <FollowupBadge date={lead.nextFollowupAt} status={lead.status} />
                   </div>
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-muted uppercase">Source Page</span>
-                  <p className="font-mono text-muted">{lead.sourcePage || 'direct'}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-muted uppercase">Campaign</span>
-                  <p className="font-mono text-muted">{lead.sourceCampaign || 'organic'}</p>
-                </div>
+                {(() => {
+                  const sourceInfo = getLeadSourceInfo(lead);
+                  return (
+                    <>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[10px] font-bold text-muted uppercase">Source Page (कुठून आला)</span>
+                        <span className="font-bold text-foreground text-xs">{sourceInfo.pageLabel}</span>
+                        {sourceInfo.originProductHref && (
+                          <a
+                            href={sourceInfo.originProductHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-[#4a7635] hover:underline"
+                          >
+                            <span>Origin: {sourceInfo.originProductLabel}</span>
+                            <ExternalLink size={10} />
+                          </a>
+                        )}
+                        <span className="font-mono text-[10px] text-muted">ref: {sourceInfo.rawPage || 'direct'}</span>
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[10px] font-bold text-muted uppercase">Campaign</span>
+                        <p className="font-bold text-foreground text-xs">{sourceInfo.campaignLabel}</p>
+                        <span className="font-mono text-[10px] text-muted">tag: {sourceInfo.rawPage || lead.sourceCampaign || 'organic'}</span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
+
+              {lead.isDuplicate && (
+                <div className="flex items-center gap-2.5 rounded-xl bg-purple-100 dark:bg-purple-950/50 border border-purple-300 dark:border-purple-800/60 p-3 text-purple-900 dark:text-purple-200 font-semibold text-xs shadow-sm">
+                  <Copy size={16} className="shrink-0 text-purple-700 dark:text-purple-400" />
+                  <span>
+                    This enquiry is tagged as a duplicate submission.
+                    {lead.mergedIntoId && ` Merged into original #${lead.mergedIntoId}.`}
+                  </span>
+                </div>
+              )}
 
               {lead.message && (
                 <div className="border-t border-[var(--border-subtle)] pt-3">
@@ -547,12 +627,23 @@ export default function LeadDetailPage({
                   className="rounded-xl border border-[var(--border-subtle)] bg-background px-3 py-2.5 text-xs font-bold text-foreground focus:border-[#4a7635] focus:outline-none"
                 >
                   <option value="">-- Unassigned --</option>
+                  {lead.assignedAgent &&
+                    !agents.some((ag) => ag.id === lead.assignedAgent!.id) && (
+                      <option value={lead.assignedAgent.id}>
+                        👤 {lead.assignedAgent.fullName} (Current)
+                      </option>
+                    )}
                   {agents.map((ag) => (
                     <option key={ag.id} value={ag.id}>
                       👤 {ag.fullName}
                     </option>
                   ))}
                 </select>
+                {lead.assignedAgent && (
+                  <span className="text-[10px] text-muted">
+                    Currently assigned to: <strong className="text-foreground">{lead.assignedAgent.fullName}</strong>
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col gap-1.5">

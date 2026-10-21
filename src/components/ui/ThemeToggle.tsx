@@ -60,7 +60,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-black/5 shadow-sm transition-all duration-300 hover:scale-110 hover:bg-black/10 dark:border-[var(--border-subtle)] dark:bg-foreground/10 dark:hover:bg-foreground/10"
+      className="group flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-black/5 text-zinc-700 transition-all duration-200 hover:scale-105 hover:bg-black/10 hover:text-black dark:border-white/10 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15 dark:hover:text-white"
       aria-label="Toggle Dark Mode"
       title="Toggle Dark Mode"
     >
@@ -71,7 +71,7 @@ export function ThemeToggle() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-5 w-5 text-[var(--color-brand-orange)]"
+          className="h-4.5 w-4.5 text-amber-400 transition-colors group-hover:text-amber-300"
         >
           <path
             strokeLinecap="round"
@@ -86,7 +86,7 @@ export function ThemeToggle() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="h-5 w-5 text-indigo-900"
+          className="h-4.5 w-4.5 text-zinc-700 transition-colors group-hover:text-zinc-950"
         >
           <path
             strokeLinecap="round"

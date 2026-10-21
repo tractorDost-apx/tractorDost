@@ -30,6 +30,7 @@ import { BulkAssignModal } from './components/BulkAssignModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 import { LogCallModal } from './components/LogCallModal';
 import { AddNoteModal } from './components/AddNoteModal';
+import { parseStaffUsers } from './lead-helpers';
 import Pagination from '@/components/shared/Pagination';
 
 export default function AdminLeadsPage() {
@@ -83,8 +84,10 @@ export default function AdminLeadsPage() {
   useEffect(() => {
     const fetchReferences = async () => {
       try {
-        const [usersRes, dealersRes, brandsRes] = await Promise.allSettled([
+        const [usersRes, agentsRes, adminsRes, dealersRes, brandsRes] = await Promise.allSettled([
           usersAPI.getAllUsers({ limit: 100 }),
+          usersAPI.getAllUsers({ role: 'AGENT', limit: 100 }),
+          usersAPI.getAllUsers({ role: 'ADMIN', limit: 100 }),
           dealerAPI.getAllDealers({ limit: 100 }),
           brandAPI.getAllBrands({ limit: 100 }),
         ]);
@@ -101,24 +104,32 @@ export default function AdminLeadsPage() {
           setAgents(staffUsers);
         }
 
-        if (dealersRes.status === 'fulfilled' && dealersRes.value.success) {
-          const dealerList = (dealersRes.value.data as any)?.data || [];
-          setDealers(
-            dealerList.map((d: any) => ({
-              id: d.id,
-              businessName: d.businessName,
-            }))
-          );
+        if (dealersRes.status === 'fulfilled' && dealersRes.value && dealersRes.value.success) {
+          const dealerList = (dealersRes.value.data as any)?.data || dealersRes.value.data || [];
+          if (Array.isArray(dealerList)) {
+            setDealers(
+              dealerList.map((d: any) => ({
+                id: d.id,
+                businessName: d.businessName || d.showroomName || `Dealer #${d.id}`,
+              }))
+            );
+          }
         }
 
-        if (brandsRes.status === 'fulfilled' && brandsRes.value.success) {
-          const brandList = (brandsRes.value.data as any)?.brands || (brandsRes.value.data as any)?.data || [];
-          setBrands(
-            brandList.map((b: any) => ({
-              id: b.id,
-              name: b.name,
-            }))
-          );
+        if (brandsRes.status === 'fulfilled' && brandsRes.value && brandsRes.value.success) {
+          const brandList =
+            (brandsRes.value.data as any)?.brands ||
+            (brandsRes.value.data as any)?.data ||
+            brandsRes.value.data ||
+            [];
+          if (Array.isArray(brandList)) {
+            setBrands(
+              brandList.map((b: any) => ({
+                id: b.id,
+                name: b.name,
+              }))
+            );
+          }
         }
       } catch (err) {
         console.error('Failed to fetch reference data', err);
@@ -126,7 +137,7 @@ export default function AdminLeadsPage() {
     };
 
     fetchReferences();
-  }, []);
+  }, [user]);
 
   // Fetch KPI Stats
   const fetchStats = useCallback(async () => {

@@ -18,6 +18,8 @@ import {
   AlertCircle,
   Copy,
   ChevronDown,
+  ExternalLink,
+  Compass,
 } from 'lucide-react';
 import { Lead, LeadStatus, LeadType } from '@/lib/api/leads';
 import {
@@ -27,6 +29,11 @@ import {
   FollowupBadge,
 } from './LeadStatusBadge';
 import { LEAD_STATUSES } from './LeadFilters';
+import {
+  getLeadProductLink,
+  getLeadLocationInfo,
+  getLeadSourceInfo,
+} from '../lead-helpers';
 
 interface LeadTableProps {
   leads: Lead[];
@@ -448,10 +455,10 @@ export function LeadTable({
                         </span>
                         {lead.isDuplicate && (
                           <span
-                            className="inline-flex items-center gap-0.5 rounded bg-purple-500/10 px-1 py-0.2 text-[9px] font-black text-purple-400 border border-purple-500/20"
-                            title="Duplicate Inquiry"
+                            className="inline-flex items-center gap-0.5 rounded bg-purple-100 dark:bg-purple-950/40 px-1.5 py-0.5 text-[9px] font-black text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-800/50"
+                            title={`Duplicate Inquiry (Merged into #${lead.mergedIntoId || 'original'})`}
                           >
-                            <Copy size={9} />
+                            <Copy size={9} className="text-purple-700 dark:text-purple-400" />
                             DUP
                           </span>
                         )}
@@ -477,12 +484,37 @@ export function LeadTable({
                             <Phone size={10} className="text-muted" />
                             {lead.mobile}
                           </span>
-                          {(lead.district || lead.state) && (
-                            <span className="flex items-center gap-0.5 font-medium text-muted truncate max-w-[120px]">
-                              <MapPin size={10} className="shrink-0 text-muted" />
-                              {lead.district || lead.state}
-                            </span>
-                          )}
+                          {(() => {
+                            const locationInfo = getLeadLocationInfo(lead);
+                            if (!locationInfo.mapsUrl && !lead.district && !lead.state) return null;
+                            return (
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className="flex items-center gap-0.5 font-medium text-muted truncate max-w-[120px]"
+                                  title={locationInfo.locationText}
+                                >
+                                  <MapPin size={10} className="shrink-0 text-muted" />
+                                  {locationInfo.locationText}
+                                </span>
+                                {locationInfo.mapsUrl && (
+                                  <a
+                                    href={locationInfo.mapsUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="inline-flex items-center text-emerald-400 hover:text-emerald-300"
+                                    title={
+                                      locationInfo.hasCoords
+                                        ? `Open GPS (${locationInfo.coordsString}) in Google Maps`
+                                        : `Search location in Google Maps`
+                                    }
+                                  >
+                                    <ExternalLink size={9} />
+                                  </a>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -490,46 +522,84 @@ export function LeadTable({
 
                   {/* Enquiry Type & Source */}
                   <td className="px-3 py-3.5">
-                    <div className="flex flex-col gap-1 items-start">
-                      <LeadTypeBadge type={lead.leadType} />
-                      {lead.sourcePage && (
-                        <span className="text-[10px] text-muted font-mono truncate max-w-[110px]" title={lead.sourcePage}>
-                          src: {lead.sourcePage}
-                        </span>
-                      )}
-                    </div>
+                    {(() => {
+                      const sourceInfo = getLeadSourceInfo(lead);
+                      return (
+                        <div className="flex flex-col gap-1 items-start">
+                          <LeadTypeBadge type={lead.leadType} />
+                          {sourceInfo.pageLabel && (
+                            <span
+                              className="inline-flex items-center gap-0.5 text-[10px] text-muted font-mono truncate max-w-[110px]"
+                              title={`Source: ${sourceInfo.pageLabel} | Campaign: ${sourceInfo.campaignLabel}`}
+                            >
+                              src: {sourceInfo.pageLabel}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
 
                   {/* Interested Product & Budget */}
                   <td className="px-3 py-3.5">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[12px] font-bold text-foreground/90">
-                        {lead.interestedModel || lead.tractor?.modelName || (
-                          <span className="text-muted italic">General Enquiry</span>
-                        )}
-                      </span>
-                      <div className="flex items-center gap-1.5 text-[10px] text-muted">
-                        {lead.interestedBrand && (
-                          <span className="font-semibold text-foreground/70">
-                            {lead.interestedBrand}
-                          </span>
-                        )}
-                        {lead.budget ? (
-                          <span className="font-bold text-emerald-400">
-                            Budget: {formatBudget(Number(lead.budget))}
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
+                    {(() => {
+                      const productLink = getLeadProductLink(lead);
+                      return (
+                        <div className="flex flex-col gap-0.5">
+                          {productLink ? (
+                            <a
+                              href={productLink.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="group/prod inline-flex items-center gap-1 text-[12px] font-bold text-foreground hover:text-[#4a7635] transition-colors"
+                              title={`Open ${productLink.label} in a new tab`}
+                            >
+                              <span className="truncate max-w-[160px] group-hover/prod:underline">
+                                {productLink.label}
+                              </span>
+                              <ExternalLink
+                                size={11}
+                                className="shrink-0 text-muted group-hover/prod:text-[#4a7635]"
+                              />
+                            </a>
+                          ) : (
+                            <span className="text-[12px] font-bold text-muted italic">
+                              General Enquiry
+                            </span>
+                          )}
+                          <div className="flex items-center gap-1.5 text-[10px] text-muted">
+                            {lead.interestedBrand && (
+                              <span className="font-semibold text-foreground/70">
+                                {lead.interestedBrand}
+                              </span>
+                            )}
+                            {lead.budget ? (
+                              <span className="font-bold text-emerald-400">
+                                Budget: {formatBudget(Number(lead.budget))}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </td>
 
                   {/* Assigned Agent / Dealer */}
                   <td className="px-3 py-3.5">
                     <div className="flex flex-col gap-0.5 items-start">
                       {lead.assignedAgent ? (
-                        <span className="inline-flex items-center gap-1 rounded-lg border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 text-[11px] font-bold text-sky-400">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onQuickAssign(lead);
+                          }}
+                          title="Click to reassign agent"
+                          className="inline-flex items-center gap-1 rounded-lg border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 text-[11px] font-bold text-sky-400 hover:bg-sky-500/20 hover:border-sky-500/40 transition-all cursor-pointer"
+                        >
                           👤 {lead.assignedAgent.fullName}
-                        </span>
+                        </button>
                       ) : (
                         <button
                           type="button"
@@ -537,13 +607,16 @@ export function LeadTable({
                             e.stopPropagation();
                             onQuickAssign(lead);
                           }}
-                          className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-400 hover:bg-amber-500/20 transition-colors"
+                          className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-400 hover:bg-amber-500/20 transition-colors cursor-pointer"
                         >
                           ⚡ Unassigned
                         </button>
                       )}
                       {lead.dealer && (
-                        <span className="text-[10px] font-semibold text-muted truncate max-w-[130px]" title={lead.dealer.businessName}>
+                        <span
+                          className="text-[10px] font-semibold text-muted truncate max-w-[130px]"
+                          title={lead.dealer.businessName}
+                        >
                           Dealer: {lead.dealer.businessName}
                         </span>
                       )}
@@ -555,19 +628,22 @@ export function LeadTable({
                     <IntentScoreBadge score={lead.intentScore} />
                   </td>
 
-                  {/* Status & Inline Changer */}
+                  {/* Status & Inline Changer without overlapping text */}
                   <td
                     className="px-3 py-3.5"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="relative inline-block">
+                    <div className="relative inline-flex items-center">
+                      <LeadStatusBadge status={lead.status} />
+                      <ChevronDown size={11} className="ml-1 text-muted pointer-events-none" />
                       <select
                         value={lead.status}
                         onChange={(e) =>
                           onQuickStatusChange(lead, e.target.value as LeadStatus)
                         }
-                        className="cursor-pointer appearance-none rounded-full border border-transparent py-1 pr-6 pl-2 text-xs font-black outline-none transition-all hover:ring-2 hover:ring-[var(--border-subtle)] focus:ring-2 focus:ring-[#4a7635]"
-                        style={{ background: 'transparent' }}
+                        aria-label="Change lead status"
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        title="Click to change status"
                       >
                         {LEAD_STATUSES.map((st) => (
                           <option key={st.value} value={st.value} className="bg-background text-foreground">
@@ -575,10 +651,6 @@ export function LeadTable({
                           </option>
                         ))}
                       </select>
-                      <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-2.5">
-                        <LeadStatusBadge status={lead.status} />
-                        <ChevronDown size={11} className="ml-1 text-muted" />
-                      </div>
                     </div>
                   </td>
 

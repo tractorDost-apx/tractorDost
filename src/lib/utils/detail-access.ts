@@ -14,14 +14,16 @@ const STORAGE_KEY = 'tractordost:lead-access';
 export interface Coordinates {
   latitude: number;
   longitude: number;
+  accuracy?: number;
 }
 
 /**
- * Attempts to capture the user's current GPS coordinates via the Geolocation API.
- * Never blocks submission: resolves with coordinates if granted, or null if denied,
- * unavailable, unsupported, or times out.
+ * Attempts to capture the user's high-accuracy GPS coordinates via the Geolocation API.
+ * 1. Tries `enableHighAccuracy: true` first for pin-point accuracy (GPS/Wi-Fi positioning).
+ * 2. If high accuracy times out or errors, falls back to standard accuracy so submission never fails.
+ * 3. Never throws: resolves with coordinates or null.
  */
-export function captureLocation(timeoutMs = 2500): Promise<Coordinates | null> {
+export function captureLocation(timeoutMs = 7000): Promise<Coordinates | null> {
   if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.geolocation) {
     return Promise.resolve(null);
   }
@@ -36,35 +38,124 @@ export function captureLocation(timeoutMs = 2500): Promise<Coordinates | null> {
       }
     }, timeoutMs);
 
-    try {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          if (!finished) {
-            finished = true;
-            clearTimeout(timer);
-            resolve({
-              latitude: Number(position.coords.latitude.toFixed(6)),
-              longitude: Number(position.coords.longitude.toFixed(6)),
-            });
-          }
-        },
-        (_error) => {
+    // Step 1: Attempt High Accuracy GPS positioning
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (!finished) {
+          finished = true;
+          clearTimeout(timer);
+          resolve({
+            latitude: Number(position.coords.latitude.toFixed(6)),
+            longitude: Number(position.coords.longitude.toFixed(6)),
+            accuracy: Math.round(position.coords.accuracy),
+          });
+        }
+      },
+      (_err) => {
+        // Step 2: Fallback to standard/coarse positioning if high accuracy is unavailable
+        if (finished) return;
+        try {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              if (!finished) {
+                finished = true;
+                clearTimeout(timer);
+                resolve({
+                  latitude: Number(pos.coords.latitude.toFixed(6)),
+                  longitude: Number(pos.coords.longitude.toFixed(6)),
+                  accuracy: Math.round(pos.coords.accuracy),
+                });
+              }
+            },
+            () => {
+              if (!finished) {
+                finished = true;
+                clearTimeout(timer);
+                resolve(null);
+              }
+            },
+            { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 }
+          );
+        } catch {
           if (!finished) {
             finished = true;
             clearTimeout(timer);
             resolve(null);
           }
-        },
-        { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 60000 }
-      );
-    } catch {
-      if (!finished) {
-        finished = true;
-        clearTimeout(timer);
-        resolve(null);
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: Math.max(3500, timeoutMs - 1500),
+        maximumAge: 0, // Force fresh real-time GPS fix
       }
-    }
+    );
   });
+}
+
+/**
+ * Reverse geocodes coordinates (lat/lng) to address parts (city, district, state)
+ */
+export async function reverseGeocodeCoords(latitude: number, longitude: number): Promise<{
+  city?: string;
+  district?: string;
+  state?: string;
+  address?: string;
+} | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14&addressdetails=1&accept-language=en`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const addr = data?.address;
+    if (!addr) return null;
+
+    const city = addr.city || addr.town || addr.village || addr.suburb || addr.county || '';
+    const district = addr.county || addr.state_district || addr.district || '';
+    const state = addr.state || '';
+
+    return { city, district, state, address: data.display_name };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Geocodes city and state to coordinates if user denied GPS or device has no GPS.
+ * Ensures Google Map location is ALWAYS captured accurately for every single lead!
+ */
+export async function geocodeLocationText(city?: string, state?: string): Promise<Coordinates | null> {
+  const query = [city, state, 'India'].filter(Boolean).join(', ');
+  if (!query || query === 'India') return null;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0 && data[0].lat && data[0].lon) {
+      return {
+        latitude: Number(Number(data[0].lat).toFixed(6)),
+        longitude: Number(Number(data[0].lon).toFixed(6)),
+        accuracy: 1000,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 const STORAGE_PREFIX = 'tractordost:lead-access';

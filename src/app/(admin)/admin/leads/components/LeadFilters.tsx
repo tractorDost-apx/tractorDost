@@ -590,11 +590,11 @@ export function LeadFilters({
               }
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition-all ${
                 filters.isDuplicate
-                  ? 'border border-purple-500/50 bg-purple-500/20 text-purple-300 ring-2 ring-purple-500/20'
+                  ? 'border border-purple-400 dark:border-purple-600 bg-purple-100 dark:bg-purple-950/60 text-purple-900 dark:text-purple-200 ring-2 ring-purple-500/30'
                   : 'border border-[var(--border-subtle)] bg-foreground/5 text-muted hover:bg-foreground/10 hover:text-foreground'
               }`}
             >
-              <Copy size={12} className={filters.isDuplicate ? 'text-purple-400' : ''} />
+              <Copy size={12} className={filters.isDuplicate ? 'text-purple-700 dark:text-purple-400' : ''} />
               <span>Duplicate Inquiries</span>
             </button>
           </div>
@@ -779,12 +779,12 @@ export function LeadFilters({
           )}
 
           {filters.isDuplicate && (
-            <span className="inline-flex items-center gap-1 rounded-lg border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 font-bold text-purple-400">
+            <span className="inline-flex items-center gap-1 rounded-lg border border-purple-300 dark:border-purple-800/50 bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 font-bold text-purple-900 dark:text-purple-200">
               Duplicates
               <button
                 type="button"
                 onClick={() => onFilterChange({ isDuplicate: undefined, page: 1 })}
-                className="hover:text-rose-400"
+                className="hover:text-rose-600 dark:hover:text-rose-400 ml-0.5"
               >
                 <X size={12} />
               </button>
