@@ -24,7 +24,6 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         // User is authenticated but lacks required role
         switch (user.role.name) {
           case 'ADMIN':
-          case 'SUPER_ADMIN':
             router.replace('/admin/dashboard');
             break;
           case 'AGENT':

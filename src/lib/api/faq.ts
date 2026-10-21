@@ -110,7 +110,7 @@ export const faqAPI = {
   },
 
   /**
-   * Create a new FAQ entry (ADMIN / SUPER_ADMIN required).
+   * Create a new FAQ entry (ADMIN required).
    */
   create: async (data: CreateFaqInput): Promise<ApiResponse<FAQ>> => {
     const response = await apiClient.post<ApiResponse<FAQ>>('/content/faqs', data);
@@ -118,7 +118,7 @@ export const faqAPI = {
   },
 
   /**
-   * Update an existing FAQ by ID (ADMIN / SUPER_ADMIN required).
+   * Update an existing FAQ by ID (ADMIN required).
    */
   update: async (id: number, data: UpdateFaqInput): Promise<ApiResponse<FAQ>> => {
     const response = await apiClient.patch<ApiResponse<FAQ>>(`/content/faqs/${id}`, data);
@@ -126,7 +126,7 @@ export const faqAPI = {
   },
 
   /**
-   * Delete a FAQ entry by ID (ADMIN / SUPER_ADMIN required).
+   * Delete a FAQ entry by ID (ADMIN required).
    */
   delete: async (id: number): Promise<ApiResponse<{ success: true }>> => {
     const response = await apiClient.delete<ApiResponse<{ success: true }>>(`/content/faqs/${id}`);

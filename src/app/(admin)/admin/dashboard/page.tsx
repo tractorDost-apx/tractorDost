@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
             Welcome back, {user?.fullName?.split(' ')[0] || 'Admin'}! 👋
           </h1>
           <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
-            {user?.role?.name === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
+            Admin
           </span>
         </div>
         <p className="text-muted font-medium">Here is an overview of the platform's performance.</p>

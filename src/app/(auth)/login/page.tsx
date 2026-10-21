@@ -76,7 +76,6 @@ export default function LoginPage() {
       if (!targetPath && user?.role?.name) {
         switch (user.role.name) {
           case 'ADMIN':
-          case 'SUPER_ADMIN':
             targetPath = '/admin/dashboard';
             break;
           case 'DEALER':

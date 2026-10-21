@@ -47,7 +47,7 @@ export default function DashboardPage() {
   ];
 
   const getRoleDisplay = () => {
-    if (user?.role?.name === 'SUPER_ADMIN' || user?.role?.name === 'ADMIN') return 'Admin';
+    if (user?.role?.name === 'ADMIN') return 'Admin';
     if (user?.role?.name === 'DEALER') return 'Dealer';
     return 'Customer';
   };

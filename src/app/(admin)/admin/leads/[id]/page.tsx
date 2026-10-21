@@ -55,7 +55,7 @@ export default function LeadDetailPage({
   const leadId = Number(resolvedParams.id);
   const router = useRouter();
   const { user } = useAuth();
-  const isAdmin = user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN';
+  const isAdmin = user?.role?.name === 'ADMIN';
 
   const [lead, setLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
@@ -133,7 +133,7 @@ export default function LeadDetailPage({
         if (usersRes.status === 'fulfilled' && usersRes.value.success) {
           const userList = (usersRes.value.data as any)?.data || usersRes.value.data || [];
           const staffUsers = userList
-            .filter((u: any) => u.role === 'AGENT' || u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')
+            .filter((u: any) => u.role === 'AGENT' || u.role === 'ADMIN')
             .map((u: any) => ({
               id: u.id,
               fullName: u.fullName || u.name || `User #${u.id}`,

@@ -134,7 +134,7 @@ export const usersAPI = {
   },
 
   /**
-   * Delete a user (Super Admin only)
+   * Delete a user (Admin only)
    */
   deleteUserById: async (id: number) => {
     const response = await apiClient.delete<{ success: boolean; message: string }>(
