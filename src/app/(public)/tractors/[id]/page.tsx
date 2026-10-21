@@ -11,9 +11,10 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
+  const lookupId = isNaN(Number(id)) ? id : Number(id);
 
   try {
-    const res = await tractorAPI.getTractorTeaser(Number(id));
+    const res = await tractorAPI.getTractorTeaser(lookupId);
     if (res.success && res.data) {
       const tractor = res.data;
       return {
@@ -41,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function TractorDetailsPage({ params }: Props) {
   const { id } = await params;
+  const lookupId = isNaN(Number(id)) ? id : Number(id);
 
   let tractor: any = null;
   let similarTractors: any[] = [];
@@ -49,7 +51,7 @@ export default async function TractorDetailsPage({ params }: Props) {
   try {
     // Only the public teaser is fetched here. Full details load in the browser, after the lead gate.
     const [tractorRes, compareRes] = await Promise.all([
-      tractorAPI.getTractorTeaser(Number(id)),
+      tractorAPI.getTractorTeaser(lookupId),
       compareAPI
         .getFrequencyOfCompare({ limit: 10, sort: 'desc' })
         .catch(() => ({ success: false, data: [] })),

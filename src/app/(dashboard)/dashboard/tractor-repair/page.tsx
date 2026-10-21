@@ -154,7 +154,7 @@ export default function TractorRepairPage() {
           radius: 1000,
           limit: 50,
         }),
-        dealerAPI.getAllDealers({ limit: 50 }),
+        dealerAPI.getAllDealers({ limit: 50, sortBy: 'positive_reviews' }),
       ]);
 
       let loadedCenters: NearbyServiceCenter[] = [];
@@ -216,6 +216,37 @@ export default function TractorRepairPage() {
       return matchesSearch && matchesService;
     });
   }, [centers, searchQuery, selectedServiceFilter]);
+
+  // Sort and filter dealers by number of positive reviews in descending order
+  const sortedDealers = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    const filtered = dealers.filter((d) => {
+      if (!q) return true;
+      return (
+        d.businessName?.toLowerCase().includes(q) ||
+        d.district?.toLowerCase().includes(q) ||
+        d.state?.toLowerCase().includes(q) ||
+        d.dealerType?.toLowerCase().includes(q) ||
+        d.phone?.toLowerCase().includes(q)
+      );
+    });
+
+    return [...filtered].sort((a, b) => {
+      const aPos = Number(a.positiveReviewsCount ?? 0);
+      const bPos = Number(b.positiveReviewsCount ?? 0);
+      if (bPos !== aPos) return bPos - aPos;
+
+      const aRating = Number(a.rating) || 0;
+      const bRating = Number(b.rating) || 0;
+      if (bRating !== aRating) return bRating - aRating;
+
+      const aCount = Number(a.reviewsCount) || 0;
+      const bCount = Number(b.reviewsCount) || 0;
+      if (bCount !== aCount) return bCount - aCount;
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [dealers, searchQuery]);
 
   // Handle opening booking modal for a center or dealer
   const handleOpenBooking = async (centerItem?: NearbyServiceCenter, dealerItem?: Dealer) => {
@@ -656,7 +687,7 @@ export default function TractorRepairPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-                {dealers.map((dealer) => (
+                {sortedDealers.map((dealer) => (
                   <div
                     key={dealer.id}
                     className="glass-panel group flex flex-col justify-between rounded-3xl  p-6 transition-all hover:border-[var(--color-brand-green)]/30"
@@ -667,11 +698,19 @@ export default function TractorRepairPage() {
                           <h3 className="text-foreground text-base font-black tracking-tight group-hover:text-[var(--color-brand-green)]">
                             {dealer.businessName}
                           </h3>
-                          <span className="text-muted text-[11px] font-bold">
-                            {dealer.dealerType} • Certified
-                          </span>
+                          <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                            <span className="text-muted text-[11px] font-bold">
+                              {dealer.dealerType} • Certified
+                            </span>
+                            {Number((dealer as any).positiveReviewsCount || 0) > 0 && (
+                              <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-[10px] font-black text-amber-400">
+                                <Star size={10} className="fill-amber-400 text-amber-400" />
+                                {(dealer as any).positiveReviewsCount} {((dealer as any).positiveReviewsCount === 1) ? 'Positive Review' : 'Positive Reviews'}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <ShieldCheck size={18} className="text-[var(--color-brand-green)]" />
+                        <ShieldCheck size={18} className="text-[var(--color-brand-green)] shrink-0" />
                       </div>
 
                       <div className="space-y-1 text-xs">

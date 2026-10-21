@@ -301,7 +301,7 @@ export const tractorAPI = {
    * Fetch the full detail of one tractor. Needs a login or a lead grant for this tractor, otherwise
    * the API answers 403 with code LEAD_REQUIRED.
    */
-  getTractorById: async (id: number, detailAccessToken?: string) => {
+  getTractorById: async (id: number | string, detailAccessToken?: string) => {
     const response = await apiClient.get<{ success: boolean; data: Tractor }>(
       `/tractor/getById/${id}`,
       { headers: detailAccessHeaders(detailAccessToken) }
@@ -312,7 +312,7 @@ export const tractorAPI = {
   /**
    * Public summary shown before the detail page is unlocked
    */
-  getTractorTeaser: async (id: number) => {
+  getTractorTeaser: async (id: number | string) => {
     const response = await apiClient.get<{ success: boolean; data: TractorTeaser }>(
       `/tractor/getTeaser/${id}`
     );
