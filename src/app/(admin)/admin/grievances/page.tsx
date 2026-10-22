@@ -1,16 +1,11 @@
-'use client';
 import React from 'react';
-import { Construction } from 'lucide-react';
+import BannerManagement from '@/components/admin/banner-management';
+
+export const metadata = {
+  title: 'Banner Management | TractorDost Admin',
+  description: 'Create, schedule, and track the promotional banners shown on the TractorDost homepage',
+};
 
 export default function GrievancesAdminPage() {
-  return (
-    <div className="flex h-[70vh] flex-col items-center justify-center p-8 text-center">
-      <Construction size={64} className="text-muted mb-4 opacity-50" />
-      <h1 className="text-foreground mb-2 text-2xl font-black">Grievances Management</h1>
-      <p className="text-muted max-w-md">
-        This admin module is currently being built. It will provide full management capabilities for
-        customer grievances.
-      </p>
-    </div>
-  );
+  return <BannerManagement />;
 }
