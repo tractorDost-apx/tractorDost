@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Wrench,
   Building2,
@@ -14,15 +14,16 @@ import {
   Loader2,
   Truck,
   Zap,
-  Package,
   Star,
   ShieldCheck,
   Send,
   X,
   ExternalLink,
-  ChevronRight,
   Sparkles,
   Navigation,
+  LocateFixed,
+  Crosshair,
+  RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '@/store/AuthContext';
 import { MyReviewAction } from '@/components/reviews/my-review-action';
@@ -44,6 +45,351 @@ const SERVICE_TYPE_OPTIONS = [
   { value: 'spare_parts', label: 'Genuine Spare Parts Replacement' },
 ];
 
+const STORAGE_LOCATION_KEY = 'tractordost:user_location';
+
+export const POPULAR_DISTRICTS = [
+  { name: 'Pune', lat: 18.5204, lng: 73.8567, district: 'Pune', state: 'Maharashtra' },
+  { name: 'Nashik', lat: 19.9975, lng: 73.7898, district: 'Nashik', state: 'Maharashtra' },
+  { name: 'Ahmednagar', lat: 19.0952, lng: 74.7496, district: 'Ahmednagar', state: 'Maharashtra' },
+  { name: 'Kolhapur', lat: 16.7050, lng: 74.2433, district: 'Kolhapur', state: 'Maharashtra' },
+  { name: 'Chh. Sambhajinagar', lat: 19.8762, lng: 75.3433, district: 'Aurangabad', state: 'Maharashtra' },
+  { name: 'Satara', lat: 17.6805, lng: 73.9997, district: 'Satara', state: 'Maharashtra' },
+  { name: 'Solapur', lat: 17.6599, lng: 75.9064, district: 'Solapur', state: 'Maharashtra' },
+  { name: 'Sangli', lat: 16.8524, lng: 74.5815, district: 'Sangli', state: 'Maharashtra' },
+  { name: 'Nagpur', lat: 21.1458, lng: 79.0882, district: 'Nagpur', state: 'Maharashtra' },
+  { name: 'Jalgaon', lat: 21.0077, lng: 75.5626, district: 'Jalgaon', state: 'Maharashtra' },
+  { name: 'Amravati', lat: 20.9320, lng: 77.7523, district: 'Amravati', state: 'Maharashtra' },
+  { name: 'Nanded', lat: 19.1383, lng: 77.3210, district: 'Nanded', state: 'Maharashtra' },
+];
+
+export interface UserLocationState {
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  displayName?: string;
+  city?: string;
+  district?: string;
+  state?: string;
+  pincode?: string;
+  isLiveGps: boolean;
+  source?: 'gps' | 'network' | 'ip' | 'preset' | 'manual';
+}
+
+export interface GpsLocationResult {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  source: 'gps' | 'network';
+}
+
+// Compute great-circle distance in kilometers
+function computeHaversineDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+}
+
+// Reverse geocode coordinates via multi-provider strategy (OpenStreetMap Nominatim + BigDataCloud fallback)
+async function reverseGeocodeCoords(lat: number, lon: number): Promise<{
+  formattedAddress: string;
+  city: string;
+  district: string;
+  state: string;
+  pincode: string;
+} | null> {
+  // Strategy 1: OpenStreetMap Nominatim with zoom 16 (resolves rural villages and landmarks properly)
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4500);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=16&addressdetails=1&accept-language=en`,
+      {
+        signal: controller.signal,
+        headers: { Accept: 'application/json' },
+      }
+    );
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.address) {
+        const addr = data.address;
+        const road = addr.road || addr.street || '';
+        const suburb = addr.suburb || addr.neighbourhood || addr.village || addr.hamlet || addr.locality || '';
+        const city = addr.city || addr.town || addr.municipality || '';
+        const district = addr.county || addr.state_district || addr.district || city || '';
+        const state = addr.state || '';
+        const pincode = addr.postcode || '';
+
+        const parts = [
+          addr.amenity || addr.building || '',
+          road,
+          suburb,
+          city && city !== suburb ? city : '',
+          district && district !== city ? district : '',
+          state,
+          pincode ? `PIN - ${pincode}` : '',
+        ].filter(Boolean);
+
+        return {
+          formattedAddress: parts.join(', ') || data.display_name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`,
+          city: city || suburb || district,
+          district: district || city,
+          state,
+          pincode,
+        };
+      }
+    }
+  } catch (e) {
+    // Continue to fallback
+  }
+
+  // Strategy 2: BigDataCloud Reverse Geocoding (fast, free client API for India and global)
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json();
+      const locality = data.locality || data.localityInfo?.administrative?.[3]?.name || '';
+      const city = data.city || data.localityInfo?.administrative?.[2]?.name || locality;
+      const district = data.principalSubdivision ? (data.localityInfo?.administrative?.[2]?.name || city) : city;
+      const state = data.principalSubdivision || '';
+      const pincode = data.postcode || '';
+
+      const parts = [locality, city !== locality ? city : '', district !== city ? district : '', state, pincode ? `PIN - ${pincode}` : ''].filter(Boolean);
+
+      return {
+        formattedAddress: parts.join(', ') || `${lat.toFixed(4)}, ${lon.toFixed(4)}`,
+        city: city || locality || district,
+        district: district || city,
+        state,
+        pincode,
+      };
+    }
+  } catch (e) {
+    // Both failed
+  }
+
+  return {
+    formattedAddress: `Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}`,
+    city: '',
+    district: '',
+    state: '',
+    pincode: '',
+  };
+}
+
+// Forward geocode query (village/taluka/city/pincode) via OpenStreetMap Nominatim restricted to India
+async function forwardGeocodeAddress(query: string): Promise<{
+  latitude: number;
+  longitude: number;
+  displayName: string;
+  city?: string;
+  district?: string;
+  state?: string;
+} | null> {
+  try {
+    if (!query || query.trim().length < 2) return null;
+    const cleanQuery = query.trim();
+    // If it's a 6-digit Indian PIN code, append India for 100% precision
+    const searchString = /^\d{6}$/.test(cleanQuery) ? `${cleanQuery}, India` : cleanQuery;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        searchString
+      )}&limit=3&countrycodes=in&addressdetails=1&accept-language=en`,
+      {
+        signal: controller.signal,
+        headers: { Accept: 'application/json' },
+      }
+    );
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) return null;
+    const first = data[0];
+    const addr = first.address || {};
+    const city = addr.city || addr.town || addr.village || addr.county || '';
+    const district = addr.county || addr.state_district || addr.district || city;
+    const state = addr.state || '';
+
+    return {
+      latitude: Number(Number(first.lat).toFixed(6)),
+      longitude: Number(Number(first.lon).toFixed(6)),
+      displayName: first.display_name,
+      city,
+      district,
+      state,
+    };
+  } catch (e) {
+    console.warn('Forward geocoding error:', e);
+    return null;
+  }
+}
+
+// Fallback: IP-based location when browser GPS permission is denied or unavailable
+async function fetchIpLocation(): Promise<{
+  latitude: number;
+  longitude: number;
+  city: string;
+  region: string;
+  pincode: string;
+} | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    // Free IP geolocation
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.latitude && data.longitude) {
+        return {
+          latitude: Number(Number(data.latitude).toFixed(6)),
+          longitude: Number(Number(data.longitude).toFixed(6)),
+          city: data.city || '',
+          region: data.region || '',
+          pincode: data.postal || '',
+        };
+      }
+    }
+  } catch {
+    // Continue
+  }
+
+  // Backup IP API
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch('https://freeipapi.com/api/json', { signal: controller.signal });
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.latitude && data.longitude) {
+        return {
+          latitude: Number(Number(data.latitude).toFixed(6)),
+          longitude: Number(Number(data.longitude).toFixed(6)),
+          city: data.cityName || '',
+          region: data.regionName || '',
+          pincode: data.zipCode || '',
+        };
+      }
+    }
+  } catch {
+    // Both IP APIs failed
+  }
+
+  return null;
+}
+
+// Request browser GPS with dual-tier fallback (High Accuracy GPS -> Standard Network Accuracy)
+function fetchBrowserGps(timeoutMs = 12000): Promise<GpsLocationResult> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by your browser.'));
+      return;
+    }
+
+    let isDone = false;
+
+    // Timeout safety
+    const totalTimer = setTimeout(() => {
+      if (!isDone) {
+        isDone = true;
+        reject(new Error('Location request timed out. Please check browser permissions or select your district below.'));
+      }
+    }, timeoutMs);
+
+    // Tier 1: Try High Accuracy GPS positioning (GPS chip / mobile sensor)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(totalTimer);
+          resolve({
+            latitude: Number(pos.coords.latitude.toFixed(6)),
+            longitude: Number(pos.coords.longitude.toFixed(6)),
+            accuracy: Math.round(pos.coords.accuracy),
+            source: 'gps',
+          });
+        }
+      },
+      (err) => {
+        if (isDone) return;
+
+        // If permission explicitly denied, do not retry
+        if (err.code === 1) {
+          isDone = true;
+          clearTimeout(totalTimer);
+          const deniedErr = new Error('Location permission was denied in your browser. Click the lock icon in the address bar to allow location.');
+          (deniedErr as any).isPermissionDenied = true;
+          reject(deniedErr);
+          return;
+        }
+
+        // Tier 2: Fallback to standard network/Wi-Fi positioning (succeeds on PC, laptops, indoors)
+        try {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              if (!isDone) {
+                isDone = true;
+                clearTimeout(totalTimer);
+                resolve({
+                  latitude: Number(pos.coords.latitude.toFixed(6)),
+                  longitude: Number(pos.coords.longitude.toFixed(6)),
+                  accuracy: Math.round(pos.coords.accuracy),
+                  source: 'network',
+                });
+              }
+            },
+            (fallbackErr) => {
+              if (!isDone) {
+                isDone = true;
+                clearTimeout(totalTimer);
+                let msg = 'Could not acquire GPS position.';
+                if (fallbackErr.code === 1) {
+                  msg = 'Location permission was denied in your browser settings.';
+                  const e = new Error(msg);
+                  (e as any).isPermissionDenied = true;
+                  reject(e);
+                  return;
+                } else if (fallbackErr.code === 2) {
+                  msg = 'GPS signal lost or unavailable on this device.';
+                } else if (fallbackErr.code === 3) {
+                  msg = 'GPS request timed out. Please choose your district or search village below.';
+                }
+                reject(new Error(msg));
+              }
+            },
+            { enableHighAccuracy: false, timeout: Math.max(4000, timeoutMs - 5000), maximumAge: 180000 }
+          );
+        } catch {
+          if (!isDone) {
+            isDone = true;
+            clearTimeout(totalTimer);
+            reject(new Error('Location services unavailable.'));
+          }
+        }
+      },
+      { enableHighAccuracy: true, timeout: Math.min(6500, Math.floor(timeoutMs * 0.6)), maximumAge: 30000 }
+    );
+  });
+}
+
 export default function TractorRepairPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'centers' | 'my-bookings'>('centers');
@@ -54,6 +400,25 @@ export default function TractorRepairPage() {
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedServiceFilter, setSelectedServiceFilter] = useState('');
+
+  // User Location State (Default: Pune, Maharashtra)
+  const [userLocation, setUserLocation] = useState<UserLocationState>({
+    latitude: 18.5204,
+    longitude: 73.8567,
+    accuracy: undefined,
+    displayName: 'Pune, Maharashtra',
+    city: 'Pune',
+    district: 'Pune',
+    state: 'Maharashtra',
+    isLiveGps: false,
+    source: 'preset',
+  });
+  const [searchRadius, setSearchRadius] = useState<number>(100); // 25, 50, 100, 250, 500 km
+  const [detectingLocation, setDetectingLocation] = useState<boolean>(false);
+  const [manualLocationInput, setManualLocationInput] = useState<string>('');
+  const [geocodingLocation, setGeocodingLocation] = useState<boolean>(false);
+  const [locationToast, setLocationToast] = useState<string | null>(null);
+  const [permissionBlocked, setPermissionBlocked] = useState<boolean>(false);
 
   // Bookings list state
   const [loadingBookings, setLoadingBookings] = useState(false);
@@ -70,12 +435,29 @@ export default function TractorRepairPage() {
     servicesAvailable?: string[];
   } | null>(null);
   const [submittingBooking, setSubmittingBooking] = useState(false);
+  const [modalGpsDetecting, setModalGpsDetecting] = useState<boolean>(false);
+  const [modalGeocoding, setModalGeocoding] = useState<boolean>(false);
+  const [modalGpsStatus, setModalGpsStatus] = useState<'idle' | 'locked' | 'manual'>('idle');
+  const [modalGpsAccuracy, setModalGpsAccuracy] = useState<number | null>(null);
+  const [modalGpsError, setModalGpsError] = useState<string | null>(null);
+
   // Read-only reviews viewer for a service center
   const [reviewsCenter, setReviewsCenter] = useState<{ serviceCenterId: number; serviceName: string } | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
-  // Min date for booking: at least 2 days ahead to ensure it's safely > 24 hours
+  // Helper to persist location in localStorage
+  const saveUserLocation = (loc: UserLocationState) => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_LOCATION_KEY, JSON.stringify(loc));
+      }
+    } catch {
+      // Storage unavailable
+    }
+  };
+
+  // Min date for booking: at least 2 days ahead
   const minBookingDate = useMemo(() => {
     const d = new Date(Date.now() + 36 * 60 * 60 * 1000);
     const yyyy = d.getFullYear();
@@ -114,63 +496,345 @@ export default function TractorRepairPage() {
     }
   }, [user]);
 
-  // Helper to fetch live GPS coordinates silently upon submission
-  const getLiveCoordinates = (): Promise<{ latitude: number; longitude: number }> => {
-    return new Promise((resolve) => {
-      if (typeof window === 'undefined' || !navigator.geolocation) {
-        resolve({
-          latitude: bookingForm.latitude || 18.5204,
-          longitude: bookingForm.longitude || 73.8567,
+  // Load Centers & Dealers with specific location & radius
+  const loadCentersAndDealers = useCallback(
+    async (lat: number, lon: number, radiusKm: number) => {
+      try {
+        setLoadingCenters(true);
+        // Note: Backend validates radius <= 500
+        const validRadius = Math.min(Math.max(radiusKm, 10), 500);
+
+        const [nearbyRes, dealersRes] = await Promise.allSettled([
+          serviceCenterAPI.getNearbyServiceCenters({
+            latitude: lat,
+            longitude: lon,
+            radius: validRadius,
+            limit: 50,
+          }),
+          dealerAPI.getAllDealers({ limit: 50 }),
+        ]);
+
+        let loadedCenters: NearbyServiceCenter[] = [];
+        if (nearbyRes.status === 'fulfilled' && nearbyRes.value.success) {
+          loadedCenters = nearbyRes.value.data.serviceCenters || [];
+        }
+
+        // Augment centers with client-side accurate distance calculation
+        const augmentedCenters = loadedCenters.map((c) => {
+          if (c.latitude && c.longitude) {
+            const calculatedDist = computeHaversineDistanceKm(lat, lon, Number(c.latitude), Number(c.longitude));
+            return {
+              ...c,
+              distanceKm: calculatedDist,
+            };
+          }
+          return c;
         });
-        return;
+
+        // Sort by distance ascending
+        augmentedCenters.sort((a, b) => (a.distanceKm || 9999) - (b.distanceKm || 9999));
+        setCenters(augmentedCenters);
+
+        if (dealersRes.status === 'fulfilled' && dealersRes.value.success) {
+          const rawDealers: Dealer[] = dealersRes.value.data.data || [];
+          // Augment dealers with calculated distance from current coordinates and sort by proximity
+          const augmentedDealers = rawDealers.map((d: any) => {
+            if (d.latitude && d.longitude) {
+              const dist = computeHaversineDistanceKm(lat, lon, Number(d.latitude), Number(d.longitude));
+              return { ...d, distanceKm: dist };
+            }
+            return d;
+          });
+          augmentedDealers.sort((a: any, b: any) => (a.distanceKm ?? 9999) - (b.distanceKm ?? 9999));
+          setDealers(augmentedDealers);
+        }
+      } catch (err: any) {
+        console.error('Failed to load service centers:', err);
+      } finally {
+        setLoadingCenters(false);
       }
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          resolve({
-            latitude: Number(pos.coords.latitude.toFixed(6)),
-            longitude: Number(pos.coords.longitude.toFixed(6)),
-          });
-        },
-        (err) => {
-          console.warn('Geolocation unavailable, using default fallback coordinates:', err);
-          resolve({
-            latitude: bookingForm.latitude || 18.5204,
-            longitude: bookingForm.longitude || 73.8567,
-          });
-        },
-        { timeout: 4000, enableHighAccuracy: true, maximumAge: 60000 }
-      );
-    });
+    },
+    []
+  );
+
+  // Auto-detect location on initial page mount with cached restore + dual-tier fallback
+  useEffect(() => {
+    let isMounted = true;
+
+    const initLocation = async () => {
+      let initialLat = 18.5204;
+      let initialLng = 73.8567;
+      let hasCached = false;
+
+      // Step 1: Check localStorage for previously saved verified location
+      try {
+        const cached = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_LOCATION_KEY) : null;
+        if (cached) {
+          const parsed: UserLocationState = JSON.parse(cached);
+          if (parsed && typeof parsed.latitude === 'number' && typeof parsed.longitude === 'number') {
+            hasCached = true;
+            initialLat = parsed.latitude;
+            initialLng = parsed.longitude;
+            setUserLocation(parsed);
+            setBookingForm((prev) => ({
+              ...prev,
+              latitude: parsed.latitude,
+              longitude: parsed.longitude,
+              address: prev.address || parsed.displayName || '',
+            }));
+            loadCentersAndDealers(parsed.latitude, parsed.longitude, searchRadius);
+          }
+        }
+      } catch (e) {
+        console.warn('Could not read cached location:', e);
+      }
+
+      // If no cached location, fetch immediately with default coordinates
+      if (!hasCached) {
+        loadCentersAndDealers(initialLat, initialLng, searchRadius);
+      }
+
+      // Step 2: Attempt fresh GPS fix with dual-tier (High Accuracy -> Network)
+      try {
+        setDetectingLocation(true);
+        const gps = await fetchBrowserGps(8000);
+        if (!isMounted) return;
+
+        setPermissionBlocked(false);
+
+        let name = `${gps.latitude.toFixed(4)}, ${gps.longitude.toFixed(4)}`;
+        let city = '';
+        let district = '';
+        let state = '';
+        let pincode = '';
+
+        const geo = await reverseGeocodeCoords(gps.latitude, gps.longitude);
+        if (geo) {
+          name = geo.formattedAddress;
+          city = geo.city;
+          district = geo.district;
+          state = geo.state;
+          pincode = geo.pincode;
+        }
+
+        const newLoc: UserLocationState = {
+          latitude: gps.latitude,
+          longitude: gps.longitude,
+          accuracy: gps.accuracy,
+          displayName: name,
+          city,
+          district,
+          state,
+          pincode,
+          isLiveGps: true,
+          source: gps.source,
+        };
+
+        setUserLocation(newLoc);
+        saveUserLocation(newLoc);
+
+        setBookingForm((prev) => ({
+          ...prev,
+          latitude: gps.latitude,
+          longitude: gps.longitude,
+          address: prev.address || name,
+        }));
+
+        loadCentersAndDealers(gps.latitude, gps.longitude, searchRadius);
+      } catch (err: any) {
+        if (!isMounted) return;
+        if (err?.isPermissionDenied) {
+          setPermissionBlocked(true);
+        }
+
+        // If no cached location was found and GPS failed, attempt IP location fallback
+        if (!hasCached) {
+          try {
+            const ipLoc = await fetchIpLocation();
+            if (ipLoc && isMounted) {
+              const newLoc: UserLocationState = {
+                latitude: ipLoc.latitude,
+                longitude: ipLoc.longitude,
+                displayName: `${ipLoc.city || ipLoc.region || 'Detected City'}, ${ipLoc.region || 'India'}`,
+                city: ipLoc.city,
+                district: ipLoc.city,
+                state: ipLoc.region,
+                pincode: ipLoc.pincode,
+                isLiveGps: false,
+                source: 'ip',
+              };
+              setUserLocation(newLoc);
+              saveUserLocation(newLoc);
+              setBookingForm((prev) => ({
+                ...prev,
+                latitude: ipLoc.latitude,
+                longitude: ipLoc.longitude,
+                address: prev.address || newLoc.displayName || '',
+              }));
+              loadCentersAndDealers(ipLoc.latitude, ipLoc.longitude, searchRadius);
+            }
+          } catch {
+            // Already loaded default location
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setDetectingLocation(false);
+        }
+      }
+    };
+
+    initLocation();
+    loadMyBookings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Handle manual trigger to detect live GPS on the main page
+  const handleDetectPageGps = async () => {
+    try {
+      setDetectingLocation(true);
+      setLocationToast(null);
+      setPermissionBlocked(false);
+      const gps = await fetchBrowserGps(14000);
+
+      let name = `${gps.latitude.toFixed(4)}, ${gps.longitude.toFixed(4)}`;
+      let city = '';
+      let district = '';
+      let state = '';
+      let pincode = '';
+
+      const geo = await reverseGeocodeCoords(gps.latitude, gps.longitude);
+      if (geo) {
+        name = geo.formattedAddress;
+        city = geo.city;
+        district = geo.district;
+        state = geo.state;
+        pincode = geo.pincode;
+      }
+
+      const newLoc: UserLocationState = {
+        latitude: gps.latitude,
+        longitude: gps.longitude,
+        accuracy: gps.accuracy,
+        displayName: name,
+        city,
+        district,
+        state,
+        pincode,
+        isLiveGps: true,
+        source: gps.source,
+      };
+
+      setUserLocation(newLoc);
+      saveUserLocation(newLoc);
+
+      setBookingForm((prev) => ({
+        ...prev,
+        latitude: gps.latitude,
+        longitude: gps.longitude,
+        address: prev.address || name,
+      }));
+
+      const precText = gps.accuracy ? ` (±${gps.accuracy}m)` : '';
+      setLocationToast(`Accurate location locked: ${city || district || 'Exact Location'}${precText}`);
+      setTimeout(() => setLocationToast(null), 4000);
+
+      await loadCentersAndDealers(gps.latitude, gps.longitude, searchRadius);
+    } catch (err: any) {
+      if (err?.isPermissionDenied) {
+        setPermissionBlocked(true);
+      }
+      setLocationToast(err.message || 'Could not detect live GPS. Please enter your location manually or tap a district below.');
+      setTimeout(() => setLocationToast(null), 6000);
+    } finally {
+      setDetectingLocation(false);
+    }
   };
 
-  // Load Centers & Dealers
-  const loadCentersAndDealers = async () => {
+  // Handle quick selection of popular agricultural districts
+  const handleSelectPresetDistrict = async (d: (typeof POPULAR_DISTRICTS)[0]) => {
+    const newLoc: UserLocationState = {
+      latitude: d.lat,
+      longitude: d.lng,
+      displayName: `${d.name}, ${d.state}`,
+      city: d.name,
+      district: d.district,
+      state: d.state,
+      isLiveGps: false,
+      source: 'preset',
+    };
+
+    setUserLocation(newLoc);
+    saveUserLocation(newLoc);
+
+    setBookingForm((prev) => ({
+      ...prev,
+      latitude: d.lat,
+      longitude: d.lng,
+      address: `${d.name}, ${d.district}, ${d.state}`,
+    }));
+
+    setLocationToast(`Location set to ${d.name}, ${d.state}`);
+    setTimeout(() => setLocationToast(null), 3500);
+
+    await loadCentersAndDealers(d.lat, d.lng, searchRadius);
+  };
+
+  // Handle radius change
+  const handleRadiusChange = (newRadius: number) => {
+    setSearchRadius(newRadius);
+    loadCentersAndDealers(userLocation.latitude, userLocation.longitude, newRadius);
+  };
+
+  // Handle manual search by City / Village / Taluka / Pincode
+  const handleManualLocationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualLocationInput.trim()) return;
+
     try {
-      setLoadingCenters(true);
-      const [nearbyRes, dealersRes] = await Promise.allSettled([
-        serviceCenterAPI.getNearbyServiceCenters({
-          latitude: 18.5204,
-          longitude: 73.8567,
-          radius: 1000,
-          limit: 50,
-        }),
-        dealerAPI.getAllDealers({ limit: 50 }),
-      ]);
+      setGeocodingLocation(true);
+      setLocationToast(null);
+      const res = await forwardGeocodeAddress(manualLocationInput);
 
-      let loadedCenters: NearbyServiceCenter[] = [];
-      if (nearbyRes.status === 'fulfilled' && nearbyRes.value.success) {
-        loadedCenters = nearbyRes.value.data.serviceCenters || [];
-      }
+      if (res) {
+        const newLoc: UserLocationState = {
+          latitude: res.latitude,
+          longitude: res.longitude,
+          displayName: res.displayName,
+          city: res.city,
+          district: res.district,
+          state: res.state,
+          isLiveGps: false,
+          source: 'manual',
+        };
 
-      setCenters(loadedCenters);
+        setUserLocation(newLoc);
+        saveUserLocation(newLoc);
 
-      if (dealersRes.status === 'fulfilled' && dealersRes.value.success) {
-        setDealers(dealersRes.value.data.data || []);
+        setBookingForm((prev) => ({
+          ...prev,
+          latitude: res.latitude,
+          longitude: res.longitude,
+          address: res.displayName,
+        }));
+
+        const cleanName = res.city || res.district || res.displayName.split(',')[0];
+        setLocationToast(`Location set to: ${cleanName}`);
+        setTimeout(() => setLocationToast(null), 4000);
+
+        await loadCentersAndDealers(res.latitude, res.longitude, searchRadius);
+      } else {
+        setLocationToast(`Could not find coordinates for "${manualLocationInput}". Please try a nearby town, taluka or 6-digit PIN code.`);
+        setTimeout(() => setLocationToast(null), 5000);
       }
     } catch (err: any) {
-      console.error('Failed to load service centers:', err);
+      setLocationToast(err.message || 'Geocoding failed. Please check network.');
+      setTimeout(() => setLocationToast(null), 4000);
     } finally {
-      setLoadingCenters(false);
+      setGeocodingLocation(false);
     }
   };
 
@@ -190,11 +854,6 @@ export default function TractorRepairPage() {
       setLoadingBookings(false);
     }
   };
-
-  useEffect(() => {
-    loadCentersAndDealers();
-    loadMyBookings();
-  }, []);
 
   // Filter service centers
   const filteredCenters = useMemo(() => {
@@ -221,9 +880,18 @@ export default function TractorRepairPage() {
   const handleOpenBooking = async (centerItem?: NearbyServiceCenter, dealerItem?: Dealer) => {
     setFormError(null);
     setFormSuccess(null);
+    setModalGpsError(null);
 
     const name = user?.fullName || (user as any)?.name || '';
     const mobile = user?.mobile ? String(user.mobile) : (user as any)?.phone || '';
+
+    // Initialize location in booking form
+    const currentLat = userLocation.latitude;
+    const currentLng = userLocation.longitude;
+    const currentAddr = userLocation.displayName || '';
+
+    setModalGpsStatus(userLocation.isLiveGps ? 'locked' : userLocation.source === 'manual' || userLocation.source === 'preset' ? 'manual' : 'idle');
+    setModalGpsAccuracy(userLocation.accuracy || null);
 
     if (centerItem) {
       const availableServices =
@@ -245,18 +913,20 @@ export default function TractorRepairPage() {
         name: prev.name || name,
         mobile: prev.mobile || mobile,
         preferredDate: prev.preferredDate || minBookingDate,
+        address: prev.address || currentAddr,
+        latitude: currentLat,
+        longitude: currentLng,
         serviceType: availableServices.includes(prev.serviceType)
           ? prev.serviceType
           : availableServices[0] || 'general_maintenance',
       }));
     } else if (dealerItem) {
       try {
-        // Fetch dealer's service center
         const scRes = await serviceCenterAPI.getServiceCenterByDealer(dealerItem.id);
         if (scRes.success && scRes.data) {
           const scId = Number((scRes.data as any).serviceCenterId || scRes.data.id);
           if (!scId || isNaN(scId)) {
-            setFormError('This dealership does not have an active workshop ID configured yet.');
+            alert('This dealership does not have an active workshop ID configured yet.');
             return;
           }
 
@@ -279,18 +949,81 @@ export default function TractorRepairPage() {
             name: prev.name || name,
             mobile: prev.mobile || mobile,
             preferredDate: prev.preferredDate || minBookingDate,
+            address: prev.address || currentAddr,
+            latitude: currentLat,
+            longitude: currentLng,
             serviceType: availableServices.includes(prev.serviceType)
               ? prev.serviceType
               : availableServices[0] || 'general_maintenance',
           }));
         } else {
-          setFormError('This dealership has not configured an active service center workshop yet.');
+          alert('This dealership has not configured an active service center workshop yet. Please choose another verified workshop from the list.');
           return;
         }
       } catch (err: any) {
-        setFormError('Unable to load service center details for this dealer.');
+        alert('Unable to load service center details for this dealer.');
         return;
       }
+    }
+  };
+
+  // In-Modal: Detect Exact Live GPS
+  const handleModalDetectGps = async () => {
+    try {
+      setModalGpsDetecting(true);
+      setModalGpsError(null);
+      const gps = await fetchBrowserGps(15000);
+
+      setBookingForm((prev) => ({
+        ...prev,
+        latitude: gps.latitude,
+        longitude: gps.longitude,
+      }));
+      setModalGpsAccuracy(gps.accuracy);
+      setModalGpsStatus('locked');
+
+      // Attempt reverse geocoding to fill address
+      const rev = await reverseGeocodeCoords(gps.latitude, gps.longitude);
+      if (rev && rev.formattedAddress) {
+        setBookingForm((prev) => ({
+          ...prev,
+          address: rev.formattedAddress,
+        }));
+      }
+    } catch (err: any) {
+      setModalGpsError(err.message || 'Could not acquire GPS lock. Please enter address manually.');
+      setModalGpsStatus('idle');
+    } finally {
+      setModalGpsDetecting(false);
+    }
+  };
+
+  // In-Modal: Pin Coordinates from Entered Address
+  const handleModalPinFromAddress = async () => {
+    if (!bookingForm.address.trim()) {
+      setModalGpsError('Please type your address, town, or landmark first.');
+      return;
+    }
+
+    try {
+      setModalGeocoding(true);
+      setModalGpsError(null);
+      const res = await forwardGeocodeAddress(bookingForm.address);
+      if (res) {
+        setBookingForm((prev) => ({
+          ...prev,
+          latitude: res.latitude,
+          longitude: res.longitude,
+        }));
+        setModalGpsStatus('manual');
+        setModalGpsAccuracy(null);
+      } else {
+        setModalGpsError('Could not pinpoint that address on the map. Please add a city or PIN code.');
+      }
+    } catch (err: any) {
+      setModalGpsError(err.message || 'Pinning failed. Please try again.');
+    } finally {
+      setModalGeocoding(false);
     }
   };
 
@@ -311,7 +1044,6 @@ export default function TractorRepairPage() {
       return;
     }
 
-    // Normalize mobile: remove non-digits
     let cleanMobile = bookingForm.mobile.replace(/\D/g, '');
     if (cleanMobile.startsWith('91') && cleanMobile.length === 12) {
       cleanMobile = cleanMobile.slice(2);
@@ -341,7 +1073,6 @@ export default function TractorRepairPage() {
       return;
     }
 
-    // Parse preferredDate robustly
     let scheduledDate = new Date();
     if (bookingForm.preferredDate) {
       const parts = bookingForm.preferredDate.split('-');
@@ -366,8 +1097,22 @@ export default function TractorRepairPage() {
     try {
       setSubmittingBooking(true);
 
-      // Silently capture live GPS coordinates upon submit
-      const liveCoords = await getLiveCoordinates();
+      // Resolve final high-accuracy coordinates
+      let finalLat = bookingForm.latitude;
+      let finalLng = bookingForm.longitude;
+
+      // If user hasn't explicitly locked GPS and coordinates are still at default Pune, forward geocode the entered address
+      if (modalGpsStatus === 'idle' && (finalLat === 18.5204 && finalLng === 73.8567)) {
+        try {
+          const geo = await forwardGeocodeAddress(bookingForm.address);
+          if (geo) {
+            finalLat = geo.latitude;
+            finalLng = geo.longitude;
+          }
+        } catch {
+          // fallback to current coordinates
+        }
+      }
 
       const payload: CreateServiceBookingPayload = {
         name: name,
@@ -378,8 +1123,8 @@ export default function TractorRepairPage() {
         description: bookingForm.description.trim(),
         preferredDate: scheduledDate.toISOString(),
         address: bookingForm.address.trim(),
-        latitude: liveCoords.latitude,
-        longitude: liveCoords.longitude,
+        latitude: finalLat,
+        longitude: finalLng,
         notes: bookingForm.notes.trim() || undefined,
       };
 
@@ -450,6 +1195,14 @@ export default function TractorRepairPage() {
 
   return (
     <div className="flex h-full w-full flex-col pb-12">
+      {/* Toast Notification */}
+      {locationToast && (
+        <div className="animate-fade-in fixed top-5 right-5 z-[200] flex items-center gap-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--background)] px-4 py-3 text-xs font-bold text-foreground shadow-2xl">
+          <MapPin size={16} className="text-[var(--color-brand-green)]" />
+          <span>{locationToast}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
@@ -492,7 +1245,9 @@ export default function TractorRepairPage() {
             {myBookings.length > 0 && (
               <span
                 className={`rounded-full px-1.5 py-0.2 text-[10px] font-black ${
-                  activeTab === 'my-bookings' ? 'bg-black text-[var(--color-brand-green)]' : 'bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)]'
+                  activeTab === 'my-bookings'
+                    ? 'bg-black text-[var(--color-brand-green)]'
+                    : 'bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)]'
                 }`}
               >
                 {myBookings.length}
@@ -505,8 +1260,175 @@ export default function TractorRepairPage() {
       {/* TAB 1: FIND SERVICE CENTERS & DEALERS */}
       {activeTab === 'centers' && (
         <div className="space-y-6">
-          {/* Search & Filters */}
-          <div className="glass-panel grid grid-cols-1 gap-4 rounded-3xl  p-5 md:grid-cols-3">
+          {/* HIGH-PRECISION LOCATION CONTROLLER CARD */}
+          <div className="glass-panel flex flex-col gap-4 rounded-3xl p-5 border border-[var(--border-subtle)] bg-foreground/[0.02]">
+            {permissionBlocked && (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-300">
+                <div className="flex items-center gap-2">
+                  <AlertCircle size={16} className="shrink-0 text-amber-400" />
+                  <span>
+                    <strong>Browser Location Access Blocked:</strong> To use accurate satellite GPS, click the 🔒 icon in your browser address bar and select <em>&ldquo;Allow Location&rdquo;</em>, or choose your district below.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDetectPageGps}
+                  className="shrink-0 rounded-xl bg-amber-400/20 px-3 py-1 text-xs font-bold text-amber-200 hover:bg-amber-400/30"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-3">
+                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                  <MapPin size={22} />
+                  {userLocation.isLiveGps && (
+                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-500" />
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-muted text-[11px] font-bold uppercase tracking-wider">
+                      Search Location:
+                    </span>
+                    {userLocation.isLiveGps ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-400">
+                        <CheckCircle2 size={11} /> Accurate GPS Locked {userLocation.accuracy ? `(±${userLocation.accuracy}m)` : ''}
+                      </span>
+                    ) : userLocation.source === 'network' ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-400">
+                        <CheckCircle2 size={11} /> Wi-Fi / Network Location {userLocation.accuracy ? `(±${userLocation.accuracy}m)` : ''}
+                      </span>
+                    ) : userLocation.source === 'ip' ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-bold text-indigo-400">
+                        City Location (via Network)
+                      </span>
+                    ) : userLocation.source === 'manual' ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-400">
+                        Custom Searched Location
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-400">
+                        {userLocation.city || 'District Preset'}
+                      </span>
+                    )}
+
+                    <a
+                      href={`https://www.google.com/maps?q=${userLocation.latitude},${userLocation.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted hover:text-[var(--color-brand-green)] inline-flex items-center gap-1 text-[11px] font-bold transition-colors ml-1"
+                      title="Verify your exact coordinates on Google Maps"
+                    >
+                      <span>View on Google Maps</span>
+                      <ExternalLink size={10} />
+                    </a>
+                  </div>
+
+                  <h3 className="text-foreground text-sm font-black tracking-tight sm:text-base line-clamp-1">
+                    {userLocation.displayName || `Lat: ${userLocation.latitude.toFixed(4)}, Lng: ${userLocation.longitude.toFixed(4)}`}
+                  </h3>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={handleDetectPageGps}
+                  disabled={detectingLocation}
+                  className="flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-3.5 py-2 text-xs font-black text-black uppercase tracking-wider shadow-md transition-all hover:opacity-90 disabled:opacity-50"
+                  title="Detect live GPS from your device"
+                >
+                  {detectingLocation ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Locking GPS...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LocateFixed size={14} />
+                      <span>Use Exact Live GPS</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center gap-1 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-2.5 py-1.5 text-xs">
+                  <span className="text-muted font-bold text-[11px]">Radius:</span>
+                  <select
+                    value={searchRadius}
+                    onChange={(e) => handleRadiusChange(Number(e.target.value))}
+                    className="text-foreground cursor-pointer bg-transparent font-black focus:outline-none"
+                  >
+                    <option value="25" className="bg-[var(--background)]">25 km</option>
+                    <option value="50" className="bg-[var(--background)]">50 km</option>
+                    <option value="100" className="bg-[var(--background)]">100 km</option>
+                    <option value="250" className="bg-[var(--background)]">250 km</option>
+                    <option value="500" className="bg-[var(--background)]">500 km (Max)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Manual Location Search Input */}
+            <form onSubmit={handleManualLocationSubmit} className="flex flex-col gap-2 pt-2 border-t border-[var(--border-subtle)] sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <Search size={14} className="text-muted pointer-events-none absolute top-3 left-3" />
+                <input
+                  type="text"
+                  value={manualLocationInput}
+                  onChange={(e) => setManualLocationInput(e.target.value)}
+                  placeholder="Enter your village, city, taluka or 6-digit PIN code (e.g. Nashik, Baramati, 422003)..."
+                  className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 py-2 pr-3 pl-9 text-xs font-medium focus:border-[var(--color-brand-green)]/50 focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={geocodingLocation || !manualLocationInput.trim()}
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/10 px-4 py-2 text-xs font-bold text-foreground transition-all hover:bg-foreground/20 disabled:opacity-40"
+              >
+                {geocodingLocation ? <Loader2 size={13} className="animate-spin" /> : <Crosshair size={13} />}
+                <span>Set Location</span>
+              </button>
+            </form>
+
+            {/* Quick Agricultural Districts Presets */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[var(--border-subtle)]/60">
+              <span className="text-muted text-[10px] font-bold uppercase tracking-wider mr-1">
+                Quick Select:
+              </span>
+              {POPULAR_DISTRICTS.map((dist) => {
+                const isSelected =
+                  userLocation.city?.toLowerCase() === dist.name.toLowerCase() ||
+                  userLocation.district?.toLowerCase() === dist.district.toLowerCase() ||
+                  (Math.abs(userLocation.latitude - dist.lat) < 0.05 && Math.abs(userLocation.longitude - dist.lng) < 0.05);
+
+                return (
+                  <button
+                    key={dist.name}
+                    type="button"
+                    onClick={() => handleSelectPresetDistrict(dist)}
+                    className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                      isSelected
+                        ? 'bg-[var(--color-brand-green)] text-black shadow-sm font-black'
+                        : 'border border-[var(--border-subtle)] bg-foreground/5 text-muted hover:text-foreground hover:bg-foreground/10'
+                    }`}
+                  >
+                    {dist.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Search & Category Filters */}
+          <div className="glass-panel grid grid-cols-1 gap-4 rounded-3xl p-5 md:grid-cols-3">
             <div className="relative md:col-span-2">
               <Search
                 size={18}
@@ -527,9 +1449,9 @@ export default function TractorRepairPage() {
                 onChange={(e) => setSelectedServiceFilter(e.target.value)}
                 className="text-foreground w-full rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-3 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
               >
-                <option value="" className="bg-foreground/5">All Repair & Service Types</option>
+                <option value="" className="bg-[var(--background)]">All Repair & Service Types</option>
                 {SERVICE_TYPE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-foreground/5">
+                  <option key={opt.value} value={opt.value} className="bg-[var(--background)]">
                     {opt.label}
                   </option>
                 ))}
@@ -539,15 +1461,16 @@ export default function TractorRepairPage() {
 
           {/* Service Centers Grid */}
           {loadingCenters ? (
-            <div className="flex flex-1 items-center justify-center py-24">
+            <div className="flex flex-1 items-center justify-center py-24 space-y-3 flex-col">
               <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={36} />
+              <p className="text-muted text-xs font-bold">Scanning authorized service centers near your location...</p>
             </div>
           ) : filteredCenters.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {filteredCenters.map((center) => (
                 <div
                   key={center.serviceCenterId}
-                  className="glass-panel group flex flex-col justify-between rounded-3xl  p-6 transition-all duration-300 hover:border-[var(--color-brand-green)]/30 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5"
+                  className="glass-panel group flex flex-col justify-between rounded-3xl p-6 transition-all duration-300 hover:border-[var(--color-brand-green)]/30 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/5"
                 >
                   <div className="space-y-4">
                     {/* Header: Title & Badges */}
@@ -571,8 +1494,8 @@ export default function TractorRepairPage() {
                       <div className="text-foreground/90 flex items-center gap-2 font-bold">
                         <MapPin size={14} className="shrink-0 text-[var(--color-brand-green)]" />
                         <span>{center.district}, {center.state}</span>
-                        {center.distanceKm && (
-                          <span className="text-muted text-[10px] font-medium">
+                        {center.distanceKm !== undefined && (
+                          <span className="text-[var(--color-brand-green)] text-[11px] font-black">
                             ({center.distanceKm} km away)
                           </span>
                         )}
@@ -624,7 +1547,7 @@ export default function TractorRepairPage() {
                     )}
                   </div>
 
-                  {/* Action Button */}
+                  {/* Action Buttons */}
                   <div className="mt-6 space-y-2 border-t border-[var(--border-subtle)] pt-4">
                     <button
                       onClick={() => handleOpenBooking(center)}
@@ -648,10 +1571,10 @@ export default function TractorRepairPage() {
               <div className="glass-panel flex flex-col items-center justify-center p-10 text-center">
                 <Wrench className="text-muted mb-3" size={36} />
                 <h3 className="text-foreground text-base font-bold">
-                  Choose from Authorized Dealership Network
+                  No Direct Service Centers Within {searchRadius} km
                 </h3>
                 <p className="text-muted mt-1 max-w-md text-xs font-medium">
-                  Select an authorized dealer in your area to submit your tractor repair and inspection request.
+                  Select an authorized dealer below or expand your search radius up to 500 km.
                 </p>
               </div>
 
@@ -659,7 +1582,7 @@ export default function TractorRepairPage() {
                 {dealers.map((dealer) => (
                   <div
                     key={dealer.id}
-                    className="glass-panel group flex flex-col justify-between rounded-3xl  p-6 transition-all hover:border-[var(--color-brand-green)]/30"
+                    className="glass-panel group flex flex-col justify-between rounded-3xl p-6 transition-all hover:border-[var(--color-brand-green)]/30"
                   >
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-2">
@@ -675,14 +1598,19 @@ export default function TractorRepairPage() {
                       </div>
 
                       <div className="space-y-1 text-xs">
-                        <div className="text-foreground/90 flex items-center gap-1.5 font-bold">
-                          <MapPin size={13} className="text-[var(--color-brand-green)]" />
-                          {dealer.district}, {dealer.state}
+                        <div className="text-foreground/90 flex flex-wrap items-center gap-1.5 font-bold">
+                          <MapPin size={13} className="text-[var(--color-brand-green)] shrink-0" />
+                          <span>{dealer.district}, {dealer.state}</span>
+                          {(dealer as any).distanceKm !== undefined && (
+                            <span className="text-[var(--color-brand-green)] text-[11px] font-black">
+                              ({(dealer as any).distanceKm} km away)
+                            </span>
+                          )}
                         </div>
                         {dealer.phone && (
                           <div className="text-muted flex items-center gap-1.5">
-                            <Phone size={12} />
-                            {dealer.phone}
+                            <Phone size={12} className="shrink-0" />
+                            <span>{dealer.phone}</span>
                           </div>
                         )}
                       </div>
@@ -737,67 +1665,74 @@ export default function TractorRepairPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {myBookings.map((b) => (
-                <div
-                  key={b.bookingId}
-                  className="glass-panel flex flex-col justify-between gap-4 rounded-3xl  p-6 md:flex-row md:items-center"
-                >
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-foreground text-lg font-black tracking-tight">
-                        {b.tractorBrand} {b.tractorModel}
-                      </span>
-                      <span className="text-muted text-xs font-bold">•</span>
-                      <span className="text-[var(--color-brand-green)] text-xs font-bold uppercase">
-                        {b.serviceType.replace(/_/g, ' ')}
-                      </span>
-                    </div>
+              {myBookings.map((b) => {
+                const mapLink =
+                  b.latitude && b.longitude
+                    ? `https://www.google.com/maps?q=${b.latitude},${b.longitude}`
+                    : b.mapUrl || null;
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
-                      <span className="text-foreground/90 flex items-center gap-1.5 font-bold">
-                        <Building2 size={13} className="text-muted" />
-                        {b.serviceCenterName || b.dealerName}
-                      </span>
-                      <span className="text-muted flex items-center gap-1.5">
-                        <Calendar size={13} />
-                        Preferred Date: <strong className="text-foreground">{formatDate(b.preferredDate)}</strong>
-                      </span>
-                      {b.address && (
-                        <span className="text-muted flex items-center gap-1.5">
-                          <MapPin size={13} className="text-[var(--color-brand-green)]" />
-                          <span className="text-foreground/90 font-medium truncate max-w-xs">{b.address}</span>
+                return (
+                  <div
+                    key={b.bookingId}
+                    className="glass-panel flex flex-col justify-between gap-4 rounded-3xl p-6 md:flex-row md:items-center"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-foreground text-lg font-black tracking-tight">
+                          {b.tractorBrand} {b.tractorModel}
                         </span>
+                        <span className="text-muted text-xs font-bold">•</span>
+                        <span className="text-[var(--color-brand-green)] text-xs font-bold uppercase">
+                          {b.serviceType.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
+                        <span className="text-foreground/90 flex items-center gap-1.5 font-bold">
+                          <Building2 size={13} className="text-muted" />
+                          {b.serviceCenterName || b.dealerName}
+                        </span>
+                        <span className="text-muted flex items-center gap-1.5">
+                          <Calendar size={13} />
+                          Preferred Date: <strong className="text-foreground">{formatDate(b.preferredDate)}</strong>
+                        </span>
+                        {b.address && (
+                          <span className="text-muted flex items-center gap-1.5">
+                            <MapPin size={13} className="text-[var(--color-brand-green)]" />
+                            <span className="text-foreground/90 font-medium truncate max-w-xs">{b.address}</span>
+                          </span>
+                        )}
+                        <span className="text-muted text-[11px]">
+                          Requested: {formatDateTime(b.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      {getStatusBadge(b.status)}
+                      {b.status === 'COMPLETED' && b.serviceCenterId && (
+                        <MyReviewAction
+                          targetType="SERVICE_CENTER"
+                          targetId={b.serviceCenterId}
+                          targetName={b.serviceCenterName}
+                          canRate
+                        />
                       )}
-                      <span className="text-muted text-[11px]">
-                        Requested: {formatDateTime(b.createdAt)}
-                      </span>
+                      {mapLink && (
+                        <a
+                          href={mapLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-muted hover:text-foreground rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-2.5 transition-colors"
+                          title="View Location on Google Maps"
+                        >
+                          <ExternalLink size={15} />
+                        </a>
+                      )}
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-3">
-                    {getStatusBadge(b.status)}
-                    {b.status === 'COMPLETED' && b.serviceCenterId && (
-                      <MyReviewAction
-                        targetType="SERVICE_CENTER"
-                        targetId={b.serviceCenterId}
-                        targetName={b.serviceCenterName}
-                        canRate
-                      />
-                    )}
-                    {b.mapUrl && (
-                      <a
-                        href={b.mapUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-muted hover:text-foreground rounded-xl border border-[var(--border-subtle)] bg-foreground/5 p-2.5 transition-colors"
-                        title="View Location on Google Maps"
-                      >
-                        <ExternalLink size={15} />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -822,10 +1757,10 @@ export default function TractorRepairPage() {
         </div>
       )}
 
-      {/* MODAL: SUBMIT REPAIR REQUEST */}
+      {/* MODAL: SUBMIT REPAIR REQUEST WITH ACCURATE LOCATION LOCK */}
       {selectedCenter && (
         <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/25 dark:bg-black/80 p-4 backdrop-blur-md sm:p-6">
-          <div className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
+          <div className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl">
             {/* Modal Header */}
             <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6">
               <div className="flex items-center gap-3">
@@ -938,7 +1873,7 @@ export default function TractorRepairPage() {
                         selectedCenter.servicesAvailable.length === 0 ||
                         selectedCenter.servicesAvailable.includes(opt.value);
                       return (
-                        <option key={opt.value} value={opt.value} className="bg-foreground/5">
+                        <option key={opt.value} value={opt.value} className="bg-[var(--background)]">
                           {opt.label} {isOffered ? '' : '(Custom Request)'}
                         </option>
                       );
@@ -958,20 +1893,114 @@ export default function TractorRepairPage() {
                   />
                 </div>
 
-                {/* MANDATORY BREAKDOWN LOCATION ADDRESS */}
-                <div className="sm:col-span-2">
-                  <label className="text-muted mb-1 flex items-center gap-1.5 text-xs font-bold">
-                    <MapPin size={13} className="text-[var(--color-brand-green)]" />
-                    Breakdown / Service Location Address *
-                  </label>
+                {/* ACCURATE BREAKDOWN LOCATION PICKER */}
+                <div className="sm:col-span-2 space-y-2 rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.03] p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="text-foreground flex items-center gap-1.5 text-xs font-black">
+                      <MapPin size={15} className="text-[var(--color-brand-green)]" />
+                      <span>Breakdown / Service Location *</span>
+                    </label>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleModalDetectGps}
+                        disabled={modalGpsDetecting}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-3 py-1.5 text-[11px] font-black text-black uppercase tracking-wider shadow-sm transition-all hover:opacity-90 disabled:opacity-50"
+                        title="Capture precise GPS sensor coordinates"
+                      >
+                        {modalGpsDetecting ? (
+                          <>
+                            <Loader2 size={13} className="animate-spin" />
+                            <span>Locking GPS...</span>
+                          </>
+                        ) : (
+                          <>
+                            <LocateFixed size={13} />
+                            <span>Detect Exact Live GPS</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleModalPinFromAddress}
+                        disabled={modalGeocoding || !bookingForm.address.trim()}
+                        className="inline-flex items-center gap-1 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-2.5 py-1.5 text-[11px] font-bold text-foreground transition-all hover:bg-foreground/10 disabled:opacity-40"
+                        title="Derive GPS coordinates from typed address"
+                      >
+                        {modalGeocoding ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <Crosshair size={12} />
+                        )}
+                        <span>Pin from Address</span>
+                      </button>
+                    </div>
+                  </div>
+
                   <input
                     type="text"
                     required
                     value={bookingForm.address}
-                    onChange={(e) => setBookingForm({ ...bookingForm, address: e.target.value })}
-                    placeholder="Enter breakdown landmark, farm field, village, district..."
+                    onChange={(e) => {
+                      setBookingForm({ ...bookingForm, address: e.target.value });
+                      if (modalGpsStatus === 'locked') setModalGpsStatus('manual');
+                    }}
+                    placeholder="Enter village, farm landmark, taluka, district, or PIN code..."
                     className="text-foreground w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-bold focus:border-[var(--color-brand-green)]/50 focus:outline-none"
                   />
+
+                  {/* GPS Verification Status Card */}
+                  {modalGpsStatus === 'locked' && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-400">
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 size={14} className="shrink-0 text-emerald-400" />
+                        <span>
+                          <strong>Accurate GPS Locked:</strong> Lat: {bookingForm.latitude.toFixed(5)}, Lng: {bookingForm.longitude.toFixed(5)}
+                          {modalGpsAccuracy ? ` (±${modalGpsAccuracy}m precision)` : ''}
+                        </span>
+                      </div>
+
+                      <a
+                        href={`https://www.google.com/maps?q=${bookingForm.latitude},${bookingForm.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 underline hover:text-emerald-200"
+                      >
+                        <span>Verify on Google Maps</span>
+                        <ExternalLink size={11} />
+                      </a>
+                    </div>
+                  )}
+
+                  {modalGpsStatus === 'manual' && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs font-medium text-blue-400">
+                      <div className="flex items-center gap-1.5">
+                        <Crosshair size={14} className="shrink-0 text-blue-400" />
+                        <span>
+                          <strong>Coordinates Aligned:</strong> Lat: {bookingForm.latitude.toFixed(5)}, Lng: {bookingForm.longitude.toFixed(5)}
+                        </span>
+                      </div>
+
+                      <a
+                        href={`https://www.google.com/maps?q=${bookingForm.latitude},${bookingForm.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-300 underline hover:text-blue-200"
+                      >
+                        <span>Verify on Google Maps</span>
+                        <ExternalLink size={11} />
+                      </a>
+                    </div>
+                  )}
+
+                  {modalGpsError && (
+                    <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 p-2.5 text-[11px] font-medium text-amber-300">
+                      <AlertCircle size={14} className="shrink-0" />
+                      <span>{modalGpsError}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="sm:col-span-2">

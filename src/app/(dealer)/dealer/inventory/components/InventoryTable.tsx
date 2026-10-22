@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { DealerInventoryItem } from '@/types/models/dealerInventory';
 import {
   Tractor,
@@ -25,6 +26,7 @@ interface InventoryTableProps {
   onToggleAvailability: (item: DealerInventoryItem) => void;
   onAddClick: () => void;
   onListForSale?: (item: DealerInventoryItem) => void;
+  isItemListed?: (item: DealerInventoryItem) => boolean;
 }
 
 export function InventoryTable({
@@ -35,6 +37,7 @@ export function InventoryTable({
   onToggleAvailability,
   onAddClick,
   onListForSale,
+  isItemListed,
 }: InventoryTableProps) {
   const getStockStatus = (item: DealerInventoryItem) => {
     if (!item.isAvailable) {
@@ -174,6 +177,8 @@ export function InventoryTable({
               const title = item.tractorName || item.customModel || 'Unnamed Model';
               const isCatalog = Boolean(item.tractorId);
 
+              const isListed = isItemListed ? isItemListed(item) : false;
+
               return (
                 <tr
                   key={item.inventoryId}
@@ -266,14 +271,24 @@ export function InventoryTable({
                   {/* Actions */}
                   <td className="px-2 lg:px-3 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {isCatalog && onListForSale && (
-                        <button
-                          onClick={() => onListForSale(item)}
-                          className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1.5 text-xs font-bold text-[var(--color-brand-green)] shadow-sm transition-all hover:bg-[var(--color-brand-green)] hover:text-white"
-                          title="List this inventory tractor for sale on Used Marketplace"
+                      {isListed ? (
+                        <Link
+                          href="/dealer/used-listings"
+                          className="flex shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 shadow-sm transition-all hover:bg-emerald-500/20"
+                          title="This tractor is already live on the Used Marketplace. Click to view."
                         >
-                          <Tag size={14} /> List for Sale
-                        </button>
+                          <CheckCircle2 size={14} className="text-emerald-500" /> Listed for Sale
+                        </Link>
+                      ) : (
+                        onListForSale && (
+                          <button
+                            onClick={() => onListForSale(item)}
+                            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1.5 text-xs font-bold text-[var(--color-brand-green)] shadow-sm transition-all hover:bg-[var(--color-brand-green)] hover:text-white"
+                            title="List this inventory tractor for sale on Used Marketplace"
+                          >
+                            <Tag size={14} /> List for Sale
+                          </button>
+                        )
                       )}
                       <button
                         onClick={() => onEdit(item)}
@@ -305,6 +320,7 @@ export function InventoryTable({
           const StatusIcon = status.icon;
           const title = item.tractorName || item.customModel || 'Unnamed Model';
           const isCatalog = Boolean(item.tractorId);
+          const isListed = isItemListed ? isItemListed(item) : false;
 
           return (
             <div
@@ -373,13 +389,23 @@ export function InventoryTable({
                 </button>
 
                 <div className="flex flex-wrap items-center justify-end gap-2">
-                  {isCatalog && onListForSale && (
-                    <button
-                      onClick={() => onListForSale(item)}
-                      className="flex items-center gap-1 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1.5 text-xs font-bold text-[var(--color-brand-green)] transition-all hover:bg-[var(--color-brand-green)] hover:text-white"
+                  {isListed ? (
+                    <Link
+                      href="/dealer/used-listings"
+                      className="flex items-center gap-1 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400"
+                      title="This tractor is already live on the Used Marketplace"
                     >
-                      <Tag size={14} /> List for Sale
-                    </button>
+                      <CheckCircle2 size={13} className="text-emerald-500" /> Listed for Sale
+                    </Link>
+                  ) : (
+                    onListForSale && (
+                      <button
+                        onClick={() => onListForSale(item)}
+                        className="flex items-center gap-1 rounded-xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1.5 text-xs font-bold text-[var(--color-brand-green)] transition-all hover:bg-[var(--color-brand-green)] hover:text-white"
+                      >
+                        <Tag size={14} /> List for Sale
+                      </button>
+                    )
                   )}
                   <button
                     onClick={() => onEdit(item)}

@@ -99,11 +99,13 @@ export interface UsedTractorListing {
   conditionGrade: ConditionGrade;
 
   askingPrice: number;
+  price?: number;
   negotiable: boolean;
   estimatedMarketPrice?: number | null;
   financeAvailable: boolean;
 
   listingStatus: ListingStatus;
+  status?: ListingStatus | string;
   isActive?: boolean;
   urgency: UrgencyLevel;
   isCertified: boolean;
@@ -262,6 +264,7 @@ export interface ListingPage<T> {
   page: number;
   limit: number;
   totalPages: number;
+  meta?: { total: number; page: number; limit: number; totalPages: number };
 }
 
 /** Pagination shape: { data, meta } (enquiries, documents, inspections) */

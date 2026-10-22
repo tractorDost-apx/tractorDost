@@ -11,7 +11,7 @@ import Link from 'next/link';
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { refreshUser } = useAuth();
+  const { user, refreshUser, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [mobile, setMobile] = useState('');
@@ -21,6 +21,33 @@ export default function LoginPage() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [success, setSuccess] = useState('');
   const [isResending, setIsResending] = useState(false);
+  const [devOtpHint, setDevOtpHint] = useState<string | null>(null);
+
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+
+  // Auto-redirect if already logged in
+  React.useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      const roleName = user?.role?.name?.toUpperCase();
+      const isDealer =
+        roleName === 'DEALER' ||
+        user?.sellerType?.toLowerCase() === 'dealer' ||
+        Boolean(user?.dealer);
+      const isAdmin = roleName === 'ADMIN' || roleName === 'SUPER_ADMIN';
+
+      if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/login') {
+        window.location.href = callbackUrl;
+      } else if (isAdmin) {
+        window.location.href = '/admin/dashboard';
+      } else if (isDealer) {
+        window.location.href = '/dealer/dashboard';
+      } else if (roleName === 'AGENT') {
+        window.location.href = '/agent/dashboard';
+      } else {
+        window.location.href = '/dashboard';
+      }
+    }
+  }, [authLoading, isAuthenticated, user, callbackUrl]);
 
   React.useEffect(() => {
     if (step === 2 && timeLeft > 0) {
@@ -30,8 +57,6 @@ export default function LoginPage() {
       return () => clearTimeout(timer);
     }
   }, [step, timeLeft]);
-
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +70,12 @@ export default function LoginPage() {
     setSuccess('');
 
     try {
-      await authAPI.requestOtp(mobile);
+      const res = await authAPI.requestOtp(mobile);
+      const devOtp = res?.data?.devOtp || res?.devOtp;
+      if (devOtp) {
+        setOtp(devOtp);
+        setDevOtpHint(devOtp);
+      }
       setStep(2);
       setTimeLeft(60);
     } catch (err: unknown) {
@@ -68,29 +98,37 @@ export default function LoginPage() {
     setSuccess('');
 
     try {
-      await authAPI.verifyOtp(otp);
-      const user = await refreshUser(); // Fetch user session via context
+      const res = await authAPI.verifyOtp(otp);
+      if (res?.data?.accessToken && typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('accessToken', res.data.accessToken);
+          document.cookie = `accessToken=${res.data.accessToken}; path=/; max-age=900; SameSite=Lax`;
+        } catch (_) {}
+      }
+      const loggedInUser = await refreshUser(); // Fetch user session via context
 
-      let targetPath = callbackUrl !== '/' ? callbackUrl : null;
+      const roleName = loggedInUser?.role?.name?.toUpperCase();
+      const isDealer =
+        roleName === 'DEALER' ||
+        loggedInUser?.sellerType?.toLowerCase() === 'dealer' ||
+        Boolean(loggedInUser?.dealer);
+      const isAdmin = roleName === 'ADMIN' || roleName === 'SUPER_ADMIN';
 
-      if (!targetPath && user?.role?.name) {
-        switch (user.role.name) {
-          case 'ADMIN':
-          case 'SUPER_ADMIN':
-            targetPath = '/admin/dashboard';
-            break;
-          case 'DEALER':
-            targetPath = '/dealer/dashboard';
-            break;
-          case 'CUSTOMER':
-            targetPath = '/dashboard';
-            break;
-          default:
-            targetPath = '/dashboard';
-        }
+      let targetPath = '';
+
+      if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/login') {
+        targetPath = callbackUrl;
+      } else if (isAdmin) {
+        targetPath = '/admin/dashboard';
+      } else if (isDealer) {
+        targetPath = '/dealer/dashboard';
+      } else if (roleName === 'AGENT') {
+        targetPath = '/agent/dashboard';
+      } else {
+        targetPath = '/dashboard';
       }
 
-      router.push(targetPath || '/dashboard');
+      window.location.href = targetPath;
     } catch (err: unknown) {
       const errorResponse = err as { response?: { data?: { message?: string } } };
       setError(errorResponse.response?.data?.message || 'Invalid OTP. Please try again.');
@@ -105,7 +143,12 @@ export default function LoginPage() {
     setSuccess('');
 
     try {
-      await authAPI.requestOtp(mobile);
+      const res = await authAPI.requestOtp(mobile);
+      const devOtp = res?.data?.devOtp || res?.devOtp;
+      if (devOtp) {
+        setOtp(devOtp);
+        setDevOtpHint(devOtp);
+      }
       setSuccess('OTP resent successfully!');
       setTimeLeft(60);
     } catch (err: unknown) {
@@ -204,6 +247,14 @@ export default function LoginPage() {
           </form>
         ) : (
           <form onSubmit={handleVerifyOtp} className="relative z-10 flex w-full flex-col gap-5">
+            {devOtpHint && (
+              <div className="flex items-center justify-center gap-2 rounded-xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 py-2 px-4 text-xs font-bold text-[var(--color-brand-green)] animate-in fade-in">
+                <span>Dev OTP:</span>
+                <span className="font-mono text-sm tracking-widest bg-[var(--color-brand-green)]/20 px-2 py-0.5 rounded-md font-black">
+                  {devOtpHint}
+                </span>
+              </div>
+            )}
             <div className="relative">
               <input
                 type="text"

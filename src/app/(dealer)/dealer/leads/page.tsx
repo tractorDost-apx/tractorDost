@@ -392,8 +392,14 @@ export default function LeadsPage() {
 
       {/* Lead Detail & Disposition Modal */}
       {selectedEnquiry && (
-        <div className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/25 dark:bg-black/60 backdrop-blur-sm">
-          <div className="text-foreground relative flex w-full max-h-[80vh] max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl [backdrop-filter:none]">
+        <div
+          onClick={() => setSelectedEnquiry(null)}
+          className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="text-foreground relative flex w-full max-h-[85vh] max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl"
+          >
             <div className="bg-foreground/5 shrink-0 flex items-center justify-between border-b border-[var(--border-subtle)] p-6">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 p-2.5 text-[var(--color-brand-green)]">

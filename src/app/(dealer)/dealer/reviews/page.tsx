@@ -30,6 +30,15 @@ export default function DealerReviewsPage() {
           const res = await dealerAPI.getAllDealers({ limit: 100 });
           const matched = res.success ? res.data?.data.find((d) => d.userId === user.id) : undefined;
           dealerId = matched?.id ?? null;
+          if (
+            !dealerId &&
+            (user?.role?.name?.toUpperCase() === 'ADMIN' ||
+              user?.role?.name?.toUpperCase() === 'SUPER_ADMIN')
+          ) {
+            const primary =
+              res.data?.data.find((d) => d.verificationStatus === 'VERIFIED') || res.data?.data[0];
+            dealerId = primary?.id ?? null;
+          }
         }
         if (!dealerId) {
           setError('No dealer profile linked to your user account.');

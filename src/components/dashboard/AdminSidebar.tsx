@@ -138,10 +138,28 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const { logout, user } = useAuth();
 
-  // By default, open 'Core' and the group containing the active link
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('tractordost:admin_sidebar_collapsed');
+      if (saved !== null) {
+        setIsCollapsed(saved === 'true');
+      }
+    } catch (_) {}
+  }, []);
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('tractordost:admin_sidebar_collapsed', String(next));
+      } catch (_) {}
+      return next;
+    });
+  };
 
   useEffect(() => {
     const activeGroup = NAV_GROUPS.find((group) =>
@@ -201,7 +219,7 @@ export default function AdminSidebar() {
             </h2>
           )}
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={toggleCollapse}
             className={`hover:bg-foreground/10 text-muted hover:text-foreground rounded-md p-1.5 transition-all ${isCollapsed ? 'mx-auto' : ''}`}
           >
             <Menu size={20} />

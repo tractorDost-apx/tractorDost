@@ -15,33 +15,40 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   const router = useRouter();
   const pathname = usePathname();
 
+  const userRole = user?.role?.name?.toUpperCase();
+  const isDealerUser =
+    userRole === 'DEALER' ||
+    user?.sellerType?.toLowerCase() === 'dealer' ||
+    Boolean(user?.dealer);
+
+  const normalizedAllowedRoles = allowedRoles?.map((r) => r.toUpperCase());
+
+  // Determine if current user is authorized for this route
+  const isAuthorized =
+    !normalizedAllowedRoles ||
+    normalizedAllowedRoles.length === 0 ||
+    (userRole && normalizedAllowedRoles.includes(userRole)) ||
+    (isDealerUser && normalizedAllowedRoles.includes('DEALER'));
+
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
         // Redirect to login if not authenticated, saving the current path to return to
         router.replace(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
-      } else if (allowedRoles && user?.role?.name && !allowedRoles.includes(user.role.name)) {
+      } else if (!isAuthorized) {
         // User is authenticated but lacks required role
-        switch (user.role.name) {
-          case 'ADMIN':
-          case 'SUPER_ADMIN':
-            router.replace('/admin/dashboard');
-            break;
-          case 'AGENT':
-            router.replace('/agent/dashboard');
-            break;
-          case 'DEALER':
-            router.replace('/dealer/dashboard');
-            break;
-          case 'CUSTOMER':
-            router.replace('/dashboard');
-            break;
-          default:
-            router.replace('/');
+        if (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') {
+          router.replace('/admin/dashboard');
+        } else if (isDealerUser) {
+          router.replace('/dealer/dashboard');
+        } else if (userRole === 'AGENT') {
+          router.replace('/agent/dashboard');
+        } else {
+          router.replace('/dashboard');
         }
       }
     }
-  }, [isLoading, isAuthenticated, user, router, pathname, allowedRoles]);
+  }, [isLoading, isAuthenticated, isAuthorized, userRole, isDealerUser, router, pathname]);
 
   if (isLoading) {
     return (
@@ -52,10 +59,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   }
 
   // Render children only if authenticated and authorized
-  if (
-    !isAuthenticated ||
-    (allowedRoles && user?.role?.name && !allowedRoles.includes(user.role.name))
-  ) {
+  if (!isAuthenticated || !isAuthorized) {
     return null; // Return null to prevent flicker before redirect occurs
   }
 

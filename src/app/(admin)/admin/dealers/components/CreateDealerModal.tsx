@@ -182,28 +182,34 @@ export function CreateDealerModal({ onClose, onSuccess }: CreateDealerModalProps
     }
 
     // Construct Payload (EXCLUDING confirmPanNumber and confirmGstNumber!)
+    const cleanWebsite = website.trim()
+      ? website.trim().startsWith('http://') || website.trim().startsWith('https://')
+        ? website.trim()
+        : `https://${website.trim()}`
+      : undefined;
+
     const payload: CreateDealerPayload = {
-      mobile: Number(mobile),
-      fullName: fullName || undefined,
-      businessName,
-      slug,
+      mobile: Number(mobile.trim()),
+      fullName: fullName.trim() || undefined,
+      businessName: businessName.trim(),
+      slug: slug.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'),
       dealerType,
-      phone,
-      whatsapp: whatsapp || undefined,
-      email: email || undefined,
-      website: website || undefined,
-      panNumber: panNumber || undefined,
-      gstNumber: gstNumber || undefined,
-      address,
-      state,
-      district,
-      pincode: pincode || undefined,
+      phone: phone.trim(),
+      whatsapp: whatsapp.trim() || undefined,
+      email: email.trim() ? email.trim().toLowerCase() : undefined,
+      website: cleanWebsite,
+      panNumber: panNumber.trim() ? panNumber.trim().toUpperCase() : undefined,
+      gstNumber: gstNumber.trim() ? gstNumber.trim().toUpperCase() : undefined,
+      address: address.trim(),
+      state: state.trim(),
+      district: district.trim(),
+      pincode: pincode.trim() || undefined,
       latitude: latitude ? Number(latitude) : undefined,
       longitude: longitude ? Number(longitude) : undefined,
       serviceRadiusKm: serviceRadiusKm ? Number(serviceRadiusKm) : 50,
-      aboutDealer: aboutDealer || undefined,
-      seoTitle: seoTitle || undefined,
-      seoDescription: seoDescription || undefined,
+      aboutDealer: aboutDealer.trim() || undefined,
+      seoTitle: seoTitle.trim() || undefined,
+      seoDescription: seoDescription.trim() || undefined,
     };
 
     try {
@@ -214,10 +220,13 @@ export function CreateDealerModal({ onClose, onSuccess }: CreateDealerModalProps
       }
     } catch (err: any) {
       console.error('Error creating dealer:', err);
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error?.[0]?.message ||
-        'Failed to create dealer';
+      const firstIssue = err?.response?.data?.error?.[0]?.message;
+      const serverMsg = err?.response?.data?.message;
+      const msg = firstIssue
+        ? serverMsg && serverMsg !== 'Validation failed'
+          ? `${serverMsg}: ${firstIssue}`
+          : firstIssue
+        : serverMsg || 'Failed to create dealer. Please check the form and try again.';
       setApiError(msg);
     } finally {
       setSubmitting(false);

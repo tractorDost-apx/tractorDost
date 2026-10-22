@@ -59,6 +59,8 @@ export interface AdminReviewListParams {
   page?: number;
   limit?: number;
   approved?: boolean;
+  targetType?: ReviewTargetType;
+  targetId?: number;
 }
 
 export const reviewsAPI = {

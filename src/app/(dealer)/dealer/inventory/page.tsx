@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useDealerInventory } from '@/hooks/dealers/use-dealer-inventory';
+import { useMyUsedListings } from '@/hooks/used-listings/use-used-listings';
 import { InventoryStatsCards } from './components/InventoryStatsCards';
 import { InventoryTable } from './components/InventoryTable';
 import { InventoryFormModal } from './components/InventoryFormModal';
@@ -18,7 +19,58 @@ import {
   CheckCircle2,
   Filter,
   ArrowUpDown,
+  Tag,
 } from 'lucide-react';
+
+function cleanString(str?: string | null): string {
+  if (!str) return '';
+  return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function isTractorListed(
+  item: DealerInventoryItem,
+  listings: Array<{
+    tractorId?: number | null;
+    tractorBrand?: string | null;
+    tractorModel?: string | null;
+    listingStatus?: string;
+  }>
+): boolean {
+  return listings.some((l) => {
+    // Only consider live or pending listings (ignore rejected, sold, expired)
+    const isLive = l.listingStatus === 'ACTIVE' || l.listingStatus === 'PENDING_APPROVAL';
+    if (!isLive) return false;
+
+    // 1. Exact catalog tractorId match
+    if (item.tractorId && l.tractorId && item.tractorId === l.tractorId) {
+      return true;
+    }
+
+    // 2. Model & Brand matching
+    const itemModel = cleanString(item.tractorName || item.customModel);
+    const listingModel = cleanString(l.tractorModel);
+
+    if (!itemModel || !listingModel) return false;
+
+    const modelMatches =
+      itemModel === listingModel ||
+      itemModel.includes(listingModel) ||
+      listingModel.includes(itemModel);
+
+    const itemBrand = cleanString(item.brand);
+    const listingBrand = cleanString(l.tractorBrand);
+
+    if (itemBrand && listingBrand) {
+      const brandMatches =
+        itemBrand === listingBrand ||
+        itemBrand.includes(listingBrand) ||
+        listingBrand.includes(itemBrand);
+      return modelMatches && brandMatches;
+    }
+
+    return modelMatches;
+  });
+}
 
 export default function DealerInventoryPage() {
   const {
@@ -45,7 +97,27 @@ export default function DealerInventoryPage() {
   const [isFormModalOpen, setIsFormModalOpen] = useState<boolean>(false);
   const [itemToEdit, setItemToEdit] = useState<DealerInventoryItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<DealerInventoryItem | null>(null);
+  const [isListForSaleOpen, setIsListForSaleOpen] = useState<boolean>(false);
   const [itemToListForSale, setItemToListForSale] = useState<DealerInventoryItem | null>(null);
+
+  // Fetch dealer's used listings to know which inventory tractors are already live on marketplace
+  const { data: usedListingsData, reload: reloadUsedListings } = useMyUsedListings({
+    page: 1,
+    limit: 100,
+  });
+  const [recentlyListedInventoryIds, setRecentlyListedInventoryIds] = useState<number[]>([]);
+
+  const isItemListed = useCallback(
+    (item: DealerInventoryItem) => {
+      if (recentlyListedInventoryIds.includes(item.inventoryId)) {
+        return true;
+      }
+
+      const listings = usedListingsData?.data ?? [];
+      return isTractorListed(item, listings);
+    },
+    [recentlyListedInventoryIds, usedListingsData]
+  );
 
   // Toast feedback state
   const [toastMessage, setToastMessage] = useState<{
@@ -175,12 +247,25 @@ export default function DealerInventoryPage() {
           </div>
         </div>
 
-        <button
-          onClick={handleOpenAddModal}
-          className="flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 sm:self-auto"
-        >
-          <Plus size={18} className="stroke-[3]" /> Add Inventory Item
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => {
+              setItemToListForSale(null);
+              setIsListForSaleOpen(true);
+            }}
+            className="flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-2.5 text-xs font-bold tracking-wider text-[var(--color-brand-green)] uppercase shadow-sm transition-all hover:bg-[var(--color-brand-green)] hover:text-white active:scale-95 sm:self-auto"
+            title="List a used tractor directly on marketplace"
+          >
+            <Tag size={16} /> List Used Tractor for Sale
+          </button>
+
+          <button
+            onClick={handleOpenAddModal}
+            className="flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs font-bold tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 active:scale-95 sm:self-auto"
+          >
+            <Plus size={18} className="stroke-[3]" /> Add Inventory Item
+          </button>
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -271,7 +356,11 @@ export default function DealerInventoryPage() {
         onDelete={handleOpenDeleteModal}
         onToggleAvailability={handleToggleAvailability}
         onAddClick={handleOpenAddModal}
-        onListForSale={(item) => setItemToListForSale(item)}
+        onListForSale={(item) => {
+          setItemToListForSale(item);
+          setIsListForSaleOpen(true);
+        }}
+        isItemListed={isItemListed}
       />
 
       {/* Add / Edit Form Modal */}
@@ -294,17 +383,34 @@ export default function DealerInventoryPage() {
       )}
 
       {/* Create Used Listing for Marketplace Modal */}
-      {itemToListForSale && (
+      {isListForSaleOpen && (
         <CreateDealerUsedListingModal
-          isOpen={Boolean(itemToListForSale)}
-          onClose={() => setItemToListForSale(null)}
-          onSuccess={(msg: string) => showToast('success', msg)}
-          initialData={{
-            brand: itemToListForSale.brand,
-            tractorName: itemToListForSale.tractorName,
-            customModel: itemToListForSale.customModel,
-            hp: itemToListForSale.hp,
+          isOpen={isListForSaleOpen}
+          onClose={() => {
+            setIsListForSaleOpen(false);
+            setItemToListForSale(null);
           }}
+          onSuccess={(msg: string) => {
+            showToast('success', msg);
+            setIsListForSaleOpen(false);
+            if (itemToListForSale) {
+              setRecentlyListedInventoryIds((prev) => [...prev, itemToListForSale.inventoryId]);
+            }
+            setItemToListForSale(null);
+            reloadUsedListings();
+          }}
+          initialData={
+            itemToListForSale
+              ? {
+                  brand: itemToListForSale.brand,
+                  tractorName: itemToListForSale.tractorName,
+                  customModel: itemToListForSale.customModel,
+                  hp: itemToListForSale.hp,
+                  tractorId: itemToListForSale.tractorId,
+                  inventoryId: itemToListForSale.inventoryId,
+                }
+              : undefined
+          }
         />
       )}
     </div>

@@ -35,6 +35,8 @@ interface CreateDealerUsedListingModalProps {
     tractorName?: string | null;
     customModel?: string | null;
     hp?: number | null;
+    tractorId?: number | null;
+    inventoryId?: number | null;
   };
 }
 
@@ -96,10 +98,19 @@ export function CreateDealerUsedListingModal({
   const [hoursUsed, setHoursUsed] = useState<number>(1200);
 
   React.useEffect(() => {
-    if (isOpen && initialData) {
-      if (initialData.brand) setTractorBrand(initialData.brand);
-      if (initialData.tractorName || initialData.customModel) {
-        setTractorModel(initialData.tractorName || initialData.customModel || '');
+    if (isOpen) {
+      setError(null);
+      setSubmitting(false);
+      setUploadProgressText('');
+      if (initialData) {
+        if (initialData.brand) setTractorBrand(initialData.brand);
+        if (initialData.tractorName || initialData.customModel) {
+          setTractorModel(initialData.tractorName || initialData.customModel || '');
+        }
+      } else {
+        setTractorBrand('');
+        setTractorModel('');
+        setAskingPrice('');
       }
     }
   }, [isOpen, initialData]);
@@ -212,6 +223,11 @@ export function CreateDealerUsedListingModal({
         pincode: pincode.trim() || undefined,
         description: description.trim() || undefined,
         majorRepairs: majorRepairs.trim() || undefined,
+        tractorId: initialData?.tractorId || undefined,
+        dealerInventoryId:
+          initialData?.tractorId && initialData?.inventoryId
+            ? Number(initialData.inventoryId)
+            : undefined,
       };
 
       const res = await usedTractorListingAPI.createListing(payload as any);
@@ -272,10 +288,15 @@ export function CreateDealerUsedListingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative max-h-[80vh] overflow-y-auto w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-[var(--background)] p-6 shadow-2xl md:p-8">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !submitting) onClose();
+      }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="relative flex flex-col max-h-[90vh] w-full max-w-4xl rounded-2xl border border-lime-400/20 bg-[var(--background)] p-6 shadow-2xl md:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-5">
+        <div className="flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] pb-5">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-lime-400/10 text-lime-400">
               <Tractor size={26} />
@@ -295,6 +316,7 @@ export function CreateDealerUsedListingModal({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="rounded-lg p-2 text-muted hover:bg-foreground/5 hover:text-foreground transition-colors"
           >
@@ -303,7 +325,7 @@ export function CreateDealerUsedListingModal({
         </div>
 
         {/* Informational Banner */}
-        <div className="mt-4 flex items-start gap-3 rounded-xl border border-lime-400/30 bg-lime-950/20 p-3.5 text-xs text-lime-300">
+        <div className="mt-4 flex shrink-0 items-start gap-3 rounded-xl border border-lime-400/30 bg-lime-950/20 p-3.5 text-xs text-lime-300">
           <Sparkles className="h-5 w-5 shrink-0 text-lime-400 mt-0.5" />
           <div>
             <span className="font-bold">Instant Dealer Publishing:</span> As an authorized dealer, this used tractor is separate from inventory and will be published live immediately on the marketplace with your uploaded verification documents without waiting for agent inspection.
@@ -312,16 +334,17 @@ export function CreateDealerUsedListingModal({
 
         {/* Error notice */}
         {error && (
-          <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-medium text-red-400">
+          <div className="mt-4 flex shrink-0 items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-medium text-red-400">
             <AlertCircle size={18} className="shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6 max-h-[70vh] overflow-y-auto pr-1">
-          {/* Section 1: Tractor Information */}
-          <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 space-y-6 overflow-y-auto pr-2">
+            {/* Section 1: Tractor Information */}
+            <div className="space-y-4">
             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-lime-400">
               <Tractor size={16} /> 1. Tractor Model & Details
             </h3>
@@ -951,9 +974,10 @@ export function CreateDealerUsedListingModal({
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-5">
+        {/* Action Buttons */}
+          <div className="flex shrink-0 items-center justify-between border-t border-[var(--border-subtle)] pt-4 mt-2">
             <span className="text-xs text-lime-400 font-semibold animate-pulse">
               {uploadProgressText}
             </span>

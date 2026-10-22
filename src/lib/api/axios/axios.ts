@@ -5,18 +5,24 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-// Add a request interceptor to attach the Bearer token from cookies
+// Add a request interceptor to attach the Bearer token from cookies or localStorage
 apiClient.interceptors.request.use(
   (config) => {
     // Only run on the client side
     if (typeof window !== 'undefined') {
+      let token: string | null = null;
       const cookies = document.cookie.split(';');
       const accessTokenCookie = cookies.find((c) => c.trim().startsWith('accessToken='));
       if (accessTokenCookie) {
-        const token = accessTokenCookie.trim().substring('accessToken='.length);
-        if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
-        }
+        token = accessTokenCookie.trim().substring('accessToken='.length);
+      }
+      if (!token) {
+        try {
+          token = localStorage.getItem('accessToken');
+        } catch (_) {}
+      }
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
       }
     }
     return config;
@@ -29,7 +35,13 @@ let refreshPromise: Promise<boolean> | null = null;
 // Bypasses apiClient (and its own interceptors) so a failed refresh can never recurse.
 export const refreshAccessToken = async (): Promise<boolean> => {
   try {
-    await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
+    const res = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
+    if (res.data?.data?.accessToken && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('accessToken', res.data.data.accessToken);
+        document.cookie = `accessToken=${res.data.data.accessToken}; path=/; max-age=900; SameSite=Lax`;
+      } catch (_) {}
+    }
     return true;
   } catch {
     return false;

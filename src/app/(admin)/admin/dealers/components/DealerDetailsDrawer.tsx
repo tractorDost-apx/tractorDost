@@ -28,6 +28,7 @@ import {
   DealerTypeBadge,
 } from './DealerStatusBadge';
 import { DealerBrandManagementModal } from './DealerBrandManagementModal';
+import { DealerPerformanceMetrics } from './DealerPerformanceMetrics';
 
 interface DealerDetailsDrawerProps {
   dealerId: number | null;
@@ -316,48 +317,8 @@ export function DealerDetailsDrawer({
                     </div>
                   )}
 
-                  {/* Profile Metrics Card if loaded */}
-                  {profile && (
-                    <div className="glass-panel space-y-4 rounded-2xl  p-5">
-                      <h4 className="text-xs font-black tracking-wider text-lime-400 uppercase">
-                        Performance & Resolution Metrics
-                      </h4>
-                      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
-                          <div className="text-foreground text-xl font-black">
-                            {profile.overallRating.toFixed(1)}
-                          </div>
-                          <div className="text-muted mt-0.5 text-[10px] font-bold uppercase">
-                            Overall Rating
-                          </div>
-                        </div>
-                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
-                          <div className="text-foreground text-xl font-black">
-                            {profile.grievanceStats.totalGrievances}
-                          </div>
-                          <div className="text-muted mt-0.5 text-[10px] font-bold uppercase">
-                            Total Grievances
-                          </div>
-                        </div>
-                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
-                          <div className="text-xl font-black text-emerald-400">
-                            {profile.grievanceStats.resolved}
-                          </div>
-                          <div className="text-muted mt-0.5 text-[10px] font-bold uppercase">
-                            Resolved
-                          </div>
-                        </div>
-                        <div className="rounded-xl bg-foreground/5 p-3 text-center">
-                          <div className="text-xl font-black text-lime-400">
-                            {profile.grievanceStats.resolutionRate}
-                          </div>
-                          <div className="text-muted mt-0.5 text-[10px] font-bold uppercase">
-                            Resolution Rate
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  {/* Performance & Resolution Metrics */}
+                  <DealerPerformanceMetrics profile={profile} loading={loading} />
                 </div>
               )}
 
@@ -702,6 +663,8 @@ export function DealerDetailsDrawer({
               {/* TAB 8: REVIEWS & COMPLAINTS */}
               {activeTab === 'reviews_complaints' && (
                 <div className="space-y-4">
+                  {/* Detailed Performance & Resolution Metrics */}
+                  <DealerPerformanceMetrics profile={profile} loading={loading} />
                   {/* Reviews Summary */}
                   <div className="glass-panel space-y-3 rounded-2xl  p-5">
                     <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">

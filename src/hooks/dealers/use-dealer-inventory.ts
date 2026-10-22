@@ -64,6 +64,16 @@ export function useDealerInventory() {
             if (matched) {
               id = matched.id;
               name = matched.businessName;
+            } else if (
+              user?.role?.name?.toUpperCase() === 'ADMIN' ||
+              user?.role?.name?.toUpperCase() === 'SUPER_ADMIN'
+            ) {
+              const primary =
+                res.data.data.find((d) => d.verificationStatus === 'VERIFIED') || res.data.data[0];
+              if (primary) {
+                id = primary.id;
+                name = primary.businessName;
+              }
             }
           }
         }

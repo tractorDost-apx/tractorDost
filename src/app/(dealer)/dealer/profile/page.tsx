@@ -30,6 +30,15 @@ export default function DealerProfilePage() {
           const matched = res.data.data.find((d) => d.userId === user.id);
           if (matched) {
             targetDealerId = matched.id;
+          } else if (
+            user?.role?.name?.toUpperCase() === 'ADMIN' ||
+            user?.role?.name?.toUpperCase() === 'SUPER_ADMIN'
+          ) {
+            const primary =
+              res.data.data.find((d) => d.verificationStatus === 'VERIFIED') || res.data.data[0];
+            if (primary) {
+              targetDealerId = primary.id;
+            }
           }
         }
       }

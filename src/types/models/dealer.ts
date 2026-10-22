@@ -171,12 +171,22 @@ export interface DealerProfileSummary {
     fourStar: number;
     fiveStar: number;
   };
+  positivePercentage?: number;
+  subscores?: {
+    serviceQuality?: number | null;
+    responseTime?: number | null;
+    afterSalesSupport?: number | null;
+    priceFairness?: number | null;
+  };
   grievanceStats: {
     totalGrievances: number;
     resolved: number;
     pending: number;
     escalated: number;
     resolutionRate: string;
+    resolutionPercentage?: number;
+    healthStatus?: 'PERFECT' | 'EXCELLENT' | 'GOOD' | 'NEEDS_ATTENTION';
+    avgResolutionDays?: number | null;
   };
   recentReviews: Array<{
     id: number;
@@ -300,16 +310,31 @@ export interface UpdateDealerPayload {
 
 export interface UpdateDealerAdminPayload {
   businessName?: string;
+  slug?: string;
+  dealerType?: DealerType;
   phone?: string;
-  email?: string;
+  whatsapp?: string | null;
+  email?: string | null;
+  website?: string | null;
+  gstNumber?: string | null;
+  panNumber?: string | null;
   address?: string;
   state?: string;
   district?: string;
-  pincode?: string;
+  pincode?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  serviceRadiusKm?: number | null;
+  workingHours?: any;
+  serviceAreas?: any;
   verificationStatus?: VerificationStatus;
   isCertified?: boolean;
-  certificationReason?: string;
-  rejectionReason?: string;
-  serviceRadiusKm?: number;
+  certificationReason?: string | null;
+  rejectionReason?: string | null;
   isActive?: boolean;
+  aboutDealer?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  brandIds?: number[];
+  primaryBrandId?: number | null;
 }
