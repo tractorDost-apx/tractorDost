@@ -525,19 +525,23 @@ export default function TractorRepairPage() {
     });
   };
 
-  // Load Centers & Dealers
-  const loadCentersAndDealers = async () => {
-    try {
-      setLoadingCenters(true);
-      const [nearbyRes, dealersRes] = await Promise.allSettled([
-        serviceCenterAPI.getNearbyServiceCenters({
-          latitude: 18.5204,
-          longitude: 73.8567,
-          radius: 1000,
-          limit: 50,
-        }),
-        dealerAPI.getAllDealers({ limit: 50, sortBy: 'positive_reviews' }),
-      ]);
+  // Load Centers & Dealers with specific location & radius
+  const loadCentersAndDealers = useCallback(
+    async (lat: number = 18.5204, lon: number = 73.8567, radiusKm: number = 1000) => {
+      try {
+        setLoadingCenters(true);
+        // Note: Backend validates radius <= 500
+        const validRadius = Math.min(Math.max(radiusKm, 10), 500);
+
+        const [nearbyRes, dealersRes] = await Promise.allSettled([
+          serviceCenterAPI.getNearbyServiceCenters({
+            latitude: lat,
+            longitude: lon,
+            radius: validRadius,
+            limit: 50,
+          }),
+          dealerAPI.getAllDealers({ limit: 50, sortBy: 'positive_reviews' }),
+        ]);
 
         let loadedCenters: NearbyServiceCenter[] = [];
         if (nearbyRes.status === 'fulfilled' && nearbyRes.value.success) {

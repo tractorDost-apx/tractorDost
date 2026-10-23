@@ -37,7 +37,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         router.replace(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
       } else if (!isAuthorized) {
         // User is authenticated but lacks required role
-        switch (user.role.name) {
+        switch (user?.role?.name) {
           case 'ADMIN':
             router.replace('/admin/dashboard');
             break;

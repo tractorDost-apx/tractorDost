@@ -106,11 +106,12 @@ export default function LoginPage() {
         } catch (_) {}
       }
       const loggedInUser = await refreshUser(); // Fetch user session via context
+      const targetUser = loggedInUser || user;
 
-      let targetPath = callbackUrl !== '/' ? callbackUrl : null;
+      let targetPath = callbackUrl && callbackUrl !== '/' ? callbackUrl : '';
 
-      if (!targetPath && user?.role?.name) {
-        switch (user.role.name) {
+      if (!targetPath && targetUser?.role?.name) {
+        switch (targetUser.role.name) {
           case 'ADMIN':
             targetPath = '/admin/dashboard';
             break;
@@ -125,7 +126,7 @@ export default function LoginPage() {
         }
       }
 
-      window.location.href = targetPath;
+      window.location.href = targetPath || '/dashboard';
     } catch (err: unknown) {
       const errorResponse = err as { response?: { data?: { message?: string } } };
       setError(errorResponse.response?.data?.message || 'Invalid OTP. Please try again.');
