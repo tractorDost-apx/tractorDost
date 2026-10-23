@@ -169,20 +169,22 @@ export default function OnRoadPricePage() {
                     <button
                       key={brand.id}
                       onClick={() => handleBrandSelect(brand)}
-                      className="bg-background/50 group flex flex-col items-center justify-center rounded-[2rem] border border-[var(--border-subtle)] p-6 transition-all duration-300 hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5 hover:shadow-[var(--card-shadow)]"
+                      className="group relative flex flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-4 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg dark:border-white/10 dark:bg-card"
                     >
-                      {brand.logoUrl ? (
-                        <img
-                          src={brand.logoUrl}
-                          alt={brand.name}
-                          className="mb-3 h-16 w-16 object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110 dark:mix-blend-normal"
-                        />
-                      ) : (
-                        <div className="bg-foreground/5 mb-3 flex h-16 w-16 items-center justify-center rounded-full text-2xl font-black">
-                          {brand.name.charAt(0)}
-                        </div>
-                      )}
-                      <span className="text-foreground text-center text-sm font-black transition-colors group-hover:text-[var(--color-brand-green)]">
+                      <div className="relative mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-2.5 shadow-xs transition-all duration-300 group-hover:scale-108 group-hover:shadow-md dark:border-white/10 dark:bg-white/95">
+                        {brand.logoUrl ? (
+                          <img
+                            src={brand.logoUrl}
+                            alt={brand.name}
+                            className="h-full w-full object-contain rounded-xl transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-xl font-black text-[var(--color-brand-green)]">
+                            {brand.name.charAt(0)}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-foreground text-center text-xs font-black tracking-wider uppercase transition-colors group-hover:text-[var(--color-brand-green)] line-clamp-1">
                         {brand.name}
                       </span>
                     </button>

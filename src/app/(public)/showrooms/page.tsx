@@ -224,13 +224,15 @@ export default function ShowroomsPage() {
                     className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-all ${selectedBrand === brand.id ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' : 'bg-foreground/5 text-foreground hover:bg-foreground/10 border-transparent'}`}
                   >
                     {brand.logoUrl ? (
-                      <img
-                        src={brand.logoUrl}
-                        alt={brand.name}
-                        className="h-6 w-6 rounded-sm bg-white object-contain p-0.5 mix-blend-multiply dark:mix-blend-normal"
-                      />
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-black/5 bg-white p-0.5 shadow-xs dark:border-white/10">
+                        <img
+                          src={brand.logoUrl}
+                          alt={brand.name}
+                          className="h-full w-full object-contain rounded-xs"
+                        />
+                      </div>
                     ) : (
-                      <div className="bg-foreground/10 flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--color-brand-green)]/20 to-[var(--color-brand-green)]/5 text-[10px] font-black text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20">
                         {brand.name.charAt(0)}
                       </div>
                     )}
@@ -349,11 +351,13 @@ export default function ShowroomsPage() {
                         {showroom.brand && (
                           <div className="bg-background flex items-center gap-2 rounded-lg border border-[var(--border-subtle)] px-3 py-1 shadow-sm">
                             {showroom.brand.logoUrl && (
-                              <img
-                                src={showroom.brand.logoUrl}
-                                alt={showroom.brand.name}
-                                className="h-4 w-4 object-contain mix-blend-multiply dark:mix-blend-normal"
-                              />
+                              <div className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-md border border-black/5 bg-white p-0.5 shadow-2xs">
+                                <img
+                                  src={showroom.brand.logoUrl}
+                                  alt={showroom.brand.name}
+                                  className="h-full w-full object-contain rounded-xs"
+                                />
+                              </div>
                             )}
                             <span className="text-foreground text-xs font-black">
                               {showroom.brand.name}

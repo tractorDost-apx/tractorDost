@@ -907,7 +907,7 @@ function TractorsListingContent() {
                       className="group relative flex flex-col gap-6 overflow-hidden rounded-[2.25rem] border border-black/8 dark:border-white/10 bg-white/90 dark:bg-[#121814]/90 p-6 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-xl sm:flex-row"
                     >
                       {/* Image Box */}
-                      <div className="group/img relative flex h-52 w-full shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 bg-gradient-to-br from-black/[0.02] via-emerald-500/[0.04] to-amber-500/[0.03] dark:from-white/[0.02] dark:via-emerald-950/25 dark:to-amber-950/20 p-4 sm:w-72">
+                      <div className="group/img relative flex h-52 w-full shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 bg-foreground/5 sm:w-72">
                         {tractor.brand?.name && (
                           <div className="absolute top-3 left-3 z-10 rounded-full border border-black/5 dark:border-white/10 bg-white/95 dark:bg-black/80 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-[var(--color-brand-green)] uppercase shadow-xs backdrop-blur-md">
                             {tractor.brand.name}
@@ -923,7 +923,7 @@ function TractorsListingContent() {
                           <img
                             src={primaryImage}
                             alt={tractor.modelName}
-                            className="relative z-0 h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover/img:scale-108 dark:mix-blend-normal"
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-108"
                           />
                         ) : (
                           <div className="flex flex-col items-center justify-center gap-2">
@@ -1002,7 +1002,7 @@ function TractorsListingContent() {
                     className="group relative flex flex-col overflow-hidden rounded-[2.25rem] border border-black/8 dark:border-white/10 bg-white/90 dark:bg-[#121814]/90 p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-[var(--color-brand-green)]/40 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/10"
                   >
                     {/* Image Area */}
-                    <div className="group/img relative mb-4 flex h-48 w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 bg-gradient-to-br from-black/[0.02] via-emerald-500/[0.04] to-amber-500/[0.03] dark:from-white/[0.02] dark:via-emerald-950/25 dark:to-amber-950/20 p-4">
+                    <div className="group/img relative mb-4 flex h-52 w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 bg-foreground/5">
                       {/* Floating Brand Badge */}
                       {tractor.brand?.name && (
                         <div className="absolute top-3 left-3 z-10 rounded-full border border-black/5 dark:border-white/10 bg-white/95 dark:bg-black/80 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-[var(--color-brand-green)] uppercase shadow-xs backdrop-blur-md">
@@ -1021,7 +1021,7 @@ function TractorsListingContent() {
                         <img
                           src={primaryImage}
                           alt={tractor.modelName}
-                          className="relative z-0 h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover/img:scale-108 dark:mix-blend-normal"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-108"
                         />
                       ) : (
                         <div className="flex flex-col items-center justify-center gap-2">

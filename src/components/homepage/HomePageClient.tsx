@@ -122,22 +122,22 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                 <Link
                   key={brand.id}
                   href={`/tractors?brand=${brand.id}`}
-                  className="bg-background/40 hover:bg-background group flex aspect-square flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--border-brand)] hover:shadow-md"
+                  className="group relative flex aspect-square flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-3.5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg dark:border-white/10 dark:bg-card"
                 >
-                  <div className="relative mb-3 flex h-14 w-14 items-center justify-center">
+                  <div className="relative mb-2.5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-2.5 shadow-xs transition-all duration-300 group-hover:scale-108 group-hover:shadow-md dark:border-white/10 dark:bg-white/95">
                     {brand.logoUrl ? (
                       <img
                         src={brand.logoUrl}
                         alt={brand.name}
-                        className="max-h-full max-w-full object-contain opacity-90 transition-transform duration-300 group-hover:scale-105 group-hover:opacity-100"
+                        className="h-full w-full object-contain rounded-xl transition-transform duration-300"
                       />
                     ) : (
-                      <span className="text-foreground/30 text-2xl font-bold transition-colors group-hover:text-[var(--color-brand-green)]">
+                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-lg sm:text-xl font-black text-[var(--color-brand-green)]">
                         {brand.name.charAt(0)}
-                      </span>
+                      </div>
                     )}
                   </div>
-                  <span className="text-muted group-hover:text-foreground text-center text-[10px] font-semibold tracking-widest uppercase transition-colors">
+                  <span className="text-foreground group-hover:text-[var(--color-brand-green)] text-center text-xs font-black tracking-wider uppercase transition-colors line-clamp-1">
                     {brand.name}
                   </span>
                 </Link>
@@ -189,22 +189,24 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                         href={`/tractors/${tractor.id}`}
                         className="group bg-background/50 relative flex cursor-pointer flex-col overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-4 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--border-brand)] hover:shadow-lg"
                       >
-                        <div className="bg-background/80 text-foreground absolute top-6 right-6 z-10 rounded-full border border-[var(--border-subtle)] px-3 py-1.5 text-[10px] font-bold tracking-wider uppercase backdrop-blur-md">
-                          Premium
-                        </div>
+                        <div className="group/img relative mb-5 h-56 w-full overflow-hidden rounded-2xl bg-foreground/5">
+                          <div className="bg-background/85 text-foreground absolute top-3 right-3 z-10 rounded-full border border-[var(--border-subtle)] px-3 py-1 text-[10px] font-bold tracking-wider uppercase shadow-xs backdrop-blur-md">
+                            Premium
+                          </div>
 
-                        <div className="bg-foreground/5 group/img relative mb-5 flex h-52 w-full items-center justify-center overflow-hidden rounded-2xl p-4">
                           {primaryImage ? (
                             <img
                               src={primaryImage}
                               alt={tractor.modelName}
-                              className="relative z-0 h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover/img:scale-105 dark:mix-blend-normal"
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
                             />
                           ) : (
-                            <Tractor
-                              className="text-foreground/20 h-20 w-20 transition-all duration-500 group-hover/img:scale-105"
-                              strokeWidth={1}
-                            />
+                            <div className="flex h-full w-full items-center justify-center">
+                              <Tractor
+                                className="text-foreground/20 h-20 w-20 transition-all duration-500 group-hover/img:scale-105"
+                                strokeWidth={1}
+                              />
+                            </div>
                           )}
                         </div>
 

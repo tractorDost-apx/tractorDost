@@ -302,13 +302,15 @@ export function DealerBrandManagementModal({
                         </div>
 
                         {brand.logoUrl ? (
-                          <img
-                            src={brand.logoUrl}
-                            alt={brand.name}
-                            className="h-7 w-7 shrink-0 rounded border border-[var(--border-subtle)] bg-foreground/5 object-contain p-0.5"
-                          />
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-black/5 bg-white p-0.5 shadow-2xs">
+                            <img
+                              src={brand.logoUrl}
+                              alt={brand.name}
+                              className="h-full w-full object-contain rounded-xs"
+                            />
+                          </div>
                         ) : (
-                          <div className="text-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded bg-foreground/10 text-xs font-black">
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-xs font-black text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20">
                             {brand.name.charAt(0)}
                           </div>
                         )}

@@ -97,10 +97,10 @@ export default function BrandsListingPage() {
             <Link
               key={brand.id}
               href={`/tractors?brand=${brand.id}`}
-              className="group bg-background/50 relative flex cursor-pointer flex-col overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-6 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--border-brand)] hover:shadow-lg"
+              className="group bg-white dark:bg-card relative flex cursor-pointer flex-col overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-xs transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg dark:border-white/10"
             >
               {/* Logo Area */}
-              <div className="bg-foreground/5 group-hover:bg-background relative mb-6 flex h-40 w-full items-center justify-center overflow-hidden rounded-2xl p-4 transition-colors">
+              <div className="relative mb-6 flex h-40 w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-6 shadow-xs transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/95">
                 {brand.isFeatured && (
                   <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full bg-yellow-500 px-2 py-1 text-[10px] font-bold tracking-widest text-white uppercase shadow-sm">
                     <Star size={10} className="fill-current" /> Featured
@@ -110,12 +110,12 @@ export default function BrandsListingPage() {
                   <img
                     src={brand.logoUrl}
                     alt={brand.name}
-                    className="relative z-0 h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110 dark:mix-blend-normal"
+                    className="relative z-0 h-full w-full object-contain rounded-xl transition-transform duration-500 group-hover:scale-108"
                   />
                 ) : (
-                  <span className="text-foreground/20 text-5xl font-black transition-colors group-hover:text-[var(--color-brand-green)]/40">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-4xl font-black text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shadow-xs group-hover:scale-110 transition-transform duration-300">
                     {brand.name.charAt(0)}
-                  </span>
+                  </div>
                 )}
               </div>
 

@@ -389,7 +389,7 @@ function TractorDetailsView({
                   <img
                     src={activeMediaUrl}
                     alt={activeMedia.altText || tractor.modelName}
-                    className="relative z-0 h-full w-full object-contain p-8 mix-blend-multiply transition-transform duration-500 group-hover:scale-105 dark:mix-blend-normal"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 )
               ) : (
@@ -407,26 +407,30 @@ function TractorDetailsView({
 
             {/* Thumbnails */}
             {mediaList.length > 1 && (
-              <div className="custom-scrollbar flex gap-4 overflow-x-auto pb-2">
+              <div className="custom-scrollbar flex gap-3 overflow-x-auto pb-2">
                 {mediaList.map((media, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveMediaIndex(idx)}
-                    className={`from-foreground/5 h-24 w-24 flex-shrink-0 rounded-[1rem] border-2 bg-gradient-to-br to-transparent p-2 transition-all ${activeMediaIndex === idx ? 'border-[var(--color-brand-green)] shadow-[var(--color-brand-green)]/20 shadow-md' : 'hover:border-[var(--border-brand)] border-transparent'}`}
+                    className={`relative h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 overflow-hidden rounded-2xl border-2 transition-all ${
+                      activeMediaIndex === idx
+                        ? 'border-[var(--color-brand-green)] shadow-md ring-2 ring-[var(--color-brand-green)]/20'
+                        : 'border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/50 opacity-80 hover:opacity-100'
+                    }`}
                   >
                     {media.mediaType === 'VIDEO' ? (
-                      <div className="flex h-full w-full items-center justify-center">
+                      <div className="flex h-full w-full items-center justify-center bg-black/10">
                         <Play size={24} className="text-[var(--color-brand-orange)]" />
                       </div>
                     ) : media.mediaType === 'PDF' ? (
-                      <div className="flex h-full w-full items-center justify-center">
+                      <div className="flex h-full w-full items-center justify-center bg-foreground/5">
                         <FileText size={24} className="text-muted" />
                       </div>
                     ) : (
                       <img
                         src={media.url}
                         alt={media.altText || `Thumbnail ${idx}`}
-                        className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                       />
                     )}
                   </button>
@@ -1015,12 +1019,12 @@ function TractorDetailsView({
                   href={`/tractors/${st.slug || st.id}`}
                   className="spatial-card group bg-background relative flex cursor-pointer flex-col overflow-hidden rounded-[2.5rem] p-5 transition-all duration-500 hover:-translate-y-2 hover:border-[var(--color-brand-green)]/30 hover:shadow-[0_20px_40px_-10px_rgba(74,118,53,0.15)]"
                 >
-                  <div className="from-foreground/5 group/img relative mb-4 flex h-40 w-full items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-4">
+                  <div className="group/img relative mb-4 flex h-44 w-full items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-foreground/5">
                     {stPrimaryImage ? (
                       <img
                         src={stPrimaryImage}
                         alt={st.modelName}
-                        className="h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover/img:scale-110 dark:mix-blend-normal"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-110"
                       />
                     ) : (
                       <TractorIcon className="text-foreground/20 h-16 w-16" strokeWidth={1} />

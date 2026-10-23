@@ -159,22 +159,22 @@ export default function PublicHomePage() {
                                 <Link
                                     key={brand.id}
                                     href={`/tractors?brand=${brand.id}`}
-                                    className="bg-background group flex aspect-square flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-orange)] hover:shadow-lg"
+                                    className="group relative flex aspect-square flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-3.5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg dark:border-white/10 dark:bg-card"
                                 >
-                                    <div className="relative mb-2 flex h-16 w-16 items-center justify-center">
+                                    <div className="relative mb-2.5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-2.5 shadow-xs transition-all duration-300 group-hover:scale-108 group-hover:shadow-md dark:border-white/10 dark:bg-white/95">
                                         {brand.logoUrl ? (
                                             <img
                                                 src={brand.logoUrl}
                                                 alt={brand.name}
-                                                className="max-h-full max-w-full object-contain transition-transform group-hover:scale-110"
+                                                className="h-full w-full object-contain rounded-xl transition-transform duration-300"
                                             />
                                         ) : (
-                                            <span className="text-foreground/20 text-2xl font-black">
+                                            <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-lg sm:text-xl font-black text-[var(--color-brand-green)]">
                                                 {brand.name.charAt(0)}
-                                            </span>
+                                            </div>
                                         )}
                                     </div>
-                                    <span className="text-foreground text-center text-xs font-black tracking-wider uppercase">
+                                    <span className="text-foreground group-hover:text-[var(--color-brand-green)] text-center text-xs font-black tracking-wider uppercase transition-colors line-clamp-1">
                                         {brand.name}
                                     </span>
                                 </Link>
@@ -213,9 +213,9 @@ export default function PublicHomePage() {
                                     className="glass-panel group relative flex flex-col overflow-hidden rounded-3xl shadow-sm transition-all hover:border-[var(--color-brand-green)]/30 hover:shadow-xl"
                                 >
                                     {/* Image Section */}
-                                    <div className="from-foreground/5 relative flex h-56 items-center justify-center overflow-hidden bg-gradient-to-b to-transparent p-6">
-                                        <div className="absolute top-4 left-4 z-10 flex items-center gap-1 rounded-full bg-[var(--color-brand-orange)] px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase">
-                                            <Star size={12} className="fill-white" /> Top Rated
+                                    <div className="relative h-56 w-full overflow-hidden bg-foreground/5">
+                                        <div className="absolute top-3 left-3 z-10 flex items-center gap-1 rounded-full bg-[var(--color-brand-orange)] px-2.5 py-0.5 text-[9px] font-black tracking-widest text-white uppercase shadow-md backdrop-blur-md">
+                                            <Star size={10} className="fill-white" /> Top Rated
                                         </div>
                                         <img
                                             src={
@@ -224,7 +224,7 @@ export default function PublicHomePage() {
                                                     : 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'
                                             }
                                             alt={tractor.modelName}
-                                            className="relative z-0 h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105 dark:mix-blend-normal"
+                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                             onError={(e) => {
                                                 (e.target as HTMLImageElement).src =
                                                     'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';

@@ -306,12 +306,12 @@ export default function BrandsPage() {
                             <img
                               src={brand.logoUrl}
                               alt={brand.name}
-                              className="max-h-full max-w-full object-contain"
+                              className="max-h-full max-w-full object-contain rounded-lg"
                             />
                           ) : (
-                            <span className="text-[10px] font-black text-muted uppercase">
-                              N/A
-                            </span>
+                            <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-xs font-black text-[var(--color-brand-green)]">
+                              {brand.name.charAt(0)}
+                            </div>
                           )}
                         </div>
                         <div className="flex flex-col gap-0.5">
@@ -429,10 +429,12 @@ export default function BrandsPage() {
                     <img
                       src={detailBrand.logoUrl}
                       alt={detailBrand.name}
-                      className="max-h-full max-w-full object-contain"
+                      className="max-h-full max-w-full object-contain rounded-xl"
                     />
                   ) : (
-                    <span className="text-xs font-black text-muted uppercase">N/A</span>
+                    <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-lg font-black text-[var(--color-brand-green)]">
+                      {detailBrand.name.charAt(0)}
+                    </div>
                   )}
                 </div>
                 <div className="min-w-0">

@@ -8,6 +8,7 @@ import { categoryAPI, Category } from '@/lib/api/categories';
 import { tractorFamilyAPI, TractorFamily } from '@/lib/api/tractorFamilies';
 import { mediaAPI } from '@/lib/api/media';
 import MediaUploader from '@/components/shared/MediaUploader';
+import TractorMediaManager from './TractorMediaManager';
 import TractorSpecForm from './TractorSpecForm';
 import TractorStatePrices from './TractorStatePrices';
 import {
@@ -810,31 +811,20 @@ export default function TractorForm({
 
           {/* TAB 4: MEDIA */}
           {activeTab === 'media' && (
-            <div className="animate-fade-in flex flex-col gap-8">
-              <h2 className="text-foreground mb-2 text-2xl font-black">Media & Gallery</h2>
-
-              <div>
-                <MediaUploader
-                  files={mediaFiles}
-                  onFilesChange={setMediaFiles}
-                  maxFiles={10}
-                  accept="image/*"
-                  label="Tractor Images"
-                  description="Upload up to 10 high-quality images. The first image will be used as the primary thumbnail."
-                />
-              </div>
-
-              <div className="border-t border-[var(--border-subtle)] pt-8">
-                <h2 className="text-foreground mb-4 text-xl font-black">Brochure</h2>
-                <MediaUploader
-                  files={brochureFile}
-                  onFilesChange={setBrochureFile}
-                  maxFiles={1}
-                  accept=".pdf"
-                  label="Brochure PDF"
-                  description="Upload the official brochure PDF."
-                />
-              </div>
+            <div className="animate-fade-in flex flex-col gap-6">
+              <TractorMediaManager
+                tractorId={initialData?.id}
+                isEdit={isEdit}
+                initialMedia={initialData?.media || []}
+                brochurePdf={initialData?.brochurePdf}
+                newMediaFiles={mediaFiles}
+                onNewMediaFilesChange={setMediaFiles}
+                newBrochureFiles={brochureFile}
+                onNewBrochureFilesChange={setBrochureFile}
+                onMediaUpdated={(updatedMedia) => {
+                  setFormData((prev) => ({ ...prev, media: updatedMedia }));
+                }}
+              />
             </div>
           )}
 
