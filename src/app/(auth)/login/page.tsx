@@ -208,13 +208,16 @@ export default function LoginPage() {
         )}
 
         {step === 1 ? (
-          <form onSubmit={handleRequestOtp} className="relative z-10 flex w-full flex-col gap-5">
+          <form onSubmit={handleRequestOtp} className="relative z-10 flex w-full flex-col gap-5" suppressHydrationWarning>
             <div className="group relative">
               <span className="text-muted absolute top-1/2 left-5 -translate-y-1/2 text-lg font-bold transition-colors select-none group-focus-within:text-[var(--color-brand-green)]">
                 +91
               </span>
               <input
+                id="mobile"
+                name="mobile"
                 type="tel"
+                autoComplete="tel"
                 maxLength={10}
                 placeholder="Mobile Number"
                 value={mobile}
@@ -222,12 +225,14 @@ export default function LoginPage() {
                 className="bg-background/50 text-foreground placeholder:text-muted/60 hover:border-[var(--border-brand)] h-14 w-full rounded-xl border border-[var(--border-subtle)] pr-5 pl-16 text-lg font-black transition-all focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
                 required
                 disabled={isLoading}
+                suppressHydrationWarning
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading || mobile.length !== 10}
+              suppressHydrationWarning
               className="group mt-2 flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[var(--color-brand-green)] text-base font-black text-white shadow-[var(--color-brand-green)]/20 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-[var(--color-brand-green)]/40 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? (
@@ -244,7 +249,7 @@ export default function LoginPage() {
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} className="relative z-10 flex w-full flex-col gap-5">
+          <form onSubmit={handleVerifyOtp} className="relative z-10 flex w-full flex-col gap-5" suppressHydrationWarning>
             {devOtpHint && (
               <div className="flex items-center justify-center gap-2 rounded-xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 py-2 px-4 text-xs font-bold text-[var(--color-brand-green)] animate-in fade-in">
                 <span>Dev OTP:</span>
@@ -255,7 +260,10 @@ export default function LoginPage() {
             )}
             <div className="relative">
               <input
+                id="otp"
+                name="otp"
                 type="text"
+                autoComplete="one-time-code"
                 maxLength={6}
                 placeholder="0 0 0 0 0 0"
                 value={otp}
@@ -263,12 +271,14 @@ export default function LoginPage() {
                 className="bg-background/50 text-foreground placeholder:text-muted/40 hover:border-[var(--border-brand)] h-14 w-full rounded-xl border border-[var(--border-subtle)] px-5 text-center text-2xl font-black tracking-[0.5em] transition-all placeholder:tracking-widest focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"
                 required
                 disabled={isLoading || isResending}
+                suppressHydrationWarning
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading || isResending || otp.length !== 6}
+              suppressHydrationWarning
               className="group mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-green)] text-base font-black text-white shadow-[var(--color-brand-green)]/20 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-[var(--color-brand-green)]/40 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? <TractorLoader size={28} /> : 'Secure Login'}
