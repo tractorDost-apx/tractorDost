@@ -292,7 +292,7 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="animate-fade-in flex h-full w-full flex-col gap-6 pb-12">
+    <div className="animate-fade-in flex h-full w-full flex-col gap-4 sm:gap-5 pb-6">
       {/* Header section with Create User action */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>

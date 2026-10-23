@@ -21,7 +21,7 @@ export function LayoutOrchestrator({ children }: { children: React.ReactNode }) 
       <main
         className={`flex flex-1 flex-col ${
           isDashboardRoute
-            ? 'px-4 pt-6 pb-6'
+            ? 'px-3 py-3 sm:px-5 sm:py-3.5'
             : isHome
               ? 'pt-0 px-0 pb-0'
               : 'px-4 pt-28 pb-12 sm:px-8 lg:px-12'

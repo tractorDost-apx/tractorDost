@@ -372,7 +372,7 @@ export default function AdminDashboardPage() {
   }, [recentDealers, recentUsers, recentListings, recentLeads, recentEnquiries]);
 
   return (
-    <div className="animate-fade-in flex h-full flex-col space-y-8">
+    <div className="animate-fade-in flex h-full flex-col space-y-6 pb-6">
       <div>
         <div className="mb-2 flex items-center gap-3">
           <h1 className="text-foreground text-3xl font-black">

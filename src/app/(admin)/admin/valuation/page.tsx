@@ -49,7 +49,7 @@ export default function AdminValuationPage() {
   const displayListings = activeTab === 'PENDING' ? pendingInspections : completedInspections;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-6">
+    <div className="animate-fade-in w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>

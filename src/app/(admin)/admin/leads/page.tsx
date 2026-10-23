@@ -61,9 +61,11 @@ export default function AdminLeadsPage() {
   const [agents, setAgents] = useState<{ id: number; fullName: string }[]>([]);
   const [dealers, setDealers] = useState<{ id: number; businessName: string }[]>([]);
   const [brands, setBrands] = useState<{ id: number; name: string }[]>([]);
+  const [loadingAgents, setLoadingAgents] = useState(true);
 
   // Selection & Modals
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
+  const [assignInitialAgentId, setAssignInitialAgentId] = useState<number | null>(null);
   const [drawerLeadId, setDrawerLeadId] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -82,7 +84,9 @@ export default function AdminLeadsPage() {
 
   // Fetch reference data (Agents, Dealers, Brands) once
   useEffect(() => {
+    let isMounted = true;
     const fetchReferences = async () => {
+      setLoadingAgents(true);
       try {
         const [usersRes, agentsRes, adminsRes, dealersRes, brandsRes] = await Promise.allSettled([
           usersAPI.getAllUsers({ limit: 100 }),
@@ -92,17 +96,28 @@ export default function AdminLeadsPage() {
           brandAPI.getAllBrands({ limit: 100 }),
         ]);
 
-        if (usersRes.status === 'fulfilled' && usersRes.value.success) {
-          const userList = (usersRes.value.data as any)?.data || usersRes.value.data || [];
-          // Filter agents and admins
-          const staffUsers = userList
-            .filter((u: any) => u.role === 'AGENT' || u.role === 'ADMIN')
-            .map((u: any) => ({
-              id: u.id,
-              fullName: u.fullName || u.name || `User #${u.id}`,
-            }));
-          setAgents(staffUsers);
+        if (!isMounted) return;
+
+        // Aggregate candidate users from agents, admins, and general users queries
+        const candidateUsers: any[] = [];
+
+        if (agentsRes.status === 'fulfilled' && agentsRes.value?.success) {
+          const agentList = (agentsRes.value.data as any)?.data || agentsRes.value.data || [];
+          if (Array.isArray(agentList)) candidateUsers.push(...agentList);
         }
+
+        if (adminsRes.status === 'fulfilled' && adminsRes.value?.success) {
+          const adminList = (adminsRes.value.data as any)?.data || adminsRes.value.data || [];
+          if (Array.isArray(adminList)) candidateUsers.push(...adminList);
+        }
+
+        if (usersRes.status === 'fulfilled' && usersRes.value?.success) {
+          const userList = (usersRes.value.data as any)?.data || usersRes.value.data || [];
+          if (Array.isArray(userList)) candidateUsers.push(...userList);
+        }
+
+        const staffUsers = parseStaffUsers(candidateUsers, user);
+        setAgents(staffUsers);
 
         if (dealersRes.status === 'fulfilled' && dealersRes.value && dealersRes.value.success) {
           const dealerList = (dealersRes.value.data as any)?.data || dealersRes.value.data || [];
@@ -133,10 +148,15 @@ export default function AdminLeadsPage() {
         }
       } catch (err) {
         console.error('Failed to fetch reference data', err);
+      } finally {
+        if (isMounted) setLoadingAgents(false);
       }
     };
 
     fetchReferences();
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   // Fetch KPI Stats
@@ -268,7 +288,7 @@ export default function AdminLeadsPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col gap-6 p-4 sm:p-6 lg:p-8">
+    <div className="animate-fade-in relative flex w-full flex-col gap-5 pb-6">
       {/* Toast Notification */}
       {notification && (
         <div
@@ -375,6 +395,7 @@ export default function AdminLeadsPage() {
         onQuickStatusChange={handleQuickStatusChange}
         onQuickAssign={(l) => {
           setSelectedLeadIds([l.id]);
+          setAssignInitialAgentId(l.assignedTo || l.assignedAgent?.id || null);
           setIsBulkAssignOpen(true);
         }}
         onLogCall={(l) => setLogCallTargetLead(l)}
@@ -407,7 +428,10 @@ export default function AdminLeadsPage() {
 
           <button
             type="button"
-            onClick={() => setIsBulkAssignOpen(true)}
+            onClick={() => {
+              setAssignInitialAgentId(null);
+              setIsBulkAssignOpen(true);
+            }}
             className="flex items-center gap-1.5 rounded-xl bg-sky-600 px-3.5 py-1.5 text-xs font-black text-white hover:bg-sky-500 transition-colors"
           >
             <UserCheck size={14} />
@@ -416,7 +440,10 @@ export default function AdminLeadsPage() {
 
           <button
             type="button"
-            onClick={() => setSelectedLeadIds([])}
+            onClick={() => {
+              setSelectedLeadIds([]);
+              setAssignInitialAgentId(null);
+            }}
             className="rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3 py-1.5 text-xs font-bold text-muted hover:bg-foreground/10 hover:text-foreground transition-colors"
           >
             Deselect All
@@ -445,12 +472,19 @@ export default function AdminLeadsPage() {
       {/* Bulk Assign Modal */}
       <BulkAssignModal
         isOpen={isBulkAssignOpen}
-        onClose={() => setIsBulkAssignOpen(false)}
+        onClose={() => {
+          setIsBulkAssignOpen(false);
+          setAssignInitialAgentId(null);
+        }}
         selectedLeadIds={selectedLeadIds}
         agents={agents}
-        onSuccess={() => {
-          showNotification(`Successfully assigned ${selectedLeadIds.length} lead(s)!`);
+        isLoadingAgents={loadingAgents}
+        initialAgentId={assignInitialAgentId}
+        onSuccess={(updatedCount) => {
+          const count = updatedCount ?? selectedLeadIds.length;
+          showNotification(`Successfully assigned ${count} lead${count === 1 ? '' : 's'}!`);
           setSelectedLeadIds([]);
+          setAssignInitialAgentId(null);
           fetchLeads();
           fetchStats();
         }}
