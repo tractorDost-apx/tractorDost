@@ -20,7 +20,7 @@ export default function AccessControlDashboard() {
   ] as const;
 
   return (
-    <div className="animate-fade-in flex h-full flex-col space-y-8">
+    <div className="animate-fade-in flex h-full flex-col space-y-6 pb-4">
       <div>
         <div className="mb-2 flex items-center gap-3">
           <ShieldCheck className="text-[var(--color-brand-green)]" size={36} />

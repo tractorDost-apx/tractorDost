@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function BrandsPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
+    <div className="flex h-full min-h-[380px] items-center justify-center p-6 text-center">
       <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
         <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
         <h1 className="mb-4 text-3xl font-bold text-lime-400">Brands</h1>

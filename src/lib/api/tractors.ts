@@ -281,18 +281,27 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface GetTractorsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  brandId?: number;
+  familyId?: number;
+  fuelType?: FuelType | string;
+  driveType?: DriveType | string;
+  launchStatus?: LaunchStatus | string;
+  hpMin?: number;
+  hpMax?: number;
+  priceMin?: number;
+  priceMax?: number;
+  isActive?: boolean | string;
+}
+
 export const tractorAPI = {
   /**
    * Fetch all tractors with pagination, search and filters
    */
-  getAllTractors: async (params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    brandId?: number;
-    familyId?: number;
-    launchStatus?: string;
-  }) => {
+  getAllTractors: async (params?: GetTractorsParams) => {
     const response = await apiClient.get<PaginatedResponse<Tractor>>('/tractor/getAll', { params });
     return response.data;
   },

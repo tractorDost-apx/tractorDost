@@ -141,7 +141,7 @@ export default function AdminDealersPage() {
   };
 
   return (
-    <div className="animate-fade-in flex h-full w-full max-w-full flex-col gap-6 overflow-x-hidden pb-12">
+    <div className="animate-fade-in flex h-full w-full max-w-full flex-col gap-5 overflow-x-hidden pb-6">
       {/* Header section with KPIs */}
       <DealerHeader
         totalCount={totalCount}

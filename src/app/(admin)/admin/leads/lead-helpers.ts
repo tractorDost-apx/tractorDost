@@ -210,16 +210,24 @@ export function parseStaffUsers(
 
   for (const u of list) {
     if (!u || !u.id) continue;
+    if (u.isDeleted || u.isActive === false) continue;
+
     const roleName = (typeof u.role === 'string' ? u.role : u.role?.name || '').toUpperCase();
     if (['AGENT', 'ADMIN', 'SUPER_ADMIN'].includes(roleName)) {
-      const label = u.fullName || u.name || (u.mobile ? `User (${u.mobile})` : `User #${u.id}`);
       const roleBadge = roleName === 'AGENT' ? 'Agent' : 'Admin';
-      staffMap.set(u.id, {
-        id: u.id,
-        fullName: `${label} (${roleBadge})`,
+      const rawName = u.fullName?.trim() || u.name?.trim();
+      const mobilePart = u.mobile ? String(u.mobile).trim() : null;
+      const emailPart = u.email ? String(u.email).trim() : null;
+
+      const baseLabel = rawName || (mobilePart ? `${roleBadge} (${mobilePart})` : null) || emailPart || `${roleBadge} #${u.id}`;
+      const fullName = baseLabel.endsWith(`(${roleBadge})`) ? baseLabel : `${baseLabel} (${roleBadge})`;
+
+      staffMap.set(Number(u.id), {
+        id: Number(u.id),
+        fullName,
       });
     }
   }
 
-  return Array.from(staffMap.values());
+  return Array.from(staffMap.values()).sort((a, b) => a.fullName.localeCompare(b.fullName));
 }

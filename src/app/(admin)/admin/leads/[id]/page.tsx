@@ -138,16 +138,26 @@ export default function LeadDetailPage({
           dealerAPI.getAllDealers({ limit: 100 }),
         ]);
 
-        if (usersRes.status === 'fulfilled' && usersRes.value.success) {
-          const userList = (usersRes.value.data as any)?.data || usersRes.value.data || [];
-          const staffUsers = userList
-            .filter((u: any) => u.role === 'AGENT' || u.role === 'ADMIN')
-            .map((u: any) => ({
-              id: u.id,
-              fullName: u.fullName || u.name || `User #${u.id}`,
-            }));
-          setAgents(staffUsers);
+        // Aggregate candidate users from agents, admins, and general users queries
+        const candidateUsers: any[] = [];
+
+        if (agentsRes.status === 'fulfilled' && agentsRes.value?.success) {
+          const agentList = (agentsRes.value.data as any)?.data || agentsRes.value.data || [];
+          if (Array.isArray(agentList)) candidateUsers.push(...agentList);
         }
+
+        if (adminsRes.status === 'fulfilled' && adminsRes.value?.success) {
+          const adminList = (adminsRes.value.data as any)?.data || adminsRes.value.data || [];
+          if (Array.isArray(adminList)) candidateUsers.push(...adminList);
+        }
+
+        if (usersRes.status === 'fulfilled' && usersRes.value?.success) {
+          const userList = (usersRes.value.data as any)?.data || usersRes.value.data || [];
+          if (Array.isArray(userList)) candidateUsers.push(...userList);
+        }
+
+        const staffUsers = parseStaffUsers(candidateUsers, user);
+        setAgents(staffUsers);
 
         if (dealersRes.status === 'fulfilled' && dealersRes.value && dealersRes.value.success) {
           const dealerList = (dealersRes.value.data as any)?.data || dealersRes.value.data || [];
@@ -265,7 +275,7 @@ export default function LeadDetailPage({
 
   if (loading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center p-6">
+      <div className="flex min-h-full min-h-[380px] items-center justify-center p-6">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#4a7635] border-t-transparent" />
           <p className="text-xs font-bold text-muted">Loading lead details...</p>
@@ -276,7 +286,7 @@ export default function LeadDetailPage({
 
   if (error || !lead) {
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center">
+      <div className="flex min-h-full min-h-[380px] flex-col items-center justify-center p-6 text-center">
         <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-6 text-rose-400">
           <AlertCircle size={32} className="mx-auto mb-2" />
           <h2 className="text-base font-black">Lead Not Found</h2>
