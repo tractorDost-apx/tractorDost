@@ -14,6 +14,8 @@ export interface DetailAccessLeadInput {
   address?: string;
   latitude?: number;
   longitude?: number;
+  sourcePage?: string;
+  sourceCampaign?: string;
 }
 
 /** Grant that opens every tractor and implement detail page. Expires on `expiresAt` (ISO string). */

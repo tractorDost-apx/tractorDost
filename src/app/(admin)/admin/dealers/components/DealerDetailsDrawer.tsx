@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   X,
@@ -18,6 +18,11 @@ import {
   Calendar,
   MessageSquare,
   Wrench,
+  Maximize2,
+  Minimize2,
+  GripVertical,
+  ExternalLink,
+  Compass,
 } from 'lucide-react';
 import { dealerAPI } from '@/lib/api/dealers';
 import { Dealer, DealerProfileSummary } from '@/types/models/dealer';
@@ -48,6 +53,9 @@ type TabType =
   | 'reviews_complaints'
   | 'metadata';
 
+const DEFAULT_WIDTH = 960; // Default drawer width in px (~max-w-5xl)
+const MIN_WIDTH = 480;     // Minimum width limit
+
 export function DealerDetailsDrawer({
   dealerId,
   onClose,
@@ -62,9 +70,102 @@ export function DealerDetailsDrawer({
   const [mounted, setMounted] = useState(false);
   const [showBrandModal, setShowBrandModal] = useState(false);
 
+  // Resize & Full-screen states
+  const [width, setWidth] = useState<number>(DEFAULT_WIDTH);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const lastCustomWidthRef = useRef<number>(DEFAULT_WIDTH);
+  const hasDraggedRef = useRef(false);
+
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== 'undefined') {
+      const initialWidth = Math.min(DEFAULT_WIDTH, window.innerWidth);
+      setWidth(initialWidth);
+      lastCustomWidthRef.current = initialWidth;
+    }
   }, []);
+
+  // Sync width on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (isFullScreen) {
+        setWidth(window.innerWidth);
+      } else {
+        setWidth((prev) => Math.min(prev, window.innerWidth));
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isFullScreen]);
+
+  // Global drag listeners for mouse/pointer tracking
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const onGlobalMove = (e: PointerEvent) => {
+      hasDraggedRef.current = true;
+      const clientX = e.clientX;
+      const screenW = window.innerWidth;
+      const rawWidth = screenW - clientX;
+      const minW = Math.min(MIN_WIDTH, screenW);
+
+      // Snap to full screen if dragged within 60px of screen left edge
+      if (clientX <= 60 || rawWidth >= screenW - 60) {
+        setWidth(screenW);
+        setIsFullScreen(true);
+      } else {
+        setIsFullScreen(false);
+        const clampedWidth = Math.max(minW, Math.min(rawWidth, screenW));
+        setWidth(clampedWidth);
+        lastCustomWidthRef.current = clampedWidth;
+      }
+    };
+
+    const onGlobalUp = () => {
+      setIsDragging(false);
+      setTimeout(() => {
+        hasDraggedRef.current = false;
+      }, 150);
+    };
+
+    const origCursor = document.body.style.cursor;
+    const origUserSelect = document.body.style.userSelect;
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+
+    window.addEventListener('pointermove', onGlobalMove);
+    window.addEventListener('pointerup', onGlobalUp);
+    window.addEventListener('pointercancel', onGlobalUp);
+
+    return () => {
+      document.body.style.cursor = origCursor;
+      document.body.style.userSelect = origUserSelect;
+      window.removeEventListener('pointermove', onGlobalMove);
+      window.removeEventListener('pointerup', onGlobalUp);
+      window.removeEventListener('pointercancel', onGlobalUp);
+    };
+  }, [isDragging]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+    hasDraggedRef.current = false;
+  };
+
+  const toggleFullScreen = () => {
+    if (isFullScreen) {
+      setIsFullScreen(false);
+      setWidth(lastCustomWidthRef.current || DEFAULT_WIDTH);
+    } else {
+      lastCustomWidthRef.current = width;
+      setIsFullScreen(true);
+      if (typeof window !== 'undefined') {
+        setWidth(window.innerWidth);
+      }
+    }
+  };
 
   // Fetch details and reset state when dealerId changes
   useEffect(() => {
@@ -138,14 +239,62 @@ export function DealerDetailsDrawer({
 
   const drawerContent = (
     <div
-      onClick={onClose}
+      onClick={(e) => {
+        if (hasDraggedRef.current) return;
+        onClose();
+      }}
       className="animate-fade-in fixed inset-0 top-0 left-0 z-[100] flex h-screen w-screen justify-end overflow-hidden bg-black/80 backdrop-blur-md"
     >
-      {/* Inner Panel - Flex Container with strict min-h-0 */}
+      {/* Inner Panel - Resizable & Expandable to Full Screen */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex h-full max-h-screen w-full max-w-4xl shrink-0 flex-col overflow-hidden border-l border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl"
+        style={{
+          width: isFullScreen ? '100vw' : `${width}px`,
+          maxWidth: '100vw',
+        }}
+        className={`relative flex h-full max-h-screen shrink-0 flex-col border-l border-[var(--border-subtle)] bg-[var(--background)] shadow-2xl ${
+          isDragging ? 'select-none' : 'transition-[width] duration-200 ease-out'
+        }`}
       >
+        {/* DRAG-TO-RESIZE HANDLE ON THE LEFT EDGE */}
+        <div
+          onPointerDown={handlePointerDown}
+          onDoubleClick={toggleFullScreen}
+          className={`group absolute top-0 bottom-0 z-40 flex w-5 cursor-ew-resize items-center justify-center select-none touch-none ${
+            isFullScreen ? 'left-0' : '-left-2.5'
+          }`}
+          title="Drag left to make full screen • Double-click to toggle"
+        >
+          {/* Active / hover highlight line */}
+          <div
+            className={`h-full w-1 transition-all ${
+              isDragging
+                ? 'bg-lime-400 shadow-[0_0_14px_rgba(163,230,53,1)] ring-2 ring-lime-400/50'
+                : 'bg-transparent group-hover:bg-lime-400/80 group-hover:shadow-[0_0_8px_rgba(163,230,53,0.6)]'
+            }`}
+          />
+
+          {/* Grip pill indicator in middle */}
+          <div
+            className={`absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full border bg-[var(--background)] py-3 px-1 shadow-xl transition-all ${
+              isFullScreen ? 'left-1' : 'left-0 -translate-x-1/2'
+            } ${
+              isDragging
+                ? 'border-lime-400 bg-lime-400/15 text-lime-400 scale-110 shadow-lime-400/25 ring-2 ring-lime-400/40'
+                : 'border-[var(--border-subtle)] text-muted group-hover:border-lime-400/60 group-hover:text-lime-400 group-hover:scale-110 group-hover:shadow-lg'
+            }`}
+          >
+            <GripVertical size={14} />
+          </div>
+
+          {/* Floating hint tooltip on hover */}
+          <div className="pointer-events-none absolute left-6 top-1/2 -translate-y-1/2 hidden whitespace-nowrap rounded-lg border border-lime-400/30 bg-black/95 px-2.5 py-1 text-[11px] font-bold text-lime-400 opacity-0 shadow-2xl backdrop-blur-md transition-opacity group-hover:opacity-100 sm:block">
+            {isFullScreen
+              ? 'Drag right to shrink • Double-click to restore'
+              : 'Drag left to full screen • Double-click to expand'}
+          </div>
+        </div>
+
         {/* 1. DEALER HEADER (FIXED TOP, SHRINK-0) */}
         <div className="z-20 flex shrink-0 items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/5 p-6 backdrop-blur-md">
           <div className="flex items-center gap-4">
@@ -165,29 +314,44 @@ export function DealerDetailsDrawer({
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             {dealer && (
               <>
                 <button
                   onClick={() => onOpenEdit(dealer)}
-                  className="text-foreground flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2 text-xs font-bold transition-colors hover:bg-foreground/10"
+                  className="text-foreground flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-3.5 py-2 text-xs font-bold transition-colors hover:bg-foreground/10 cursor-pointer"
                 >
                   <Edit2 size={14} /> Edit
                 </button>
                 <button
                   onClick={() => onOpenModeration(dealer)}
-                  className="flex items-center gap-1.5 rounded-xl bg-lime-400 px-3.5 py-2 text-xs font-black tracking-wider text-black uppercase transition-colors hover:bg-lime-300"
+                  className="flex items-center gap-1.5 rounded-xl bg-lime-400 px-3.5 py-2 text-xs font-black tracking-wider text-black uppercase transition-colors hover:bg-lime-300 cursor-pointer"
                 >
                   <ShieldCheck size={14} /> Moderate
                 </button>
               </>
             )}
+
+            {/* FULL SCREEN TOGGLE BUTTON */}
+            <button
+              onClick={toggleFullScreen}
+              className={`rounded-xl border p-2 transition-all cursor-pointer ${
+                isFullScreen
+                  ? 'border-lime-400/40 bg-lime-400/10 text-lime-400 hover:bg-lime-400/20'
+                  : 'text-muted hover:text-foreground border-[var(--border-subtle)] bg-foreground/5 hover:bg-foreground/10'
+              }`}
+              title={isFullScreen ? 'Exit full screen (Restore)' : 'Full screen (or drag left edge)'}
+              aria-label={isFullScreen ? 'Exit full screen' : 'Expand full screen'}
+            >
+              {isFullScreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+            </button>
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onClose();
               }}
-              className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10"
+              className="text-muted hover:text-foreground rounded-xl p-2 transition-colors hover:bg-foreground/10 cursor-pointer"
               title="Close panel (Esc)"
             >
               <X size={20} />
@@ -456,22 +620,51 @@ export function DealerDetailsDrawer({
 
               {/* TAB 4: LOCATION */}
               {activeTab === 'location' && (
-                <div className="glass-panel space-y-4 rounded-2xl  p-5">
-                  <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
-                    Geographic Location
-                  </h3>
-                  <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-2">
+                <div className="glass-panel space-y-4 rounded-2xl p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-lime-500/10 text-lime-400">
+                        <MapPin size={16} />
+                      </div>
+                      <h3 className="text-sm font-black tracking-wider text-lime-400 uppercase">
+                        Geographic Location
+                      </h3>
+                    </div>
+
+                    {((dealer.latitude && dealer.longitude) || dealer.address) && (
+                      <a
+                        href={
+                          dealer.latitude && dealer.longitude
+                            ? `https://www.google.com/maps/search/?api=1&query=${dealer.latitude},${dealer.longitude}`
+                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                [dealer.address, dealer.district, dealer.state, dealer.pincode]
+                                  .filter(Boolean)
+                                  .join(', ')
+                              )}`
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition-colors"
+                      >
+                        <Compass size={13} />
+                        <span>Open in Google Maps</span>
+                        <ExternalLink size={11} />
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-2 pt-1">
                     <div className="md:col-span-2">
                       <span className="text-muted block font-bold">Complete Address</span>
-                      <span className="text-foreground text-sm font-bold">{dealer.address}</span>
+                      <span className="text-foreground text-sm font-bold">{dealer.address || 'Not specified'}</span>
                     </div>
                     <div>
                       <span className="text-muted block font-bold">State</span>
-                      <span className="text-foreground font-bold">{dealer.state}</span>
+                      <span className="text-foreground font-bold">{dealer.state || 'N/A'}</span>
                     </div>
                     <div>
                       <span className="text-muted block font-bold">District</span>
-                      <span className="text-foreground font-bold">{dealer.district}</span>
+                      <span className="text-foreground font-bold">{dealer.district || 'N/A'}</span>
                     </div>
                     <div>
                       <span className="text-muted block font-bold">Pincode</span>

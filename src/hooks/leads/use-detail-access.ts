@@ -11,6 +11,7 @@ import {
   getDetailAccessToken,
   saveDetailAccess,
 } from '@/lib/utils/detail-access';
+import { getCapturedLeadAttribution } from '@/lib/utils/lead-attribution';
 
 export type DetailAccessState<T> =
   | { status: 'loading' }
@@ -89,9 +90,17 @@ export function useDetailAccess<T>(
             coords = await geocodeLocationText(user.villageCity || undefined, user.state || undefined);
           }
 
+          const attribution = getCapturedLeadAttribution({
+            pagePath: typeof window !== 'undefined' ? window.location.pathname : undefined,
+            defaultPageLabel: targetType === 'TRACTOR' ? 'Tractor Detail Page' : 'Implement Detail Page',
+            defaultCampaign: 'Detail Access (Auto-grant)',
+          });
+
           const payload: any = {
             targetType,
             targetId,
+            sourcePage: attribution.sourcePage,
+            sourceCampaign: attribution.sourceCampaign,
           };
           if (coords?.latitude !== undefined && coords?.longitude !== undefined) {
             payload.latitude = coords.latitude;

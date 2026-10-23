@@ -5,7 +5,7 @@ import { usedTractorEnquiryAPI } from '@/lib/api/used-enquiries';
 import type { LeadStatus } from '@/types/models/used-listing';
 import { EnquiryFilters } from '@/components/admin/used-enquiries/EnquiryFilters';
 import { EnquiryTable } from '@/components/admin/used-enquiries/EnquiryTable';
-import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import Pagination from '@/components/shared/Pagination';
 
 export default function AdminUsedEnquiriesPage() {
@@ -21,7 +21,7 @@ export default function AdminUsedEnquiriesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const limit = 15;
+  const [limit, setLimit] = useState(15);
 
   // Banner messages
   const [alertMsg, setAlertMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(
@@ -36,10 +36,10 @@ export default function AdminUsedEnquiriesPage() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Fetch enquiries when page, tab, search, or sorting changes
+  // Fetch enquiries when page, limit, tab, search, or sorting changes
   useEffect(() => {
     fetchEnquiries();
-  }, [currentPage, activeTab, debouncedSearch, sortOption]);
+  }, [currentPage, limit, activeTab, debouncedSearch, sortOption]);
 
   const fetchEnquiries = () => {
     setLoading(true);
@@ -195,27 +195,17 @@ export default function AdminUsedEnquiriesPage() {
       />
 
       {/* Pagination Controls */}
-      {!loading && totalPages > 1 && (
-        <div className="bg-foreground/5 flex items-center justify-between rounded-2xl border border-[var(--border-subtle)] p-4">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="bg-background hover:bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold transition-all disabled:pointer-events-none disabled:opacity-50"
-          >
-            <ChevronLeft size={16} /> Previous
-          </button>
-          <span className="text-muted text-sm font-bold">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="bg-background hover:bg-foreground/5 flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold transition-all disabled:pointer-events-none disabled:opacity-50"
-          >
-            Next <ChevronRight size={16} />
-          </button>
-        </div>
-      )}
+      <Pagination
+        page={currentPage}
+        limit={limit}
+        totalCount={totalCount}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setCurrentPage(1);
+        }}
+      />
     </div>
   );
 }

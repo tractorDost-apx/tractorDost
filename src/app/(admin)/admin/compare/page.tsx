@@ -88,7 +88,7 @@ export default function CompareAnalyticsPage() {
       }
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [search, page, logsSearch, logsPage, activeTab]);
+  }, [search, page, limit, logsSearch, logsPage, logsLimit, activeTab]);
 
   // Find max frequency to normalize progress bars
   const maxFreq = records.length > 0 ? Math.max(...records.map((r) => r.frequency)) : 1;

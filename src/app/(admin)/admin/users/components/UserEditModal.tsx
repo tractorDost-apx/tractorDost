@@ -19,6 +19,8 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { User } from '@/types/models/user';
 import { usersAPI, UserStats } from '@/lib/api/users';
@@ -37,6 +39,22 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  // Keyboard shortcut: Escape exits fullscreen first, or closes modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isFullScreen) {
+          setIsFullScreen(false);
+        } else {
+          onClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullScreen, onClose]);
 
   const [formData, setFormData] = useState({
     fullName: user.fullName || '',
@@ -220,8 +238,23 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm sm:p-6">
-      <div className="animate-fade-in border border-[var(--border-subtle)] flex max-h-[88vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-background shadow-2xl">
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm ${
+      isFullScreen ? 'p-0' : 'p-4 sm:p-6'
+    }`}>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0"
+        onClick={() => {
+          if (isFullScreen) setIsFullScreen(false);
+          else onClose();
+        }}
+      />
+
+      <div className={`relative z-10 animate-fade-in border border-[var(--border-subtle)] flex flex-col overflow-hidden bg-background shadow-2xl transition-all duration-200 ${
+        isFullScreen
+          ? 'h-full w-full max-h-none max-w-none rounded-none'
+          : 'max-h-[88vh] w-full max-w-3xl rounded-3xl'
+      }`}>
         {/* Sticky Header */}
         <div className="border-b border-[var(--border-subtle)] bg-background z-10 flex shrink-0 items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
@@ -280,8 +313,18 @@ export function UserEditModal({ user, onClose, onSaved }: UserEditModalProps) {
 
             <button
               type="button"
+              onClick={() => setIsFullScreen((prev) => !prev)}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-foreground/10 hover:text-foreground cursor-pointer"
+              title={isFullScreen ? 'Exit Full Screen (Esc)' : 'Expand to Full Screen'}
+            >
+              {isFullScreen ? <Minimize2 size={17} /> : <Maximize2 size={17} />}
+            </button>
+
+            <button
+              type="button"
               onClick={onClose}
               className="flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-foreground/10 hover:text-foreground cursor-pointer"
+              title="Close (Esc)"
             >
               <X size={18} />
             </button>

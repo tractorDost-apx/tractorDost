@@ -27,6 +27,7 @@ import {
   X,
   ChevronDown,
   SlidersHorizontal,
+  Eye,
 } from 'lucide-react';
 import Link from 'next/link';
 import Pagination from '@/components/shared/Pagination';
@@ -67,8 +68,26 @@ export default function TractorsPage() {
   // Toggle advanced filter panel
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-  // Track which row has its "Deep Analysis" view open
-  const [deepExpandedId, setDeepExpandedId] = useState<number | null>(null);
+  // Track which tractor is selected for the details popup modal
+  const [selectedTractor, setSelectedTractor] = useState<Tractor | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedTractor(null);
+      }
+    };
+    if (selectedTractor) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedTractor]);
 
   // Fetch brands on mount
   useEffect(() => {
@@ -266,9 +285,6 @@ export default function TractorsPage() {
     setPage(1);
   };
 
-  const toggleDeepExpand = (id: number) => {
-    setDeepExpandedId(deepExpandedId === id ? null : id);
-  };
 
   const handleDelete = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -343,7 +359,7 @@ export default function TractorsPage() {
   };
 
   return (
-    <div className="animate-fade-in flex h-full w-full flex-col gap-4 sm:gap-5 pb-6">
+    <div className="animate-fade-in flex flex-1 h-full w-full flex-col gap-4 sm:gap-5 pb-2">
       {/* Header section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -862,276 +878,137 @@ export default function TractorsPage() {
                 </tr>
               ) : (
                 tractors.map((tractor) => {
-                  const isDeepExpanded = deepExpandedId === tractor.id;
                   const primaryImage =
                     tractor.media?.find((m) => m.isPrimary) || tractor.media?.[0];
 
                   return (
-                    <React.Fragment key={tractor.id}>
-                      <tr
-                        className={`hover:bg-foreground/5 cursor-pointer transition-colors ${isDeepExpanded ? 'bg-foreground/5' : ''}`}
-                        onClick={() => toggleDeepExpand(tractor.id)}
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-white p-1 shadow-sm">
-                              {primaryImage ? (
-                                <img
-                                  src={primaryImage.url}
-                                  alt={tractor.modelName}
-                                  className="h-full w-full object-contain"
-                                />
-                              ) : (
-                                <TractorIcon size={20} className="text-muted" />
-                              )}
-                            </div>
-                            <div>
-                              <div className="text-foreground text-base font-black">
-                                {tractor.brand?.name} {tractor.modelName}
-                              </div>
-                              <div
-                                className="text-muted/80 max-w-[150px] truncate text-xs font-bold sm:max-w-[200px]"
-                                title={tractor.slug}
-                              >
-                                {tractor.slug}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-foreground/80 font-black">
-                              {tractor.hp ? `${tractor.hp} HP` : 'HP N/A'}
-                            </span>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-muted bg-foreground/5 rounded px-1.5 py-0.5 text-[10px] font-bold">
-                                {tractor.fuelType}
-                              </span>
-                              <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                {tractor.driveType.replace('_', ' ')}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex max-w-[150px] flex-wrap gap-1">
-                            {tractor.categories && tractor.categories.length > 0 ? (
-                              tractor.categories.map((c, i) => (
-                                <span
-                                  key={i}
-                                  className="bg-foreground/5 text-foreground/70 rounded-md px-2 py-0.5 text-[10px] font-bold"
-                                >
-                                  {c.category?.name}
-                                </span>
-                              ))
+                    <tr
+                      key={tractor.id}
+                      className="hover:bg-[var(--color-brand-green)]/[0.04] group cursor-pointer transition-colors"
+                      onClick={() => setSelectedTractor(tractor)}
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-white p-1 shadow-sm transition-transform group-hover:scale-105">
+                            {primaryImage ? (
+                              <img
+                                src={primaryImage.url}
+                                alt={tractor.modelName}
+                                className="h-full w-full object-contain"
+                              />
                             ) : (
-                              <span className="text-muted text-xs">None</span>
+                              <TractorIcon size={20} className="text-muted" />
                             )}
                           </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col items-start gap-2">
-                            <span
-                              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-wide uppercase ${getStatusColor(tractor.launchStatus)}`}
+                          <div>
+                            <div className="text-foreground text-base font-black transition-colors group-hover:text-[var(--color-brand-green)]">
+                              {tractor.brand?.name} {tractor.modelName}
+                            </div>
+                            <div
+                              className="text-muted/80 max-w-[150px] truncate text-xs font-bold sm:max-w-[200px]"
+                              title={tractor.slug}
                             >
-                              {tractor.launchStatus}
+                              {tractor.slug}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-foreground/80 font-black">
+                            {tractor.hp ? `${tractor.hp} HP` : 'HP N/A'}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-muted bg-foreground/5 rounded px-1.5 py-0.5 text-[10px] font-bold">
+                              {tractor.fuelType}
                             </span>
-                            <div className="flex items-center gap-2">
+                            <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                              {tractor.driveType?.replace('_', ' ')}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex max-w-[150px] flex-wrap gap-1">
+                          {tractor.categories && tractor.categories.length > 0 ? (
+                            tractor.categories.map((c, i) => (
                               <span
-                                className={`inline-block h-2 w-2 rounded-full ${tractor.isActive ? 'bg-[var(--color-brand-green)]' : 'bg-red-500'}`}
-                              />
-                              <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                {tractor.isActive ? 'Active' : 'Inactive'}
+                                key={i}
+                                className="bg-foreground/5 text-foreground/70 rounded-md px-2 py-0.5 text-[10px] font-bold"
+                              >
+                                {c.category?.name}
                               </span>
-                              {tractor.isFeatured && (
-                                <span className="text-[10px] font-black tracking-wider text-[var(--color-brand-orange)] uppercase">
-                                  Featured
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 font-black text-[var(--color-brand-green)]">
-                          {tractor.exShowroomPriceMin ? (
-                            <span>
-                              {formatPrice(tractor.exShowroomPriceMin)}{' '}
-                              {tractor.exShowroomPriceMax
-                                ? `- ${formatPrice(tractor.exShowroomPriceMax)}`
-                                : ''}
-                            </span>
+                            ))
                           ) : (
-                            <span className="text-muted font-medium">Not Set</span>
+                            <span className="text-muted text-xs">None</span>
                           )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <Link
-                              href={`/admin/tractors/${tractor.id}`}
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)]"
-                              title="Edit Tractor"
-                            >
-                              <Edit2 size={16} />
-                            </Link>
-                            <button
-                              onClick={(e) => handleDelete(tractor.id, e)}
-                              className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500"
-                              title="Delete Tractor"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col items-start gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-wide uppercase ${getStatusColor(tractor.launchStatus)}`}
+                          >
+                            {tractor.launchStatus}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-block h-2 w-2 rounded-full ${tractor.isActive ? 'bg-[var(--color-brand-green)]' : 'bg-red-500'}`}
+                            />
+                            <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                              {tractor.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                            {tractor.isFeatured && (
+                              <span className="text-[10px] font-black tracking-wider text-[var(--color-brand-orange)] uppercase">
+                                Featured
+                              </span>
+                            )}
                           </div>
-                        </td>
-                      </tr>
-
-                      {/* DEEP ANALYSIS VIEW */}
-                      {isDeepExpanded && (
-                        <tr>
-                          <td colSpan={6} className="bg-foreground/[0.02] px-0 py-0">
-                            <div className="animate-fade-in flex flex-col gap-6 border-b-2 border-[var(--color-brand-green)] p-6 shadow-inner md:p-8">
-                              <div className="grid w-full grid-cols-1 gap-8 whitespace-normal md:grid-cols-12">
-                                {/* SEO & Meta Data */}
-                                <div className="flex flex-col gap-4 md:col-span-5">
-                                  <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-orange)]">
-                                    <BarChart size={18} />
-                                    <h3 className="text-sm font-black tracking-wide uppercase">
-                                      SEO & Engagement
-                                    </h3>
-                                  </div>
-
-                                  <div className="mb-2 grid grid-cols-2 gap-4">
-                                    <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                                      <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                        Total Views
-                                      </span>
-                                      <span className="text-foreground text-lg font-black">
-                                        {tractor.viewsCount || 0}
-                                      </span>
-                                    </div>
-                                    <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                                      <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                        Total Leads
-                                      </span>
-                                      <span className="text-lg font-black text-[var(--color-brand-green)]">
-                                        {tractor.leadsCount || 0}
-                                      </span>
-                                    </div>
-                                  </div>
-
-                                  <div className="bg-background flex flex-col gap-3 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                                    <div>
-                                      <span className="text-muted mb-1 block text-[10px] font-black tracking-wider uppercase">
-                                        SEO Title
-                                      </span>
-                                      <p className="text-foreground text-sm font-bold">
-                                        {tractor.seoTitle || 'Not specified'}
-                                      </p>
-                                    </div>
-                                    <div className="bg-foreground/5 h-px w-full" />
-                                    <div>
-                                      <span className="text-muted mb-1 block text-[10px] font-black tracking-wider uppercase">
-                                        SEO Description
-                                      </span>
-                                      <p className="text-foreground/70 text-xs font-medium">
-                                        {tractor.seoDescription || 'Not specified'}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Quick Specs Highlight */}
-                                <div className="flex flex-col gap-4 md:col-span-7">
-                                  <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-green)]">
-                                    <Settings2 size={18} />
-                                    <h3 className="text-sm font-black tracking-wide uppercase">
-                                      Key Technical Specs
-                                    </h3>
-                                  </div>
-
-                                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                                    <div className="bg-background flex flex-col items-center gap-1 rounded-xl border border-[var(--border-subtle)] p-4 text-center shadow-sm">
-                                      <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                        Engine CC
-                                      </span>
-                                      <span className="text-foreground text-sm font-black">
-                                        {tractor.spec?.engineCc || '-'}
-                                      </span>
-                                    </div>
-                                    <div className="bg-background flex flex-col items-center gap-1 rounded-xl border border-[var(--border-subtle)] p-4 text-center shadow-sm">
-                                      <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                        Cylinders
-                                      </span>
-                                      <span className="text-foreground text-sm font-black">
-                                        {tractor.spec?.cylinders || '-'}
-                                      </span>
-                                    </div>
-                                    <div className="bg-background flex flex-col items-center gap-1 rounded-xl border border-[var(--border-subtle)] p-4 text-center shadow-sm">
-                                      <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                        PTO HP
-                                      </span>
-                                      <span className="text-foreground text-sm font-black">
-                                        {tractor.spec?.ptoHp || '-'}
-                                      </span>
-                                    </div>
-                                    <div className="bg-background flex flex-col items-center gap-1 rounded-xl border border-[var(--border-subtle)] p-4 text-center shadow-sm">
-                                      <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                        Lift Cap.
-                                      </span>
-                                      <span className="text-foreground text-sm font-black">
-                                        {tractor.spec?.liftingCapacityKg
-                                          ? `${tractor.spec.liftingCapacityKg} kg`
-                                          : '-'}
-                                      </span>
-                                    </div>
-                                  </div>
-
-                                  <div className="mt-2 flex flex-col gap-3">
-                                    <div className="flex items-start gap-2">
-                                      <Info size={16} className="text-muted mt-0.5 shrink-0" />
-                                      <div>
-                                        <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
-                                          Overview
-                                        </span>
-                                        <p className="text-foreground/80 line-clamp-2 text-xs font-medium">
-                                          {tractor.overview || 'No overview provided.'}
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-start gap-2">
-                                      <CheckCircle
-                                        size={16}
-                                        className="mt-0.5 shrink-0 text-[var(--color-brand-green)]"
-                                      />
-                                      <div>
-                                        <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
-                                          Why Buy?
-                                        </span>
-                                        <p className="text-foreground/80 line-clamp-2 text-xs font-medium">
-                                          {tractor.whyBuy || 'No reason provided.'}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-4">
-                                <div className="text-muted flex items-center gap-2 text-xs font-bold">
-                                  <ImageIcon size={14} />
-                                  {tractor.media?.length || 0} Media File(s) Attached
-                                </div>
-                                <Link
-                                  href={`/admin/tractors/${tractor.id}`}
-                                  className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/20 shadow-lg transition-colors hover:bg-[var(--color-brand-orange)]"
-                                >
-                                  <Edit2 size={16} /> Edit Full Profile
-                                </Link>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-black text-[var(--color-brand-green)]">
+                        {tractor.exShowroomPriceMin ? (
+                          <span>
+                            {formatPrice(tractor.exShowroomPriceMin)}{' '}
+                            {tractor.exShowroomPriceMax
+                              ? `- ${formatPrice(tractor.exShowroomPriceMax)}`
+                              : ''}
+                          </span>
+                        ) : (
+                          <span className="text-muted font-medium">Not Set</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedTractor(tractor);
+                            }}
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)]"
+                            title="View Tractor Details Popup"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <Link
+                            href={`/admin/tractors/${tractor.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)]"
+                            title="Edit Tractor"
+                          >
+                            <Edit2 size={16} />
+                          </Link>
+                          <button
+                            onClick={(e) => handleDelete(tractor.id, e)}
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500"
+                            title="Delete Tractor"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })
               )}
@@ -1152,6 +1029,320 @@ export default function TractorsPage() {
           }}
         />
       </div>
+
+      {/* QUICK TRACTOR PROFILE POPUP MODAL */}
+      {selectedTractor && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 sm:p-6 backdrop-blur-md animate-fade-in">
+          <div
+            className="fixed inset-0 -z-10"
+            onClick={() => setSelectedTractor(null)}
+          />
+
+          <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-background shadow-2xl animate-scale-up">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/[0.02] p-5 sm:p-6">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm">
+                  {selectedTractor.media?.find((m) => m.isPrimary)?.url || selectedTractor.media?.[0]?.url ? (
+                    <img
+                      src={
+                        selectedTractor.media?.find((m) => m.isPrimary)?.url ||
+                        selectedTractor.media?.[0]?.url
+                      }
+                      alt={selectedTractor.modelName}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <TractorIcon size={24} className="text-muted" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-foreground text-xl font-black tracking-tight truncate">
+                      {selectedTractor.brand?.name} {selectedTractor.modelName}
+                    </h2>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase ${getStatusColor(
+                        selectedTractor.launchStatus
+                      )}`}
+                    >
+                      {selectedTractor.launchStatus}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                        selectedTractor.isActive
+                          ? 'bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]'
+                          : 'bg-red-500/15 text-red-500'
+                      }`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          selectedTractor.isActive
+                            ? 'bg-[var(--color-brand-green)]'
+                            : 'bg-red-500'
+                        }`}
+                      />
+                      {selectedTractor.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    {selectedTractor.isFeatured && (
+                      <span className="rounded-full bg-[var(--color-brand-orange)]/15 px-2 py-0.5 text-[10px] font-black text-[var(--color-brand-orange)] uppercase">
+                        Featured
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-muted text-xs font-semibold truncate mt-0.5">
+                    Slug: <code className="text-foreground/80 font-mono text-[11px]">{selectedTractor.slug}</code> • ID: #{selectedTractor.id}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedTractor(null)}
+                className="text-muted hover:text-foreground hover:bg-foreground/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all cursor-pointer"
+                title="Close modal (Esc)"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              {/* Quick KPIs */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Horsepower & Drive
+                  </span>
+                  <div className="text-foreground text-lg font-black mt-1">
+                    {selectedTractor.hp ? `${selectedTractor.hp} HP` : 'N/A'}
+                  </div>
+                  <span className="text-muted text-xs font-semibold capitalize">
+                    {selectedTractor.driveType?.replace('_', ' ') || '-'} • {selectedTractor.fuelType || '-'}
+                  </span>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Ex-Showroom Price
+                  </span>
+                  <div className="text-[var(--color-brand-green)] text-base sm:text-lg font-black mt-1 break-words">
+                    {selectedTractor.exShowroomPriceMin ? (
+                      `${formatPrice(selectedTractor.exShowroomPriceMin)} - ${formatPrice(selectedTractor.exShowroomPriceMax || selectedTractor.exShowroomPriceMin)}`
+                    ) : (
+                      <span className="text-muted text-sm font-medium">Not Set</span>
+                    )}
+                  </div>
+                  <span className="text-muted text-xs font-semibold">Standard estimate</span>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Total Views
+                  </span>
+                  <div className="text-foreground text-lg font-black mt-1">
+                    {selectedTractor.viewsCount || 0}
+                  </div>
+                  <span className="text-muted text-xs font-semibold">Farmer impressions</span>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Total Inquiries
+                  </span>
+                  <div className="text-[var(--color-brand-orange)] text-lg font-black mt-1">
+                    {selectedTractor.leadsCount || 0}
+                  </div>
+                  <span className="text-muted text-xs font-semibold">Verified buyer leads</span>
+                </div>
+              </div>
+
+              {/* Categories */}
+              {selectedTractor.categories && selectedTractor.categories.length > 0 && (
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted mb-2 block text-[10px] font-black tracking-wider uppercase">
+                    Assigned Categories
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTractor.categories.map((c, i) => (
+                      <span
+                        key={i}
+                        className="rounded-xl border border-[var(--border-subtle)] bg-background px-3 py-1 text-xs font-bold text-foreground"
+                      >
+                        {c.category?.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Technical Specifications Highlights */}
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-5 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+                  <div className="flex items-center gap-2 text-[var(--color-brand-green)]">
+                    <Settings2 size={18} />
+                    <h3 className="text-sm font-black tracking-wide uppercase">
+                      Key Technical Specifications
+                    </h3>
+                  </div>
+                  <Link
+                    href={`/admin/tractors/specs?search=${encodeURIComponent(selectedTractor.modelName)}`}
+                    className="text-xs font-bold text-[var(--color-brand-green)] hover:underline"
+                  >
+                    View All Specs →
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3 text-center">
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                      Engine CC
+                    </span>
+                    <div className="text-foreground text-sm font-black mt-0.5">
+                      {selectedTractor.spec?.engineCc ? `${selectedTractor.spec.engineCc} CC` : '-'}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3 text-center">
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                      Cylinders
+                    </span>
+                    <div className="text-foreground text-sm font-black mt-0.5">
+                      {selectedTractor.spec?.cylinders || '-'}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3 text-center">
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                      PTO HP
+                    </span>
+                    <div className="text-foreground text-sm font-black mt-0.5">
+                      {selectedTractor.spec?.ptoHp ? `${selectedTractor.spec.ptoHp} HP` : '-'}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3 text-center">
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
+                      Lift Capacity
+                    </span>
+                    <div className="text-foreground text-sm font-black mt-0.5">
+                      {selectedTractor.spec?.liftingCapacityKg
+                        ? `${selectedTractor.spec.liftingCapacityKg} kg`
+                        : '-'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Story / Description */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm">
+                  <div className="flex items-center gap-2 text-muted mb-2">
+                    <Info size={16} />
+                    <span className="text-[10px] font-black tracking-wider uppercase">
+                      Product Overview
+                    </span>
+                  </div>
+                  <p className="text-foreground/80 text-xs font-medium leading-relaxed">
+                    {selectedTractor.overview || 'No overview has been added yet.'}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm">
+                  <div className="flex items-center gap-2 text-[var(--color-brand-green)] mb-2">
+                    <CheckCircle size={16} />
+                    <span className="text-[10px] font-black tracking-wider uppercase">
+                      Why Buy This Tractor?
+                    </span>
+                  </div>
+                  <p className="text-foreground/80 text-xs font-medium leading-relaxed">
+                    {selectedTractor.whyBuy || 'No reasons provided yet.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* SEO Details */}
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm space-y-3">
+                <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2">
+                  <BarChart size={16} />
+                  <span className="text-[10px] font-black tracking-wider uppercase">
+                    SEO & Meta Information
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase block">
+                      Meta Title
+                    </span>
+                    <p className="text-foreground text-xs font-bold mt-1">
+                      {selectedTractor.seoTitle || 'Not configured'}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase block">
+                      Meta Description
+                    </span>
+                    <p className="text-foreground/70 text-xs font-medium mt-1">
+                      {selectedTractor.seoDescription || 'Not configured'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Attached Media */}
+              {selectedTractor.media && selectedTractor.media.length > 0 && (
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm">
+                  <div className="flex items-center gap-2 text-muted mb-3">
+                    <ImageIcon size={16} />
+                    <span className="text-[10px] font-black tracking-wider uppercase">
+                      Attached Media ({selectedTractor.media.length} files)
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {selectedTractor.media.map((med, idx) => (
+                      <div
+                        key={idx}
+                        className="relative h-20 w-24 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-white p-1"
+                      >
+                        <img
+                          src={med.url}
+                          alt={med.altText || `Media ${idx + 1}`}
+                          className="h-full w-full object-contain"
+                        />
+                        {med.isPrimary && (
+                          <span className="absolute bottom-1 right-1 rounded bg-[var(--color-brand-green)] px-1 py-0.5 text-[9px] font-black text-white uppercase">
+                            Primary
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] bg-foreground/[0.02] p-4 sm:p-6">
+              <div className="text-muted flex items-center gap-2 text-xs font-bold">
+                <ImageIcon size={14} />
+                {selectedTractor.media?.length || 0} Media File(s)
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedTractor(null)}
+                  className="rounded-xl border border-[var(--border-subtle)] bg-background px-4 py-2 text-xs font-bold text-foreground transition-colors hover:bg-foreground/5 cursor-pointer"
+                >
+                  Close
+                </button>
+                <Link
+                  href={`/admin/tractors/${selectedTractor.id}`}
+                  className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-black tracking-wider text-white uppercase shadow-md transition-all hover:bg-[var(--color-brand-orange)]"
+                >
+                  <Edit2 size={14} /> Edit Full Profile
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

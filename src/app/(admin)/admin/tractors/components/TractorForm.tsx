@@ -255,6 +255,43 @@ export default function TractorForm({
       }
     }
 
+    // Validate general vehicle pricing
+    if (formData.exShowroomPriceMin && Number(formData.exShowroomPriceMin) < 0) {
+      setActiveTab('pricing');
+      alert('Minimum ex-showroom price cannot be negative.');
+      return;
+    }
+    if (formData.exShowroomPriceMax && Number(formData.exShowroomPriceMax) < 0) {
+      setActiveTab('pricing');
+      alert('Maximum ex-showroom price cannot be negative.');
+      return;
+    }
+    if (
+      formData.exShowroomPriceMin &&
+      formData.exShowroomPriceMax &&
+      Number(formData.exShowroomPriceMin) > Number(formData.exShowroomPriceMax)
+    ) {
+      setActiveTab('pricing');
+      alert('Minimum ex-showroom price cannot be greater than maximum ex-showroom price.');
+      return;
+    }
+
+    // Validate state-wise pricing before saving
+    if (formData.priceByState && formData.priceByState.length > 0) {
+      for (const p of formData.priceByState) {
+        if (!p.exShowroom || Number(p.exShowroom) <= 0) {
+          setActiveTab('pricing');
+          alert(`Invalid pricing for ${p.state}: Ex-showroom price must be greater than 0. Negative or zero pricing is not allowed.`);
+          return;
+        }
+        if (Number(p.rtoCharges) < 0 || Number(p.insuranceEst) < 0 || Number(p.dealerCharges) < 0) {
+          setActiveTab('pricing');
+          alert(`Invalid pricing for ${p.state}: Additional charges cannot be negative.`);
+          return;
+        }
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -674,9 +711,14 @@ export default function TractorForm({
                     </span>
                     <input
                       type="number"
+                      min="0"
+                      step="any"
                       name="exShowroomPriceMin"
                       value={formData.exShowroomPriceMin || ''}
                       onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault();
+                      }}
                       placeholder="e.g. 500000"
                       className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent py-3 pr-4 pl-8 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                     />
@@ -693,9 +735,14 @@ export default function TractorForm({
                     </span>
                     <input
                       type="number"
+                      min="0"
+                      step="any"
                       name="exShowroomPriceMax"
                       value={formData.exShowroomPriceMax || ''}
                       onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault();
+                      }}
                       placeholder="e.g. 600000"
                       className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent py-3 pr-4 pl-8 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
                     />

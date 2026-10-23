@@ -9,6 +9,7 @@ import { Lock, ShieldCheck, X, Loader2, CheckCircle2, Download, Sparkles, MapPin
 import { INDIAN_STATES } from '@/lib/constants/indian-states';
 import { leadAPI, type DetailAccessGrant, type DetailTargetType, type DetailAccessLeadInput } from '@/lib/api/leads';
 import { captureLocation, geocodeLocationText, reverseGeocodeCoords, saveDetailAccess } from '@/lib/utils/detail-access';
+import { getCapturedLeadAttribution } from '@/lib/utils/lead-attribution';
 
 const MOBILE_RE = /^[6-9]\d{9}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -168,6 +169,12 @@ export function DetailAccessGate({
         coords = await geocodeLocationText(values.city, values.state);
       }
 
+      const attribution = getCapturedLeadAttribution({
+        pagePath: pathname,
+        defaultPageLabel: targetType === 'TRACTOR' ? 'Tractor Detail Page' : 'Implement Detail Page',
+        defaultCampaign: 'Detail Access Gate (Specs & Features Unlock)',
+      });
+
       const payload: DetailAccessLeadInput = {
         targetType,
         targetId,
@@ -177,6 +184,8 @@ export function DetailAccessGate({
         city: values.city.trim() || undefined,
         email: values.email.trim() || undefined,
         address: values.address.trim() || undefined,
+        sourcePage: attribution.sourcePage,
+        sourceCampaign: attribution.sourceCampaign,
       };
 
       if (coords && typeof coords.latitude === 'number' && typeof coords.longitude === 'number') {

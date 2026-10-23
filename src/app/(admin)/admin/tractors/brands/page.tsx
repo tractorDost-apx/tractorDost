@@ -19,6 +19,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Eye,
 } from 'lucide-react';
 import BrandModal from './components/BrandModal';
 import BrandModelsModal from './components/BrandModelsModal';
@@ -36,7 +37,25 @@ export default function BrandsPage() {
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [detailBrand, setDetailBrand] = useState<Brand | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDetailBrand(null);
+      }
+    };
+    if (detailBrand) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [detailBrand]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -111,12 +130,9 @@ export default function BrandsPage() {
     fetchBrands(); // Refresh list after add/edit
   };
 
-  const toggleExpand = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
 
   return (
-    <div className="animate-fade-in flex h-full w-full flex-col gap-6 pb-12">
+    <div className="animate-fade-in flex flex-1 h-full w-full flex-col gap-6 pb-2">
       {/* Header section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -270,190 +286,112 @@ export default function BrandsPage() {
                 </tr>
               ) : (
                 brands.map((brand) => (
-                  <React.Fragment key={brand.id}>
-                    <tr
-                      className={`hover:bg-foreground/5 cursor-pointer transition-colors ${expandedId === brand.id ? 'bg-foreground/5' : ''}`}
-                      onClick={() => toggleExpand(brand.id)}
-                    >
-                      <td className="text-muted px-6 py-4">
-                        {expandedId === brand.id ? (
-                          <ChevronUp size={18} />
-                        ) : (
-                          <ChevronDown size={18} />
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm">
-                            {brand.logoUrl ? (
-                              <img
-                                src={brand.logoUrl}
-                                alt={brand.name}
-                                className="max-h-full max-w-full object-contain"
-                              />
-                            ) : (
-                              <span className="text-[10px] font-black text-muted uppercase">
-                                N/A
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <div className="text-foreground text-base font-black tracking-tight">
-                              {brand.name}
-                            </div>
-                            <div
-                              className="text-muted/70 max-w-[150px] truncate text-[10px] font-bold tracking-wider uppercase sm:max-w-[200px]"
-                              title={brand.slug}
-                            >
-                              {brand.slug}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1 text-xs">
-                          <span className="text-foreground/80 flex items-center gap-1.5 font-bold">
-                            <Globe size={12} className="text-muted" /> {brand.country || 'N/A'}
-                          </span>
-                          <span className="text-muted font-medium">
-                            Est. {brand.foundedYear || 'Unknown'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setModelsBrand(brand);
-                          }}
-                          className="bg-foreground/5 text-foreground/80 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black tracking-wide transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)]"
-                        >
-                          {brand.totalModels || 0} Models
-                        </button>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-widest uppercase ${brand.isActive ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-red-500/10 text-red-500'}`}
-                          >
-                            {brand.isActive ? 'Active' : 'Inactive'}
-                          </span>
-                          {brand.isFeatured && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-black tracking-widest text-blue-500 uppercase">
-                              Featured
+                  <tr
+                    key={brand.id}
+                    className="hover:bg-[var(--color-brand-green)]/[0.04] group cursor-pointer transition-colors"
+                    onClick={() => setDetailBrand(brand)}
+                  >
+                    <td className="text-muted px-6 py-4">
+                      <div
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground/5 text-muted transition-colors group-hover:bg-[var(--color-brand-green)]/15 group-hover:text-[var(--color-brand-green)]"
+                        title="Click to view brand profile"
+                      >
+                        <Eye size={16} />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm transition-transform group-hover:scale-105">
+                          {brand.logoUrl ? (
+                            <img
+                              src={brand.logoUrl}
+                              alt={brand.name}
+                              className="max-h-full max-w-full object-contain"
+                            />
+                          ) : (
+                            <span className="text-[10px] font-black text-muted uppercase">
+                              N/A
                             </span>
                           )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={(e) => handleEdit(brand, e)}
-                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)]"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            onClick={(e) => handleDelete(brand.id, e)}
-                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-
-                    {/* EXPANDED DEEP ANALYSIS VIEW */}
-                    {expandedId === brand.id && (
-                      <tr>
-                        <td colSpan={6} className="bg-foreground/[0.02] px-0 py-0">
-                          <div className="animate-fade-in flex flex-col gap-6 border-b-2 border-[var(--color-brand-green)] p-6 md:p-8">
-                            <div className="grid w-full grid-cols-1 gap-8 whitespace-normal md:grid-cols-2">
-                              {/* Left Column - General Info */}
-                              <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-green)]">
-                                  <FileText size={18} />
-                                  <h3 className="text-sm font-black tracking-wide uppercase">
-                                    Brand Identity & About
-                                  </h3>
-                                </div>
-                                <p className="text-foreground/80 bg-background rounded-xl border border-[var(--border-subtle)] p-4 text-sm leading-relaxed font-medium shadow-sm">
-                                  {brand.aboutBrand ||
-                                    'No description provided for this brand yet.'}
-                                </p>
-
-                                <div className="mt-2 grid grid-cols-2 gap-4">
-                                  <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                                    <span className="text-muted flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase">
-                                      <Activity size={12} /> Sort Order
-                                    </span>
-                                    <span className="text-foreground text-lg font-black">
-                                      {brand.sortOrder || 0}
-                                    </span>
-                                  </div>
-                                  <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                                    <span className="text-muted flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase">
-                                      <Tag size={12} /> DB ID
-                                    </span>
-                                    <span className="text-foreground text-lg font-black">
-                                      #{brand.id}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Right Column - SEO Info */}
-                              <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-orange)]">
-                                  <BarChart size={18} />
-                                  <h3 className="text-sm font-black tracking-wide uppercase">
-                                    SEO & Meta Configuration
-                                  </h3>
-                                </div>
-
-                                <div className="bg-background flex flex-col gap-4 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                                  <div className="flex flex-col gap-1.5">
-                                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                      SEO Title
-                                    </span>
-                                    <span className="text-foreground text-sm font-bold">
-                                      {brand.seoTitle || (
-                                        <span className="text-muted/50 font-medium italic">
-                                          Not configured
-                                        </span>
-                                      )}
-                                    </span>
-                                  </div>
-
-                                  <div className="bg-foreground/5 h-px w-full"></div>
-
-                                  <div className="flex flex-col gap-1.5">
-                                    <span className="text-muted text-[10px] font-black tracking-wider uppercase">
-                                      SEO Description
-                                    </span>
-                                    <span className="text-foreground/80 text-sm leading-relaxed font-medium">
-                                      {brand.seoDescription || (
-                                        <span className="text-muted/50 italic">Not configured</span>
-                                      )}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-end pt-4">
-                              <button
-                                onClick={(e) => handleEdit(brand, e)}
-                                className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/20 shadow-lg transition-colors hover:bg-[var(--color-brand-orange)]"
-                              >
-                                <Edit2 size={16} /> Edit Brand Master
-                              </button>
-                            </div>
+                        <div className="flex flex-col gap-0.5">
+                          <div className="text-foreground text-base font-black tracking-tight transition-colors group-hover:text-[var(--color-brand-green)]">
+                            {brand.name}
                           </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
+                          <div
+                            className="text-muted/70 max-w-[150px] truncate text-[10px] font-bold tracking-wider uppercase sm:max-w-[200px]"
+                            title={brand.slug}
+                          >
+                            {brand.slug}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1 text-xs">
+                        <span className="text-foreground/80 flex items-center gap-1.5 font-bold">
+                          <Globe size={12} className="text-muted" /> {brand.country || 'N/A'}
+                        </span>
+                        <span className="text-muted font-medium">
+                          Est. {brand.foundedYear || 'Unknown'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModelsBrand(brand);
+                        }}
+                        className="bg-foreground/5 text-foreground/80 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black tracking-wide transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] cursor-pointer"
+                      >
+                        {brand.totalModels || 0} Models
+                      </button>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-widest uppercase ${brand.isActive ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-red-500/10 text-red-500'}`}
+                        >
+                          {brand.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                        {brand.isFeatured && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-black tracking-widest text-blue-500 uppercase">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDetailBrand(brand);
+                          }}
+                          className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] cursor-pointer"
+                          title="View Brand Profile"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          onClick={(e) => handleEdit(brand, e)}
+                          className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)] cursor-pointer"
+                          title="Edit Brand"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(brand.id, e)}
+                          className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500 cursor-pointer"
+                          title="Delete Brand"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 ))
               )}
             </tbody>
@@ -473,6 +411,188 @@ export default function BrandsPage() {
           }}
         />
       </div>
+
+      {/* BRAND QUICK PROFILE POPUP MODAL */}
+      {detailBrand && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 sm:p-6 backdrop-blur-md animate-fade-in">
+          <div
+            className="fixed inset-0 -z-10"
+            onClick={() => setDetailBrand(null)}
+          />
+
+          <div className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-background shadow-2xl animate-scale-up">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/[0.02] p-5 sm:p-6">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-2 shadow-sm">
+                  {detailBrand.logoUrl ? (
+                    <img
+                      src={detailBrand.logoUrl}
+                      alt={detailBrand.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-xs font-black text-muted uppercase">N/A</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-foreground text-xl font-black tracking-tight truncate">
+                      {detailBrand.name}
+                    </h2>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase ${
+                        detailBrand.isActive
+                          ? 'bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]'
+                          : 'bg-red-500/15 text-red-500'
+                      }`}
+                    >
+                      {detailBrand.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    {detailBrand.isFeatured && (
+                      <span className="rounded-full bg-blue-500/15 px-2.5 py-0.5 text-[10px] font-black text-blue-500 uppercase">
+                        Featured
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-muted text-xs font-semibold mt-0.5">
+                    Slug: <code className="text-foreground/80 font-mono text-[11px]">{detailBrand.slug}</code> • ID: #{detailBrand.id}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setDetailBrand(null)}
+                className="text-muted hover:text-foreground hover:bg-foreground/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all cursor-pointer"
+                title="Close modal (Esc)"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              {/* Quick Metrics */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Country of Origin
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1 flex items-center gap-1.5">
+                    <Globe size={14} className="text-muted" />
+                    {detailBrand.country || 'N/A'}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Founded Year
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1">
+                    {detailBrand.foundedYear || 'Unknown'}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Total Models
+                  </span>
+                  <div className="text-[var(--color-brand-green)] text-base font-black mt-1">
+                    {detailBrand.totalModels || 0} Models
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Display Sort Order
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1">
+                    {detailBrand.sortOrder || 0}
+                  </div>
+                </div>
+              </div>
+
+              {/* Brand About / Story */}
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-5 shadow-sm space-y-2">
+                <div className="flex items-center gap-2 text-[var(--color-brand-green)]">
+                  <FileText size={16} />
+                  <h3 className="text-xs font-black tracking-wider uppercase">
+                    Brand Identity & Heritage
+                  </h3>
+                </div>
+                <p className="text-foreground/80 text-xs sm:text-sm font-medium leading-relaxed">
+                  {detailBrand.aboutBrand || 'No detailed background story provided for this brand yet.'}
+                </p>
+              </div>
+
+              {/* SEO Meta Information */}
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-5 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2.5">
+                  <BarChart size={16} />
+                  <h3 className="text-xs font-black tracking-wider uppercase">
+                    SEO & Meta Configuration
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase block">
+                      SEO Title
+                    </span>
+                    <p className="text-foreground text-xs font-bold mt-1">
+                      {detailBrand.seoTitle || <span className="text-muted/60 italic font-normal">Not configured</span>}
+                    </p>
+                  </div>
+                  <div className="bg-foreground/5 h-px w-full" />
+                  <div>
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase block">
+                      SEO Description
+                    </span>
+                    <p className="text-foreground/70 text-xs font-medium mt-1">
+                      {detailBrand.seoDescription || <span className="text-muted/60 italic font-normal">Not configured</span>}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between border-t border-[var(--border-subtle)] bg-foreground/[0.02] p-4 sm:p-6">
+              <button
+                type="button"
+                onClick={() => {
+                  const b = detailBrand;
+                  setDetailBrand(null);
+                  setModelsBrand(b);
+                }}
+                className="text-xs font-bold text-[var(--color-brand-green)] hover:underline flex items-center gap-1.5 cursor-pointer"
+              >
+                Browse Models ({detailBrand.totalModels || 0}) →
+              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDetailBrand(null)}
+                  className="rounded-xl border border-[var(--border-subtle)] bg-background px-4 py-2 text-xs font-bold text-foreground transition-colors hover:bg-foreground/5 cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    const b = detailBrand;
+                    setDetailBrand(null);
+                    handleEdit(b, e);
+                  }}
+                  className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-black tracking-wider text-white uppercase shadow-md transition-all hover:bg-[var(--color-brand-orange)] cursor-pointer"
+                >
+                  <Edit2 size={14} /> Edit Brand Master
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isModalOpen && <BrandModal brand={selectedBrand} onClose={handleModalClose} />}
 

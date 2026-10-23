@@ -10,14 +10,14 @@ export default function MediaGalleryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
   const fetchMedia = async () => {
     setLoading(true);
     try {
-      const response = await mediaAPI.getAllMedia({ page, limit: 12, search });
+      const response = await mediaAPI.getAllMedia({ page, limit, search });
       if (response.success) {
         setMediaItems(response.data.data || []);
         setTotalPages(response.data.totalPages || 1);
@@ -35,7 +35,7 @@ export default function MediaGalleryPage() {
       fetchMedia();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [search, page]);
+  }, [search, page, limit]);
 
   const handleDelete = async (id: number) => {
     if (
@@ -156,27 +156,17 @@ export default function MediaGalleryPage() {
         )}
       </div>
 
-      {!loading && totalPages > 1 && (
-        <div className="glass-panel flex items-center justify-between rounded-2xl p-4">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="bg-foreground/5 hover:bg-foreground/10 rounded-xl px-4 py-2 text-sm font-bold transition-colors disabled:pointer-events-none disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="text-muted text-sm font-bold">
-            Page {page} of {totalPages}
-          </span>
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="bg-foreground/5 hover:bg-foreground/10 rounded-xl px-4 py-2 text-sm font-bold transition-colors disabled:pointer-events-none disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <Pagination
+        page={page}
+        limit={limit}
+        totalCount={totalCount}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+      />
     </div>
   );
 }

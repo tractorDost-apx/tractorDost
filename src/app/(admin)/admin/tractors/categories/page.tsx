@@ -12,6 +12,8 @@ import {
   AlignLeft,
   Info,
   Hash,
+  Eye,
+  X,
 } from 'lucide-react';
 import CategoryModal from './components/CategoryModal';
 import Pagination from '@/components/shared/Pagination';
@@ -26,12 +28,29 @@ export default function CategoriesPage() {
 
   // Track which categories are expanded in the tree view
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
-  // Track which row has its "Deep Analysis" view open
-  const [deepExpandedId, setDeepExpandedId] = useState<number | null>(null);
+  // Category Details Popup Modal state
+  const [detailCategory, setDetailCategory] = useState<Category | null>(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  // Keyboard accessibility and body scroll locking for Detail Modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDetailCategory(null);
+    };
+    if (detailCategory) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [detailCategory]);
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -65,10 +84,6 @@ export default function CategoriesPage() {
       newExpanded.add(id);
     }
     setExpandedIds(newExpanded);
-  };
-
-  const toggleDeepExpand = (id: number) => {
-    setDeepExpandedId(deepExpandedId === id ? null : id);
   };
 
   const handleEdit = (category: Category, e: React.MouseEvent) => {
@@ -106,13 +121,12 @@ export default function CategoriesPage() {
     cats.forEach((category) => {
       const hasChildren = category.children && category.children.length > 0;
       const isExpanded = expandedIds.has(category.id);
-      const isDeepExpanded = deepExpandedId === category.id;
 
       rows.push(
         <React.Fragment key={category.id}>
           <tr
-            className={`hover:bg-foreground/5 cursor-pointer border-b border-[var(--border-subtle)] transition-colors last:border-0 ${isDeepExpanded ? 'bg-foreground/5' : ''}`}
-            onClick={() => toggleDeepExpand(category.id)}
+            className="hover:bg-[var(--color-brand-green)]/[0.04] group cursor-pointer border-b border-[var(--border-subtle)] transition-colors last:border-0"
+            onClick={() => setDetailCategory(category)}
           >
             <td className="px-6 py-4">
               <div className="flex items-center gap-3" style={{ paddingLeft: `${level * 2}rem` }}>
@@ -120,8 +134,10 @@ export default function CategoriesPage() {
                 <div className="flex w-6 shrink-0 items-center justify-center">
                   {hasChildren ? (
                     <button
+                      type="button"
                       onClick={(e) => toggleExpand(category.id, e)}
-                      className="hover:bg-foreground/10 text-muted hover:text-foreground rounded-md p-1 transition-colors"
+                      className="hover:bg-foreground/10 text-muted hover:text-foreground rounded-md p-1 transition-colors cursor-pointer"
+                      title={isExpanded ? 'Collapse Sub-categories' : 'Expand Sub-categories'}
                     >
                       {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                     </button>
@@ -178,95 +194,37 @@ export default function CategoriesPage() {
             </td>
             <td className="text-foreground/80 px-6 py-4 font-bold">#{category.sortOrder}</td>
             <td className="px-6 py-4">
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex items-center justify-end gap-1 sm:gap-2">
                 <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDetailCategory(category);
+                  }}
+                  className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] cursor-pointer"
+                  title="View Category Profile"
+                >
+                  <Eye size={16} />
+                </button>
+                <button
+                  type="button"
                   onClick={(e) => handleEdit(category, e)}
-                  className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)]"
-                  title="Edit"
+                  className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)] cursor-pointer"
+                  title="Edit Category"
                 >
                   <Edit2 size={16} />
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => handleDelete(category.id, e)}
-                  className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500"
-                  title="Delete"
+                  className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500 cursor-pointer"
+                  title="Delete Category"
                 >
                   <Trash2 size={16} />
                 </button>
               </div>
             </td>
           </tr>
-
-          {/* DEEP ANALYSIS VIEW */}
-          {isDeepExpanded && (
-            <tr>
-              <td colSpan={5} className="bg-foreground/[0.02] px-0 py-0">
-                <div
-                  className="animate-fade-in flex flex-col gap-6 border-b-2 border-[var(--color-brand-green)] p-6 md:p-8"
-                  style={{ paddingLeft: `calc(1.5rem + ${level * 2}rem)` }}
-                >
-                  <div className="grid w-full grid-cols-1 gap-8 whitespace-normal md:grid-cols-2">
-                    {/* Description Area */}
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-green)]">
-                        <AlignLeft size={18} />
-                        <h3 className="text-sm font-black tracking-wide uppercase">
-                          Category Description
-                        </h3>
-                      </div>
-                      <p className="text-foreground/80 bg-background rounded-xl border border-[var(--border-subtle)] p-4 text-sm leading-relaxed font-medium shadow-sm">
-                        {category.description || 'No description provided for this category.'}
-                      </p>
-                    </div>
-
-                    {/* Meta Info Area */}
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2 text-[var(--color-brand-orange)]">
-                        <Info size={18} />
-                        <h3 className="text-sm font-black tracking-wide uppercase">
-                          Database & Relations
-                        </h3>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                          <span className="text-muted flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase">
-                            <Hash size={12} /> DB ID
-                          </span>
-                          <span className="text-foreground text-lg font-black">#{category.id}</span>
-                        </div>
-                        <div className="bg-background flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                          <span className="text-muted flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase">
-                            <Layers size={12} /> Sub-Categories
-                          </span>
-                          <span className="text-foreground text-lg font-black">
-                            {category._count?.children || 0}
-                          </span>
-                        </div>
-                        <div className="bg-background col-span-2 flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] p-4 shadow-sm">
-                          <span className="text-muted flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase">
-                            <Hash size={12} /> Parent Category ID
-                          </span>
-                          <span className="text-foreground text-lg font-black">
-                            {category.parentId ? `#${category.parentId}` : 'None (Root Level)'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-4">
-                    <button
-                      onClick={(e) => handleEdit(category, e)}
-                      className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/20 shadow-lg transition-colors hover:bg-[var(--color-brand-orange)]"
-                    >
-                      <Edit2 size={16} /> Edit Category Master
-                    </button>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          )}
         </React.Fragment>
       );
 
@@ -282,13 +240,13 @@ export default function CategoriesPage() {
   const paginatedCategories = categories.slice((page - 1) * limit, page * limit);
 
   return (
-    <div className="animate-fade-in flex h-full w-full flex-col gap-6 pb-12">
+    <div className="animate-fade-in flex flex-1 h-full w-full flex-col gap-6 pb-2">
       {/* Header section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-foreground text-3xl font-black tracking-tight">Tractor Categories</h1>
           <p className="text-muted mt-1 text-sm font-bold">
-            Deep analysis & master view of the catalog tree structure.
+            Catalog taxonomy and hierarchical structure master.
           </p>
         </div>
         <button
@@ -296,7 +254,7 @@ export default function CategoriesPage() {
             setSelectedCategory(null);
             setIsModalOpen(true);
           }}
-          className="spatial-button flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg"
+          className="spatial-button flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg cursor-pointer"
         >
           <Plus size={16} /> Add New Category
         </button>
@@ -309,7 +267,7 @@ export default function CategoriesPage() {
           Total Root Categories: {categories.length}
         </div>
         <p className="text-muted ml-2 text-xs font-medium">
-          Click on the arrows to expand tree, click rows for deep analysis.
+          Click arrows to expand tree branches, or click any row to view complete category profile popup.
         </p>
       </div>
 
@@ -359,6 +317,189 @@ export default function CategoriesPage() {
           }}
         />
       </div>
+
+      {/* Category Detail Profile Modal */}
+      {detailCategory && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 sm:p-6 backdrop-blur-md animate-fade-in">
+          <div
+            className="fixed inset-0 -z-10"
+            onClick={() => setDetailCategory(null)}
+          />
+
+          <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-background shadow-2xl animate-scale-up">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/[0.02] p-5 sm:p-6">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm">
+                  {detailCategory.iconUrl ? (
+                    <img
+                      src={detailCategory.iconUrl}
+                      alt={detailCategory.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  ) : (
+                    <Layers size={22} className="text-[var(--color-brand-green)]" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-foreground text-lg sm:text-xl font-black truncate">
+                      {detailCategory.name}
+                    </h2>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black tracking-widest uppercase ${
+                        detailCategory.isActive
+                          ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+                          : 'bg-red-500/10 text-red-500'
+                      }`}
+                    >
+                      {detailCategory.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    {detailCategory.parentId ? (
+                      <span className="bg-foreground/10 text-muted rounded px-2 py-0.5 text-[10px] font-black tracking-wider uppercase">
+                        Sub-Category
+                      </span>
+                    ) : (
+                      <span className="bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] rounded px-2 py-0.5 text-[10px] font-black tracking-wider uppercase">
+                        Root Level
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-muted text-xs font-bold truncate mt-0.5">
+                    Slug: <span className="text-foreground/80 font-mono">{detailCategory.slug}</span>
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setDetailCategory(null)}
+                className="hover:bg-foreground/5 text-muted hover:text-foreground shrink-0 rounded-full p-2 transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              {/* Quick Key Metrics */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Tractors Linked
+                  </span>
+                  <div className="text-[var(--color-brand-green)] text-base font-black mt-1">
+                    {detailCategory._count?.tractors || 0} Tractors
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Sub-Categories
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1">
+                    {detailCategory.children?.length || detailCategory._count?.children || 0}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Display Sort Order
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1">
+                    #{detailCategory.sortOrder ?? 0}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Database Record ID
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1">
+                    #{detailCategory.id}
+                  </div>
+                </div>
+              </div>
+
+              {/* Description Section */}
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-5 shadow-sm space-y-2">
+                <div className="flex items-center gap-2 text-[var(--color-brand-green)]">
+                  <AlignLeft size={16} />
+                  <h3 className="text-xs font-black tracking-wider uppercase">
+                    Category Description
+                  </h3>
+                </div>
+                <p className="text-foreground/80 text-xs sm:text-sm font-medium leading-relaxed">
+                  {detailCategory.description || 'No detailed description provided for this category yet.'}
+                </p>
+              </div>
+
+              {/* Hierarchy & Relations */}
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-5 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2.5">
+                  <Info size={16} />
+                  <h3 className="text-xs font-black tracking-wider uppercase">
+                    Hierarchy & Database Relations
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3.5">
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase block">
+                      Hierarchy Level
+                    </span>
+                    <span className="text-foreground text-xs sm:text-sm font-bold mt-1 block">
+                      {detailCategory.parentId ? `Child Category (Parent ID: #${detailCategory.parentId})` : 'Root Category (Top Level)'}
+                    </span>
+                  </div>
+
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3.5">
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase block">
+                      Sub-Category Count
+                    </span>
+                    <span className="text-foreground text-xs sm:text-sm font-bold mt-1 block">
+                      {detailCategory.children?.length ? `${detailCategory.children.length} Direct Sub-categories` : 'None (Leaf Node)'}
+                    </span>
+                  </div>
+
+                  <div className="col-span-1 sm:col-span-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3.5">
+                    <span className="text-muted text-[10px] font-black tracking-wider uppercase block">
+                      Category Route / URL Slug
+                    </span>
+                    <span className="text-foreground text-xs sm:text-sm font-mono font-bold mt-1 block">
+                      /tractors/category/{detailCategory.slug}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between border-t border-[var(--border-subtle)] bg-foreground/[0.02] p-4 sm:p-6">
+              <button
+                type="button"
+                onClick={() => setDetailCategory(null)}
+                className="hover:bg-foreground/5 text-foreground rounded-xl border border-[var(--border-subtle)] px-4 py-2 text-xs font-bold transition-colors cursor-pointer"
+              >
+                Close Window
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const cat = detailCategory;
+                  setDetailCategory(null);
+                  setSelectedCategory(cat);
+                  setIsModalOpen(true);
+                }}
+                className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/20 shadow-lg transition-colors hover:bg-[var(--color-brand-orange)] cursor-pointer"
+              >
+                <Edit2 size={14} /> Edit Category Master
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isModalOpen && (
         <CategoryModal

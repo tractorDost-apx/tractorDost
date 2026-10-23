@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   X,
@@ -23,6 +23,9 @@ import {
   Flame,
   MessageSquare,
   Sparkles,
+  Maximize2,
+  Minimize2,
+  GripVertical,
 } from 'lucide-react';
 import {
   Lead,
@@ -44,6 +47,11 @@ import {
   getLeadLocationInfo,
   getLeadSourceInfo,
 } from '../lead-helpers';
+import { LeadLocationSection } from './LeadLocationSection';
+import {
+  LeadSourcePlatformBadge,
+  LeadSourceOverviewCard,
+} from './LeadSourcePlatformBadge';
 
 interface LeadDetailsDrawerProps {
   leadId: number | null;
@@ -94,10 +102,112 @@ export function LeadDetailsDrawer({
   const [editingNoteText, setEditingNoteText] = useState<string>('');
 
   const [mounted, setMounted] = useState(false);
+  const [drawerWidth, setDrawerWidth] = useState<number>(680);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const lastCustomWidthRef = useRef<number>(680);
 
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== 'undefined') {
+      const initial = Math.min(680, window.innerWidth);
+      setDrawerWidth(initial);
+      lastCustomWidthRef.current = initial;
+    }
   }, []);
+
+  // Sync width on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (isFullscreen) {
+        setDrawerWidth(window.innerWidth);
+      } else {
+        setDrawerWidth((prev) => Math.min(prev, window.innerWidth));
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isFullscreen]);
+
+  // Keyboard shortcut: Escape exits fullscreen first, or closes drawer
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isFullscreen) {
+          setIsFullscreen(false);
+          setDrawerWidth(lastCustomWidthRef.current || 680);
+        } else {
+          onClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isFullscreen, onClose]);
+
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      setIsFullscreen(false);
+      setDrawerWidth(lastCustomWidthRef.current || 680);
+    } else {
+      lastCustomWidthRef.current = drawerWidth;
+      setIsFullscreen(true);
+      if (typeof window !== 'undefined') {
+        setDrawerWidth(window.innerWidth);
+      }
+    }
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  // Drag-to-resize and drag-to-fullscreen handling using PointerEvent
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const onPointerMove = (e: PointerEvent) => {
+      const clientX = e.clientX;
+      const screenW = window.innerWidth;
+      const rawWidth = screenW - clientX;
+      const minW = Math.min(420, screenW);
+
+      // Auto-snap to full screen if dragged within 70px of screen left edge or > 88% of screen width
+      if (clientX <= 70 || rawWidth >= screenW * 0.88) {
+        setIsFullscreen(true);
+        setDrawerWidth(screenW);
+      } else {
+        setIsFullscreen(false);
+        const clamped = Math.max(minW, Math.min(rawWidth, screenW));
+        setDrawerWidth(clamped);
+        lastCustomWidthRef.current = clamped;
+      }
+    };
+
+    const onPointerUp = () => {
+      setIsDragging(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+
+    return () => {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [isDragging]);
 
   const fetchLeadDetails = async (id: number) => {
     setLoading(true);
@@ -257,7 +367,41 @@ export function LeadDetailsDrawer({
       />
 
       {/* Drawer content */}
-      <div className="relative z-10 flex h-full w-full max-w-2xl flex-col border-l border-[var(--border-subtle)] bg-background/95 shadow-2xl backdrop-blur-2xl transition-transform duration-300 animate-in slide-in-from-right sm:w-[650px]">
+      <div
+        style={{
+          width: isFullscreen ? '100vw' : `${drawerWidth}px`,
+          maxWidth: '100vw',
+        }}
+        className={`relative z-10 flex h-full flex-col border-l border-[var(--border-subtle)] bg-background/95 shadow-2xl backdrop-blur-2xl ${
+          isDragging ? 'select-none transition-none' : 'transition-all duration-200 ease-out'
+        } ${isFullscreen ? 'border-l-0' : ''}`}
+      >
+        {/* Left Drag Resize Handle */}
+        <div
+          onPointerDown={handlePointerDown}
+          onDoubleClick={toggleFullscreen}
+          className={`absolute top-0 bottom-0 -left-3.5 w-7 flex items-center justify-center cursor-ew-resize group z-30 touch-none select-none ${
+            isDragging ? 'bg-[#4a7635]/10' : ''
+          }`}
+          title="Drag left to resize or full screen | Double-click to toggle full screen"
+        >
+          {/* Visual pill handle */}
+          <div
+            className={`flex items-center justify-center rounded-full transition-all duration-200 ${
+              isDragging
+                ? 'bg-[#4a7635] shadow-lg shadow-[#4a7635]/50 h-28 w-2.5'
+                : 'bg-foreground/20 group-hover:bg-[#4a7635] group-hover:h-24 group-hover:w-2'
+            }`}
+          >
+            <GripVertical
+              size={12}
+              className={`transition-opacity ${
+                isDragging ? 'opacity-100 text-white' : 'opacity-0 group-hover:opacity-100 text-white'
+              }`}
+            />
+          </div>
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--border-subtle)] px-6 py-4">
           <div className="flex items-center gap-3">
@@ -268,6 +412,10 @@ export function LeadDetailsDrawer({
                 </span>
                 {lead && <LeadStatusBadge status={lead.status} />}
                 {lead && <LeadTypeBadge type={lead.leadType} />}
+                {lead && (() => {
+                  const sInfo = getLeadSourceInfo(lead);
+                  return <LeadSourcePlatformBadge sourceInfo={sInfo} size="xs" />;
+                })()}
                 {lead?.isDuplicate && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-[10px] font-black text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-800/50">
                     <Copy size={10} className="text-purple-700 dark:text-purple-400" />
@@ -281,14 +429,24 @@ export function LeadDetailsDrawer({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl p-2 text-muted transition-colors hover:bg-foreground/10 hover:text-foreground"
-            title="Close Drawer"
-          >
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="rounded-xl p-2 text-muted transition-colors hover:bg-foreground/10 hover:text-foreground cursor-pointer"
+              title={isFullscreen ? 'Exit Full Screen (Esc)' : 'Expand to Full Screen'}
+            >
+              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl p-2 text-muted transition-colors hover:bg-foreground/10 hover:text-foreground"
+              title="Close Drawer"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Feedback banners */}
@@ -380,7 +538,7 @@ export function LeadDetailsDrawer({
             <>
               {/* TAB 1: OVERVIEW */}
               {activeTab === 'overview' && (
-                <div className="flex flex-col gap-6">
+                <div className={`grid grid-cols-1 ${isFullscreen || drawerWidth >= 960 ? 'xl:grid-cols-2' : ''} gap-6`}>
                   {/* Customer Contact Box */}
                   <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-4">
                     <h3 className="text-xs font-black uppercase tracking-wider text-muted mb-3">
@@ -425,54 +583,7 @@ export function LeadDetailsDrawer({
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3 sm:col-span-2">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
-                          <MapPin size={16} />
-                        </div>
-                        <div className="flex flex-col flex-1">
-                          <span className="text-[10px] font-bold text-muted uppercase">
-                            Location & Coordinates
-                          </span>
-                          {(() => {
-                            const locationInfo = getLeadLocationInfo(lead);
-                            return (
-                              <div className="flex flex-col gap-2 mt-0.5">
-                                <span className="text-xs font-bold text-foreground">
-                                  {locationInfo.locationText}
-                                </span>
-
-                                <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                                  {locationInfo.hasCoords ? (
-                                    <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] font-mono font-bold text-emerald-400">
-                                      <Compass size={12} />
-                                      <span>GPS: {locationInfo.coordsString}</span>
-                                    </span>
-                                  ) : (
-                                    <span className="text-[10px] italic text-muted">
-                                      GPS coordinates not captured
-                                    </span>
-                                  )}
-
-                                  {locationInfo.mapsUrl && (
-                                    <a
-                                      href={locationInfo.mapsUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition-colors"
-                                    >
-                                      <MapPin size={13} />
-                                      <span>
-                                        {locationInfo.hasCoords ? 'Open in Google Maps' : 'Search on Google Maps'}
-                                      </span>
-                                      <ExternalLink size={11} />
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
+                      <LeadLocationSection lead={lead} />
                     </div>
                   </div>
 
@@ -543,10 +654,18 @@ export function LeadDetailsDrawer({
                           <>
                             <div className="flex flex-col gap-1">
                               <span className="text-[10px] font-bold text-muted uppercase">
-                                Source Page (कुठून आला)
+                                Source Platform
+                              </span>
+                              <div className="mt-0.5">
+                                <LeadSourcePlatformBadge sourceInfo={sourceInfo} size="sm" />
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-bold text-muted uppercase">
+                                Source Page
                               </span>
                               <div className="flex flex-col gap-0.5">
-                                <span className="text-xs font-bold text-foreground">
+                                <span className={`text-xs font-bold ${sourceInfo.isPageKnown ? 'text-foreground' : 'text-muted italic'}`}>
                                   {sourceInfo.pageLabel}
                                 </span>
                                 {sourceInfo.originProductHref && (
@@ -560,9 +679,6 @@ export function LeadDetailsDrawer({
                                     <ExternalLink size={10} />
                                   </a>
                                 )}
-                                <span className="text-[10px] font-mono text-muted">
-                                  ref: {sourceInfo.rawPage || 'direct'}
-                                </span>
                               </div>
                             </div>
                             <div className="flex flex-col gap-1">
@@ -570,12 +686,9 @@ export function LeadDetailsDrawer({
                                 Source Campaign
                               </span>
                               <div className="flex flex-col gap-0.5">
-                                <p className="text-xs font-bold text-foreground">
+                                <p className={`text-xs font-bold ${sourceInfo.isCampaignKnown ? 'text-foreground' : 'text-muted italic'}`}>
                                   {sourceInfo.campaignLabel}
                                 </p>
-                                <span className="text-[10px] font-mono text-muted">
-                                  tag: {sourceInfo.rawPage || lead.sourceCampaign || 'organic'}
-                                </span>
                               </div>
                             </div>
                           </>
@@ -594,6 +707,9 @@ export function LeadDetailsDrawer({
                       </div>
                     )}
                   </div>
+
+                  {/* LEAD SOURCE & ATTRIBUTION OVERVIEW */}
+                  <LeadSourceOverviewCard sourceInfo={getLeadSourceInfo(lead)} lead={lead} />
 
                   {/* System & Duplicate Status */}
                   <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 p-4 text-xs font-semibold">

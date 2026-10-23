@@ -51,6 +51,11 @@ import {
 } from '../lead-helpers';
 import { LEAD_STATUSES } from '../components/LeadFilters';
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
+import { LeadLocationSection } from '../components/LeadLocationSection';
+import {
+  LeadSourcePlatformBadge,
+  LeadSourceOverviewCard,
+} from '../components/LeadSourcePlatformBadge';
 
 export default function LeadDetailPage({
   params,
@@ -336,6 +341,7 @@ export default function LeadDetailPage({
             </span>
             <LeadStatusBadge status={lead.status} />
             <LeadTypeBadge type={lead.leadType} />
+            <LeadSourcePlatformBadge sourceInfo={getLeadSourceInfo(lead)} size="xs" />
             {lead.isDuplicate && (
               <span className="inline-flex items-center gap-1 rounded-md bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-[10px] font-black text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-800/50">
                 <Copy size={10} className="text-purple-700 dark:text-purple-400" />
@@ -427,7 +433,8 @@ export default function LeadDetailPage({
       <div className="flex flex-col gap-6">
         {/* OVERVIEW */}
         {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Customer Box */}
             <div className="glass-panel flex flex-col gap-4 rounded-2xl border border-[var(--border-subtle)] p-5">
               <h3 className="text-xs font-black uppercase tracking-wider text-muted">
@@ -458,52 +465,7 @@ export default function LeadDetailPage({
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
-                    <MapPin size={16} />
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    <span className="text-[10px] font-bold text-muted uppercase">Location & Coordinates</span>
-                    {(() => {
-                      const locationInfo = getLeadLocationInfo(lead);
-                      return (
-                        <div className="flex flex-col gap-2 mt-0.5">
-                          <p className="text-xs font-bold text-foreground">
-                            {locationInfo.locationText}
-                          </p>
-
-                          <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                            {locationInfo.hasCoords ? (
-                              <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] font-mono font-bold text-emerald-400">
-                                <Compass size={12} />
-                                <span>GPS: {locationInfo.coordsString}</span>
-                              </span>
-                            ) : (
-                              <span className="text-[10px] italic text-muted">
-                                GPS coordinates not captured
-                              </span>
-                            )}
-
-                            {locationInfo.mapsUrl && (
-                              <a
-                                href={locationInfo.mapsUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-500 transition-colors"
-                              >
-                                <MapPin size={13} />
-                                <span>
-                                  {locationInfo.hasCoords ? 'Open in Google Maps' : 'Search on Google Maps'}
-                                </span>
-                                <ExternalLink size={11} />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </div>
+                <LeadLocationSection lead={lead} />
               </div>
             </div>
 
@@ -559,8 +521,14 @@ export default function LeadDetailPage({
                   return (
                     <>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] font-bold text-muted uppercase">Source Page (कुठून आला)</span>
-                        <span className="font-bold text-foreground text-xs">{sourceInfo.pageLabel}</span>
+                        <span className="text-[10px] font-bold text-muted uppercase">Source Platform</span>
+                        <div className="mt-0.5">
+                          <LeadSourcePlatformBadge sourceInfo={sourceInfo} size="sm" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[10px] font-bold text-muted uppercase">Source Page</span>
+                        <span className={`text-xs font-bold ${sourceInfo.isPageKnown ? 'text-foreground' : 'text-muted italic'}`}>{sourceInfo.pageLabel}</span>
                         {sourceInfo.originProductHref && (
                           <a
                             href={sourceInfo.originProductHref}
@@ -572,12 +540,10 @@ export default function LeadDetailPage({
                             <ExternalLink size={10} />
                           </a>
                         )}
-                        <span className="font-mono text-[10px] text-muted">ref: {sourceInfo.rawPage || 'direct'}</span>
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] font-bold text-muted uppercase">Campaign</span>
-                        <p className="font-bold text-foreground text-xs">{sourceInfo.campaignLabel}</p>
-                        <span className="font-mono text-[10px] text-muted">tag: {sourceInfo.rawPage || lead.sourceCampaign || 'organic'}</span>
+                        <span className="text-[10px] font-bold text-muted uppercase">Source Campaign</span>
+                        <p className={`text-xs font-bold ${sourceInfo.isCampaignKnown ? 'text-foreground' : 'text-muted italic'}`}>{sourceInfo.campaignLabel}</p>
                       </div>
                     </>
                   );
@@ -604,7 +570,11 @@ export default function LeadDetailPage({
               )}
             </div>
           </div>
-        )}
+
+          {/* Lead Source & Attribution Overview Card */}
+          <LeadSourceOverviewCard sourceInfo={getLeadSourceInfo(lead)} lead={lead} />
+        </>
+      )}
 
         {/* STATUS & ACTIONS */}
         {activeTab === 'actions' && (

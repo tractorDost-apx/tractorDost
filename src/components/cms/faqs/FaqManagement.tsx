@@ -317,19 +317,19 @@ export default function FaqManagement() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="animate-fade-in flex flex-1 h-full w-full flex-col gap-6 pb-2">
       {/* Top Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black tracking-tight text-white">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-foreground text-2xl sm:text-3xl font-black tracking-tight">
               FAQ Management
             </h1>
-            <span className="rounded-full bg-[var(--color-brand-green)]/20 border border-[var(--color-brand-green)]/30 px-2.5 py-0.5 text-[11px] font-extrabold text-[var(--color-brand-green)]">
+            <span className="rounded-full bg-[var(--color-brand-green)]/10 border border-[var(--color-brand-green)]/20 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-[var(--color-brand-green)] uppercase">
               CMS Module
             </span>
           </div>
-          <p className="mt-1 text-xs text-muted max-w-xl leading-relaxed">
+          <p className="text-muted mt-1 text-xs sm:text-sm font-semibold max-w-xl">
             Create, categorize, and publish frequently asked questions for tractors,
             financing, brands, and general platform guidance.
           </p>
@@ -340,7 +340,7 @@ export default function FaqManagement() {
             type="button"
             onClick={handleRefresh}
             disabled={loading || refreshing}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted hover:bg-white/10 hover:text-white transition-all disabled:opacity-50"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-foreground/5 text-muted hover:text-foreground transition-all disabled:opacity-50 cursor-pointer"
             title="Refresh FAQs"
           >
             <RefreshCw
@@ -352,7 +352,7 @@ export default function FaqManagement() {
           <button
             type="button"
             onClick={handleAddNew}
-            className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-[var(--color-brand-green)]/20 hover:opacity-90 transition-all cursor-pointer"
+            className="spatial-button flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg cursor-pointer"
           >
             <Plus size={16} />
             <span>Add New FAQ</span>
@@ -362,43 +362,43 @@ export default function FaqManagement() {
 
       {/* Metric Cards Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="glass-panel rounded-2xl p-4 border border-white/10 shadow-sm">
+        <div className="glass-panel rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm">
           <div className="flex items-center justify-between text-muted text-xs font-bold">
             <span>Total FAQs</span>
-            <HelpCircle size={15} className="text-white/60" />
+            <HelpCircle size={15} className="text-foreground/40" />
           </div>
-          <p className="mt-2 text-2xl font-black text-white">{stats.total}</p>
+          <p className="mt-2 text-2xl font-black text-foreground">{stats.total}</p>
           <p className="mt-0.5 text-[10px] text-muted font-medium">All recorded entries</p>
         </div>
 
-        <div className="glass-panel rounded-2xl p-4 border border-white/10 shadow-sm">
+        <div className="glass-panel rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm">
           <div className="flex items-center justify-between text-muted text-xs font-bold">
             <span>Published</span>
-            <Eye size={15} className="text-emerald-400" />
+            <Eye size={15} className="text-[var(--color-brand-green)]" />
           </div>
-          <p className="mt-2 text-2xl font-black text-emerald-400">
+          <p className="mt-2 text-2xl font-black text-[var(--color-brand-green)]">
             {stats.published}
           </p>
           <p className="mt-0.5 text-[10px] text-muted font-medium">Live on platform</p>
         </div>
 
-        <div className="glass-panel rounded-2xl p-4 border border-white/10 shadow-sm">
+        <div className="glass-panel rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm">
           <div className="flex items-center justify-between text-muted text-xs font-bold">
             <span>Drafts</span>
-            <EyeOff size={15} className="text-zinc-400" />
+            <EyeOff size={15} className="text-muted" />
           </div>
-          <p className="mt-2 text-2xl font-black text-zinc-300">
+          <p className="mt-2 text-2xl font-black text-muted">
             {stats.drafts}
           </p>
           <p className="mt-0.5 text-[10px] text-muted font-medium">Unpublished / staging</p>
         </div>
 
-        <div className="glass-panel rounded-2xl p-4 border border-white/10 shadow-sm">
+        <div className="glass-panel rounded-2xl p-4 border border-[var(--border-subtle)] shadow-sm">
           <div className="flex items-center justify-between text-muted text-xs font-bold">
             <span>Categories</span>
-            <FolderTree size={15} className="text-blue-400" />
+            <FolderTree size={15} className="text-blue-500" />
           </div>
-          <p className="mt-2 text-2xl font-black text-blue-400">
+          <p className="mt-2 text-2xl font-black text-blue-500">
             {stats.categoriesCount}
           </p>
           <p className="mt-0.5 text-[10px] text-muted font-medium">Distinct taxonomies</p>

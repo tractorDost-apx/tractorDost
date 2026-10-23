@@ -116,17 +116,35 @@ export function DealerServiceCenterModal({
         if (scRes.status === 'fulfilled' && scRes.value.success && scRes.value.data) {
           const sc = scRes.value.data;
           setExistingServiceCenter(sc);
+
+          // If phone was previously stored/returned as masked placeholder, fallback to dealer phone or clean value
+          const initialPhone = (sc.phone && !sc.phone.includes('X'))
+            ? sc.phone
+            : (dealer.phone && !dealer.phone.includes('X'))
+              ? dealer.phone
+              : '';
+
+          const initialWhatsapp = (sc.whatsapp && !sc.whatsapp.includes('X'))
+            ? sc.whatsapp
+            : (dealer.whatsapp && !dealer.whatsapp.includes('X'))
+              ? dealer.whatsapp
+              : '';
+
+          const initialEmergency = (sc.emergencyPhone && !sc.emergencyPhone.includes('X'))
+            ? sc.emergencyPhone
+            : '';
+
           setFormData({
-            serviceName: sc.serviceName,
-            address: sc.address,
-            state: sc.state,
-            district: sc.district,
-            pincode: sc.pincode || '',
-            latitude: sc.latitude != null ? Number(sc.latitude) : 18.5204,
-            longitude: sc.longitude != null ? Number(sc.longitude) : 73.8567,
-            phone: sc.phone,
-            whatsapp: sc.whatsapp || '',
-            emergencyPhone: sc.emergencyPhone || '',
+            serviceName: sc.serviceName || `${dealer.businessName} Service Center`,
+            address: sc.address || dealer.address || '',
+            state: sc.state || dealer.state || '',
+            district: sc.district || dealer.district || '',
+            pincode: sc.pincode || dealer.pincode || '',
+            latitude: sc.latitude != null ? Number(sc.latitude) : (dealer.latitude ? Number(dealer.latitude) : 18.5204),
+            longitude: sc.longitude != null ? Number(sc.longitude) : (dealer.longitude ? Number(dealer.longitude) : 73.8567),
+            phone: initialPhone,
+            whatsapp: initialWhatsapp,
+            emergencyPhone: initialEmergency,
             hasPickupService: Boolean(sc.hasPickupService),
             hasEmergencySupport: Boolean(sc.hasEmergencySupport),
             sparePartsAvailable: Boolean(sc.sparePartsAvailable),
@@ -177,18 +195,48 @@ export function DealerServiceCenterModal({
     setError(null);
     setSuccessMsg(null);
 
-    if (!formData.serviceName.trim() || formData.serviceName.length < 5) {
+    if (!formData.serviceName.trim() || formData.serviceName.trim().length < 5) {
       setError('Service Center Name must be at least 5 characters');
       return;
     }
 
-    if (!formData.address.trim() || formData.address.length < 10) {
-      setError('Address must be at least 10 characters');
+    if (!formData.address.trim() || formData.address.trim().length < 10) {
+      setError('Address must be at least 10 characters long');
       return;
     }
 
-    if (!formData.phone.trim()) {
-      setError('A valid primary phone number is required');
+    const cleanPhone = formData.phone.trim().replace(/[\s-]/g, '');
+    const phoneDigits = cleanPhone.replace(/\D/g, '').slice(-10);
+    if (phoneDigits.length !== 10 || !/^[6-9]/.test(phoneDigits)) {
+      setError('Please enter a valid 10-digit Indian mobile number for Primary Phone (starts with 6-9)');
+      return;
+    }
+
+    let cleanWhatsapp: string | undefined = undefined;
+    if (formData.whatsapp.trim()) {
+      const waClean = formData.whatsapp.trim().replace(/[\s-]/g, '');
+      const waDigits = waClean.replace(/\D/g, '').slice(-10);
+      if (waDigits.length !== 10 || !/^[6-9]/.test(waDigits)) {
+        setError('Please enter a valid 10-digit Indian mobile number for WhatsApp (starts with 6-9)');
+        return;
+      }
+      cleanWhatsapp = waDigits;
+    }
+
+    let cleanEmergency: string | undefined = undefined;
+    if (formData.emergencyPhone.trim()) {
+      const emClean = formData.emergencyPhone.trim().replace(/[\s-]/g, '');
+      const emDigits = emClean.replace(/\D/g, '').slice(-10);
+      if (emDigits.length !== 10 || !/^[6-9]/.test(emDigits)) {
+        setError('Please enter a valid 10-digit Indian mobile number for Emergency Phone (starts with 6-9)');
+        return;
+      }
+      cleanEmergency = emDigits;
+    }
+
+    const cleanPincode = (formData.pincode.trim() || dealer.pincode || '411047').replace(/\s+/g, '');
+    if (!/^\d{6}$/.test(cleanPincode)) {
+      setError('Pincode must be a valid 6-digit number');
       return;
     }
 
@@ -202,20 +250,25 @@ export function DealerServiceCenterModal({
       return;
     }
 
+    const parsedLat = parseFloat(String(formData.latitude));
+    const parsedLng = parseFloat(String(formData.longitude));
+    const validLat = !isNaN(parsedLat) && parsedLat >= -90 && parsedLat <= 90 ? parsedLat : 18.5204;
+    const validLng = !isNaN(parsedLng) && parsedLng >= -180 && parsedLng <= 180 ? parsedLng : 73.8567;
+
     try {
       setSubmitting(true);
 
       const payload: CreateServiceCenterPayload = {
         serviceName: formData.serviceName.trim(),
         address: formData.address.trim(),
-        state: formData.state.trim(),
-        district: formData.district.trim(),
-        pincode: formData.pincode.trim() || '411047',
-        latitude: Number(formData.latitude) || 18.5204,
-        longitude: Number(formData.longitude) || 73.8567,
-        phone: formData.phone.trim(),
-        whatsapp: formData.whatsapp.trim() || undefined,
-        emergencyPhone: formData.emergencyPhone.trim() || undefined,
+        state: formData.state.trim() || dealer.state || 'Maharashtra',
+        district: formData.district.trim() || dealer.district || 'Pune',
+        pincode: cleanPincode,
+        latitude: validLat,
+        longitude: validLng,
+        phone: phoneDigits,
+        whatsapp: cleanWhatsapp,
+        emergencyPhone: cleanEmergency,
         supportedBrands: selectedBrands,
         servicesAvailable: selectedServices,
         hasPickupService: formData.hasPickupService,
@@ -254,12 +307,17 @@ export function DealerServiceCenterModal({
       }
     } catch (err: any) {
       console.error('Error creating/updating service center:', err);
-      setError(
-        err?.response?.data?.message ||
-          err?.response?.data?.error?.[0]?.message ||
-          err?.message ||
-          'Failed to process service center request'
-      );
+      const resData = err?.response?.data;
+      let errorMsg = resData?.message || err?.message || 'Failed to process service center request';
+
+      if (Array.isArray(resData?.error) && resData.error.length > 0) {
+        const issues = resData.error.map((issue: any) => {
+          const field = Array.isArray(issue.path) && issue.path.length > 0 ? `${issue.path.join('.')}: ` : '';
+          return `${field}${issue.message}`;
+        });
+        errorMsg = issues.join(', ');
+      }
+      setError(errorMsg);
     } finally {
       setSubmitting(false);
     }

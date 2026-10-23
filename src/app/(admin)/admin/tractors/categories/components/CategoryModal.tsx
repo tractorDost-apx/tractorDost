@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Category, categoryAPI } from '@/lib/api/categories';
-import { X, Upload, Check, AlertCircle, FileText, Layers, Settings2 } from 'lucide-react';
+import { X, Upload, Check, AlertCircle, FileText, Layers, Settings2, Maximize2, Minimize2 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 
 interface CategoryModalProps {
@@ -28,7 +28,23 @@ export default function CategoryModal({ category, categories, onClose }: Categor
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcut: Escape exits fullscreen first, or closes modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isFullScreen) {
+          setIsFullScreen(false);
+        } else {
+          onClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullScreen, onClose]);
 
   useEffect(() => {
     if (category) {
@@ -141,21 +157,48 @@ export default function CategoryModal({ category, categories, onClose }: Categor
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm sm:p-6 dark:bg-black/75">
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm dark:bg-black/75 ${
+      isFullScreen ? 'p-0' : 'p-4 sm:p-6'
+    }`}>
+      {/* Backdrop */}
       <div
-        className="animate-fade-in flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#121814]"
+        className="fixed inset-0"
+        onClick={() => {
+          if (isFullScreen) setIsFullScreen(false);
+          else onClose();
+        }}
+      />
+
+      <div
+        className={`relative z-10 animate-fade-in flex flex-col overflow-hidden border border-zinc-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#121814] transition-all duration-200 ${
+          isFullScreen
+            ? 'h-full w-full max-h-none max-w-none rounded-none'
+            : 'max-h-[85vh] w-full max-w-4xl rounded-3xl'
+        }`}
       >
         {/* Sticky Header */}
         <div className="z-10 flex shrink-0 items-center justify-between border-b border-zinc-100 bg-white px-6 py-5 dark:border-white/10 dark:bg-[#121814]">
           <h2 className="text-foreground text-2xl font-black tracking-tight">
             {isEditing ? 'Edit Category Master' : 'Create New Category'}
           </h2>
-          <button
-            onClick={onClose}
-            className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex h-10 w-10 items-center justify-center rounded-full transition-colors"
-          >
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsFullScreen((prev) => !prev)}
+              className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex h-10 w-10 items-center justify-center rounded-full transition-colors cursor-pointer"
+              title={isFullScreen ? 'Exit Full Screen (Esc)' : 'Expand to Full Screen'}
+            >
+              {isFullScreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-foreground/5 hover:bg-foreground/10 text-foreground flex h-10 w-10 items-center justify-center rounded-full transition-colors cursor-pointer"
+              title="Close (Esc)"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Form Body */}

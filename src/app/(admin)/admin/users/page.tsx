@@ -6,7 +6,6 @@ import {
   Plus,
   Filter,
   Edit2,
-  Trash2,
   CheckCircle,
   XCircle,
   ShieldCheck,
@@ -25,6 +24,7 @@ import {
   RotateCcw,
   Loader2,
   X,
+  Eye,
 } from 'lucide-react';
 import { usersAPI } from '@/lib/api/users';
 import { apiClient } from '@/lib/api/axios/axios';
@@ -45,7 +45,25 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'true' | 'false'>('all');
   const [kycFilter, setKycFilter] = useState('');
   const [rolesList, setRolesList] = useState<{ id: number; name: string }[]>([]);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [detailUser, setDetailUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDetailUser(null);
+      }
+    };
+    if (detailUser) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [detailUser]);
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -54,9 +72,6 @@ export default function AdminUsersPage() {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [userToToggle, setUserToToggle] = useState<{ user: User; willDeactivate: boolean } | null>(null);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [deleteModalError, setDeleteModalError] = useState<string | null>(null);
 
   useEffect(() => {
     // Load available roles from backend
@@ -171,75 +186,12 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleDeleteClick = (targetUser: User, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (deletingId === targetUser.id) return;
-    setDeleteModalError(null);
-    setUserToDelete(targetUser);
-  };
-
-  const executeDelete = async (targetUser: User) => {
-    if (deletingId) return;
-    const id = targetUser.id;
-
-    try {
-      setDeletingId(id);
-      setDeleteModalError(null);
-      setError(null);
-
-      const res = await usersAPI.deleteUserById(id);
-      if (res?.success) {
-        // Optimistic UI update: instantly remove from state
-        setUsers((prev) => prev.filter((u) => u.id !== id));
-        setTotalCount((prev) => Math.max(0, prev - 1));
-        if (selectedUser?.id === id) setSelectedUser(null);
-        if (expandedId === id) setExpandedId(null);
-
-        setActionSuccess(
-          `User ${targetUser.fullName ? `"${targetUser.fullName}"` : `#${id}`} has been deleted successfully.`
-        );
-        setTimeout(() => setActionSuccess(null), 5000);
-
-        // Close delete modal
-        setUserToDelete(null);
-
-        // Refresh list in background to sync pagination
-        fetchUsers();
-      } else {
-        throw new Error(res?.message || 'Failed to delete user');
-      }
-    } catch (err: any) {
-      console.warn('Delete user operation warning:', err?.message || err);
-      const statusCode = err?.response?.status;
-      const apiMessage = err?.response?.data?.message;
-
-      if (statusCode === 403 || apiMessage === 'Unauthorized') {
-        setDeleteModalError(
-          'Permanent deletion requires administrative privileges. You can deactivate this account instead to immediately revoke login and platform access.'
-        );
-      } else {
-        const errorMsg =
-          apiMessage ||
-          (Array.isArray(err?.response?.data?.error)
-            ? err.response.data.error.map((i: any) => i.message).join(', ')
-            : null) ||
-          'Failed to delete user account. Please check permissions.';
-        setDeleteModalError(errorMsg);
-      }
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   const openEditModal = (user: User, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setSelectedUser(user);
     setIsEditModalOpen(true);
   };
 
-  const toggleExpand = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
 
   const resetFilters = () => {
     setSearch('');
@@ -292,7 +244,7 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="animate-fade-in flex h-full w-full flex-col gap-4 sm:gap-5 pb-6">
+    <div className="animate-fade-in flex flex-1 h-full w-full flex-col gap-4 sm:gap-5 pb-2">
       {/* Header section with Create User action */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -316,7 +268,7 @@ export default function AdminUsersPage() {
           className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs font-black text-white shadow-lg shadow-[var(--color-brand-green)]/20 transition-all hover:bg-[var(--color-brand-green-dark)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer shrink-0"
         >
           <Plus size={16} />
-          <span>+ Create User Master</span>
+          <span>Create User Master</span>
         </button>
       </div>
 
@@ -455,7 +407,7 @@ export default function AdminUsersPage() {
                 <th className="px-4 py-3.5 min-w-[110px]">Role</th>
                 <th className="px-4 py-3.5 min-w-[110px]">KYC</th>
                 <th className="px-4 py-3.5 min-w-[110px]">Status</th>
-                <th className="px-4 py-3.5 text-right min-w-[310px]">Master Actions</th>
+                <th className="px-4 py-3.5 text-right min-w-[210px]">Master Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-subtle)]">
@@ -473,299 +425,149 @@ export default function AdminUsersPage() {
                 </tr>
               ) : (
                 users.map((user) => (
-                  <React.Fragment key={user.id}>
-                    <tr
-                      className={`hover:bg-foreground/5 cursor-pointer transition-colors ${
-                        expandedId === user.id ? 'bg-foreground/5' : ''
-                      }`}
-                      onClick={() => toggleExpand(user.id)}
-                    >
-                      <td className="text-muted px-4 py-3.5">
-                        {expandedId === user.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </td>
+                  <tr
+                    key={user.id}
+                    className="hover:bg-[var(--color-brand-green)]/[0.04] group cursor-pointer transition-colors"
+                    onClick={() => setDetailUser(user)}
+                  >
+                    <td className="text-muted px-4 py-3.5">
+                      <div
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-foreground/5 text-muted transition-colors group-hover:bg-[var(--color-brand-green)]/15 group-hover:text-[var(--color-brand-green)]"
+                        title="Click to view full user master record"
+                      >
+                        <Eye size={15} />
+                      </div>
+                    </td>
 
-                      {/* User Info */}
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2.5">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-[var(--color-brand-green)]/10 text-sm font-black text-[var(--color-brand-green)] uppercase">
-                            {user.fullName ? user.fullName.charAt(0) : 'U'}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-foreground text-xs font-black tracking-tight">
-                              {user.fullName || 'Unnamed User'}
-                            </span>
-                            <span className="text-muted text-[10px] font-mono font-semibold">
-                              ID: #{user.id}
-                            </span>
-                          </div>
+                    {/* User Info */}
+                    <td className="px-4 py-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-[var(--color-brand-green)]/10 text-sm font-black text-[var(--color-brand-green)] uppercase transition-transform group-hover:scale-105">
+                          {user.fullName ? user.fullName.charAt(0) : 'U'}
                         </div>
-                      </td>
-
-                      {/* Contact Info */}
-                      <td className="px-4 py-3.5">
-                        <div className="flex flex-col gap-0.5 text-xs">
-                          <span className="text-foreground font-mono font-bold flex items-center gap-1.5">
-                            <Phone size={11} className="text-muted shrink-0" />
-                            {user.mobile ? `+91 ${user.mobile}` : 'No mobile'}
+                        <div className="flex flex-col">
+                          <span className="text-foreground text-xs font-black tracking-tight transition-colors group-hover:text-[var(--color-brand-green)]">
+                            {user.fullName || 'Unnamed User'}
                           </span>
-                          <span className="text-muted text-[11px] flex items-center gap-1.5 font-medium">
-                            <Mail size={11} className="shrink-0" />
-                            {user.email || 'No email specified'}
+                          <span className="text-muted text-[10px] font-mono font-semibold">
+                            ID: #{user.id}
                           </span>
                         </div>
-                      </td>
+                      </div>
+                    </td>
 
-                      {/* Role Badge */}
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${getRoleBadgeStyle(
-                            user.role?.name
-                          )}`}
-                        >
-                          {user.role?.name || 'CUSTOMER'}
+                    {/* Contact Info */}
+                    <td className="px-4 py-3.5">
+                      <div className="flex flex-col gap-0.5 text-xs">
+                        <span className="text-foreground font-mono font-bold flex items-center gap-1.5">
+                          <Phone size={11} className="text-muted shrink-0" />
+                          {user.mobile ? `+91 ${user.mobile}` : 'No mobile'}
                         </span>
-                      </td>
+                        <span className="text-muted text-[11px] flex items-center gap-1.5 font-medium">
+                          <Mail size={11} className="shrink-0" />
+                          {user.email || 'No email specified'}
+                        </span>
+                      </div>
+                    </td>
 
-                      {/* KYC Status */}
-                      <td className="px-4 py-3.5">{getKycBadge(user.kycStatus)}</td>
+                    {/* Role Badge */}
+                    <td className="px-4 py-3.5">
+                      <span
+                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${getRoleBadgeStyle(
+                          user.role?.name
+                        )}`}
+                      >
+                        {user.role?.name || 'CUSTOMER'}
+                      </span>
+                    </td>
 
-                      {/* Active Status */}
-                      <td className="px-4 py-3.5">
+                    {/* KYC Status */}
+                    <td className="px-4 py-3.5">{getKycBadge(user.kycStatus)}</td>
+
+                    {/* Active Status */}
+                    <td className="px-4 py-3.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                          user.isActive
+                            ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/50'
+                            : 'bg-rose-100 dark:bg-rose-950/40 text-rose-900 dark:text-rose-300 border border-rose-300 dark:border-rose-800/50'
+                        }`}
+                      >
                         <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
-                            user.isActive
-                              ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/50'
-                              : 'bg-rose-100 dark:bg-rose-950/40 text-rose-900 dark:text-rose-300 border border-rose-300 dark:border-rose-800/50'
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            user.isActive ? 'bg-emerald-600 dark:bg-emerald-400' : 'bg-rose-600 dark:bg-rose-400'
                           }`}
+                        />
+                        {user.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-2 shrink-0">
+                        {/* VIEW USER BUTTON */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDetailUser(user);
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-2.5 py-1.5 text-[11px] font-bold text-foreground/80 hover:bg-[var(--color-brand-green)]/15 hover:text-[var(--color-brand-green)] transition-all cursor-pointer shadow-sm whitespace-nowrap shrink-0"
+                          title="View Full User Record Popup"
                         >
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              user.isActive ? 'bg-emerald-600 dark:bg-emerald-400' : 'bg-rose-600 dark:bg-rose-400'
-                            }`}
-                          />
-                          {user.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
+                          <Eye size={13} />
+                          <span>View</span>
+                        </button>
 
-                      {/* Actions */}
-                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-2 shrink-0">
-                          {/* EDIT USER MASTER BUTTON */}
-                          <button
-                            type="button"
-                            onClick={(e) => openEditModal(user, e)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-blue-300 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/50 px-3 py-1.5 text-[11px] font-bold text-blue-900 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all cursor-pointer shadow-sm whitespace-nowrap shrink-0"
-                            title="Edit User Master Record"
-                          >
-                            <Edit2 size={12} />
-                            <span>Edit Master</span>
-                          </button>
+                        {/* EDIT USER MASTER BUTTON */}
+                        <button
+                          type="button"
+                          onClick={(e) => openEditModal(user, e)}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-blue-300 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/50 px-3 py-1.5 text-[11px] font-bold text-blue-900 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all cursor-pointer shadow-sm whitespace-nowrap shrink-0"
+                          title="Edit User Master Record"
+                        >
+                          <Edit2 size={12} />
+                          <span>Edit</span>
+                        </button>
 
-                          {/* DEACTIVATE / ACTIVATE BUTTON WITH SPINNER */}
-                          <button
-                            type="button"
-                            disabled={togglingId === user.id || (user.isActive && user.role?.name === 'SUPER_ADMIN')}
-                            onClick={(e) => handleToggleActiveClick(user, e)}
-                            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[11px] font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
-                              user.isActive
-                                ? 'border-amber-300 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40'
-                                : 'border-emerald-300 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'
-                            }`}
-                            title={
-                              user.isActive && user.role?.name === 'SUPER_ADMIN'
-                                ? 'SUPER_ADMIN cannot be deactivated'
-                                : user.isActive
-                                ? 'Deactivate User Account'
-                                : 'Activate User Account'
-                            }
-                          >
-                            {togglingId === user.id ? (
-                              <>
-                                <Loader2 size={12} className="animate-spin text-foreground" />
-                                <span>Updating...</span>
-                              </>
-                            ) : user.isActive ? (
-                              <>
-                                <XCircle size={12} className="text-amber-600 dark:text-amber-400" />
-                                <span>Deactivate</span>
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle size={12} className="text-emerald-600 dark:text-emerald-400" />
-                                <span>Activate</span>
-                              </>
-                            )}
-                          </button>
-
-                          {/* DELETE USER BUTTON */}
-                          <button
-                            type="button"
-                            disabled={deletingId === user.id || user.role?.name === 'SUPER_ADMIN'}
-                            onClick={(e) => handleDeleteClick(user, e)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-rose-300 dark:border-rose-800/60 bg-rose-50 dark:bg-rose-950/40 px-3 py-1.5 text-[11px] font-bold text-rose-800 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all shadow-sm cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                            title={
-                              user.role?.name === 'SUPER_ADMIN'
-                                ? 'SUPER_ADMIN cannot be deleted'
-                                : 'Delete User Account'
-                            }
-                          >
-                            {deletingId === user.id ? (
-                              <>
-                                <Loader2 size={12} className="animate-spin text-rose-600 dark:text-rose-400" />
-                                <span>Deleting...</span>
-                              </>
-                            ) : (
-                              <>
-                                <Trash2 size={12} className="text-rose-600 dark:text-rose-400" />
-                                <span>Delete</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-
-                    {/* EXPANDED DEEP USER MASTER VIEW */}
-                    {expandedId === user.id && (
-                      <tr>
-                        <td colSpan={7} className="bg-foreground/[0.02] px-0 py-0 border-b border-[var(--border-subtle)]">
-                          <div className="animate-fade-in flex flex-col gap-4 border-l-4 border-[var(--color-brand-green)] p-5 md:p-6 bg-foreground/[0.01]">
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-subtle)] pb-3">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-black uppercase tracking-wider text-foreground">
-                                  User Master Record — #{user.id} ({user.fullName || 'N/A'})
-                                </span>
-                                <span
-                                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${
-                                    user.isActive
-                                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/50'
-                                      : 'bg-rose-100 dark:bg-rose-950/40 text-rose-900 dark:text-rose-300 border border-rose-300 dark:border-rose-800/50'
-                                  }`}
-                                >
-                                  <span
-                                    className={`h-1.5 w-1.5 rounded-full ${
-                                      user.isActive ? 'bg-emerald-600 dark:bg-emerald-400' : 'bg-rose-600 dark:bg-rose-400'
-                                    }`}
-                                  />
-                                  {user.isActive ? 'Active' : 'Inactive'}
-                                </span>
-                              </div>
-
-                              <div className="flex flex-wrap items-center gap-2">
-                                {/* Drawer Activate/Deactivate Button */}
-                                <button
-                                  type="button"
-                                  disabled={togglingId === user.id || (user.isActive && user.role?.name === 'SUPER_ADMIN')}
-                                  onClick={(e) => handleToggleActiveClick(user, e)}
-                                  className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
-                                    user.isActive
-                                      ? 'border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-300 hover:bg-amber-100'
-                                      : 'border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100'
-                                  }`}
-                                >
-                                  {togglingId === user.id ? (
-                                    <>
-                                      <Loader2 size={13} className="animate-spin" />
-                                      <span>Updating Status...</span>
-                                    </>
-                                  ) : user.isActive ? (
-                                    <>
-                                      <XCircle size={13} className="text-amber-600 dark:text-amber-400" />
-                                      <span>Deactivate Account</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CheckCircle size={13} className="text-emerald-600 dark:text-emerald-400" />
-                                      <span>Activate Account</span>
-                                    </>
-                                  )}
-                                </button>
-
-                                {/* Drawer Delete Button */}
-                                <button
-                                  type="button"
-                                  disabled={deletingId === user.id || user.role?.name === 'SUPER_ADMIN'}
-                                  onClick={(e) => handleDeleteClick(user, e)}
-                                  className="inline-flex items-center gap-1.5 rounded-xl border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 px-3 py-1.5 text-xs font-bold text-rose-800 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all shadow-sm cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                                  title={
-                                    user.role?.name === 'SUPER_ADMIN'
-                                      ? 'SUPER_ADMIN cannot be deleted'
-                                      : 'Delete User Account'
-                                  }
-                                >
-                                  <Trash2 size={13} className="text-rose-600 dark:text-rose-400" />
-                                  <span>Delete User</span>
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={(e) => openEditModal(user, e)}
-                                  className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-4 py-1.5 text-xs font-black text-white hover:bg-[var(--color-brand-green-dark)] transition-all shadow-sm cursor-pointer whitespace-nowrap shrink-0"
-                                >
-                                  <Edit2 size={12} />
-                                  <span>Edit User Master</span>
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 text-xs">
-                              {/* Location */}
-                              <div className="flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] bg-background p-3">
-                                <span className="text-[10px] font-bold text-muted uppercase flex items-center gap-1">
-                                  <MapPin size={11} className="text-[var(--color-brand-green)]" /> Location
-                                </span>
-                                <p className="font-bold text-foreground">
-                                  {[user.villageCity, user.district, user.state].filter(Boolean).join(', ') || 'Not specified'}
-                                </p>
-                                {user.pincode && (
-                                  <span className="text-[10px] text-muted">PIN: {user.pincode}</span>
-                                )}
-                              </div>
-
-                              {/* Classification */}
-                              <div className="flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] bg-background p-3">
-                                <span className="text-[10px] font-bold text-muted uppercase flex items-center gap-1">
-                                  <Building2 size={11} className="text-blue-500" /> Classification
-                                </span>
-                                <p className="font-bold text-foreground capitalize">
-                                  {user.sellerType ? `${user.sellerType} account` : 'Individual Buyer / Farmer'}
-                                </p>
-                                <span className="text-[10px] text-muted">
-                                  Active Listing Limit: {user.activeListingLimit ?? 3}
-                                </span>
-                              </div>
-
-                              {/* Preferences */}
-                              <div className="flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] bg-background p-3">
-                                <span className="text-[10px] font-bold text-muted uppercase flex items-center gap-1">
-                                  <Globe size={11} className="text-amber-500" /> Preferences
-                                </span>
-                                <p className="font-bold text-foreground">
-                                  Language: {user.preferredLanguage || 'HI'}
-                                </p>
-                                <span className="text-[10px] text-muted">
-                                  Brand: {user.preferredBrand || 'None specified'}
-                                </span>
-                              </div>
-
-                              {/* Security / Verification */}
-                              <div className="flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] bg-background p-3">
-                                <span className="text-[10px] font-bold text-muted uppercase flex items-center gap-1">
-                                  <ShieldCheck size={11} className="text-purple-500" /> Verification
-                                </span>
-                                <p className="font-bold text-foreground">
-                                  KYC: {user.kycStatus || 'PENDING'}
-                                </p>
-                                <span className="text-[10px] text-muted">
-                                  Mobile Verified: {user.isMobileVerified ? 'Yes' : 'No'} | Email Verified: {user.isEmailVerified ? 'Yes' : 'No'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
+                        {/* DEACTIVATE / ACTIVATE BUTTON WITH SPINNER */}
+                        <button
+                          type="button"
+                          disabled={togglingId === user.id || (user.isActive && user.role?.name === 'SUPER_ADMIN')}
+                          onClick={(e) => handleToggleActiveClick(user, e)}
+                          className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[11px] font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
+                            user.isActive
+                              ? 'border-amber-300 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40'
+                              : 'border-emerald-300 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'
+                          }`}
+                          title={
+                            user.isActive && user.role?.name === 'SUPER_ADMIN'
+                              ? 'SUPER_ADMIN cannot be deactivated'
+                              : user.isActive
+                              ? 'Deactivate User Account'
+                              : 'Activate User Account'
+                          }
+                        >
+                          {togglingId === user.id ? (
+                            <>
+                              <Loader2 size={12} className="animate-spin text-foreground" />
+                              <span>Updating...</span>
+                            </>
+                          ) : user.isActive ? (
+                            <>
+                              <XCircle size={12} className="text-amber-600 dark:text-amber-400" />
+                              <span>Deactivate</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle size={12} className="text-emerald-600 dark:text-emerald-400" />
+                              <span>Activate</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 ))
               )}
             </tbody>
@@ -785,6 +587,294 @@ export default function AdminUsersPage() {
           }}
         />
       </div>
+
+      {/* USER MASTER RECORD POPUP MODAL */}
+      {detailUser && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 sm:p-6 backdrop-blur-md animate-fade-in">
+          <div
+            className="fixed inset-0 -z-10"
+            onClick={() => setDetailUser(null)}
+          />
+
+          <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-background shadow-2xl animate-scale-up">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-foreground/[0.02] p-5 sm:p-6">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--color-brand-green)]/10 text-xl font-black text-[var(--color-brand-green)] uppercase shadow-sm">
+                  {detailUser.fullName ? detailUser.fullName.charAt(0) : 'U'}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-foreground text-xl font-black tracking-tight truncate">
+                      {detailUser.fullName || 'Unnamed User'}
+                    </h2>
+                    <span
+                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${getRoleBadgeStyle(
+                        detailUser.role?.name
+                      )}`}
+                    >
+                      {detailUser.role?.name || 'CUSTOMER'}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                        detailUser.isActive
+                          ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/50'
+                          : 'bg-rose-100 dark:bg-rose-950/40 text-rose-900 dark:text-rose-300 border border-rose-300 dark:border-rose-800/50'
+                      }`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          detailUser.isActive ? 'bg-emerald-600 dark:bg-emerald-400' : 'bg-rose-600 dark:bg-rose-400'
+                        }`}
+                      />
+                      {detailUser.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    {getKycBadge(detailUser.kycStatus)}
+                  </div>
+                  <p className="text-muted text-xs font-semibold mt-0.5">
+                    User ID: <strong className="text-foreground font-mono">#{detailUser.id}</strong> • Mobile: <span className="font-mono">{detailUser.mobile ? `+91 ${detailUser.mobile}` : 'N/A'}</span>
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setDetailUser(null)}
+                className="text-muted hover:text-foreground hover:bg-foreground/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all cursor-pointer"
+                title="Close modal (Esc)"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              {/* Quick KPIs */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Security Role
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1">
+                    {detailUser.role?.name || 'CUSTOMER'}
+                  </div>
+                  <span className="text-muted text-xs font-semibold">System privilege</span>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    KYC Status
+                  </span>
+                  <div className="text-foreground text-base font-black mt-1">
+                    {detailUser.kycStatus || 'PENDING'}
+                  </div>
+                  <span className="text-muted text-xs font-semibold">Government verification</span>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Account Status
+                  </span>
+                  <div className={`text-base font-black mt-1 ${detailUser.isActive ? 'text-[var(--color-brand-green)]' : 'text-rose-500'}`}>
+                    {detailUser.isActive ? 'Active Access' : 'Suspended / Inactive'}
+                  </div>
+                  <span className="text-muted text-xs font-semibold">Platform login state</span>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
+                    Listing Limit
+                  </span>
+                  <div className="text-[var(--color-brand-orange)] text-base font-black mt-1">
+                    {detailUser.activeListingLimit ?? 3} Active Listings
+                  </div>
+                  <span className="text-muted text-xs font-semibold">Concurrent tractors allowed</span>
+                </div>
+              </div>
+
+              {/* 4 Detail Panels */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* Contact Profile */}
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-[var(--color-brand-green)] border-b border-[var(--border-subtle)] pb-2">
+                    <Phone size={15} />
+                    <span className="text-[10px] font-black tracking-wider uppercase">
+                      Contact & Communications
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Mobile Number:</span>
+                      <span className="font-mono font-bold text-foreground">
+                        {detailUser.mobile ? `+91 ${detailUser.mobile}` : 'Not provided'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Email Address:</span>
+                      <span className="font-medium text-foreground">
+                        {detailUser.email || 'Not provided'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Preferred Language:</span>
+                      <span className="font-bold text-foreground uppercase">
+                        {detailUser.preferredLanguage || 'HI'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Geographic Location */}
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-[var(--color-brand-orange)] border-b border-[var(--border-subtle)] pb-2">
+                    <MapPin size={15} />
+                    <span className="text-[10px] font-black tracking-wider uppercase">
+                      Geographic Location
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">State:</span>
+                      <span className="font-bold text-foreground">
+                        {detailUser.state || 'Not specified'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">District:</span>
+                      <span className="font-bold text-foreground">
+                        {detailUser.district || 'Not specified'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Village / City:</span>
+                      <span className="font-bold text-foreground">
+                        {detailUser.villageCity || 'Not specified'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Pincode:</span>
+                      <span className="font-mono font-bold text-foreground">
+                        {detailUser.pincode || 'Not specified'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Seller & Classification */}
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-blue-500 border-b border-[var(--border-subtle)] pb-2">
+                    <Building2 size={15} />
+                    <span className="text-[10px] font-black tracking-wider uppercase">
+                      Account Classification
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Account Classification:</span>
+                      <span className="font-bold text-foreground capitalize">
+                        {detailUser.sellerType ? `${detailUser.sellerType} Account` : 'Individual Farmer / Buyer'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Preferred Tractor Brand:</span>
+                      <span className="font-bold text-foreground">
+                        {detailUser.preferredBrand || 'None Specified'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Listing Limit:</span>
+                      <span className="font-bold text-foreground">
+                        {detailUser.activeListingLimit ?? 3} Max Concurrent
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Security & Verification Details */}
+                <div className="rounded-2xl border border-[var(--border-subtle)] bg-background p-4 shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-purple-500 border-b border-[var(--border-subtle)] pb-2">
+                    <ShieldCheck size={15} />
+                    <span className="text-[10px] font-black tracking-wider uppercase">
+                      Security & Verification
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Mobile Verified:</span>
+                      <span className={`font-bold ${detailUser.isMobileVerified ? 'text-emerald-600' : 'text-amber-500'}`}>
+                        {detailUser.isMobileVerified ? 'Verified ✓' : 'Unverified ✗'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">Email Verified:</span>
+                      <span className={`font-bold ${detailUser.isEmailVerified ? 'text-emerald-600' : 'text-muted'}`}>
+                        {detailUser.isEmailVerified ? 'Verified ✓' : 'Unverified ✗'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted font-semibold">KYC Verification:</span>
+                      <span className="font-bold text-foreground uppercase">
+                        {detailUser.kycStatus || 'PENDING'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] bg-foreground/[0.02] p-4 sm:p-6">
+              <button
+                type="button"
+                disabled={togglingId === detailUser.id || (detailUser.isActive && detailUser.role?.name === 'SUPER_ADMIN')}
+                onClick={(e) => {
+                  const u = detailUser;
+                  setDetailUser(null);
+                  handleToggleActiveClick(u, e);
+                }}
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                  detailUser.isActive
+                    ? 'border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 hover:bg-amber-100'
+                    : 'border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100'
+                }`}
+              >
+                {detailUser.isActive ? (
+                  <>
+                    <XCircle size={14} className="text-amber-600 dark:text-amber-400" />
+                    <span>Deactivate Account</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={14} className="text-emerald-600 dark:text-emerald-400" />
+                    <span>Activate Account</span>
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDetailUser(null)}
+                  className="rounded-xl border border-[var(--border-subtle)] bg-background px-4 py-2 text-xs font-bold text-foreground transition-colors hover:bg-foreground/5 cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    const u = detailUser;
+                    setDetailUser(null);
+                    openEditModal(u, e);
+                  }}
+                  className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-5 py-2 text-xs font-black tracking-wider text-white uppercase shadow-md transition-all hover:bg-[var(--color-brand-orange)] cursor-pointer"
+                >
+                  <Edit2 size={14} /> Edit User Master
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CREATE USER MASTER MODAL */}
       {isCreateModalOpen && (
@@ -901,118 +991,6 @@ export default function AdminUsersPage() {
                   <>
                     <CheckCircle size={14} />
                     <span>Yes, Activate Account</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* DELETE CONFIRMATION MODAL */}
-      {userToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="relative w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-background shadow-2xl overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 shadow-inner">
-                  <Trash2 size={24} />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-foreground text-base font-black">
-                    Delete User Account?
-                  </h3>
-                  <p className="text-muted text-xs font-semibold leading-relaxed">
-                    Are you sure you want to permanently delete{' '}
-                    <strong className="text-foreground">
-                      {userToDelete.fullName || `User #${userToDelete.id}`}
-                    </strong>
-                    ? This will mark the user record as soft-deleted and permanently invalidate all active sessions.
-                  </p>
-                </div>
-              </div>
-
-              {/* User preview card inside modal */}
-              <div className="mt-4 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-foreground">
-                    {userToDelete.fullName || 'Unnamed User'} (ID: #{userToDelete.id})
-                  </span>
-                  <span className="font-mono text-muted text-[11px]">
-                    {userToDelete.mobile ? `+91 ${userToDelete.mobile}` : 'No phone'}
-                  </span>
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-muted font-medium">
-                  <span>Role: {userToDelete.role?.name || 'CUSTOMER'}</span>
-                  <span>•</span>
-                  <span>Status: {userToDelete.isActive ? 'Active' : 'Inactive'}</span>
-                  {userToDelete.email && (
-                    <>
-                      <span>•</span>
-                      <span className="truncate max-w-[150px]">{userToDelete.email}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Error or Permission Advisory */}
-              {deleteModalError && (
-                <div className="mt-4 flex flex-col gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-300">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle size={16} className="shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
-                    <p className="font-semibold leading-relaxed">{deleteModalError}</p>
-                  </div>
-                  {deleteModalError.includes('SUPER_ADMIN') && (
-                    <div className="mt-1 pt-2 border-t border-rose-500/20 flex flex-col gap-2">
-                      <p className="text-[11px] text-muted">
-                        You can immediately deactivate this account instead. Deactivation revokes login access and terminates all sessions instantly:
-                      </p>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const target = userToDelete;
-                          setUserToDelete(null);
-                          setDeleteModalError(null);
-                          await executeToggleActive(target, true);
-                        }}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 text-xs font-black shadow-md transition-all cursor-pointer"
-                      >
-                        <XCircle size={14} />
-                        <span>Deactivate Account Instead</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="border-t border-[var(--border-subtle)] bg-foreground/[0.02] flex items-center justify-end gap-2.5 px-6 py-4">
-              <button
-                type="button"
-                disabled={Boolean(deletingId)}
-                onClick={() => {
-                  setUserToDelete(null);
-                  setDeleteModalError(null);
-                }}
-                className="rounded-xl px-4 py-2 text-xs font-bold text-muted hover:bg-foreground/5 hover:text-foreground transition-colors disabled:opacity-50 cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={Boolean(deletingId)}
-                onClick={() => executeDelete(userToDelete)}
-                className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-2 text-xs font-black text-white shadow-md shadow-rose-600/20 transition-all hover:bg-rose-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
-              >
-                {deletingId ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    <span>Deleting User...</span>
-                  </>
-                ) : (
-                  <>
-                    <Trash2 size={14} />
-                    <span>Yes, Delete User</span>
                   </>
                 )}
               </button>

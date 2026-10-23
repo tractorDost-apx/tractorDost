@@ -34,6 +34,7 @@ import {
   getLeadLocationInfo,
   getLeadSourceInfo,
 } from '../lead-helpers';
+import { LeadSourcePlatformBadge } from './LeadSourcePlatformBadge';
 
 interface LeadTableProps {
   leads: Lead[];
@@ -526,11 +527,14 @@ export function LeadTable({
                       const sourceInfo = getLeadSourceInfo(lead);
                       return (
                         <div className="flex flex-col gap-1 items-start">
-                          <LeadTypeBadge type={lead.leadType} />
+                          <div className="flex flex-wrap items-center gap-1">
+                            <LeadTypeBadge type={lead.leadType} />
+                            <LeadSourcePlatformBadge sourceInfo={sourceInfo} size="xs" />
+                          </div>
                           {sourceInfo.pageLabel && (
                             <span
-                              className="inline-flex items-center gap-0.5 text-[10px] text-muted font-mono truncate max-w-[110px]"
-                              title={`Source: ${sourceInfo.pageLabel} | Campaign: ${sourceInfo.campaignLabel}`}
+                              className="inline-flex items-center gap-0.5 text-[10px] text-muted font-mono truncate max-w-[130px]"
+                              title={`Platform: ${sourceInfo.platformName} | Page: ${sourceInfo.pageLabel} | Campaign: ${sourceInfo.campaignLabel}`}
                             >
                               src: {sourceInfo.pageLabel}
                             </span>
