@@ -107,25 +107,22 @@ export default function LoginPage() {
       }
       const loggedInUser = await refreshUser(); // Fetch user session via context
 
-      const roleName = loggedInUser?.role?.name?.toUpperCase();
-      const isDealer =
-        roleName === 'DEALER' ||
-        loggedInUser?.sellerType?.toLowerCase() === 'dealer' ||
-        Boolean(loggedInUser?.dealer);
-      const isAdmin = roleName === 'ADMIN' || roleName === 'SUPER_ADMIN';
+      let targetPath = callbackUrl !== '/' ? callbackUrl : null;
 
-      let targetPath = '';
-
-      if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/login') {
-        targetPath = callbackUrl;
-      } else if (isAdmin) {
-        targetPath = '/admin/dashboard';
-      } else if (isDealer) {
-        targetPath = '/dealer/dashboard';
-      } else if (roleName === 'AGENT') {
-        targetPath = '/agent/dashboard';
-      } else {
-        targetPath = '/dashboard';
+      if (!targetPath && user?.role?.name) {
+        switch (user.role.name) {
+          case 'ADMIN':
+            targetPath = '/admin/dashboard';
+            break;
+          case 'DEALER':
+            targetPath = '/dealer/dashboard';
+            break;
+          case 'CUSTOMER':
+            targetPath = '/dashboard';
+            break;
+          default:
+            targetPath = '/dashboard';
+        }
       }
 
       window.location.href = targetPath;

@@ -37,14 +37,21 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         router.replace(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
       } else if (!isAuthorized) {
         // User is authenticated but lacks required role
-        if (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') {
-          router.replace('/admin/dashboard');
-        } else if (isDealerUser) {
-          router.replace('/dealer/dashboard');
-        } else if (userRole === 'AGENT') {
-          router.replace('/agent/dashboard');
-        } else {
-          router.replace('/dashboard');
+        switch (user.role.name) {
+          case 'ADMIN':
+            router.replace('/admin/dashboard');
+            break;
+          case 'AGENT':
+            router.replace('/agent/dashboard');
+            break;
+          case 'DEALER':
+            router.replace('/dealer/dashboard');
+            break;
+          case 'CUSTOMER':
+            router.replace('/dashboard');
+            break;
+          default:
+            router.replace('/');
         }
       }
     }

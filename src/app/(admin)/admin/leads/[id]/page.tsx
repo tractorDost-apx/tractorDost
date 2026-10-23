@@ -61,7 +61,7 @@ export default function LeadDetailPage({
   const leadId = Number(resolvedParams.id);
   const router = useRouter();
   const { user } = useAuth();
-  const isAdmin = user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN';
+  const isAdmin = user?.role?.name === 'ADMIN';
 
   const [lead, setLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
@@ -138,18 +138,16 @@ export default function LeadDetailPage({
           dealerAPI.getAllDealers({ limit: 100 }),
         ]);
 
-        const candidateUsers: any[] = [];
-        for (const res of [usersRes, agentsRes, adminsRes]) {
-          if (res.status === 'fulfilled' && res.value && res.value.success) {
-            const userList = (res.value.data as any)?.data || res.value.data || [];
-            if (Array.isArray(userList)) {
-              candidateUsers.push(...userList);
-            }
-          }
+        if (usersRes.status === 'fulfilled' && usersRes.value.success) {
+          const userList = (usersRes.value.data as any)?.data || usersRes.value.data || [];
+          const staffUsers = userList
+            .filter((u: any) => u.role === 'AGENT' || u.role === 'ADMIN')
+            .map((u: any) => ({
+              id: u.id,
+              fullName: u.fullName || u.name || `User #${u.id}`,
+            }));
+          setAgents(staffUsers);
         }
-
-        const staffUsers = parseStaffUsers(candidateUsers, user);
-        setAgents(staffUsers);
 
         if (dealersRes.status === 'fulfilled' && dealersRes.value && dealersRes.value.success) {
           const dealerList = (dealersRes.value.data as any)?.data || dealersRes.value.data || [];

@@ -72,7 +72,7 @@ export function DashboardNavbar() {
               suppressHydrationWarning
               onClick={() =>
                 router.push(
-                  user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN'
+                  user?.role?.name === 'ADMIN'
                     ? '/admin/dashboard'
                     : user?.role?.name === 'DEALER'
                       ? '/dealer/dashboard'

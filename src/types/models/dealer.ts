@@ -138,6 +138,7 @@ export interface Dealer {
 
   rating: number;
   reviewsCount: number;
+  positiveReviewsCount?: number;
   complaintsCount: number;
 
   aboutDealer?: string | null;
@@ -216,6 +217,8 @@ export interface GetDealersQueryParams {
   isActive?: boolean;
   page?: number;
   limit?: number;
+  sortBy?: 'created_at' | 'positive_reviews' | 'rating' | 'name' | string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface PaginatedDealersResponse {

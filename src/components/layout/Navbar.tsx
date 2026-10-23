@@ -200,7 +200,7 @@ export function Navbar() {
                   <button
                     onClick={() =>
                       router.push(
-                        user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN'
+                        user?.role?.name === 'ADMIN'
                           ? '/admin/dashboard'
                           : user?.role?.name === 'DEALER'
                             ? '/dealer/dashboard'
@@ -227,7 +227,7 @@ export function Navbar() {
                     {/* Dashboard Link based on role */}
                     <Link
                       href={
-                        user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN'
+                        user?.role?.name === 'ADMIN'
                           ? '/admin/dashboard'
                           : user?.role?.name === 'DEALER'
                             ? '/dealer/dashboard'

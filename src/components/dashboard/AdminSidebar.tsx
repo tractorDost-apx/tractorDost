@@ -205,7 +205,7 @@ export default function AdminSidebar() {
     );
   };
 
-  const title = user?.role?.name === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin Panel';
+  const title = 'Admin Panel';
 
   return (
     <aside

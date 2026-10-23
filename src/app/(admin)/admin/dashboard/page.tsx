@@ -372,45 +372,17 @@ export default function AdminDashboardPage() {
   }, [recentDealers, recentUsers, recentListings, recentLeads, recentEnquiries]);
 
   return (
-    <div className="animate-fade-in flex h-full flex-col space-y-8 pb-8">
-      {/* Header Banner */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <div className="mb-2 flex items-center gap-3">
-            <h1 className="text-foreground text-2xl font-black sm:text-3xl">
-              Welcome back, {user?.fullName?.split(' ')[0] || 'Admin'}! 👋
-            </h1>
-            <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
-              {user?.role?.name === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
-            </span>
-          </div>
-          <p className="text-muted text-xs font-medium sm:text-sm">
-            Live overview of TractorDost platform metrics, registered dealers, and customer inquiries.
-          </p>
+    <div className="animate-fade-in flex h-full flex-col space-y-8">
+      <div>
+        <div className="mb-2 flex items-center gap-3">
+          <h1 className="text-foreground text-3xl font-black">
+            Welcome back, {user?.fullName?.split(' ')[0] || 'Admin'}! 👋
+          </h1>
+          <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+            Admin
+          </span>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={handleManualRefresh}
-            disabled={isRefreshing || loading}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-black tracking-wider text-foreground uppercase shadow-sm transition-all hover:bg-foreground/10 active:scale-95 disabled:opacity-50"
-          >
-            <RotateCw size={14} className={isRefreshing ? 'animate-spin text-[var(--color-brand-green)]' : ''} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
-          </button>
-          <Link
-            href="/admin/tractors"
-            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-foreground/5 px-4 py-2.5 text-xs font-black tracking-wider text-foreground uppercase shadow-sm transition-all hover:bg-foreground/10 active:scale-95"
-          >
-            <Tractor size={15} className="text-[var(--color-brand-green)]" /> Catalog
-          </Link>
-          <Link
-            href="/admin/dealers"
-            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-4 py-2.5 text-xs font-black tracking-wider text-white uppercase shadow-md transition-all hover:opacity-90 active:scale-95"
-          >
-            <ShieldCheck size={15} /> Manage Dealers
-          </Link>
-        </div>
+        <p className="text-muted font-medium">Here is an overview of the platform's performance.</p>
       </div>
 
       {/* Error Notice */}

@@ -48,9 +48,9 @@ export default function DashboardSidebar() {
   };
 
   // Determine dashboard title based on role
-  let dashboardTitle = 'Farmer Hub';
-  if (user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN') {
-    dashboardTitle = 'Admin Hub';
+  let dashboardTitle = 'Customer Dashboard';
+  if (user?.role?.name === 'ADMIN') {
+    dashboardTitle = 'Admin Dashboard';
   } else if (user?.role?.name === 'DEALER') {
     dashboardTitle = 'Dealer Hub';
   }

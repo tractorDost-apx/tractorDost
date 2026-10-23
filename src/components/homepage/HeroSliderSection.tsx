@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -19,6 +19,8 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { AnimatedWord } from '@/components/ui/AnimatedWord';
+import { isExternalLink, trackBannerEvent } from '@/lib/api/banners';
+import type { PublicBanner } from '@/types/models/banner';
 
 interface SlideData {
   id: number;
@@ -67,23 +69,100 @@ const SLIDES: SlideData[] = [
   },
 ];
 
-export default function HeroSliderSection() {
+/** One background slide. Slides built from a managed banner carry its id, which tracking uses. */
+interface HeroSlide {
+  key: string;
+  bannerId?: number;
+  image: string;
+  mobileImage?: string;
+  alt: string;
+  badge: string;
+  cta?: { bannerId: number; label: string; href: string; external: boolean };
+}
+
+const FALLBACK_SLIDES: HeroSlide[] = SLIDES.map((slide) => ({
+  key: `fallback-${slide.id}`,
+  image: slide.image,
+  alt: slide.badge,
+  badge: slide.badge,
+}));
+
+const NO_BANNERS: PublicBanner[] = [];
+
+/**
+ * Live banners replace the static slides. A banner with no mobile image shows its desktop image on phones.
+ * With no live banners, the static slides are shown, so the hero is unchanged.
+ */
+function buildSlides(banners: PublicBanner[]): HeroSlide[] {
+  if (banners.length === 0) return FALLBACK_SLIDES;
+
+  return banners.map((banner) => ({
+    key: `banner-${banner.id}`,
+    bannerId: banner.id,
+    image: banner.imageUrl,
+    mobileImage: banner.mobileImageUrl ?? undefined,
+    alt: banner.altText || banner.title || '',
+    badge: banner.title || '',
+    cta:
+      banner.ctaText && banner.linkUrl
+        ? {
+            bannerId: banner.id,
+            label: banner.ctaText,
+            href: banner.linkUrl,
+            external: isExternalLink(banner.linkUrl),
+          }
+        : undefined,
+  }));
+}
+
+interface HeroSliderSectionProps {
+  /** Live homepage banners, already in display order. */
+  banners?: PublicBanner[];
+}
+
+export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSectionProps) {
   const router = useRouter();
+  const slides = useMemo(() => buildSlides(banners), [banners]);
+  const slideCount = slides.length;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [budget, setBudget] = useState('');
   const [hp, setHp] = useState('');
   const slideTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  const countedImpressions = useRef<Set<number>>(new Set());
+
+  const activeSlide = slides[currentSlide];
+  const cta = activeSlide.cta;
+  const activeBannerId = activeSlide.bannerId;
 
   // Auto-slide effect with pause on hover
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
-  }, []);
+    setCurrentSlide((prev) => (prev + 1) % slideCount);
+  }, [slideCount]);
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+    setCurrentSlide((prev) => (prev - 1 + slideCount) % slideCount);
+  }, [slideCount]);
+
+  // An impression counts only while at least half of the hero is on screen, once per banner per page load.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.intersectionRatio >= 0.5), {
+      threshold: [0, 0.5, 1],
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!inView || activeBannerId === undefined || countedImpressions.current.has(activeBannerId)) return;
+    countedImpressions.current.add(activeBannerId);
+    trackBannerEvent(activeBannerId, 'impression');
+  }, [inView, activeBannerId]);
 
   useEffect(() => {
     if (isPaused) return;
@@ -111,6 +190,7 @@ export default function HeroSliderSection() {
 
   return (
     <section
+      ref={sectionRef}
       className="group relative w-full overflow-hidden transition-all duration-500"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -120,25 +200,42 @@ export default function HeroSliderSection() {
           BACKGROUND SLIDES CAROUSEL
           ========================================= */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-stone-950">
-        {SLIDES.map((slide, idx) => {
+        {slides.map((slide, idx) => {
           const isActive = idx === currentSlide;
           return (
             <div
-              key={slide.id}
+              key={slide.key}
               className={`absolute inset-0 transition-all duration-1000 ease-out ${
                 isActive
                   ? 'scale-100 opacity-100'
                   : 'pointer-events-none scale-105 opacity-0'
               }`}
             >
-              <Image
-                src={slide.image}
-                alt={slide.badge}
-                fill
-                priority={idx === 0}
-                sizes="100vw"
-                className="object-cover object-center"
-              />
+              {slide.bannerId !== undefined ? (
+                // Device-specific image: phones (under 768px) get the mobile image when one is set,
+                // and every other case uses the desktop image. The browser picks the source, so no JS runs.
+                <picture className="absolute inset-0 block h-full w-full">
+                  {slide.mobileImage && (
+                    <source media="(max-width: 767px)" srcSet={slide.mobileImage} />
+                  )}
+                  {/* Remote S3 images are not whitelisted in next.config, so a plain <img> is used. */}
+                  <img
+                    src={slide.image}
+                    alt={slide.alt}
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                    className="h-full w-full object-cover object-center"
+                  />
+                </picture>
+              ) : (
+                <Image
+                  src={slide.image}
+                  alt={slide.alt}
+                  fill
+                  priority={idx === 0}
+                  sizes="100vw"
+                  className="object-cover object-center"
+                />
+              )}
             </div>
           );
         })}
@@ -156,16 +253,18 @@ export default function HeroSliderSection() {
             LEFT SIDE: HEADINGS, BADGES & HIGHLIGHTS
             ----------------------------------------- */}
         <div className="flex flex-1 flex-col items-start justify-start text-left pt-2">
-          {/* Active Dynamic Badge */}
-          <div className="inline-flex cursor-default items-center gap-2.5 rounded-full border border-white/20 bg-black/40 px-4 py-1.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:bg-black/60">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-brand-green)] opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-brand-green)]" />
-            </span>
-            <span className="text-xs font-semibold tracking-wider text-white/90 uppercase">
-              {SLIDES[currentSlide].badge}
-            </span>
-          </div>
+          {/* Active Dynamic Badge (banner title on banner slides, static badge otherwise) */}
+          {activeSlide.badge && (
+            <div className="inline-flex cursor-default items-center gap-2.5 rounded-full border border-white/20 bg-black/40 px-4 py-1.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:bg-black/60">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-brand-green)] opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-brand-green)]" />
+              </span>
+              <span className="text-xs font-semibold tracking-wider text-white/90 uppercase">
+                {activeSlide.badge}
+              </span>
+            </div>
+          )}
 
           {/* Main Hero Title */}
           <h1 className="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[4.2rem] lg:leading-[1.1]">
@@ -183,6 +282,31 @@ export default function HeroSliderSection() {
             Discover, buy, and finance premium new and used tractors. Compare models and connect
             with verified dealers instantly.
           </p>
+
+          {/* Banner call-to-action. Only on slides from a managed banner that has both a label and a link. */}
+          {cta && (
+            <div className="mt-6">
+              {cta.external ? (
+                <a
+                  href={cta.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackBannerEvent(cta.bannerId, 'click')}
+                  className="inline-flex items-center rounded-full bg-[var(--color-brand-green)] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)]"
+                >
+                  {cta.label}
+                </a>
+              ) : (
+                <Link
+                  href={cta.href}
+                  onClick={() => trackBannerEvent(cta.bannerId, 'click')}
+                  className="inline-flex items-center rounded-full bg-[var(--color-brand-green)] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)]"
+                >
+                  {cta.label}
+                </Link>
+              )}
+            </div>
+          )}
 
           {/* Farmer Trust Badges */}
           <div className="mt-7 flex flex-wrap items-center gap-4 pt-1 sm:gap-6">
@@ -234,7 +358,7 @@ export default function HeroSliderSection() {
 
             {/* Slide Indicator Bars */}
             <div className="flex items-center gap-2">
-              {SLIDES.map((_, idx) => {
+              {slides.map((_, idx) => {
                 const isActive = idx === currentSlide;
                 return (
                   <button
@@ -255,7 +379,7 @@ export default function HeroSliderSection() {
 
             {/* Slide Index Counter */}
             <span className="ml-2 font-mono text-xs font-semibold tracking-wider text-white/70">
-              0{currentSlide + 1} / 0{SLIDES.length}
+              0{currentSlide + 1} / 0{slideCount}
             </span>
           </div>
         </div>

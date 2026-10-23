@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ChevronRight,
@@ -21,12 +21,29 @@ import {
   Percent,
   XCircle,
   FileText,
+  Loader2,
 } from 'lucide-react';
 import { Tractor as TractorModel, TractorTeaser, tractorAPI } from '@/lib/api/tractors';
 import { CompareFrequencyRecord } from '@/lib/api/compare';
 import { useDetailAccess } from '@/hooks/leads/use-detail-access';
 import { DetailAccessGate, DetailGateSummary } from '@/components/leads/detail-access-gate';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { generateTractorBrochurePdf } from '@/lib/utils/tractorBrochurePdf';
+
+function WhatsAppIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.888 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+    </svg>
+  );
+}
 
 const formatEnum = (val: string | undefined | null) => {
   if (!val) return '';
@@ -128,12 +145,86 @@ function TractorDetailsView({
     return `₹ ${price.toLocaleString('en-IN')}`;
   };
 
-  const handleShare = () => {
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [brochureSuccess, setBrochureSuccess] = useState(false);
+  const [brochureError, setBrochureError] = useState<string | null>(null);
+  const shareDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        shareDropdownRef.current &&
+        !shareDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsShareOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsShareOpen(false);
+      }
+    };
+
+    if (isShareOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isShareOpen]);
+
+  const handleShareWhatsApp = () => {
     if (!tractor) return;
-    const text = `Check out the ${tractor.brand?.name} ${tractor.modelName} on TractorDost! Starting at ${formatPrice(tractor.exShowroomPriceMin)}.`;
     const url = window.location.href;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`;
-    window.open(whatsappUrl, '_blank');
+    const priceText = formatPrice(tractor.exShowroomPriceMin);
+    const hpText = tractor.hp ? `${tractor.hp} HP` : '';
+    const cylinders = tractor.spec?.cylinders ? `${tractor.spec.cylinders} Cylinders` : '';
+    const lift = tractor.spec?.liftingCapacityKg ? `${tractor.spec.liftingCapacityKg} Kg Lift` : '';
+    const specs = [hpText, cylinders, lift].filter(Boolean).join(' • ');
+
+    const text = [
+      `🚜 *${tractor.brand?.name || ''} ${tractor.modelName}*`,
+      specs ? `⚡ *Specs:* ${specs}` : '',
+      `💰 *Price:* Starting at ${priceText}`,
+      tractor.isFeatured ? `⭐ Featured Model on TractorDost` : '',
+      '',
+      `Check out full specifications, features, photos & on-road pricing:`,
+      url,
+    ]
+      .filter((line) => line !== '')
+      .join('\n');
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    setIsShareOpen(false);
+  };
+
+  const handleDownloadBrochure = async () => {
+    if (isGeneratingPdf || !tractor) return;
+    setIsGeneratingPdf(true);
+    setBrochureError(null);
+    setBrochureSuccess(false);
+
+    try {
+      await generateTractorBrochurePdf(tractor);
+      setBrochureSuccess(true);
+      setTimeout(() => {
+        setBrochureSuccess(false);
+        setIsShareOpen(false);
+      }, 1500);
+    } catch (err: any) {
+      console.error('Error generating tractor brochure:', err);
+      setBrochureError('Failed to generate brochure. Please try again.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const mediaList = tractor.media || [];
@@ -163,29 +254,110 @@ function TractorDetailsView({
           <div className="spatial-panel flex flex-col gap-4 rounded-[2.5rem] p-4">
             {/* Main Image */}
             <div className="from-foreground/5 group relative flex h-[400px] w-full items-center justify-center overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] bg-gradient-to-br to-transparent md:h-[500px]">
-              <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+              <div className="absolute top-4 right-4 z-20 flex flex-col gap-2" ref={shareDropdownRef}>
                 <button
-                  onClick={handleShare}
-                  className="bg-background/80 text-foreground flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-colors hover:bg-[var(--color-brand-green)] hover:text-white"
-                  title="Share via WhatsApp"
+                  type="button"
+                  onClick={() => setIsShareOpen(!isShareOpen)}
+                  aria-expanded={isShareOpen}
+                  aria-label="Share and Download"
+                  className={`bg-background/80 text-foreground relative flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-all hover:bg-[var(--color-brand-green)] hover:text-white ${
+                    isShareOpen
+                      ? 'bg-[var(--color-brand-green)] text-white shadow-md ring-2 ring-[var(--color-brand-green)]/30'
+                      : ''
+                  }`}
+                  title="Share & Download Brochure"
                 >
                   <Share2 size={18} />
                 </button>
-                {(tractor.brochurePdf ||
-                  tractor.media?.find((m: any) => m.mediaType === 'PDF')?.url) && (
-                    <a
-                      href={
-                        tractor.brochurePdf ||
-                        tractor.media?.find((m: any) => m.mediaType === 'PDF')?.url
-                      }
-                      target="_blank"
-                      rel="noreferrer"
-                      className="bg-background/80 text-foreground flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-colors hover:bg-[var(--color-brand-green)] hover:text-white"
-                      title="Download Brochure"
-                    >
-                      <Download size={18} />
-                    </a>
-                  )}
+
+                {/* Share Dropdown Menu */}
+                {isShareOpen && (
+                  <div className="bg-background/95 border-[var(--border-subtle)] animate-in fade-in zoom-in-95 duration-150 absolute top-12 right-0 z-50 w-64 origin-top-right rounded-2xl border p-2 shadow-2xl backdrop-blur-xl sm:w-72">
+                    <div className="text-muted border-b border-[var(--border-subtle)]/60 px-3 py-1.5 text-[10px] font-black tracking-widest uppercase">
+                      Share & Download
+                    </div>
+
+                    <div className="mt-1 flex flex-col gap-1">
+                      {/* Option 1: WhatsApp */}
+                      <button
+                        type="button"
+                        onClick={handleShareWhatsApp}
+                        className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-colors hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 transition-transform group-hover:scale-105 dark:text-emerald-400">
+                          <WhatsAppIcon className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-foreground text-sm font-bold leading-snug">
+                            WhatsApp
+                          </p>
+                          <p className="text-muted text-[11px] leading-tight">
+                            Share details & page link
+                          </p>
+                        </div>
+                        <ChevronRight
+                          size={16}
+                          className="text-muted transition-transform group-hover:translate-x-0.5"
+                        />
+                      </button>
+
+                      <div className="bg-[var(--border-subtle)]/60 my-0.5 h-[1px] w-full" />
+
+                      {/* Option 2: Download Brochure */}
+                      <button
+                        type="button"
+                        disabled={isGeneratingPdf}
+                        onClick={handleDownloadBrochure}
+                        className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-colors hover:bg-[var(--color-brand-green)]/10 disabled:opacity-75"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)] transition-transform group-hover:scale-105">
+                          {isGeneratingPdf ? (
+                            <Loader2
+                              size={18}
+                              className="animate-spin text-[var(--color-brand-green)]"
+                            />
+                          ) : brochureSuccess ? (
+                            <CheckCircle2
+                              size={18}
+                              className="text-[var(--color-brand-green)]"
+                            />
+                          ) : (
+                            <Download size={18} />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-foreground text-sm font-bold leading-snug">
+                            {brochureSuccess ? 'Brochure Downloaded!' : 'Download Brochure'}
+                          </p>
+                          <p className="text-muted text-[11px] leading-tight">
+                            {isGeneratingPdf
+                              ? 'Generating PDF brochure...'
+                              : brochureSuccess
+                              ? 'Brochure saved to device'
+                              : 'Complete PDF specifications'}
+                          </p>
+                        </div>
+                        {isGeneratingPdf ? (
+                          <span className="text-[10px] font-bold text-[var(--color-brand-green)]">
+                            PDF
+                          </span>
+                        ) : (
+                          <ChevronRight
+                            size={16}
+                            className="text-muted transition-transform group-hover:translate-x-0.5"
+                          />
+                        )}
+                      </button>
+
+                      {brochureError && (
+                        <p className="px-3 py-1.5 text-xs font-semibold text-red-500">
+                          {brochureError}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {tractor.videoUrl && (
                   <a
                     href={tractor.videoUrl}

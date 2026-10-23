@@ -496,23 +496,48 @@ export default function TractorRepairPage() {
     }
   }, [user]);
 
-  // Load Centers & Dealers with specific location & radius
-  const loadCentersAndDealers = useCallback(
-    async (lat: number, lon: number, radiusKm: number) => {
-      try {
-        setLoadingCenters(true);
-        // Note: Backend validates radius <= 500
-        const validRadius = Math.min(Math.max(radiusKm, 10), 500);
+  // Helper to fetch live GPS coordinates silently upon submission
+  const getLiveCoordinates = (): Promise<{ latitude: number; longitude: number }> => {
+    return new Promise((resolve) => {
+      if (typeof window === 'undefined' || !navigator.geolocation) {
+        resolve({
+          latitude: bookingForm.latitude || 18.5204,
+          longitude: bookingForm.longitude || 73.8567,
+        });
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          resolve({
+            latitude: Number(pos.coords.latitude.toFixed(6)),
+            longitude: Number(pos.coords.longitude.toFixed(6)),
+          });
+        },
+        (err) => {
+          console.warn('Geolocation unavailable, using default fallback coordinates:', err);
+          resolve({
+            latitude: bookingForm.latitude || 18.5204,
+            longitude: bookingForm.longitude || 73.8567,
+          });
+        },
+        { timeout: 4000, enableHighAccuracy: true, maximumAge: 60000 }
+      );
+    });
+  };
 
-        const [nearbyRes, dealersRes] = await Promise.allSettled([
-          serviceCenterAPI.getNearbyServiceCenters({
-            latitude: lat,
-            longitude: lon,
-            radius: validRadius,
-            limit: 50,
-          }),
-          dealerAPI.getAllDealers({ limit: 50 }),
-        ]);
+  // Load Centers & Dealers
+  const loadCentersAndDealers = async () => {
+    try {
+      setLoadingCenters(true);
+      const [nearbyRes, dealersRes] = await Promise.allSettled([
+        serviceCenterAPI.getNearbyServiceCenters({
+          latitude: 18.5204,
+          longitude: 73.8567,
+          radius: 1000,
+          limit: 50,
+        }),
+        dealerAPI.getAllDealers({ limit: 50, sortBy: 'positive_reviews' }),
+      ]);
 
         let loadedCenters: NearbyServiceCenter[] = [];
         if (nearbyRes.status === 'fulfilled' && nearbyRes.value.success) {
@@ -875,6 +900,37 @@ export default function TractorRepairPage() {
       return matchesSearch && matchesService;
     });
   }, [centers, searchQuery, selectedServiceFilter]);
+
+  // Sort and filter dealers by number of positive reviews in descending order
+  const sortedDealers = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    const filtered = dealers.filter((d) => {
+      if (!q) return true;
+      return (
+        d.businessName?.toLowerCase().includes(q) ||
+        d.district?.toLowerCase().includes(q) ||
+        d.state?.toLowerCase().includes(q) ||
+        d.dealerType?.toLowerCase().includes(q) ||
+        d.phone?.toLowerCase().includes(q)
+      );
+    });
+
+    return [...filtered].sort((a, b) => {
+      const aPos = Number(a.positiveReviewsCount ?? 0);
+      const bPos = Number(b.positiveReviewsCount ?? 0);
+      if (bPos !== aPos) return bPos - aPos;
+
+      const aRating = Number(a.rating) || 0;
+      const bRating = Number(b.rating) || 0;
+      if (bRating !== aRating) return bRating - aRating;
+
+      const aCount = Number(a.reviewsCount) || 0;
+      const bCount = Number(b.reviewsCount) || 0;
+      if (bCount !== aCount) return bCount - aCount;
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [dealers, searchQuery]);
 
   // Handle opening booking modal for a center or dealer
   const handleOpenBooking = async (centerItem?: NearbyServiceCenter, dealerItem?: Dealer) => {
@@ -1579,7 +1635,7 @@ export default function TractorRepairPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-                {dealers.map((dealer) => (
+                {sortedDealers.map((dealer) => (
                   <div
                     key={dealer.id}
                     className="glass-panel group flex flex-col justify-between rounded-3xl p-6 transition-all hover:border-[var(--color-brand-green)]/30"
@@ -1590,11 +1646,19 @@ export default function TractorRepairPage() {
                           <h3 className="text-foreground text-base font-black tracking-tight group-hover:text-[var(--color-brand-green)]">
                             {dealer.businessName}
                           </h3>
-                          <span className="text-muted text-[11px] font-bold">
-                            {dealer.dealerType} • Certified
-                          </span>
+                          <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                            <span className="text-muted text-[11px] font-bold">
+                              {dealer.dealerType} • Certified
+                            </span>
+                            {Number((dealer as any).positiveReviewsCount || 0) > 0 && (
+                              <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-[10px] font-black text-amber-400">
+                                <Star size={10} className="fill-amber-400 text-amber-400" />
+                                {(dealer as any).positiveReviewsCount} {((dealer as any).positiveReviewsCount === 1) ? 'Positive Review' : 'Positive Reviews'}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <ShieldCheck size={18} className="text-[var(--color-brand-green)]" />
+                        <ShieldCheck size={18} className="text-[var(--color-brand-green)] shrink-0" />
                       </div>
 
                       <div className="space-y-1 text-xs">

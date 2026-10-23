@@ -106,7 +106,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-black text-amber-500">
-                  {Number(dealer.rating || 0).toFixed(1)}
+                  {Number(profile?.overallRating ?? dealer.rating ?? 0).toFixed(1)}
                 </span>
                 <span className="text-xs font-bold text-amber-500">★</span>
               </div>
@@ -710,7 +710,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="bg-foreground/5 flex flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] p-6 text-center">
             <div className="mb-1 text-5xl font-black text-amber-500">
-              {Number(dealer.rating || 0).toFixed(1)}
+              {Number(profile?.overallRating ?? dealer.rating ?? 0).toFixed(1)}
             </div>
             <div className="mb-2 flex items-center gap-1 text-amber-500">
               {[...Array(5)].map((_, i) => (
@@ -718,7 +718,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
                   key={i}
                   size={16}
                   className={
-                    i < Math.round(Number(dealer.rating || 0))
+                    i < Math.round(Number(profile?.overallRating ?? dealer.rating ?? 0))
                       ? 'fill-amber-500 text-amber-500'
                       : 'text-muted/30'
                   }
@@ -726,7 +726,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
               ))}
             </div>
             <span className="text-muted text-xs font-bold">
-              Based on {dealer.reviewsCount || 0} customer reviews
+              Based on {profile?.reviewsCount ?? dealer.reviewsCount ?? 0} customer reviews
             </span>
           </div>
 
@@ -764,6 +764,46 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
             )}
           </div>
         </div>
+
+        {profile?.recentReviews && profile.recentReviews.length > 0 && (
+          <div className="space-y-3 border-t border-[var(--border-subtle)] pt-6">
+            <h3 className="text-muted text-xs font-black tracking-wider uppercase">
+              Recent Customer Reviews
+            </h3>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {profile.recentReviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="bg-foreground/5 space-y-2 rounded-2xl border border-[var(--border-subtle)] p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-amber-500">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={12}
+                          className={i < rev.rating ? 'fill-amber-500 text-amber-500' : 'text-muted/30'}
+                        />
+                      ))}
+                      <span className="ml-1 text-xs font-bold text-amber-500">{rev.rating}.0</span>
+                    </div>
+                    {rev.createdAt && (
+                      <span className="text-muted text-[10px]">
+                        {new Date(rev.createdAt).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                  {rev.headline && (
+                    <h4 className="text-foreground text-xs font-bold">{rev.headline}</h4>
+                  )}
+                  {rev.body && (
+                    <p className="text-muted text-xs font-medium">{rev.body}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* SECTION 10: Complaints */}

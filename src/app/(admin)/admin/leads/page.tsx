@@ -35,7 +35,7 @@ import Pagination from '@/components/shared/Pagination';
 
 export default function AdminLeadsPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN';
+  const isAdmin = user?.role?.name === 'ADMIN';
 
   // Leads list and pagination state
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -92,18 +92,17 @@ export default function AdminLeadsPage() {
           brandAPI.getAllBrands({ limit: 100 }),
         ]);
 
-        const candidateUsers: any[] = [];
-        for (const res of [usersRes, agentsRes, adminsRes]) {
-          if (res.status === 'fulfilled' && res.value && res.value.success) {
-            const userList = (res.value.data as any)?.data || res.value.data || [];
-            if (Array.isArray(userList)) {
-              candidateUsers.push(...userList);
-            }
-          }
+        if (usersRes.status === 'fulfilled' && usersRes.value.success) {
+          const userList = (usersRes.value.data as any)?.data || usersRes.value.data || [];
+          // Filter agents and admins
+          const staffUsers = userList
+            .filter((u: any) => u.role === 'AGENT' || u.role === 'ADMIN')
+            .map((u: any) => ({
+              id: u.id,
+              fullName: u.fullName || u.name || `User #${u.id}`,
+            }));
+          setAgents(staffUsers);
         }
-
-        const staffUsers = parseStaffUsers(candidateUsers, user);
-        setAgents(staffUsers);
 
         if (dealersRes.status === 'fulfilled' && dealersRes.value && dealersRes.value.success) {
           const dealerList = (dealersRes.value.data as any)?.data || dealersRes.value.data || [];

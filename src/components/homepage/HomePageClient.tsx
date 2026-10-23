@@ -15,12 +15,15 @@ import { tractorAPI, Tractor as TractorModel } from '@/lib/api/tractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { compareAPI, CompareFrequencyRecord } from '@/lib/api/compare';
 import HeroSliderSection from '@/components/homepage/HeroSliderSection';
+import type { PublicBanner } from '@/types/models/banner';
 
 interface HomePageClientProps {
   children?: React.ReactNode;
+  /** Live hero banners from the Banner Management module, fetched on the server. */
+  banners?: PublicBanner[];
 }
 
-export default function HomePageClient({ children }: HomePageClientProps) {
+export default function HomePageClient({ children, banners }: HomePageClientProps) {
   const [tractors, setTractors] = useState<TractorModel[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [comparisons, setComparisons] = useState<CompareFrequencyRecord[]>([]);
@@ -82,7 +85,7 @@ export default function HomePageClient({ children }: HomePageClientProps) {
       {/* =========================================
           HERO & SMART FINDER SLIDER SECTION (Full-Bleed, Edge-to-Edge)
           ========================================= */}
-      <HeroSliderSection />
+      <HeroSliderSection banners={banners} />
 
       {/* =========================================
           DYNAMIC MAIN CONTENT (Synced with Backend)
