@@ -29,7 +29,31 @@ export default function FamilyModal({ family, brandId, onClose }: FamilyModalPro
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sortOrderTouched, setSortOrderTouched] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateSortOrder = (value: string): string | null => {
+    const trimmed = value.trim();
+    if (trimmed === '') {
+      return 'Sort order is required';
+    }
+    const num = Number(trimmed);
+    if (isNaN(num)) {
+      return 'Sort order must be a valid number';
+    }
+    if (!Number.isInteger(num)) {
+      return 'Sort order must be an integer';
+    }
+    if (num < 0) {
+      return 'Sort order must be 0 or greater';
+    }
+    return null;
+  };
+
+  const sortOrderError = validateSortOrder(formData.sortOrder);
+  const isSortOrderInvalid = Boolean(
+    sortOrderError && (sortOrderTouched || Number(formData.sortOrder) < 0 || formData.sortOrder.includes('-'))
+  );
 
   useEffect(() => {
     if (family) {
@@ -68,6 +92,9 @@ export default function FamilyModal({ family, brandId, onClose }: FamilyModalPro
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
+      if (name === 'sortOrder') {
+        setSortOrderTouched(true);
+      }
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
@@ -82,6 +109,14 @@ export default function FamilyModal({ family, brandId, onClose }: FamilyModalPro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSortOrderTouched(true);
+
+    const sortOrderErr = validateSortOrder(formData.sortOrder);
+    if (sortOrderErr) {
+      setError(sortOrderErr);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -90,7 +125,7 @@ export default function FamilyModal({ family, brandId, onClose }: FamilyModalPro
       data.append('name', formData.name.trim());
       data.append('description', formData.description.trim());
       data.append('isActive', formData.isActive ? 'true' : 'false');
-      data.append('sortOrder', parseInt(formData.sortOrder || '0', 10).toString());
+      data.append('sortOrder', parseInt(formData.sortOrder.trim(), 10).toString());
       data.append('seoTitle', formData.seoTitle.trim());
       data.append('seoDescription', formData.seoDescription.trim());
 
@@ -109,7 +144,11 @@ export default function FamilyModal({ family, brandId, onClose }: FamilyModalPro
       onClose();
     } catch (err: any) {
       console.error(err);
-      setError(err?.response?.data?.message || 'Something went wrong');
+      const apiError = err?.response?.data;
+      const zodMessage = Array.isArray(apiError?.error)
+        ? apiError.error.map((e: any) => e.message).join(', ')
+        : null;
+      setError(zodMessage || apiError?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -298,11 +337,43 @@ export default function FamilyModal({ family, brandId, onClose }: FamilyModalPro
                   <input
                     type="number"
                     name="sortOrder"
+                    min="0"
+                    step="1"
                     value={formData.sortOrder}
                     onChange={handleChange}
-                    className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-transparent px-4 py-3 text-sm font-bold transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
+                    onBlur={() => setSortOrderTouched(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '.') {
+                        e.preventDefault();
+                      }
+                    }}
+                    onPaste={(e) => {
+                      const pasteData = e.clipboardData.getData('text');
+                      if (pasteData && (pasteData.includes('-') || pasteData.includes('.'))) {
+                        e.preventDefault();
+                        const sanitized = pasteData.replace(/[^0-9]/g, '');
+                        if (sanitized !== '') {
+                          setFormData((prev) => ({ ...prev, sortOrder: sanitized }));
+                        }
+                      }
+                    }}
+                    className={`w-full rounded-xl border px-4 py-3 text-sm font-bold transition-all focus:outline-none ${
+                      isSortOrderInvalid
+                        ? 'border-red-500/50 bg-red-500/5 text-foreground focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                        : 'bg-foreground/5 text-foreground focus:bg-background border-transparent focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20'
+                    }`}
                     placeholder="0"
                   />
+                  {isSortOrderInvalid && sortOrderError ? (
+                    <p className="animate-fade-in flex items-center gap-1 text-[11px] font-bold text-red-500">
+                      <AlertCircle size={12} className="shrink-0" />
+                      {sortOrderError}
+                    </p>
+                  ) : (
+                    <p className="text-muted text-[10px] font-medium">
+                      Non-negative integer (0 or greater). Lower numbers appear first.
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center">
