@@ -54,8 +54,8 @@ export interface UserPermissionOverride {
 
 export const accessControlAPI = {
   // Roles
-  getAllRoles: async () => {
-    const response = await apiClient.get('/roles/getAll');
+  getAllRoles: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const response = await apiClient.get('/roles/getAll', { params });
     return response.data;
   },
   createRole: async (data: { name: string; description?: string }) => {

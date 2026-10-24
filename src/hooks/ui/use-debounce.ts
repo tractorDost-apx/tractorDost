@@ -1,3 +1,15 @@
-// Placeholder for use-debounce.ts
-// This file is currently under development.
-export const placeholder = 'use-debounce.ts';
+'use client';
+
+import { useEffect, useState } from 'react';
+
+/** `value`, updated only after it has stopped changing for `delayMs` */
+export function useDebounce<T>(value: T, delayMs = 400): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timer);
+  }, [value, delayMs]);
+
+  return debounced;
+}
