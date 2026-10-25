@@ -91,6 +91,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: 'Used Enquiries', href: '/admin/used-listings/enquiries', icon: MessageSquareText },
       { label: 'Inspections & Valuations', href: '/admin/valuation', icon: FileCheck },
       { label: 'Listing Boosts', href: '/admin/listing-boosts', icon: Layers },
+      { label: 'Reviews', href: '/admin/reviews', icon: FileCheck },
     ],
   },
   {
@@ -119,8 +120,7 @@ const NAV_GROUPS: NavGroup[] = [
           { label: 'FAQs', href: '/admin/content/faqs' },
         ],
       },
-      { label: 'Grievances', href: '/admin/grievances', icon: AlertTriangle },
-      { label: 'Reviews', href: '/admin/reviews', icon: FileCheck },
+      { label: 'Banner', href: '/admin/grievances', icon: AlertTriangle },
     ],
   },
   {
