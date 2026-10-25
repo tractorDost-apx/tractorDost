@@ -197,6 +197,15 @@ export interface Department {
 export interface CreateDepartmentInput {
   name: string;
   description?: string;
+  headId?: number | null;
+  isActive?: boolean;
+}
+
+/** PATCH /departments/update/:id body; null clears description or headId */
+export interface UpdateDepartmentInput {
+  name?: string;
+  description?: string | null;
+  headId?: number | null;
   isActive?: boolean;
 }
 

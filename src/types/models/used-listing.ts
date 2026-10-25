@@ -53,7 +53,21 @@ export type DocType =
   | 'LOAN_NOC'
   | 'OTHER_DOCUMENT';
 
-export type ListingSortBy = 'newest' | 'price_asc' | 'price_desc' | 'year_desc' | 'hours_asc';
+/** `newest`…`hours_asc` serve the public browse page; the rest are the staff grid's sorts */
+export type ListingSortBy =
+  | 'newest'
+  | 'price_asc'
+  | 'price_desc'
+  | 'year_desc'
+  | 'hours_asc'
+  | 'created_desc'
+  | 'created_asc'
+  | 'views_desc'
+  | 'views_asc'
+  | 'leads_desc'
+  | 'leads_asc'
+  | 'updated_desc'
+  | 'updated_asc';
 
 export interface ListingMedia {
   id: number;
@@ -179,12 +193,17 @@ export interface CreateListingInput {
   longitude?: number;
 }
 
-/** Query accepted by GET /used-listings/getAll */
+/**
+ * Query accepted by GET /used-listings/getAll. The dealer, activity and updated-date
+ * params are staff-only: the backend answers 403 when a public caller sends them.
+ */
 export interface ListingFilters {
   search?: string;
   state?: string;
   district?: string;
+  city?: string;
   tractorBrand?: string;
+  tractorModel?: string;
   ownership?: number;
   maxHours?: number;
   rcAvailable?: boolean;
@@ -199,6 +218,17 @@ export interface ListingFilters {
   financeAvailable?: boolean;
   urgency?: UrgencyLevel;
   listingStatus?: ListingStatus;
+  /** Seller's dealer profile id */
+  dealerId?: number;
+  minViews?: number;
+  maxViews?: number;
+  minLeads?: number;
+  maxLeads?: number;
+  /** YYYY-MM-DD, inclusive */
+  createdFrom?: string;
+  createdTo?: string;
+  updatedFrom?: string;
+  updatedTo?: string;
   page?: number;
   limit?: number;
 }
