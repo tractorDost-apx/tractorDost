@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useAuth } from '@/store/AuthContext';
@@ -8,6 +8,9 @@ import { tractorAPI } from '@/lib/api/tractors';
 import { usedTractorListingAPI } from '@/lib/api/used-listings';
 import { usedTractorEnquiryAPI } from '@/lib/api/used-enquiries';
 import { leadAPI, LeadStats } from '@/lib/api/leads';
+import { auditLogAPI } from '@/lib/api/auditLogs';
+import { AuditLogRow } from '@/components/admin/AuditLogRow';
+import type { AuditLog } from '@/types/models/audit-log';
 import { formatRelativeTime } from '@/lib/utils/format-date';
 import {
   Users,
@@ -56,6 +59,32 @@ export default function AdminDashboardPage() {
   const [recentListings, setRecentListings] = useState<any[]>([]);
   const [recentLeads, setRecentLeads] = useState<any[]>([]);
   const [recentEnquiries, setRecentEnquiries] = useState<any[]>([]);
+
+  // Live Platform Activity tab: Enquiries (default) or Audit Logs (fetched on first open)
+  const [activityTab, setActivityTab] = useState<'enquiries' | 'audit'>('enquiries');
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditError, setAuditError] = useState<string | null>(null);
+  const [auditLoaded, setAuditLoaded] = useState(false);
+
+  const loadAuditLogs = useCallback(async () => {
+    setAuditLoading(true);
+    setAuditError(null);
+    const res = await auditLogAPI.getAuditLogs({ page: 1, limit: 10 });
+    if (res.success && res.data) {
+      setAuditLogs(Array.isArray(res.data.logs) ? res.data.logs : []);
+      setAuditLoaded(true);
+    } else {
+      setAuditError(res.message || 'Failed to fetch audit logs');
+    }
+    setAuditLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (activityTab === 'audit' && !auditLoaded && !auditLoading && !auditError) {
+      loadAuditLogs();
+    }
+  }, [activityTab, auditLoaded, auditLoading, auditError, loadAuditLogs]);
 
   const loadDashboardData = useCallback(async () => {
     setLoadError(null);
@@ -208,6 +237,7 @@ export default function AdminDashboardPage() {
   const handleManualRefresh = () => {
     setIsRefreshing(true);
     loadDashboardData();
+    if (auditLoaded || auditError) loadAuditLogs();
   };
 
   const totalCustomerContacts = totalLeads + totalEnquiries;
@@ -616,19 +646,83 @@ export default function AdminDashboardPage() {
 
       {/* Platform Recent Activity */}
       <div className="flex-1">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-foreground flex items-center gap-2 text-lg font-black tracking-tight">
             <Activity className="text-[var(--color-brand-green)]" size={20} /> Live Platform Activity
           </h2>
-          <Link
-            href="/admin/leads"
-            className="text-muted hover:text-[var(--color-brand-green)] flex items-center gap-1 text-xs font-bold transition-colors"
-          >
-            View all leads <ArrowRight size={14} />
-          </Link>
+          <div className="flex items-center gap-3">
+            <div
+              role="tablist"
+              aria-label="Activity view"
+              className="flex items-center gap-1 rounded-full border border-[var(--border-subtle)] bg-foreground/5 p-1"
+            >
+              {(
+                [
+                  { key: 'enquiries', label: 'Enquiries' },
+                  { key: 'audit', label: 'Audit Logs' },
+                ] as const
+              ).map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={activityTab === tab.key}
+                  onClick={() => setActivityTab(tab.key)}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-black transition-all ${
+                    activityTab === tab.key
+                      ? 'bg-[var(--color-brand-green)] text-black shadow-sm'
+                      : 'text-muted hover:text-foreground'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <Link
+              href={activityTab === 'audit' ? '/admin/settings/audit-logs' : '/admin/leads'}
+              className="text-muted hover:text-[var(--color-brand-green)] hidden items-center gap-1 text-xs font-bold transition-colors sm:flex"
+            >
+              {activityTab === 'audit' ? 'View all logs' : 'View all leads'} <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
 
-        {loading ? (
+        {activityTab === 'audit' ? (
+          auditLoading ? (
+            <div className="bg-foreground/5 flex items-center justify-center rounded-2xl border border-[var(--border-subtle)] py-12">
+              <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={28} />
+            </div>
+          ) : auditError ? (
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-semibold text-rose-500">
+              <div className="flex items-center gap-2.5">
+                <AlertCircle size={16} className="shrink-0" />
+                <span>{auditError}</span>
+              </div>
+              <button
+                onClick={loadAuditLogs}
+                className="rounded-lg bg-rose-500/20 px-3 py-1 font-bold text-rose-500 hover:bg-rose-500/30"
+              >
+                Retry
+              </button>
+            </div>
+          ) : auditLogs.length === 0 ? (
+            <div className="bg-foreground/5 flex flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <ShieldCheck size={24} />
+              </div>
+              <p className="text-foreground text-sm font-bold">No Audit Logs Yet</p>
+              <p className="text-muted mt-1 max-w-sm text-xs font-medium">
+                Admin and staff actions such as creating, updating or deleting records will appear here.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {auditLogs.map((log) => (
+                <AuditLogRow key={log.id} log={log} />
+              ))}
+            </div>
+          )
+        ) : loading ? (
           <div className="bg-foreground/5 flex items-center justify-center rounded-2xl border border-[var(--border-subtle)] py-12">
             <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={28} />
           </div>
@@ -679,3 +773,4 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
