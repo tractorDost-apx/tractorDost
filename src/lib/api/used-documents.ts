@@ -98,3 +98,6 @@ export const usedTractorDocumentAPI = {
     }
   },
 };
+
+export const usedDocumentsAPI = usedTractorDocumentAPI;
+

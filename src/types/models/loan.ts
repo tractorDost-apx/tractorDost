@@ -1,3 +1,1 @@
-// Placeholder for loan.ts
-// This file is currently under development.
-export const placeholder = 'loan.ts';
+export type { LoanPartner, LoanApplicationPayload } from '@/lib/api/loan';

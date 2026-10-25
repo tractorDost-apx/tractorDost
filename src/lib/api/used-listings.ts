@@ -123,3 +123,6 @@ export const usedTractorListingAPI = {
     }
   },
 };
+
+export const usedListingsAPI = usedTractorListingAPI;
+

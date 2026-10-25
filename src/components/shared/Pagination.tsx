@@ -2,48 +2,53 @@ import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export interface PaginationProps {
-  page: number;
-  limit: number;
-  totalCount: number;
+  page?: number;
+  currentPage?: number;
+  limit?: number;
+  totalCount?: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  onLimitChange: (limit: number) => void;
+  onLimitChange?: (limit: number) => void;
 }
 
 export default function Pagination({
-  page,
-  limit,
+  page: propPage,
+  currentPage,
+  limit = 10,
   totalCount,
   totalPages,
   onPageChange,
   onLimitChange,
 }: PaginationProps) {
-  if (totalCount === 0) return null;
+  const page = currentPage ?? propPage ?? 1;
+  if (totalPages <= 1 && (!totalCount || totalCount <= limit)) return null;
 
   return (
     <div className="relative z-10 mt-auto flex flex-col items-center justify-between gap-4 p-2 sm:flex-row sm:p-4">
-      <div className="text-muted flex w-full flex-col items-center justify-between gap-4 text-xs font-bold sm:w-auto sm:flex-row sm:justify-start sm:text-sm">
-        <div className="flex items-center gap-2">
-          <span>Show</span>
-          <select
-            value={limit}
-            onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="bg-foreground/5 text-foreground cursor-pointer appearance-none rounded-lg border border-transparent px-2 py-1 text-center font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
-          <span>entries</span>
+      {totalCount !== undefined && onLimitChange && (
+        <div className="text-muted flex w-full flex-col items-center justify-between gap-4 text-xs font-bold sm:w-auto sm:flex-row sm:justify-start sm:text-sm">
+          <div className="flex items-center gap-2">
+            <span>Show</span>
+            <select
+              value={limit}
+              onChange={(e) => onLimitChange(Number(e.target.value))}
+              className="bg-foreground/5 text-foreground cursor-pointer appearance-none rounded-lg border border-transparent px-2 py-1 text-center font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>entries</span>
+          </div>
+          <div className="hidden h-4 w-px bg-[var(--border-subtle)] sm:block"></div>
+          <span>
+            Showing <span className="text-foreground font-bold">{(page - 1) * limit + 1}</span> to{' '}
+            <span className="text-foreground font-bold">{Math.min(page * limit, totalCount)}</span> of{' '}
+            <span className="text-foreground font-bold">{totalCount}</span> entries
+          </span>
         </div>
-        <div className="hidden h-4 w-px bg-[var(--border-subtle)] sm:block"></div>
-        <span>
-          Showing <span className="text-foreground font-bold">{(page - 1) * limit + 1}</span> to{' '}
-          <span className="text-foreground font-bold">{Math.min(page * limit, totalCount)}</span> of{' '}
-          <span className="text-foreground font-bold">{totalCount}</span> entries
-        </span>
-      </div>
+      )}
 
       <div className="flex w-full items-center justify-center gap-1.5 sm:w-auto sm:justify-end">
         <button

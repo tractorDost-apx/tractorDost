@@ -178,3 +178,6 @@ export const reviewsAPI = {
     return response.data;
   },
 };
+
+export const reviewAPI = reviewsAPI;
+

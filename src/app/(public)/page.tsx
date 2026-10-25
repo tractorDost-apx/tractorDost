@@ -221,13 +221,12 @@ export default function PublicHomePage() {
                                             src={
                                                 tractor.media && tractor.media.length > 0
                                                     ? tractor.media.find((m) => m.isPrimary)?.url || tractor.media[0].url
-                                                    : 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'
+                                                    : '/TD%20White.png'
                                             }
                                             alt={tractor.modelName}
-                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
                                             onError={(e) => {
-                                                (e.target as HTMLImageElement).src =
-                                                    'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
+                                                (e.target as HTMLImageElement).src = '/TD%20White.png';
                                             }}
                                         />
                                     </div>

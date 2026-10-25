@@ -58,3 +58,6 @@ export const listingBoostAPI = {
     return response.data;
   },
 };
+
+export const listingBoostsAPI = listingBoostAPI;
+

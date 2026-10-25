@@ -1,3 +1,2 @@
-// Placeholder for index.tsx
-// This file is currently under development.
-export const placeholder = 'index.tsx';
+export { Navbar as Header } from '../Navbar';
+export { Navbar as default } from '../Navbar';

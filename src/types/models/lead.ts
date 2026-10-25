@@ -1,3 +1,9 @@
-// Placeholder for lead.ts
-// This file is currently under development.
-export const placeholder = 'lead.ts';
+export type {
+  Lead,
+  LeadType,
+  LeadStatus,
+  LeadNote,
+  CallLog,
+  CallOutcome,
+  GetLeadsParams,
+} from '@/lib/api/leads';

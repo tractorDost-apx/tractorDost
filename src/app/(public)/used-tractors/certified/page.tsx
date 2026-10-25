@@ -1,16 +1,19 @@
 import React from 'react';
+import { Metadata } from 'next';
+import { UsedLocationClient } from '@/components/used-tractors/UsedLocationClient';
 
-export default function CertifiedPage() {
+export const metadata: Metadata = {
+  title: 'Certified Second-Hand Used Tractors with 120-Point Inspection | TractorDost',
+  description:
+    'Buy verified and certified used tractors in India. Every tractor passes a 120-point mechanical check with genuine RC verification and easy finance options.',
+};
+
+export default function CertifiedUsedTractorsPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Certified</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
-      </div>
-    </div>
+    <UsedLocationClient
+      isCertifiedOnly={true}
+      title="Certified Second-Hand Tractors"
+      subtitle="Every certified tractor is backed by our 120-point technical inspection report, transparent engine health records, and authentic RTO paperwork."
+    />
   );
 }

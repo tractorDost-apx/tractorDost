@@ -1,3 +1,2 @@
-// Placeholder for public-layout.tsx
-// This file is currently under development.
-export const placeholder = 'public-layout.tsx';
+export { LayoutOrchestrator as PublicLayout } from './LayoutOrchestrator';
+export { LayoutOrchestrator as default } from './LayoutOrchestrator';

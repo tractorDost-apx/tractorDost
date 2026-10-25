@@ -144,3 +144,6 @@ export const usersAPI = {
   },
 };
 
+export const userAPI = usersAPI;
+
+

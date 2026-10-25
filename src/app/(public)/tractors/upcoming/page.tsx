@@ -1,16 +1,21 @@
 import React from 'react';
+import { Metadata } from 'next';
+import { TractorCategoryClient } from '@/components/tractors/TractorCategoryClient';
 
-export default function UpcomingPage() {
+export const metadata: Metadata = {
+  title: 'Upcoming Tractors in India 2026: Expected Prices & Launch Dates | TractorDost',
+  description:
+    'Stay ahead with upcoming tractor models scheduled for launch in India. Expected on-road prices, prototype field photos, and technical specifications.',
+};
+
+export default function UpcomingTractorsPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Upcoming</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
-      </div>
-    </div>
+    <TractorCategoryClient
+      title="Upcoming Tractors in India"
+      subtitle="Preview upcoming tractor models, autonomous prototypes, hydrogen concept engines, and high-horsepower utility tractors arriving soon."
+      badge="Arriving Soon"
+      categoryTag="upcoming"
+      seoContent="<h2 class='text-xl font-bold text-foreground mb-3'>Upcoming Trends in Farm Mechanization</h2><p class='mb-3'>Top OEMs including Mahindra, Escorts Kubota, and John Deere are gearing up for launches featuring driverless steering aids, auto-depth draft sensing, and alternative bio-diesel powertrains.</p><p>Sign up to receive instant WhatsApp alerts when new models are unveiled at local dealerships.</p>"
+    />
   );
 }

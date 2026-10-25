@@ -1,15 +1,28 @@
+export type InventoryCondition = 'NEW' | 'PRE_OWNED' | 'REFURBISHED' | 'DEMO';
+export type InventoryStatus = 'IN_STOCK' | 'RESERVED' | 'SOLD' | 'IN_TRANSIT';
+
 export interface DealerInventoryItem {
   inventoryId: number;
+  id?: number;
   dealerId: number;
   tractorId: number | null;
   tractorName: string | null;
-  brand: string | null;
-  hp: number | null;
-  customModel: string | null;
+  brand?: string | null;
+  hp?: number | null;
+  customModel?: string | null;
   stockCount: number;
+  quantity?: number;
   isAvailable: boolean;
-  expectedArrival: string | null;
-  lastUpdated: string;
+  condition?: InventoryCondition | string;
+  status?: InventoryStatus | string;
+  price?: number | null;
+  mfgYear?: number | null;
+  hoursDriven?: number | null;
+  description?: string | null;
+  expectedArrival?: string | null;
+  lastUpdated?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface DealerInventoryPagination {

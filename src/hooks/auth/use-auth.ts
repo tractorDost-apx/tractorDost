@@ -1,3 +1,3 @@
-// Placeholder for use-auth.ts
-// This file is currently under development.
-export const placeholder = 'use-auth.ts';
+export { useAuth } from '@/store/AuthContext';
+export { useAuth as default } from '@/store/AuthContext';
+

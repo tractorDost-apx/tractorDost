@@ -1,16 +1,21 @@
 import React from 'react';
+import { Metadata } from 'next';
+import { TractorCategoryClient } from '@/components/tractors/TractorCategoryClient';
 
-export default function CngPage() {
+export const metadata: Metadata = {
+  title: 'CNG Tractors in India: Sustainable, Fuel-Saving Farming | TractorDost',
+  description:
+    'Explore clean compressed natural gas (CNG) and dual-fuel tractors that cut fuel operational costs by up to 40% while preserving engine life.',
+};
+
+export default function CNGTractorsPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Cng</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
-      </div>
-    </div>
+    <TractorCategoryClient
+      title="CNG & Dual-Fuel Tractors in India"
+      subtitle="Reduce farm fuel bills by up to 40% with factory-certified retrofitted and OEM Compressed Natural Gas tractor technology."
+      badge="Eco Clean Fuel"
+      fuelType="CNG"
+      seoContent="<h2 class='text-xl font-bold text-foreground mb-3'>Save up to ₹1,00,000 Annually with CNG</h2><p class='mb-3'>With diesel prices fluctuating, CNG-powered tractors offer massive economic relief to farmers engaged in round-the-clock water pumping, threshing, and commercial haulage.</p><p>CNG burns cleaner, produces zero carbon deposits on spark plugs and cylinder heads, and extends engine oil drain intervals by double.</p>"
+    />
   );
 }

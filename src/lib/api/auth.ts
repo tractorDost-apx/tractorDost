@@ -14,7 +14,14 @@ export const authAPI = {
     return response.data;
   },
 
-  verifyOtp: async (otp: string) => {
+  /** Alias for requestOtp accepting either string or object */
+  sendOtp: async (param: string | { mobile: string }) => {
+    const mobile = typeof param === 'string' ? param : param.mobile;
+    return authAPI.requestOtp(mobile);
+  },
+
+  verifyOtp: async (param: string | { otp: string; mobile?: string }) => {
+    const otp = typeof param === 'string' ? param : param.otp;
     let mtToken: string | undefined;
     if (typeof window !== 'undefined') {
       try {

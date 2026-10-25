@@ -52,13 +52,27 @@ export function ThemeToggle() {
     }, 10);
   };
 
-  // Render a placeholder if not mounted to prevent hydration mismatch
+  // Render a placeholder matching button if not mounted to prevent hydration mismatch
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="h-10 w-10" />;
+  if (!mounted) {
+    return (
+      <button
+        type="button"
+        suppressHydrationWarning
+        className="group flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-black/5 text-zinc-700 transition-all duration-200 hover:scale-105 hover:bg-black/10 hover:text-black dark:border-white/10 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15 dark:hover:text-white"
+        aria-label="Toggle Dark Mode"
+        title="Toggle Dark Mode"
+      >
+        <span className="h-4.5 w-4.5" />
+      </button>
+    );
+  }
 
   return (
     <button
+      type="button"
+      suppressHydrationWarning
       onClick={toggleTheme}
       className="group flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-black/5 text-zinc-700 transition-all duration-200 hover:scale-105 hover:bg-black/10 hover:text-black dark:border-white/10 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15 dark:hover:text-white"
       aria-label="Toggle Dark Mode"

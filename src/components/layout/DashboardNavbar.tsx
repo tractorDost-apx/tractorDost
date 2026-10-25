@@ -40,6 +40,7 @@ export function DashboardNavbar() {
             <input
               type="text"
               placeholder="Search..."
+              suppressHydrationWarning
               className="bg-foreground/5 text-foreground placeholder:text-muted focus:bg-background w-full rounded-full border border-transparent py-1.5 pr-4 pl-9 text-sm font-medium transition-all focus:border-[var(--color-brand-green)]/50 focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
             />
           </div>
@@ -59,7 +60,11 @@ export function DashboardNavbar() {
             <Globe size={18} />
           </Link>
 
-          <button className="bg-foreground/5 text-foreground/80 hover:text-foreground hover:bg-foreground/10 relative flex h-9 w-9 items-center justify-center rounded-full transition-all">
+          <button
+            type="button"
+            suppressHydrationWarning
+            className="bg-foreground/5 text-foreground/80 hover:text-foreground hover:bg-foreground/10 relative flex h-9 w-9 items-center justify-center rounded-full transition-all"
+          >
             <Bell size={18} />
             <span className="border-background absolute top-2 right-2 h-2 w-2 rounded-full border bg-[var(--color-brand-orange)] shadow-sm" />
           </button>
@@ -69,6 +74,7 @@ export function DashboardNavbar() {
           {/* Profile Dropdown */}
           <div className="group relative ml-1">
             <button
+              type="button"
               suppressHydrationWarning
               onClick={() =>
                 router.push(
@@ -119,6 +125,7 @@ export function DashboardNavbar() {
                 <Settings size={16} /> Account Settings
               </Link>
               <button
+                type="button"
                 suppressHydrationWarning
                 onClick={handleLogout}
                 className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-red-500 transition-colors hover:bg-red-500/10"

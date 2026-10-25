@@ -1,3 +1,12 @@
-// Placeholder for skeleton.tsx
-// This file is currently under development.
-export const placeholder = 'skeleton.tsx';
+import React from 'react';
+
+export function Skeleton({ className = '', ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={`animate-pulse rounded-xl bg-muted/60 ${className}`}
+      {...props}
+    />
+  );
+}
+
+export default Skeleton;

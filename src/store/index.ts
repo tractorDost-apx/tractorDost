@@ -1,3 +1,6 @@
-// Placeholder for index.ts
-// This file is currently under development.
-export const placeholder = 'index.ts';
+export * from './AuthContext';
+export * from './slices/auth.slice';
+export * from './slices/ui.slice';
+export * from './slices/compare.slice';
+export * from './slices/search.slice';
+export * from './slices/cart.slice';

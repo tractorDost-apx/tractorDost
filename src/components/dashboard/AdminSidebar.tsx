@@ -120,7 +120,9 @@ const NAV_GROUPS: NavGroup[] = [
           { label: 'FAQs', href: '/admin/content/faqs' },
         ],
       },
-      { label: 'Banner', href: '/admin/grievances', icon: AlertTriangle },
+      { label: 'Banners', href: '/admin/banners', icon: ImageIcon },
+      { label: 'Grievances', href: '/admin/grievances', icon: AlertTriangle },
+      { label: 'SEO Management', href: '/admin/seo', icon: Search },
     ],
   },
   {

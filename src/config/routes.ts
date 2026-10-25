@@ -1,3 +1,98 @@
-// Placeholder for routes.ts
-// This file is currently under development.
-export const placeholder = 'routes.ts';
+export const ROUTES = {
+  PUBLIC: {
+    HOME: '/',
+    TRACTORS: '/tractors',
+    TRACTOR_DETAILS: (slug: string) => `/tractors/${slug}`,
+    TRACTOR_POPULAR: '/tractors/popular',
+    TRACTOR_LATEST: '/tractors/latest',
+    TRACTOR_UPCOMING: '/tractors/upcoming',
+    TRACTOR_ELECTRIC: '/tractors/electric',
+    TRACTOR_CNG: '/tractors/cng',
+    TRACTOR_2WD: '/tractors/2wd',
+    TRACTOR_4WD: '/tractors/4wd',
+    TRACTOR_MINI: '/tractors/mini',
+    TRACTOR_AC_CABIN: '/tractors/ac-cabin',
+
+    USED_TRACTORS: '/used-tractors',
+    USED_CERTIFIED: '/used-tractors/certified',
+    USED_BY_STATE: (state: string) => `/used-tractors/${state}`,
+    USED_BY_DISTRICT: (state: string, district: string) => `/used-tractors/${state}/${district}`,
+    USED_DETAILS: (state: string, district: string, slug: string) =>
+      `/used-tractors/${state}/${district}/${slug}`,
+
+    SELL_TRACTOR: '/sell-used-tractor',
+    VALUATION: '/used-tractor-valuation',
+
+    COMPARE: '/compare',
+    COMPARE_MODELS: (slug1: string, slug2: string) => `/compare/${slug1}-vs-${slug2}`,
+
+    LOAN: '/loan',
+    LOAN_TYPE: (type: string) => `/loan/${type}`,
+    EMI_CALCULATOR: '/emi-calculator',
+
+    IMPLEMENTS: '/implements',
+    IMPLEMENT_DETAILS: (slug: string) => `/implements/${slug}`,
+
+    HARVESTERS: '/harvesters',
+    HARVESTER_TYPE: (type: string) => `/harvesters/${type}`,
+
+    TYRES: '/tyres',
+
+    DEALERS: '/dealers',
+    DEALER_DETAILS: (idOrSlug: string | number) => `/dealers/${idOrSlug}`,
+    SHOWROOMS: '/showrooms',
+    SERVICE_CENTERS: '/service-centers',
+
+    BLOGS: '/blogs',
+    BLOG_DETAILS: (slug: string) => `/blogs/${slug}`,
+    NEWS: '/news',
+    NEWS_DETAILS: (slug: string) => `/news/${slug}`,
+    VIDEOS: '/videos',
+    VIDEO_DETAILS: (slug: string) => `/videos/${slug}`,
+    WEB_STORIES: '/web-stories',
+
+    FAQ: '/faq',
+    FAQ_DETAILS: (slug: string) => `/faq/${slug}`,
+    ABOUT: '/about',
+    CONTACT: '/contact',
+    PRIVACY: '/privacy',
+    TERMS: '/terms',
+  },
+
+  AUTH: {
+    LOGIN: '/login',
+    REGISTER: '/register',
+    PROFILE: '/profile',
+  },
+
+  ADMIN: {
+    DASHBOARD: '/admin/dashboard',
+    USERS: '/admin/users',
+    DEALERS: '/admin/dealers',
+    HR_EMPLOYEES: '/admin/hr/employees',
+    HR_DEPARTMENTS: '/admin/hr/departments',
+    BRANDS: '/admin/tractors/brands',
+    FAMILIES: '/admin/tractors/families',
+    CATEGORIES: '/admin/tractors/categories',
+    TRACTORS: '/admin/tractors',
+    TRACTOR_SPECS: '/admin/tractors/specs',
+    STATE_PRICES: '/admin/tractors/price-by-state',
+    EQUIPMENT_BRANDS: '/admin/equipment/brands',
+    IMPLEMENT_CATEGORIES: '/admin/implements/categories',
+    IMPLEMENTS: '/admin/implements',
+    USED_LISTINGS: '/admin/used-listings',
+    VALUATION: '/admin/valuation',
+    LISTING_BOOSTS: '/admin/listing-boosts',
+    REVIEWS: '/admin/reviews',
+    LEADS: '/admin/leads',
+    FINANCE: '/admin/finance',
+    BANNERS: '/admin/banners',
+    GRIEVANCES: '/admin/grievances',
+    SEO: '/admin/seo',
+    MEDIA: '/admin/media',
+    AUDIT_LOGS: '/admin/settings/audit-logs',
+    REPORTS: '/admin/reports',
+    SETTINGS: '/admin/settings',
+    ACCESS_CONTROL: '/admin/access-control',
+  },
+};

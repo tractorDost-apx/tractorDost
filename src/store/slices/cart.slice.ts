@@ -1,3 +1,9 @@
-// Placeholder for cart.slice.ts
-// This file is currently under development.
-export const placeholder = 'cart.slice.ts';
+export interface CartState {
+  itemCount: number;
+  lastUpdated: string | null;
+}
+
+export const initialCartState: CartState = {
+  itemCount: 0,
+  lastUpdated: null,
+};

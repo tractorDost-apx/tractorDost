@@ -97,3 +97,6 @@ export const usedTractorInspectionAPI = {
     }
   },
 };
+
+export const usedInspectionsAPI = usedTractorInspectionAPI;
+

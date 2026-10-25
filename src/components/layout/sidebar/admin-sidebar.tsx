@@ -1,3 +1,2 @@
-// Placeholder for admin-sidebar.tsx
-// This file is currently under development.
-export const placeholder = 'admin-sidebar.tsx';
+export { default as AdminSidebar } from '@/components/dashboard/AdminSidebar';
+export { default } from '@/components/dashboard/AdminSidebar';

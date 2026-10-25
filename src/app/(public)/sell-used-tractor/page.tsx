@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usedTractorListingAPI } from '@/lib/api/used-listings';
 import { usedTractorDocumentAPI } from '@/lib/api/used-documents';
 import { ConditionGrade, UrgencyLevel } from '@/lib/api/usedTractors';
 import type { CreateListingInput } from '@/types/models/used-listing';
 import { brandAPI } from '@/lib/api/brands';
 import { useAuth } from '@/store/AuthContext';
+import { INDIAN_STATES, STATE_DISTRICTS } from '@/lib/constants/states-districts';
+import { TractorLoader } from '@/components/ui/TractorLoader';
 import {
   Tractor,
   MapPin,
@@ -32,8 +34,9 @@ const STEPS = [
   { id: 4, title: 'Description & Photos', icon: <FileText size={20} /> },
 ];
 
-export default function SellUsedTractorPage() {
+function SellUsedTractorForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // State
   const { isAuthenticated } = useAuth();
@@ -74,13 +77,30 @@ export default function SellUsedTractorPage() {
 
   const [brands, setBrands] = useState<any[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     brandAPI.getAllBrands().then((res) => {
       if (res.success && res.data && Array.isArray(res.data.data)) {
         setBrands(res.data.data);
       }
     });
   }, []);
+
+  useEffect(() => {
+    const brand = searchParams.get('brand');
+    const model = searchParams.get('model');
+    const year = searchParams.get('year');
+    const price = searchParams.get('price');
+
+    if (brand || model || year || price) {
+      setFormData((prev) => ({
+        ...prev,
+        ...(brand ? { tractorBrand: brand } : {}),
+        ...(model ? { tractorModel: model } : {}),
+        ...(year && !isNaN(Number(year)) ? { yearOfManufacture: Number(year) } : {}),
+        ...(price && !isNaN(Number(price)) ? { askingPrice: Number(price) } : {}),
+      }));
+    }
+  }, [searchParams]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -483,29 +503,54 @@ export default function SellUsedTractorPage() {
                       <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
                         State *
                       </label>
-                      <input
-                        type="text"
+                      <select
                         name="state"
                         required
-                        placeholder="e.g. Maharashtra"
                         value={formData.state}
-                        onChange={handleChange}
-                        className="bg-background text-foreground w-full rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                      />
+                        onChange={(e) => {
+                          handleChange(e);
+                          setFormData((prev) => ({ ...prev, district: '' }));
+                        }}
+                        className="bg-background text-foreground w-full appearance-none rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
+                      >
+                        <option value="">Select State</option>
+                        {INDIAN_STATES.map((st) => (
+                          <option key={st} value={st}>
+                            {st}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
                         District *
                       </label>
-                      <input
-                        type="text"
-                        name="district"
-                        required
-                        placeholder="e.g. Pune"
-                        value={formData.district}
-                        onChange={handleChange}
-                        className="bg-background text-foreground w-full rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
-                      />
+                      {formData.state && STATE_DISTRICTS[formData.state] ? (
+                        <select
+                          name="district"
+                          required
+                          value={formData.district}
+                          onChange={handleChange}
+                          className="bg-background text-foreground w-full appearance-none rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
+                        >
+                          <option value="">Select District</option>
+                          {STATE_DISTRICTS[formData.state].map((dist) => (
+                            <option key={dist} value={dist}>
+                              {dist}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          name="district"
+                          required
+                          placeholder="e.g. Pune"
+                          value={formData.district}
+                          onChange={handleChange}
+                          className="bg-background text-foreground w-full rounded-2xl border border-[var(--border-subtle)] px-5 py-4 text-sm font-bold transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-brand-green)]"
+                        />
+                      )}
                     </div>
                     <div>
                       <label className="text-muted mb-2 block text-xs font-black tracking-widest uppercase">
@@ -893,5 +938,19 @@ export default function SellUsedTractorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SellUsedTractorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <TractorLoader />
+        </div>
+      }
+    >
+      <SellUsedTractorForm />
+    </Suspense>
   );
 }

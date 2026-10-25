@@ -180,6 +180,8 @@ export function Navbar() {
             </div>
 
             <button
+              type="button"
+              suppressHydrationWarning
               aria-label="Search"
               className="hidden h-9 w-9 items-center justify-center rounded-full text-zinc-700 transition-all duration-200 hover:scale-105 hover:bg-black/5 hover:text-black sm:flex dark:text-zinc-200 dark:hover:bg-white/10 dark:hover:text-white"
             >
@@ -191,13 +193,19 @@ export function Navbar() {
             {isAuthenticated ? (
               <div className="ml-1 flex items-center gap-1 sm:gap-2">
                 {/* Notification Bell */}
-                <button className="text-foreground/80 hover:text-foreground hover:bg-foreground/10 relative hidden h-9 w-9 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-95 sm:flex">
+                <button
+                  type="button"
+                  suppressHydrationWarning
+                  className="text-foreground/80 hover:text-foreground hover:bg-foreground/10 relative hidden h-9 w-9 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-95 sm:flex"
+                >
                   <Bell size={18} strokeWidth={2.5} />
                   <span className="border-background absolute top-2 right-2 h-2 w-2 rounded-full border bg-[var(--color-brand-orange)] shadow-sm" />
                 </button>
 
                 <div className="group relative">
                   <button
+                    type="button"
+                    suppressHydrationWarning
                     onClick={() =>
                       router.push(
                         user?.role?.name === 'ADMIN'
@@ -251,6 +259,8 @@ export function Navbar() {
                       <Heart size={16} /> Wishlist
                     </Link>
                     <button
+                      type="button"
+                      suppressHydrationWarning
                       onClick={() => logout()}
                       className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-red-500 transition-colors hover:bg-red-500/10"
                     >
@@ -263,6 +273,8 @@ export function Navbar() {
               /* Auth Buttons */
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
+                  suppressHydrationWarning
                   onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)}
                   className="shrink-0 rounded-full bg-[var(--color-brand-green)] px-6 py-2 text-sm font-bold text-white whitespace-nowrap shadow-md transition-all duration-200 hover:bg-[var(--color-brand-green-dark)] hover:shadow-lg active:scale-95"
                 >
@@ -273,6 +285,8 @@ export function Navbar() {
 
             {/* Mobile Menu Toggle */}
             <button
+              type="button"
+              suppressHydrationWarning
               className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-zinc-700 transition-all hover:bg-black/10 hover:text-black xl:hidden dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15 dark:hover:text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
@@ -327,6 +341,8 @@ export function Navbar() {
           <ThemeToggle />
           {!isAuthenticated ? (
             <button
+              type="button"
+              suppressHydrationWarning
               onClick={() => {
                 router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
                 setMobileMenuOpen(false);
@@ -337,6 +353,8 @@ export function Navbar() {
             </button>
           ) : (
             <button
+              type="button"
+              suppressHydrationWarning
               onClick={() => {
                 logout();
                 setMobileMenuOpen(false);
@@ -589,6 +607,8 @@ function NavDropdownMenu({
     <div className="group/nav relative">
       {/* Trigger */}
       <button
+        type="button"
+        suppressHydrationWarning
         className={`relative flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${
           isActive
             ? 'bg-black/10 text-black dark:bg-white/15 dark:text-white'

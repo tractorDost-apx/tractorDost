@@ -1,3 +1,1 @@
-// Placeholder for brand.ts
-// This file is currently under development.
-export const placeholder = 'brand.ts';
+export type { Brand, PaginatedResponse } from '@/lib/api/brands';

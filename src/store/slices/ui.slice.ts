@@ -1,3 +1,15 @@
-// Placeholder for ui.slice.ts
-// This file is currently under development.
-export const placeholder = 'ui.slice.ts';
+export interface UiState {
+  theme: 'light' | 'dark' | 'system';
+  isMobileMenuOpen: boolean;
+  isSearchModalOpen: boolean;
+  isLocationModalOpen: boolean;
+  activeLanguage: 'en' | 'hi' | 'mr';
+}
+
+export const initialUiState: UiState = {
+  theme: 'system',
+  isMobileMenuOpen: false,
+  isSearchModalOpen: false,
+  isLocationModalOpen: false,
+  activeLanguage: 'en',
+};

@@ -986,7 +986,7 @@ export default function TractorRepairPage() {
         if (scRes.success && scRes.data) {
           const scId = Number((scRes.data as any).serviceCenterId || scRes.data.id);
           if (!scId || isNaN(scId)) {
-            alert('This dealership does not have an active workshop ID configured yet.');
+            setFormError('This dealership does not have an active workshop ID configured yet.');
             return;
           }
 
@@ -1017,11 +1017,11 @@ export default function TractorRepairPage() {
               : availableServices[0] || 'general_maintenance',
           }));
         } else {
-          alert('This dealership has not configured an active service center workshop yet. Please choose another verified workshop from the list.');
+          setFormError('This dealership has not configured an active service center workshop yet. Please choose another verified workshop from the list.');
           return;
         }
       } catch (err: any) {
-        alert('Unable to load service center details for this dealer.');
+        setFormError('Unable to load service center details for this dealer.');
         return;
       }
     }

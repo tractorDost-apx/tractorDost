@@ -1,3 +1,3 @@
-// Placeholder for implement.ts
-// This file is currently under development.
-export const placeholder = 'implement.ts';
+export type { Implement } from '@/lib/api/implements';
+export type { EquipmentBrand } from '@/lib/api/equipmentBrands';
+export type { ImplementCategory } from '@/lib/api/implementCategories';

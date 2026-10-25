@@ -1,3 +1,2 @@
-// Placeholder for dashboard-sidebar.tsx
-// This file is currently under development.
-export const placeholder = 'dashboard-sidebar.tsx';
+export { default as DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+export { default } from '@/components/dashboard/DashboardSidebar';

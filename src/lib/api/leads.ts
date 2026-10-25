@@ -222,6 +222,25 @@ export interface CreateCallLogPayload {
   recordingUrl?: string;
 }
 
+export interface CreateLeadInput {
+  name: string;
+  mobile: string;
+  email?: string;
+  state?: string;
+  district?: string;
+  city?: string;
+  leadType?: LeadType;
+  interestedBrand?: string;
+  interestedModel?: string;
+  tractorId?: number;
+  dealerId?: number;
+  budget?: number;
+  message?: string;
+  sourcePage?: string;
+  sourceCampaign?: string;
+  [key: string]: any;
+}
+
 export const leadAPI = {
   /**
    * Records the enquiry from the lead form and returns the visitor's grant.
@@ -234,7 +253,12 @@ export const leadAPI = {
     return response.data;
   },
 
-  createLead: async (input: Record<string, unknown>) => {
+  /** Alias for createDetailAccessLead */
+  submitDetailAccess: async (input: DetailAccessLeadInput) => {
+    return leadAPI.createDetailAccessLead(input);
+  },
+
+  createLead: async (input: CreateLeadInput | Record<string, unknown>) => {
     const response = await apiClient.post<{
       success: boolean;
       data: unknown;
@@ -258,6 +282,16 @@ export const leadAPI = {
       params: cleanParams,
     });
     return response.data;
+  },
+
+  /** Alias for getLeads */
+  getAllLeads: async (params?: GetLeadsParams): Promise<PaginatedLeadsResponse> => {
+    return leadAPI.getLeads(params);
+  },
+
+  /** Helper to update lead status */
+  updateLeadStatus: async (id: number, status: LeadStatus) => {
+    return leadAPI.updateLead(id, { status });
   },
 
   /**

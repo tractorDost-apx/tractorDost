@@ -1,3 +1,39 @@
-// Placeholder for index.ts
-// This file is currently under development.
-export const placeholder = 'index.ts';
+// Unified API Exports for TractorDost Client
+export { apiClient } from './axios/axios';
+export { authAPI } from './auth';
+export { brandAPI } from './brands';
+export { tractorFamilyAPI } from './tractorFamilies';
+export { categoryAPI } from './categories';
+export { tractorAPI } from './tractors';
+export { compareAPI } from './compare';
+export { dealerAPI } from './dealers';
+export { dealerBrandAPI } from './dealerBrands';
+export { dealerInventoryAPI } from './dealerInventory';
+export { showroomAPI } from './showrooms';
+export { serviceCenterAPI } from './serviceCenters';
+export { serviceBookingAPI } from './serviceBookings';
+export { emiAPI } from './emi';
+export { loanAPI } from './loan';
+export { valuationAPI } from './valuation';
+export { newsAPI } from './news';
+export { cmsAPI } from './cms';
+export { leadAPI } from './leads';
+export { equipmentBrandAPI } from './equipmentBrands';
+export { implementCategoryAPI } from './implementCategories';
+export { implementAPI } from './implements';
+export { reviewAPI } from './reviews';
+export { auditLogAPI } from './auditLogs';
+export { bannerAPI } from './banners';
+export { appSettingAPI } from './appSettings';
+export { departmentAPI } from './departments';
+export { employeeAPI } from './employees';
+export { usedListingsAPI } from './used-listings';
+export { usedEnquiriesAPI } from './used-enquiries';
+export { usedDocumentsAPI } from './used-documents';
+export { usedInspectionsAPI } from './used-inspections';
+export { listingBoostsAPI } from './listingBoosts';
+export { userAPI } from './users';
+export { accessControlAPI } from './accessControl';
+export { mediaAPI } from './media';
+export { faqAPI } from './faq';
+export { boostPricingAPI } from './boostPricing';

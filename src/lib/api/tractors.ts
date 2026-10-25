@@ -4,6 +4,9 @@ import { detailAccessHeaders } from '@/lib/utils/detail-access';
 import type { AxiosProgressEvent } from 'axios';
 import type { BulkImportResponse, ImportProgress } from '@/types/api/tractor-import';
 
+export type { Category as TractorCategory } from './categories';
+export type { TractorFamily } from './tractorFamilies';
+
 const uploadPercent = (cb?: (percent: number) => void) => (e: AxiosProgressEvent) => {
   if (cb && e.total) cb(Math.round((e.loaded / e.total) * 100));
 };
@@ -297,6 +300,8 @@ export interface GetTractorsParams {
   isActive?: boolean | string;
 }
 
+export type TractorFilter = GetTractorsParams;
+
 export const tractorAPI = {
   /**
    * Fetch all tractors with pagination, search and filters
@@ -304,6 +309,11 @@ export const tractorAPI = {
   getAllTractors: async (params?: GetTractorsParams) => {
     const response = await apiClient.get<PaginatedResponse<Tractor>>('/tractor/getAll', { params });
     return response.data;
+  },
+
+  /** Alias for getAllTractors */
+  getTractors: async (params?: GetTractorsParams) => {
+    return tractorAPI.getAllTractors(params);
   },
 
   /**
@@ -316,6 +326,16 @@ export const tractorAPI = {
       { headers: detailAccessHeaders(detailAccessToken) }
     );
     return response.data;
+  },
+
+  /** Alias for getTractorById */
+  getTractorBySlug: async (slug: string, detailAccessToken?: string) => {
+    return tractorAPI.getTractorById(slug, detailAccessToken);
+  },
+
+  /** Alias for getTractorById */
+  getTractor: async (id: number | string, detailAccessToken?: string) => {
+    return tractorAPI.getTractorById(id, detailAccessToken);
   },
 
   /**

@@ -53,7 +53,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="relative flex min-h-screen flex-col overflow-x-hidden selection:bg-[var(--color-spatial-accent-blue)] selection:text-white">
+      <body
+        suppressHydrationWarning
+        className="relative flex min-h-screen flex-col overflow-x-hidden selection:bg-[var(--color-spatial-accent-blue)] selection:text-white"
+      >
         <SplashScreen />
         <AuthProvider>
           <LayoutOrchestrator>{children}</LayoutOrchestrator>

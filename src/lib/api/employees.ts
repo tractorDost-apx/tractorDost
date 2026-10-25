@@ -24,6 +24,11 @@ export const employeeAPI = {
     }
   },
 
+  /** Alias for getAllEmployees */
+  getEmployees: async (params?: EmployeeListParams): Promise<ApiResult<EmployeePage>> => {
+    return employeeAPI.getAllEmployees(params);
+  },
+
   /** Active staff accounts for the reporting-manager picker; CUSTOMER and DEALER are excluded on the server */
   getReportingManagers: async (
     params?: ReportingManagerParams

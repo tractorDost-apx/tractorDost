@@ -1,16 +1,21 @@
 import React from 'react';
+import { Metadata } from 'next';
+import { TractorCategoryClient } from '@/components/tractors/TractorCategoryClient';
 
-export default function AcCabinPage() {
+export const metadata: Metadata = {
+  title: 'AC Cabin Tractors in India: Price, Comfort & Heavy Duty Models | TractorDost',
+  description:
+    'Discover factory-fitted AC cabin tractors in India from John Deere, Mahindra, Solis, and New Holland for extreme summer heat, dust protection, and 12-hour operator comfort.',
+};
+
+export default function ACCabinTractorsPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Ac Cabin</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
-      </div>
-    </div>
+    <TractorCategoryClient
+      title="AC Cabin Tractors in India"
+      subtitle="Factory-fitted climate-controlled cabins protecting operators from severe 45°C summer heat, flying chaff, dust storms, and heavy monsoon rains."
+      badge="All-Weather Comfort"
+      categoryTag="ac-cabin"
+      seoContent="<h2 class='text-xl font-bold text-foreground mb-3'>The Modern Advantage of AC Cabins</h2><p class='mb-3'>Equipped with sealed acoustic insulation, micro-particle air filters, and heavy HVAC chilling units, AC cabin tractors eliminate operator fatigue during 12-hour continuous harvesting and laser-leveling shifts.</p><p>Features include 360-degree panoramic tinted glass, pneumatic suspension seats, Bluetooth infotainment systems, and mobile charging ports.</p>"
+    />
   );
 }

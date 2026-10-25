@@ -1,16 +1,13 @@
 import React from 'react';
+import { Metadata } from 'next';
+import { HarvestersClient } from '@/components/harvesters/HarvestersClient';
+
+export const metadata: Metadata = {
+  title: 'Combine Harvesters & Multi-Crop Harvesting Machines | TractorDost',
+  description:
+    'Explore top self-propelled, tractor-mounted, and track paddy combine harvesters from Preet, Dasmesh, Claas, Kartar, and John Deere with specifications and prices.',
+};
 
 export default function HarvestersPage() {
-  return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Harvesters</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
-      </div>
-    </div>
-  );
+  return <HarvestersClient initialType="all" />;
 }

@@ -73,6 +73,8 @@ export interface Implement {
   usageType?: string | null;
   priceMin?: number | null;
   priceMax?: number | null;
+  price?: number | null;
+  powerSource?: string | null;
   description?: string | null;
   brochureUrl?: string | null;
   brochureId?: string | null;
@@ -98,6 +100,7 @@ export interface PaginatedResponse<T> {
   message: string;
   data: {
     data: T[];
+    implements?: T[];
     totalCount?: number;
     currentPage?: number;
     totalPages: number;

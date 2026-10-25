@@ -5,6 +5,7 @@ export interface Banner {
   position: string;
   title: string | null;
   imageUrl: string;
+  desktopImageUrl?: string;
   imageId: string | null;
   mobileImageUrl: string | null;
   mobileImageId: string | null;
@@ -16,7 +17,9 @@ export interface Banner {
   isActive: boolean;
   sortOrder: number;
   clickCount: number;
+  clicksCount?: number;
   impressions: number;
+  impressionsCount?: number;
   createdAt: string;
   updatedAt: string;
 }

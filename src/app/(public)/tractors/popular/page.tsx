@@ -1,16 +1,21 @@
 import React from 'react';
+import { Metadata } from 'next';
+import { TractorCategoryClient } from '@/components/tractors/TractorCategoryClient';
 
-export default function PopularPage() {
+export const metadata: Metadata = {
+  title: 'Most Popular & Best Selling Tractors in India | TractorDost',
+  description:
+    'Discover India’s highest-selling tractors with proven reliability, high resale value, and widest nationwide dealership support.',
+};
+
+export default function PopularTractorsPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Popular</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
-      </div>
-    </div>
+    <TractorCategoryClient
+      title="Most Popular Tractors in India"
+      subtitle="The undisputed legends of Indian agriculture: Swaraj 744 FE, Mahindra 575 DI, Massey Ferguson 241 DI, Sonalika DI 745, and Farmtrac 60."
+      badge="All-Time Best Sellers"
+      categoryTag="popular"
+      seoContent="<h2 class='text-xl font-bold text-foreground mb-3'>Why These Tractors Dominate Indian Fields</h2><p class='mb-3'>India's best-selling tractors earned their reputation over decades of relentless service in scorching heat, monsoon mud, and dusty threshing floors. They feature unmatched spare parts availability at every village crossroads and retain the highest resale value in the used market.</p><p>Compare user ratings, field review videos, and finance options for these iconic models.</p>"
+    />
   );
 }

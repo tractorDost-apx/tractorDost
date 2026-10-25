@@ -1,3 +1,15 @@
-// Placeholder for search.slice.ts
-// This file is currently under development.
-export const placeholder = 'search.slice.ts';
+export interface SearchState {
+  query: string;
+  recentSearches: string[];
+  selectedBrandId: number | null;
+  selectedState: string | null;
+  selectedHpRange: string | null;
+}
+
+export const initialSearchState: SearchState = {
+  query: '',
+  recentSearches: [],
+  selectedBrandId: null,
+  selectedState: null,
+  selectedHpRange: null,
+};

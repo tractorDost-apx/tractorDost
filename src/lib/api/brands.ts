@@ -49,6 +49,11 @@ export const brandAPI = {
     return response.data;
   },
 
+  /** Alias for getAllBrands */
+  getBrands: async (params?: { page?: number; limit?: number; search?: string; isActive?: string; isFeatured?: string }) => {
+    return brandAPI.getAllBrands(params);
+  },
+
   /**
    * Fetch a single brand by ID
    */

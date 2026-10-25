@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { dealerAPI, Dealer } from '@/lib/api/dealers';
 import { brandAPI, Brand } from '@/lib/api/brands';
+import { leadAPI } from '@/lib/api/leads';
+import { INDIAN_STATES } from '@/lib/constants/states-districts';
 import {
   Search,
   MapPin,
@@ -20,6 +22,7 @@ import {
   Clock,
   X,
   Send,
+  Loader2,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
@@ -35,6 +38,12 @@ export default function DealersPage() {
   const [sortBy, setSortBy] = useState<'rating' | 'reviews'>('rating');
   const [inquiryModalOpen, setInquiryModalOpen] = useState<Dealer | null>(null);
 
+  // Inquiry form states
+  const [inquiryForm, setInquiryForm] = useState({ name: '', mobile: '', message: '' });
+  const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [inquirySuccess, setInquirySuccess] = useState(false);
+  const [inquiryError, setInquiryError] = useState('');
+
   // Pagination State
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -44,9 +53,6 @@ export default function DealersPage() {
   const [selectedBrand, setSelectedBrand] = useState<number | null>(null);
   const [selectedState, setSelectedState] = useState('');
   const [showOnlyOpen, setShowOnlyOpen] = useState(false);
-
-  // Fixed list of states for demo
-  const indianStates = ['Maharashtra', 'Punjab', 'Madhya Pradesh', 'Haryana', 'Uttar Pradesh'];
 
   useEffect(() => {
     // Fetch brands for filter
@@ -96,10 +102,49 @@ export default function DealersPage() {
     return () => clearTimeout(timeout);
   }, [searchQuery, selectedBrand, selectedState, sortBy, showOnlyOpen]);
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
+  const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Inquiry sent to ${inquiryModalOpen?.businessName} successfully!`);
-    setInquiryModalOpen(null);
+    if (!inquiryModalOpen) return;
+
+    if (!inquiryForm.name || inquiryForm.name.trim().length < 2) {
+      setInquiryError('Please enter your full name (at least 2 characters).');
+      return;
+    }
+    const cleanMobile = inquiryForm.mobile.replace(/\s+/g, '').replace(/^\+91/, '');
+    if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+      setInquiryError('Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
+
+    setSubmittingInquiry(true);
+    setInquiryError('');
+
+    try {
+      await leadAPI.createLead({
+        leadType: 'DEALER',
+        dealerId: inquiryModalOpen.id,
+        name: inquiryForm.name.trim(),
+        mobile: cleanMobile,
+        message: inquiryForm.message.trim() || `Inquiry for dealer: ${inquiryModalOpen.businessName}`,
+        state: selectedState || inquiryModalOpen.state || 'Maharashtra',
+        district: inquiryModalOpen.district,
+        sourcePage: '/dealers',
+      });
+
+      setInquirySuccess(true);
+      setTimeout(() => {
+        setInquiryModalOpen(null);
+        setInquirySuccess(false);
+        setInquiryForm({ name: '', mobile: '', message: '' });
+      }, 2000);
+    } catch (err: any) {
+      console.error('Failed to submit dealer inquiry:', err);
+      setInquiryError(
+        err?.response?.data?.message || 'Failed to submit inquiry. Please try again or call the dealer directly.'
+      );
+    } finally {
+      setSubmittingInquiry(false);
+    }
   };
 
   return (
@@ -168,7 +213,7 @@ export default function DealersPage() {
                 className="bg-foreground/5 text-foreground w-full appearance-none rounded-xl border-none px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
               >
                 <option value="">All States</option>
-                {indianStates.map((s) => (
+                {INDIAN_STATES.map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
@@ -474,7 +519,7 @@ export default function DealersPage() {
               <X size={20} />
             </button>
 
-            <div className="mb-8 pr-12">
+            <div className="mb-6 pr-12">
               <h3 className="mb-2 text-2xl font-black text-zinc-900 dark:text-white">Request Callback</h3>
               <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400">
                 A representative from{' '}
@@ -485,49 +530,86 @@ export default function DealersPage() {
               </p>
             </div>
 
-            <form onSubmit={handleInquirySubmit} className="flex flex-col gap-5">
-              <div>
-                <label className="mb-2 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
-                  Your Name
-                </label>
-                <input
-                  required
-                  type="text"
-                  placeholder="John Doe"
-                  className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
-                />
+            {inquirySuccess ? (
+              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-emerald-500/10 p-6 text-center text-emerald-600 dark:text-emerald-400">
+                <CheckCircle size={40} className="animate-bounce" />
+                <h4 className="text-lg font-black">Inquiry Submitted!</h4>
+                <p className="text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                  Your inquiry has been successfully sent to {inquiryModalOpen.businessName}. Their sales advisor will call you shortly.
+                </p>
               </div>
+            ) : (
+              <form onSubmit={handleInquirySubmit} className="flex flex-col gap-4">
+                {inquiryError && (
+                  <div className="rounded-xl bg-red-500/10 p-3 text-xs font-bold text-red-600 dark:text-red-400">
+                    {inquiryError}
+                  </div>
+                )}
 
-              <div>
-                <label className="mb-2 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
-                  Mobile Number
-                </label>
-                <input
-                  required
-                  type="tel"
-                  placeholder="+91 XXXXX XXXXX"
-                  className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
-                />
-              </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
+                    Your Name *
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    value={inquiryForm.name}
+                    onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })}
+                    placeholder="Enter your full name"
+                    disabled={submittingInquiry}
+                    className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
+                  />
+                </div>
 
-              <div>
-                <label className="mb-2 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
-                  Interest / Query
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="I am interested in buying..."
-                  className="w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
-                />
-              </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
+                    Mobile Number *
+                  </label>
+                  <input
+                    required
+                    type="tel"
+                    maxLength={10}
+                    value={inquiryForm.mobile}
+                    onChange={(e) => setInquiryForm({ ...inquiryForm, mobile: e.target.value })}
+                    placeholder="10-digit mobile number"
+                    disabled={submittingInquiry}
+                    className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
+                  />
+                </div>
 
-              <button
-                type="submit"
-                className="mt-2 w-full rounded-2xl bg-[var(--color-brand-green)] py-4 font-black text-white shadow-lg shadow-[var(--color-brand-green)]/30 transition-all hover:-translate-y-1 hover:brightness-105 active:translate-y-0"
-              >
-                Submit Inquiry
-              </button>
-            </form>
+                <div>
+                  <label className="mb-1.5 block text-xs font-black tracking-widest uppercase text-zinc-500 dark:text-zinc-400">
+                    Interest / Message (Optional)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={inquiryForm.message}
+                    onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
+                    placeholder="I am looking to buy a tractor / want a price quote..."
+                    disabled={submittingInquiry}
+                    className="w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-bold text-zinc-900 outline-none transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-lime-400 dark:focus:ring-lime-400/20"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submittingInquiry}
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] py-3.5 font-black text-white shadow-lg shadow-[var(--color-brand-green)]/30 transition-all hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 disabled:opacity-60"
+                >
+                  {submittingInquiry ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      Submit Inquiry
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

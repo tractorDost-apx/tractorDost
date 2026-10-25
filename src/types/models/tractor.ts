@@ -1,3 +1,7 @@
-// Placeholder for tractor.ts
-// This file is currently under development.
-export const placeholder = 'tractor.ts';
+export type {
+  Tractor,
+  TractorSpec,
+  TractorPriceByState,
+  TractorCategory,
+  TractorFamily,
+} from '@/lib/api/tractors';

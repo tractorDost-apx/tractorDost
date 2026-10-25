@@ -1,16 +1,25 @@
-import React from 'react';
+'use client';
 
-export default function TypePage() {
+import React, { use } from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { HarvestersClient } from '@/components/harvesters/HarvestersClient';
+
+export default function HarvesterTypePage({ params }: { params: Promise<{ type: string }> }) {
+  const resolvedParams = use(params);
+  const typeKey = resolvedParams.type.toLowerCase();
+
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-6 text-center">
-      <div className="glass-panel relative w-full max-w-2xl overflow-hidden p-12">
-        <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[100px] w-[100px] rounded-full bg-lime-400/10 blur-[50px]" />
-        <h1 className="mb-4 text-3xl font-bold text-lime-400">Type</h1>
-        <p className="text-muted-foreground text-lg">
-          This section is currently under development. Detailed features and content will be added
-          here soon!
-        </p>
+    <div>
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <Link
+          href="/harvesters"
+          className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft size={14} /> Back to All Harvesters
+        </Link>
       </div>
+      <HarvestersClient initialType={typeKey} />
     </div>
   );
 }

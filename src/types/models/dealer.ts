@@ -149,6 +149,7 @@ export interface Dealer {
   updatedAt: string;
 
   brands?: DealerBrand[];
+  dealerBrands?: DealerBrand[];
   inventory?: DealerInventory[];
   showroom?: Showroom | null;
   serviceCenter?: ServiceCenter | null;
@@ -226,11 +227,18 @@ export interface PaginatedDealersResponse {
   message: string;
   data: {
     data: Dealer[];
+    dealers?: Dealer[];
     totalCount: number;
     currentPage: number;
     totalPages: number;
     hasNextPage: boolean;
     hasPrevPage: boolean;
+    pagination?: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
   };
   total?: number;
 }
