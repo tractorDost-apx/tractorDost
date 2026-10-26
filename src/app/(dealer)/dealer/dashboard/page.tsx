@@ -146,12 +146,28 @@ export default function DealerDashboardPage() {
       bg: 'bg-indigo-500/10',
     },
     {
-      title: 'Used Tractor Leads',
+      title: 'Customer Leads',
       desc: 'Connect with verified buyers & farmers',
       icon: Inbox,
       href: '/dealer/leads',
       color: 'text-amber-500',
       bg: 'bg-amber-500/10',
+    },
+    {
+      title: 'Workshop Services',
+      desc: 'Manage service bookings and repair jobs',
+      icon: Wrench,
+      href: '/dealer/services',
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10',
+    },
+    {
+      title: 'Sales Analytics',
+      desc: 'Demand trends, inquiry conversions & velocity',
+      icon: TrendingUp,
+      href: '/dealer/analytics',
+      color: 'text-blue-500',
+      bg: 'bg-blue-500/10',
     },
     {
       title: 'Dealership Profile',
@@ -179,10 +195,11 @@ export default function DealerDashboardPage() {
     // 1. Leads
     (leadsData?.data ?? []).forEach((lead) => {
       const isNew = lead.status === 'NEW';
+      const tractorTitle = `${lead.listing?.tractorBrand ? `${lead.listing.tractorBrand} ` : ''}${lead.listing?.tractorModel || 'Tractor'}`.trim();
       items.push({
         id: `lead-${lead.id}`,
         title: `Buyer Lead: ${lead.name}`,
-        desc: `Enquiry on ${lead.listing?.tractorModel || 'Tractor'} · Mobile: ${lead.mobile}`,
+        desc: `Enquiry on ${tractorTitle} · Mobile: ${lead.mobile}`,
         time: formatRelativeTime(lead.createdAt),
         date: new Date(lead.createdAt),
         badge: lead.status,
@@ -212,9 +229,10 @@ export default function DealerDashboardPage() {
 
     // 3. Used Listings
     (usedData?.data ?? []).forEach((listing) => {
+      const listingTitle = `${listing.tractorBrand || ''} ${listing.tractorModel || ''}`.trim() || 'Tractor Listing';
       items.push({
         id: `listing-${listing.id}`,
-        title: `Listed: ${listing.tractorModel}`,
+        title: `Listed: ${listingTitle}`,
         desc: `Price: ₹${(listing.askingPrice ?? listing.price) ? (listing.askingPrice ?? listing.price)!.toLocaleString('en-IN') : 'N/A'} · Year: ${listing.yearOfManufacture || 'Used'}`,
         time: formatRelativeTime(listing.createdAt),
         date: new Date(listing.createdAt),

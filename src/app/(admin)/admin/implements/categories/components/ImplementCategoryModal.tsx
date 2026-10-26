@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { implementCategoryAPI, ImplementCategory } from '@/lib/api/implementCategories';
 import { X, Upload, Layers, ChevronDown } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 interface ImplementCategoryModalProps {
   category: ImplementCategory | null;
@@ -99,13 +100,15 @@ export default function ImplementCategoryModal({
 
       if (category) {
         await implementCategoryAPI.updateImplementCategory(category.id, submitData);
+        toast.success('Category updated successfully');
       } else {
         await implementCategoryAPI.createImplementCategory(submitData);
+        toast.success('Category created successfully');
       }
       onClose();
     } catch (error: any) {
       console.error(error);
-      alert(error?.response?.data?.message || 'Failed to save category.');
+      toast.error(error?.response?.data?.message || 'Failed to save category.');
     } finally {
       setLoading(false);
     }

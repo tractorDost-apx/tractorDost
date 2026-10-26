@@ -28,6 +28,7 @@ import { LeadTable } from './components/LeadTable';
 import { LeadDetailsDrawer } from './components/LeadDetailsDrawer';
 import { BulkAssignModal } from './components/BulkAssignModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
+import { toast } from '@/components/ui/toast';
 import { LogCallModal } from './components/LogCallModal';
 import { AddNoteModal } from './components/AddNoteModal';
 import { parseStaffUsers } from './lead-helpers';
@@ -268,7 +269,7 @@ export default function AdminLeadsPage() {
       await leadAPI.exportLeads(filters);
       showNotification('Leads exported successfully!');
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to export leads');
+      toast.error(err?.response?.data?.message || 'Failed to export leads');
     } finally {
       setExporting(false);
     }
@@ -283,7 +284,7 @@ export default function AdminLeadsPage() {
       fetchLeads();
       fetchStats();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Status transition not permitted');
+      toast.error(err?.response?.data?.message || 'Status transition not permitted');
     }
   };
 

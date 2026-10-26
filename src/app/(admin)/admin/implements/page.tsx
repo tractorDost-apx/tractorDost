@@ -6,6 +6,7 @@ import { Plus, Search, Edit2, Trash2, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import Pagination from '@/components/shared/Pagination';
 import ImplementBulkImport from '@/components/admin/implement-bulk-import/implement-bulk-import';
+import { toast } from '@/components/ui/toast';
 
 export default function ImplementsPage() {
   const [implementsList, setImplementsList] = useState<Implement[]>([]);
@@ -45,9 +46,10 @@ export default function ImplementsPage() {
     if (confirm('Are you sure you want to delete this implement?')) {
       try {
         await implementAPI.deleteImplement(id);
+        toast.success('Implement deleted successfully');
         fetchImplements();
       } catch (error) {
-        alert('Failed to delete implement.');
+        toast.error('Failed to delete implement.');
       }
     }
   };

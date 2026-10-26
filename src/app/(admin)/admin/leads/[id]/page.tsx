@@ -37,6 +37,7 @@ import {
 } from '@/lib/api/leads';
 import { usersAPI } from '@/lib/api/users';
 import { dealerAPI } from '@/lib/api/dealers';
+import { toast } from '@/components/ui/toast';
 import {
   LeadStatusBadge,
   LeadTypeBadge,
@@ -233,9 +234,10 @@ export default function LeadDetailPage({
     if (!lead || !confirm('Delete this call log?')) return;
     try {
       await leadAPI.deleteCallLog(lead.id, callLogId);
+      toast.success('Call log deleted successfully');
       fetchLead();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete call log');
+      toast.error(err?.response?.data?.message || 'Failed to delete call log');
     }
   };
 
@@ -248,10 +250,12 @@ export default function LeadDetailPage({
       await leadAPI.createLeadNote(lead.id, { noteText: noteText.trim() });
       setNoteText('');
       setSuccessMsg('Note added successfully!');
+      toast.success('Note added successfully!');
       fetchLead();
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to add note');
+      toast.error(err?.response?.data?.message || 'Failed to add note');
     } finally {
       setAddingNote(false);
     }
@@ -262,9 +266,10 @@ export default function LeadDetailPage({
     try {
       await leadAPI.updateLeadNote(lead.id, noteId, { noteText: editingNoteText.trim() });
       setEditingNoteId(null);
+      toast.success('Note updated successfully');
       fetchLead();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to update note');
+      toast.error(err?.response?.data?.message || 'Failed to update note');
     }
   };
 
@@ -272,9 +277,10 @@ export default function LeadDetailPage({
     if (!lead || !confirm('Delete this note?')) return;
     try {
       await leadAPI.deleteLeadNote(lead.id, noteId);
+      toast.success('Note deleted successfully');
       fetchLead();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete note');
+      toast.error(err?.response?.data?.message || 'Failed to delete note');
     }
   };
 

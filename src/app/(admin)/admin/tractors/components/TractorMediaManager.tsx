@@ -19,6 +19,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 interface TractorMediaManagerProps {
   tractorId?: number;
@@ -157,7 +158,7 @@ export default function TractorMediaManager({
   // Handler: Replace an existing photo with a new one
   const handleReplacePhoto = async (item: Media, file: File) => {
     if (!tractorId) {
-      alert('Tractor ID is required to replace media.');
+      toast.warning('Tractor ID is required to replace media.');
       return;
     }
 
@@ -184,6 +185,7 @@ export default function TractorMediaManager({
           console.warn('Could not delete old media during replace', delErr);
         }
 
+        toast.success('Photo replaced successfully with new image!');
         setMessage({
           type: 'success',
           text: 'Photo replaced successfully with new image!',
@@ -192,6 +194,7 @@ export default function TractorMediaManager({
         // 3. Refresh media list from server
         await fetchMedia();
       } else {
+        toast.error((uploadRes as any).message || 'Failed to upload replacement photo.');
         setMessage({
           type: 'error',
           text: (uploadRes as any).message || 'Failed to upload replacement photo.',
@@ -199,6 +202,7 @@ export default function TractorMediaManager({
       }
     } catch (error: any) {
       console.error('Error replacing media', error);
+      toast.error(error?.response?.data?.message || 'Failed to replace photo. Please try again.');
       setMessage({
         type: 'error',
         text: error?.response?.data?.message || 'Failed to replace photo. Please try again.',
@@ -211,7 +215,7 @@ export default function TractorMediaManager({
   // Handler: Replace brochure PDF
   const handleReplaceBrochure = async (existingBrochureItem: Media | null, file: File) => {
     if (!tractorId) {
-      alert('Tractor ID is required.');
+      toast.warning('Tractor ID is required.');
       return;
     }
 

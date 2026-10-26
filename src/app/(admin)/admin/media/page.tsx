@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { mediaAPI, Media } from '@/lib/api/media';
 import { Image as ImageIcon, Search, Trash2, FileText, CheckCircle } from 'lucide-react';
 import Pagination from '@/components/shared/Pagination';
+import { toast } from '@/components/ui/toast';
 
 export default function MediaGalleryPage() {
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
@@ -45,9 +46,10 @@ export default function MediaGalleryPage() {
     ) {
       try {
         await mediaAPI.deleteMedia(id);
+        toast.success('Media item deleted successfully');
         fetchMedia();
       } catch (error) {
-        alert('Failed to delete media.');
+        toast.error('Failed to delete media.');
       }
     }
   };

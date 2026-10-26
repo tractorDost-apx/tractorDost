@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import ImplementCategoryModal from './components/ImplementCategoryModal';
 import Pagination from '@/components/shared/Pagination';
+import { toast } from '@/components/ui/toast';
 
 export default function ImplementCategoriesPage() {
   const [categories, setCategories] = useState<ImplementCategory[]>([]);
@@ -96,9 +97,10 @@ export default function ImplementCategoriesPage() {
     ) {
       try {
         await implementCategoryAPI.deleteImplementCategory(id);
+        toast.success('Category deleted successfully');
         fetchCategories();
       } catch (error: any) {
-        alert(error?.response?.data?.message || 'Failed to delete category.');
+        toast.error(error?.response?.data?.message || 'Failed to delete category.');
       }
     }
   };
@@ -107,9 +109,10 @@ export default function ImplementCategoriesPage() {
     e.stopPropagation();
     try {
       await implementCategoryAPI.toggleImplementCategoryActive(id);
+      toast.success('Category status updated');
       fetchCategories();
     } catch (error) {
-      alert('Failed to toggle status.');
+      toast.error('Failed to toggle status.');
     }
   };
 

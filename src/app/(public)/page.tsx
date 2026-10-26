@@ -2,18 +2,41 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, ChevronRight, Flame, ArrowRightLeft, Star } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+    Search,
+    ChevronRight,
+    Flame,
+    ArrowRightLeft,
+    Star,
+    ShieldCheck,
+    Calculator,
+    Banknote,
+    Store,
+    Wrench,
+    Tractor as TractorIcon,
+    Sparkles,
+    Calendar,
+    Clock,
+    MapPin,
+} from 'lucide-react';
 import { tractorAPI, Tractor } from '@/lib/api/tractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { compareAPI, CompareFrequencyRecord } from '@/lib/api/compare';
+import { usedTractorListingAPI } from '@/lib/api/used-listings';
+import type { UsedTractorListing } from '@/types/models/used-listing';
+import { formatINR } from '@/lib/utils/format-currency';
 
 export default function PublicHomePage() {
+    const router = useRouter();
     const [tractors, setTractors] = useState<Tractor[]>([]);
+    const [usedTractors, setUsedTractors] = useState<UsedTractorListing[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
     const [comparisons, setComparisons] = useState<CompareFrequencyRecord[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Smart Matcher State
+    const [searchQuery, setSearchQuery] = useState('');
     const [budget, setBudget] = useState('');
     const [hp, setHp] = useState('');
 
@@ -21,21 +44,28 @@ export default function PublicHomePage() {
         const fetchHomeData = async () => {
             setLoading(true);
             try {
-                const [tractorsRes, brandsRes, compareRes] = await Promise.all([
+                const [tractorsRes, brandsRes, compareRes, usedRes] = await Promise.allSettled([
                     tractorAPI.getAllTractors({ limit: 6 }), // Fetch latest for featured
                     brandAPI.getAllBrands({ limit: 8 }),
-                    compareAPI.getFrequencyOfCompare({ limit: 3, sort: 'desc' }),
+                    compareAPI.getFrequencyOfCompare({ limit: 6, sort: 'desc' }),
+                    usedTractorListingAPI.getAllListings({ limit: 4, sortBy: 'newest' }),
                 ]);
 
-                if (tractorsRes.success) {
-                    const list = (tractorsRes.data as any)?.tractors || (tractorsRes.data as any)?.data || [];
+                if (tractorsRes.status === 'fulfilled' && tractorsRes.value.success) {
+                    const list = (tractorsRes.value.data as any)?.tractors || (tractorsRes.value.data as any)?.data || [];
                     setTractors(list);
                 }
-                if (brandsRes.success) {
-                    const list = brandsRes.data?.data || (brandsRes.data as any)?.brands || [];
+                if (brandsRes.status === 'fulfilled' && brandsRes.value.success) {
+                    const list = brandsRes.value.data?.data || (brandsRes.value.data as any)?.brands || [];
                     setBrands(list);
                 }
-                if (compareRes.success) setComparisons(compareRes.data.records);
+                if (compareRes.status === 'fulfilled' && compareRes.value.success) {
+                    const records = compareRes.value.data?.records || [];
+                    setComparisons(records.filter((r: any) => r.tractorLeft && r.tractorRight));
+                }
+                if (usedRes.status === 'fulfilled' && usedRes.value.success && usedRes.value.data) {
+                    setUsedTractors(usedRes.value.data.data || []);
+                }
             } catch (error) {
                 console.error('Failed to load home data', error);
             } finally {
@@ -44,6 +74,14 @@ export default function PublicHomePage() {
         };
         fetchHomeData();
     }, []);
+
+    const handleFindNow = () => {
+        const params = new URLSearchParams();
+        if (searchQuery.trim()) params.set('search', searchQuery.trim());
+        if (budget) params.set('price', budget);
+        if (hp) params.set('hp', hp);
+        router.push(`/tractors${params.toString() ? `?${params.toString()}` : ''}`);
+    };
 
     const formatPrice = (price: number | null | undefined) => {
         if (!price) return 'Price on Request';
@@ -84,12 +122,21 @@ export default function PublicHomePage() {
                             <input
                                 type="text"
                                 placeholder="Search by brand or model (e.g., Mahindra 575)"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleFindNow();
+                                }}
                                 className="w-full border-none bg-transparent text-lg font-bold text-white placeholder:text-white/40 focus:outline-none"
                             />
                         </div>
 
                         <div className="flex w-full gap-4 md:w-auto">
-                            <select className="bg-background/50 appearance-none rounded-2xl border border-[var(--border-subtle)] px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50">
+                            <select
+                                value={budget}
+                                onChange={(e) => setBudget(e.target.value)}
+                                className="bg-background/50 appearance-none rounded-2xl border border-[var(--border-subtle)] px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50"
+                            >
                                 <option value="" className="bg-background text-foreground">
                                     Any Budget
                                 </option>
@@ -104,7 +151,11 @@ export default function PublicHomePage() {
                                 </option>
                             </select>
 
-                            <select className="bg-background/50 appearance-none rounded-2xl border border-[var(--border-subtle)] px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50">
+                            <select
+                                value={hp}
+                                onChange={(e) => setHp(e.target.value)}
+                                className="bg-background/50 appearance-none rounded-2xl border border-[var(--border-subtle)] px-6 py-3 font-bold text-white outline-none focus:border-[var(--color-brand-green)]/50"
+                            >
                                 <option value="" className="bg-background text-foreground">
                                     Any HP
                                 </option>
@@ -120,7 +171,11 @@ export default function PublicHomePage() {
                             </select>
                         </div>
 
-                        <button className="w-full shrink-0 rounded-2xl bg-[var(--color-brand-green)] px-8 py-4 text-lg font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/30 shadow-lg transition-all hover:bg-[var(--color-brand-orange)] md:w-auto">
+                        <button
+                            type="button"
+                            onClick={handleFindNow}
+                            className="w-full shrink-0 rounded-2xl bg-[var(--color-brand-green)] px-8 py-4 text-lg font-black tracking-wider text-white uppercase shadow-[var(--color-brand-green)]/30 shadow-lg transition-all hover:bg-[var(--color-brand-orange)] md:w-auto"
+                        >
                             Find Now
                         </button>
                     </div>
@@ -287,7 +342,287 @@ export default function PublicHomePage() {
                     </div>
                 </section>
 
-                {/* 4. TRENDING COMPARISONS (HOT VS BATTLES) */}
+                {/* 4. FARMER ECOSYSTEM & SERVICES HUB */}
+                <section className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-2">
+                        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-3.5 py-1 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
+                            <Sparkles size={14} /> Comprehensive Agro Hub
+                        </div>
+                        <h2 className="text-foreground text-3xl font-black tracking-tight uppercase">
+                            Everything For Your Farm Machinery
+                        </h2>
+                        <p className="text-muted font-bold">
+                            From instant financing to verified second-hand tractors and doorstep workshop services.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {/* 1. Used Tractors */}
+                        <Link
+                            href="/used-tractors"
+                            className="group bg-card relative flex flex-col justify-between overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/50 hover:shadow-xl"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 transition-transform group-hover:scale-110">
+                                    <ShieldCheck size={28} />
+                                </div>
+                                <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-black text-emerald-500 uppercase">
+                                    120-Pt Check
+                                </span>
+                            </div>
+                            <div className="mt-6">
+                                <h3 className="text-foreground text-xl font-black tracking-tight group-hover:text-[var(--color-brand-green)] transition-colors">
+                                    Certified Used Tractors
+                                </h3>
+                                <p className="text-muted mt-2 text-xs leading-relaxed font-semibold">
+                                    Browse verified second-hand tractors with RC book verification, health scores, and fair market prices.
+                                </p>
+                            </div>
+                            <div className="mt-6 flex items-center gap-1.5 text-xs font-black text-[var(--color-brand-green)]">
+                                Explore Market <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                            </div>
+                        </Link>
+
+                        {/* 2. Tractor Valuation */}
+                        <Link
+                            href="/used-tractor-valuation"
+                            className="group bg-card relative flex flex-col justify-between overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/50 hover:shadow-xl"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 transition-transform group-hover:scale-110">
+                                    <Calculator size={28} />
+                                </div>
+                                <span className="rounded-full bg-amber-500/10 px-3 py-1 text-[11px] font-black text-amber-500 uppercase">
+                                    AI Estimator
+                                </span>
+                            </div>
+                            <div className="mt-6">
+                                <h3 className="text-foreground text-xl font-black tracking-tight group-hover:text-amber-500 transition-colors">
+                                    Used Tractor Valuation
+                                </h3>
+                                <p className="text-muted mt-2 text-xs leading-relaxed font-semibold">
+                                    Get an instant, data-backed resale value calculation before selling or buying any pre-owned tractor.
+                                </p>
+                            </div>
+                            <div className="mt-6 flex items-center gap-1.5 text-xs font-black text-amber-500">
+                                Check True Value <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                            </div>
+                        </Link>
+
+                        {/* 3. Tractor Loans & EMI */}
+                        <Link
+                            href="/loan"
+                            className="group bg-card relative flex flex-col justify-between overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/50 hover:shadow-xl"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500 transition-transform group-hover:scale-110">
+                                    <Banknote size={28} />
+                                </div>
+                                <span className="rounded-full bg-blue-500/10 px-3 py-1 text-[11px] font-black text-blue-500 uppercase">
+                                    From 8.95%
+                                </span>
+                            </div>
+                            <div className="mt-6">
+                                <h3 className="text-foreground text-xl font-black tracking-tight group-hover:text-blue-500 transition-colors">
+                                    Tractor Loans & Finance
+                                </h3>
+                                <p className="text-muted mt-2 text-xs leading-relaxed font-semibold">
+                                    Instant loan eligibility, low interest rates, seasonal crop-cycle repayment schedules, and fast disbursals.
+                                </p>
+                            </div>
+                            <div className="mt-6 flex items-center gap-1.5 text-xs font-black text-blue-500">
+                                Apply For Loan <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                            </div>
+                        </Link>
+
+                        {/* 4. Showrooms & Authorized Dealers */}
+                        <Link
+                            href="/showrooms"
+                            className="group bg-card relative flex flex-col justify-between overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-purple-500/50 hover:shadow-xl"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-500 transition-transform group-hover:scale-110">
+                                    <Store size={28} />
+                                </div>
+                                <span className="rounded-full bg-purple-500/10 px-3 py-1 text-[11px] font-black text-purple-500 uppercase">
+                                    1400+ Outlets
+                                </span>
+                            </div>
+                            <div className="mt-6">
+                                <h3 className="text-foreground text-xl font-black tracking-tight group-hover:text-purple-500 transition-colors">
+                                    Dealers & Showrooms
+                                </h3>
+                                <p className="text-muted mt-2 text-xs leading-relaxed font-semibold">
+                                    Locate verified authorized tractor brand dealerships and schedule test drives in your district.
+                                </p>
+                            </div>
+                            <div className="mt-6 flex items-center gap-1.5 text-xs font-black text-purple-500">
+                                Find Dealerships <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                            </div>
+                        </Link>
+
+                        {/* 5. Service Centers */}
+                        <Link
+                            href="/service-centers"
+                            className="group bg-card relative flex flex-col justify-between overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-rose-500/50 hover:shadow-xl"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500 transition-transform group-hover:scale-110">
+                                    <Wrench size={28} />
+                                </div>
+                                <span className="rounded-full bg-rose-500/10 px-3 py-1 text-[11px] font-black text-rose-500 uppercase">
+                                    Doorstep Repair
+                                </span>
+                            </div>
+                            <div className="mt-6">
+                                <h3 className="text-foreground text-xl font-black tracking-tight group-hover:text-rose-500 transition-colors">
+                                    Service Centers & Vans
+                                </h3>
+                                <p className="text-muted mt-2 text-xs leading-relaxed font-semibold">
+                                    Book regular maintenance, genuine parts, hydraulic troubleshooting, and emergency mobile workshop vans.
+                                </p>
+                            </div>
+                            <div className="mt-6 flex items-center gap-1.5 text-xs font-black text-rose-500">
+                                Book Servicing <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                            </div>
+                        </Link>
+
+                        {/* 6. Farm Implements & Harvesters */}
+                        <Link
+                            href="/harvesters"
+                            className="group bg-card relative flex flex-col justify-between overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-500/50 hover:shadow-xl"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-500 transition-transform group-hover:scale-110">
+                                    <TractorIcon size={28} />
+                                </div>
+                                <span className="rounded-full bg-teal-500/10 px-3 py-1 text-[11px] font-black text-teal-500 uppercase">
+                                    Multi-Crop
+                                </span>
+                            </div>
+                            <div className="mt-6">
+                                <h3 className="text-foreground text-xl font-black tracking-tight group-hover:text-teal-500 transition-colors">
+                                    Harvesters & Implements
+                                </h3>
+                                <p className="text-muted mt-2 text-xs leading-relaxed font-semibold">
+                                    Self-propelled combine harvesters, paddy track harvesters, rotavators, seeders, and agricultural attachments.
+                                </p>
+                            </div>
+                            <div className="mt-6 flex items-center gap-1.5 text-xs font-black text-teal-500">
+                                View Machinery <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                            </div>
+                        </Link>
+                    </div>
+                </section>
+
+                {/* 5. VERIFIED USED TRACTORS SECTION */}
+                {usedTractors.length > 0 && (
+                    <section className="flex flex-col gap-8">
+                        <div className="flex items-end justify-between">
+                            <div className="flex flex-col gap-2">
+                                <div className="inline-flex w-fit items-center gap-2 rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-0.5 text-xs font-black text-lime-400 uppercase">
+                                    <ShieldCheck size={13} /> Verified Second Hand
+                                </div>
+                                <h2 className="text-foreground text-3xl font-black tracking-tight uppercase">
+                                    Latest Certified Used Tractors
+                                </h2>
+                                <p className="text-muted font-bold">
+                                    Inspected pre-owned machines with transparent condition ratings and direct farmer sellers.
+                                </p>
+                            </div>
+                            <Link
+                                href="/used-tractors"
+                                className="hidden items-center gap-2 text-sm font-bold tracking-wider text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)] md:flex"
+                            >
+                                Browse All Used Tractors <ChevronRight size={16} />
+                            </Link>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            {usedTractors.map((tractor) => {
+                                const cover =
+                                    tractor.media?.[0]?.url ||
+                                    (Array.isArray((tractor as any).documents) && (tractor as any).documents[0]?.url) ||
+                                    null;
+                                const title = `${tractor.yearOfManufacture} ${tractor.tractorBrand} ${tractor.tractorModel}`;
+                                return (
+                                    <Link
+                                        key={tractor.id}
+                                        href={`/used-tractors/details/${tractor.id}`}
+                                        className="group bg-card relative flex flex-col justify-between overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-xl"
+                                    >
+                                        <div>
+                                            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-foreground/5">
+                                                {cover ? (
+                                                    <img
+                                                        src={cover}
+                                                        alt={title}
+                                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-full w-full flex-col items-center justify-center text-muted">
+                                                        <TractorIcon size={36} className="stroke-[1.5]" />
+                                                        <span className="mt-1 text-[11px] font-medium">Tractor</span>
+                                                    </div>
+                                                )}
+                                                {tractor.isCertified && (
+                                                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full border border-lime-400/30 bg-black/80 px-2 py-0.5 text-[10px] font-bold text-lime-400 backdrop-blur-sm">
+                                                        <ShieldCheck size={11} /> Certified
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="mt-3.5">
+                                                <h3 className="text-foreground group-hover:text-[var(--color-brand-green)] text-base font-black tracking-tight line-clamp-1 transition-colors">
+                                                    {title}
+                                                </h3>
+                                                <p className="text-muted mt-1 flex items-center gap-1 text-xs font-bold">
+                                                    <MapPin size={12} className="text-[var(--color-brand-green)]" />
+                                                    <span>{tractor.district}, {tractor.state}</span>
+                                                </p>
+                                            </div>
+
+                                            <div className="mt-3 grid grid-cols-3 gap-1 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 text-center text-xs">
+                                                <div>
+                                                    <span className="text-muted text-[9px] font-bold block">Year</span>
+                                                    <span className="text-foreground font-black">{tractor.yearOfManufacture}</span>
+                                                </div>
+                                                <div className="border-x border-[var(--border-subtle)]">
+                                                    <span className="text-muted text-[9px] font-bold block">Owner</span>
+                                                    <span className="text-foreground font-black">
+                                                        {tractor.ownership === 1 ? '1st' : tractor.ownership === 2 ? '2nd' : `${tractor.ownership}th`}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-muted text-[9px] font-bold block">Hours</span>
+                                                    <span className="text-foreground font-black">
+                                                        {tractor.hoursUsed ? `${tractor.hoursUsed}h` : 'N/A'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-3 flex items-baseline justify-between border-t border-[var(--border-subtle)] pt-2.5">
+                                            <div>
+                                                <span className="text-base font-black text-[var(--color-brand-green)] block">
+                                                    {formatINR(tractor.askingPrice)}
+                                                </span>
+                                                {tractor.negotiable && (
+                                                    <span className="text-muted text-[9px] font-bold uppercase">Negotiable</span>
+                                                )}
+                                            </div>
+                                            <span className="text-xs font-bold text-[var(--color-brand-green)] group-hover:translate-x-1 transition-transform">
+                                                View &rarr;
+                                            </span>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
+
+                {/* 6. TRENDING COMPARISONS (HOT VS BATTLES) */}
                 <section className="from-foreground/5 relative flex flex-col gap-8 overflow-hidden rounded-[3rem] border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-8 md:p-12">
                     {/* Decorative Background */}
                     <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-orange)]/5 blur-[100px]" />

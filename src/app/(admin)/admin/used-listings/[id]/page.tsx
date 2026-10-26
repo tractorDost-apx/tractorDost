@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
+import { toast } from '@/components/ui/toast';
 
 export default function AdminListingModerationPage({
   params,
@@ -123,7 +124,7 @@ export default function AdminListingModerationPage({
     if (status === ListingStatus.REJECTED) {
       const reason = window.prompt('Please enter a reason for rejection (minimum 10 characters):');
       if (!reason || reason.trim().length < 10) {
-        alert('Rejection cancelled: A valid reason of at least 10 characters is required.');
+        toast.warning('A valid reason of at least 10 characters is required for rejection.');
         return;
       }
       rejectionReason = reason.trim();
@@ -134,9 +135,10 @@ export default function AdminListingModerationPage({
       .adminUpdateListingStatus(listing.id, { listingStatus: status, isCertified, rejectionReason })
       .then((res) => {
         if (res.success) {
+          toast.success(`Listing status updated to ${status}!`);
           fetchListing();
         } else {
-          alert('Failed to update status: ' + res.message);
+          toast.error('Failed to update status: ' + res.message);
         }
         setIsUpdating(false);
       });
@@ -151,10 +153,10 @@ export default function AdminListingModerationPage({
       })
       .then((res) => {
         if (res.success) {
-          alert('Visibility settings updated!');
+          toast.success('Visibility settings updated successfully!');
           fetchListing();
         } else {
-          alert('Failed to update visibility: ' + res.message);
+          toast.error('Failed to update visibility: ' + res.message);
         }
         setIsUpdating(false);
       });
@@ -181,14 +183,14 @@ export default function AdminListingModerationPage({
       }
 
       if (res.success) {
-        alert('Agent assigned successfully!');
+        toast.success('Agent assigned successfully!');
         fetchListing(); // Refresh to show inspection
       } else {
-        alert('Failed to assign agent: ' + res.message);
+        toast.error('Failed to assign agent: ' + res.message);
       }
     } catch (e) {
       console.error(e);
-      alert('An error occurred while assigning agent.');
+      toast.error('An error occurred while assigning agent.');
     }
     setIsAssigning(false);
   };
@@ -206,7 +208,7 @@ export default function AdminListingModerationPage({
         if (createRes.success && createRes.data) {
           inspectionId = createRes.data.id;
         } else {
-          alert('Failed to create inspection: ' + createRes.message);
+          toast.error('Failed to create inspection: ' + createRes.message);
           setIsUpdating(false);
           return;
         }
@@ -251,7 +253,7 @@ export default function AdminListingModerationPage({
             const mediaRes = await usedTractorDocumentAPI.uploadDocument(mediaFormData);
             if (!mediaRes.success) {
               console.error('Failed to upload inspection image:', mediaRes);
-              alert('Inspection saved, but some image uploads failed.');
+              toast.warning('Inspection saved, but some image uploads failed.');
               setIsUpdating(false);
               return;
             }
@@ -260,20 +262,20 @@ export default function AdminListingModerationPage({
           setInspectionImages([]);
         }
 
-        alert('Inspection saved successfully!');
+        toast.success('Inspection saved successfully!');
       } else {
-        alert('Failed to submit inspection: ' + submitRes.message);
+        toast.error('Failed to submit inspection: ' + submitRes.message);
       }
     } catch (e) {
       console.error(e);
-      alert('An error occurred while saving the inspection.');
+      toast.error('An error occurred while saving the inspection.');
     }
     setIsUpdating(false);
   };
 
   const handleUploadDocument = async () => {
     if (!newDocFile) {
-      alert('Please select a document file first.');
+      toast.warning('Please select a document file first.');
       return;
     }
 
@@ -286,15 +288,15 @@ export default function AdminListingModerationPage({
 
       const res = await usedTractorDocumentAPI.uploadDocument(formData);
       if (res.success && res.data) {
-        alert('Document uploaded successfully!');
+        toast.success('Document uploaded successfully!');
         setDocuments((prev) => [...prev, res.data]);
         setNewDocFile(null);
       } else {
-        alert('Failed to upload document: ' + res.message);
+        toast.error('Failed to upload document: ' + res.message);
       }
     } catch (e) {
       console.error(e);
-      alert('An error occurred while uploading the document.');
+      toast.error('An error occurred while uploading the document.');
     }
     setIsUploadingDoc(false);
   };

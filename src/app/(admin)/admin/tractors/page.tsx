@@ -32,6 +32,7 @@ import {
 import Link from 'next/link';
 import Pagination from '@/components/shared/Pagination';
 import TractorBulkImport from '@/components/admin/tractor-bulk-import/tractor-bulk-import';
+import { toast } from '@/components/ui/toast';
 
 export default function TractorsPage() {
   const [tractors, setTractors] = useState<Tractor[]>([]);
@@ -291,9 +292,10 @@ export default function TractorsPage() {
     if (confirm('Are you sure you want to delete this tractor?')) {
       try {
         await tractorAPI.deleteTractor(id);
+        toast.success('Tractor deleted successfully');
         fetchTractors();
       } catch (error) {
-        alert('Failed to delete tractor.');
+        toast.error('Failed to delete tractor.');
       }
     }
   };

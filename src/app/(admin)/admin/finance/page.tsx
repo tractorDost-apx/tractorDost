@@ -18,6 +18,7 @@ import {
 import { leadAPI, Lead } from '@/lib/api/leads';
 import { LOAN_PARTNERS } from '@/lib/api/loan';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 export default function AdminFinancePage() {
   const [loanLeads, setLoanLeads] = useState<Lead[]>([]);
@@ -46,9 +47,10 @@ export default function AdminFinancePage() {
   const handleUpdateStatus = async (leadId: number, newStatus: any) => {
     try {
       await leadAPI.updateLead(leadId, { status: newStatus });
+      toast.success('Lead status updated successfully');
       await loadLeads();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to update lead status');
+      toast.error(err?.response?.data?.message || 'Failed to update lead status');
     }
   };
 

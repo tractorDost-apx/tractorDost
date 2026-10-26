@@ -26,6 +26,7 @@ import {
 } from '@/lib/api/banners';
 import type { Banner } from '@/types/models/banner';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -158,8 +159,10 @@ export default function AdminBannersPage() {
 
       if (editingBanner) {
         await bannerAPI.update(editingBanner.id, formData);
+        toast.success('Banner updated successfully');
       } else {
         await bannerAPI.create(formData);
+        toast.success('Banner created successfully');
       }
 
       setIsModalOpen(false);
@@ -167,6 +170,7 @@ export default function AdminBannersPage() {
     } catch (err: any) {
       console.error('Failed to save banner:', err);
       setFormError(err?.response?.data?.message || 'Failed to save banner.');
+      toast.error(err?.response?.data?.message || 'Failed to save banner.');
     } finally {
       setSubmitting(false);
     }
@@ -176,9 +180,10 @@ export default function AdminBannersPage() {
     if (!window.confirm('Are you sure you want to delete this promotional banner?')) return;
     try {
       await bannerAPI.delete(id);
+      toast.success('Banner deleted successfully');
       await loadBanners();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete banner');
+      toast.error(err?.response?.data?.message || 'Failed to delete banner');
     }
   };
 

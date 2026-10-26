@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Save, ArrowLeft, Upload, FileText, Video, Image as ImageIcon } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
+import { toast } from '@/components/ui/toast';
 
 interface ImplementFormProps {
   initialData?: Implement;
@@ -118,16 +119,16 @@ export default function ImplementForm({ initialData, isEditing = false }: Implem
 
       if (isEditing && initialData) {
         await implementAPI.updateImplement(initialData.id, submitData);
-        alert('Implement updated successfully');
+        toast.success('Implement updated successfully');
       } else {
         await implementAPI.createImplement(submitData);
-        alert('Implement created successfully');
+        toast.success('Implement created successfully');
       }
       router.push('/admin/implements');
       router.refresh();
     } catch (error: any) {
       console.error(error);
-      alert(
+      toast.error(
         error?.response?.data?.message || 'Failed to save implement. Check console for details.'
       );
     } finally {

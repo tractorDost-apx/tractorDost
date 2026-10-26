@@ -229,6 +229,13 @@ export default function UsedTractorDetailPage({
     );
   }
 
+  const formatOrdinal = (val: number | undefined) => {
+    if (!val || val === 1) return '1st';
+    if (val === 2) return '2nd';
+    if (val === 3) return '3rd';
+    return `${val}th`;
+  };
+
   const mediaList = tractor.media || [];
   const activeMediaUrl = mediaList[activeImage]?.url || null;
   const fullTitle = `${tractor.yearOfManufacture} ${tractor.tractorBrand} ${tractor.tractorModel}`;
@@ -344,7 +351,7 @@ export default function UsedTractorDetailPage({
               <div className="bg-background rounded-2xl border border-[var(--border-subtle)] p-4 text-center shadow-sm">
                 <UserIcon className="mx-auto mb-1.5 text-[var(--color-brand-green)]" size={22} />
                 <p className="text-muted text-[10px] font-bold uppercase tracking-wider">Ownership</p>
-                <p className="text-base sm:text-lg font-black text-foreground">{tractor.ownership}st Owner</p>
+                <p className="text-base sm:text-lg font-black text-foreground">{formatOrdinal(tractor.ownership)} Owner</p>
               </div>
               <div className="bg-background rounded-2xl border border-[var(--border-subtle)] p-4 text-center shadow-sm">
                 <Wrench className="mx-auto mb-1.5 text-[var(--color-brand-green)]" size={22} />
@@ -419,7 +426,7 @@ export default function UsedTractorDetailPage({
                       </li>
                       <li className="flex justify-between border-b border-[var(--border-subtle)]/50 pb-1.5">
                         <span className="text-muted font-semibold">Number of Owners</span>
-                        <span className="text-foreground font-black">{tractor.ownership}st Hand</span>
+                        <span className="text-foreground font-black">{formatOrdinal(tractor.ownership)} Hand</span>
                       </li>
                       <li className="flex justify-between border-b border-[var(--border-subtle)]/50 pb-1.5">
                         <span className="text-muted font-semibold">Hours Run on Meter</span>

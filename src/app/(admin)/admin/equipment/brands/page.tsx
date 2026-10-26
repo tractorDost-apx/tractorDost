@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import EquipmentBrandModal from './components/EquipmentBrandModal';
 import Pagination from '@/components/shared/Pagination';
+import { toast } from '@/components/ui/toast';
 
 export default function EquipmentBrandsPage() {
   const [brands, setBrands] = useState<EquipmentBrand[]>([]);
@@ -86,9 +87,10 @@ export default function EquipmentBrandsPage() {
     if (confirm('Are you sure you want to delete this equipment brand?')) {
       try {
         await equipmentBrandAPI.deleteEquipmentBrand(id);
+        toast.success('Equipment brand deleted successfully');
         fetchBrands();
       } catch (error) {
-        alert('Failed to delete equipment brand.');
+        toast.error('Failed to delete equipment brand.');
       }
     }
   };
@@ -97,9 +99,10 @@ export default function EquipmentBrandsPage() {
     e.stopPropagation();
     try {
       await equipmentBrandAPI.toggleEquipmentBrandActive(id);
+      toast.success('Equipment brand status updated');
       fetchBrands();
     } catch (error) {
-      alert('Failed to toggle status.');
+      toast.error('Failed to toggle status.');
     }
   };
 

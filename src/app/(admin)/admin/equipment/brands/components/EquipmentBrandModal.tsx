@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { equipmentBrandAPI, EquipmentBrand } from '@/lib/api/equipmentBrands';
 import { X, Upload } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 interface EquipmentBrandModalProps {
   brand: EquipmentBrand | null;
@@ -78,13 +79,15 @@ export default function EquipmentBrandModal({ brand, onClose }: EquipmentBrandMo
 
       if (brand) {
         await equipmentBrandAPI.updateEquipmentBrand(brand.id, submitData);
+        toast.success('Equipment brand updated successfully');
       } else {
         await equipmentBrandAPI.createEquipmentBrand(submitData);
+        toast.success('Equipment brand created successfully');
       }
       onClose();
     } catch (error: any) {
       console.error(error);
-      alert(error?.response?.data?.message || 'Failed to save brand.');
+      toast.error(error?.response?.data?.message || 'Failed to save brand.');
     } finally {
       setLoading(false);
     }

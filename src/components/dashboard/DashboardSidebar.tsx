@@ -13,13 +13,27 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  Tractor,
+  Inbox,
+  Landmark,
+  Calculator,
+  ArrowRightLeft,
+  Heart,
+  Bell,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Profile', href: '/dashboard/profile', icon: User },
-  { label: 'Enquiries', href: '/dashboard/my-enquiries', icon: MessageSquareText },
+  { label: 'My Listings', href: '/dashboard/my-listings', icon: Tractor },
+  { label: 'Received Enquiries', href: '/dashboard/listing-enquiries', icon: Inbox },
+  { label: 'My Enquiries', href: '/dashboard/my-enquiries', icon: MessageSquareText },
   { label: 'Tractor Repair', href: '/dashboard/tractor-repair', icon: Wrench },
+  { label: 'My Loans', href: '/dashboard/loans', icon: Landmark },
+  { label: 'Valuations', href: '/dashboard/my-valuations', icon: Calculator },
+  { label: 'Compare History', href: '/dashboard/compare-history', icon: ArrowRightLeft },
+  { label: 'Favorites', href: '/dashboard/favorites', icon: Heart },
+  { label: 'Notifications', href: '/dashboard/notifications', icon: Bell },
+  { label: 'Profile', href: '/dashboard/profile', icon: User },
 ];
 
 export default function DashboardSidebar() {
@@ -53,6 +67,8 @@ export default function DashboardSidebar() {
     dashboardTitle = 'Admin Dashboard';
   } else if (user?.role?.name === 'DEALER') {
     dashboardTitle = 'Dealer Hub';
+  } else if (user?.role?.name === 'AGENT') {
+    dashboardTitle = 'Agent Portal';
   }
 
   return (
@@ -101,7 +117,9 @@ export default function DashboardSidebar() {
           {/* Navigation Links */}
           <nav className="flex flex-col gap-1 border-t border-[var(--border-subtle)] pt-2.5">
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'));
+              const isActive =
+                pathname === item.href ||
+                (item.href !== '/dashboard' && pathname.startsWith(item.href + '/'));
               const Icon = item.icon;
               return (
                 <Link
@@ -117,7 +135,7 @@ export default function DashboardSidebar() {
                   }`}
                 >
                   <Icon
-                    size={18}
+                    size={17}
                     className={`shrink-0 ${isActive ? 'text-[var(--color-brand-green)]' : 'text-muted/70'}`}
                   />
                   {!isCollapsed && <span className="truncate">{item.label}</span>}

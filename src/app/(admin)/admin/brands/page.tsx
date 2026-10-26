@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 export default function AdminBrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -106,8 +107,10 @@ export default function AdminBrandsPage() {
 
       if (editingBrand) {
         await brandAPI.updateBrand(editingBrand.id, formData);
+        toast.success('Brand updated successfully');
       } else {
         await brandAPI.createBrand(formData);
+        toast.success('Brand created successfully');
       }
 
       setIsModalOpen(false);
@@ -115,6 +118,7 @@ export default function AdminBrandsPage() {
     } catch (err: any) {
       console.error('Failed to save brand:', err);
       setFormError(err?.response?.data?.message || 'Failed to save brand.');
+      toast.error(err?.response?.data?.message || 'Failed to save brand.');
     } finally {
       setSubmitting(false);
     }
@@ -124,9 +128,10 @@ export default function AdminBrandsPage() {
     if (!window.confirm('Are you sure you want to delete this tractor brand?')) return;
     try {
       await brandAPI.deleteBrand(id);
+      toast.success('Brand deleted successfully');
       await loadBrands();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete brand.');
+      toast.error(err?.response?.data?.message || 'Failed to delete brand.');
     }
   };
 

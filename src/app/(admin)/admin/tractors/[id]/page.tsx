@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import TractorForm from '../components/TractorForm';
 import { tractorAPI, Tractor } from '@/lib/api/tractors';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 export default function EditTractorPage() {
   const params = useParams();
@@ -30,7 +31,7 @@ export default function EditTractorPage() {
       }
     } catch (error) {
       console.error('Failed to load tractor details', error);
-      alert('Failed to load tractor details');
+      toast.error('Failed to load tractor details');
     } finally {
       setLoading(false);
     }

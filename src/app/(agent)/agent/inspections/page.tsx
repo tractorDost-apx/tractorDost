@@ -11,6 +11,10 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  IndianRupee,
+  Gauge,
+  Award,
+  Sparkles,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Link from 'next/link';
@@ -22,6 +26,8 @@ export default function AgentInspectionsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const isAdmin = user?.role?.name?.toUpperCase() === 'ADMIN';
+
   useEffect(() => {
     if (user?.id) {
       fetchData();
@@ -31,10 +37,10 @@ export default function AgentInspectionsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await usedTractorInspectionAPI.getAllInspections({
-        inspectorId: user?.id,
-        limit: 50,
-      });
+      // Backend scopes AGENT to their inspectorId automatically.
+      // For ADMIN, omitting inspectorId allows seeing all inspections across the system.
+      const queryParams = isAdmin ? { limit: 50 } : { inspectorId: user?.id, limit: 50 };
+      const res = await usedTractorInspectionAPI.getAllInspections(queryParams);
       if (res.success && res.data?.data) {
         setInspections(res.data.data);
       }
@@ -46,9 +52,24 @@ export default function AgentInspectionsPage() {
 
   const filteredInspections = inspections.filter((i) => {
     const matchStatus = statusFilter === 'ALL' || i.status === statusFilter;
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return matchStatus;
+
+    const brand = (i.listing?.tractorBrand || '').toLowerCase();
+    const model = (i.listing?.tractorModel || '').toLowerCase();
+    const district = (i.listing?.district || '').toLowerCase();
+    const villageCity = (i.listing?.villageCity || '').toLowerCase();
+    const state = (i.listing?.state || '').toLowerCase();
+    const idMatch = String(i.id).includes(q) || String(i.listingId).includes(q);
+
     const matchSearch =
-      (i.listing?.tractorBrand || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (i.listing?.tractorModel || '').toLowerCase().includes(searchQuery.toLowerCase());
+      brand.includes(q) ||
+      model.includes(q) ||
+      district.includes(q) ||
+      villageCity.includes(q) ||
+      state.includes(q) ||
+      idMatch;
+
     return matchStatus && matchSearch;
   });
 
@@ -61,23 +82,27 @@ export default function AgentInspectionsPage() {
             My Inspections
           </h1>
           <p className="text-muted mt-1 font-medium">
-            Manage and track your assigned tractor inspections.
+            Manage, inspect, and submit reports for assigned tractor listings.
           </p>
+        </div>
+        <div className="text-muted text-xs font-bold">
+          Showing {filteredInspections.length} of {inspections.length} assignments
         </div>
       </div>
 
-      <div className="mb-6 flex flex-col gap-4 md:flex-row">
-        <div className="relative flex-1">
+      {/* Filter and Search Bar */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="relative md:col-span-2">
           <Search className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
           <input
             type="text"
-            placeholder="Search by brand or model..."
+            placeholder="Search by tractor brand, model, city, district, or ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-background w-full rounded-2xl border border-[var(--border-subtle)] py-3.5 pr-4 pl-12 font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
           />
         </div>
-        <div className="relative min-w-[200px]">
+        <div className="relative">
           <Filter className="text-muted absolute top-1/2 left-4 -translate-y-1/2" size={20} />
           <select
             value={statusFilter}
@@ -85,8 +110,9 @@ export default function AgentInspectionsPage() {
             className="bg-background w-full cursor-pointer appearance-none rounded-2xl border border-[var(--border-subtle)] py-3.5 pr-4 pl-12 font-bold transition-colors focus:border-[var(--color-brand-green)] focus:outline-none"
           >
             <option value="ALL">All Statuses</option>
-            <option value="ASSIGNED">Assigned (Pending)</option>
+            <option value="ASSIGNED">Assigned (Pending Inspection)</option>
             <option value="REPORT_UPLOADED">Report Uploaded</option>
+            <option value="COMPLETED">Completed</option>
             <option value="CERTIFIED">Certified</option>
           </select>
         </div>
@@ -100,8 +126,9 @@ export default function AgentInspectionsPage() {
         <div className="bg-background overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] shadow-sm">
           <div className="divide-y divide-[var(--border-subtle)]">
             {filteredInspections.length === 0 ? (
-              <div className="text-muted p-12 text-center text-lg font-bold">
-                No inspections found matching your criteria.
+              <div className="text-muted flex flex-col items-center justify-center gap-2 p-12 text-center text-base font-bold">
+                <p>No inspections found matching your criteria.</p>
+                <p className="text-xs font-normal">Try clearing your search query or selecting &quot;All Statuses&quot;.</p>
               </div>
             ) : (
               filteredInspections.map((inspection) => (
@@ -118,48 +145,71 @@ export default function AgentInspectionsPage() {
 function InspectionRow({ inspection }: { inspection: any }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const listing = inspection.listing || {};
-  const images = listing.media?.filter((m: any) => m.mediaType !== 'pdf') || [];
+
+  // Extract images from media
+  const mediaImages = (listing.media || [])
+    .filter((m: any) => m.mediaType !== 'pdf' && m.url)
+    .map((m: any) => ({ url: m.url, id: m.id }));
+
+  // Also include tractor photos uploaded as documents
+  const docImages = (listing.documents || [])
+    .filter((d: any) => d.url && !d.url.toLowerCase().endsWith('.pdf'))
+    .map((d: any) => ({ url: d.url, id: `doc-${d.id}` }));
+
+  // De-duplicate images by URL
+  const allImages = Array.from(
+    new Map([...mediaImages, ...docImages].map((img) => [img.url, img])).values()
+  );
+
+  const tractorTitle =
+    listing.tractorBrand || listing.tractorModel
+      ? `${listing.tractorBrand || ''} ${listing.tractorModel || ''}`.trim()
+      : `Tractor Listing #${inspection.listingId}`;
+
+  const askingPriceFormatted = listing.askingPrice
+    ? `₹${Number(listing.askingPrice).toLocaleString('en-IN')}`
+    : null;
 
   return (
-    <div className="hover:bg-foreground/5 flex flex-col items-center justify-between gap-6 p-6 transition-colors md:flex-row md:p-8">
+    <div className="hover:bg-foreground/5 flex flex-col items-start justify-between gap-6 p-6 transition-colors md:flex-row md:items-center md:p-8">
       <div className="flex w-full flex-1 flex-col items-start gap-6 md:flex-row md:items-center">
-        {images.length > 0 ? (
-          <div className="group bg-foreground/5 relative h-48 w-full shrink-0 overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-sm md:h-24 md:w-32">
+        {/* Thumbnail or Carousel */}
+        {allImages.length > 0 ? (
+          <div className="group bg-foreground/5 relative h-48 w-full shrink-0 overflow-hidden rounded-2xl border border-[var(--border-subtle)] shadow-sm md:h-28 md:w-36">
             <img
-              src={images[currentImageIndex]?.url}
-              alt={`Tractor Image ${currentImageIndex + 1}`}
+              src={allImages[currentImageIndex]?.url}
+              alt={`${tractorTitle} thumbnail`}
               className="animate-in fade-in h-full w-full object-cover transition-all duration-300"
             />
 
-            {images.length > 1 && (
+            {allImages.length > 1 && (
               <>
-                {/* Left Arrow */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
-                    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                    setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
                   }}
-                  className="absolute top-1/2 left-1 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
+                  className="absolute top-1/2 left-1.5 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/75"
+                  aria-label="Previous image"
                 >
-                  <ChevronLeft size={12} />
+                  <ChevronLeft size={14} />
                 </button>
 
-                {/* Right Arrow */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
-                    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                    setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
                   }}
-                  className="absolute top-1/2 right-1 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
+                  className="absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center justify-center rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/75"
+                  aria-label="Next image"
                 >
-                  <ChevronRight size={12} />
+                  <ChevronRight size={14} />
                 </button>
 
-                {/* Indicators / Dots */}
-                <div className="absolute bottom-1 left-1/2 flex -translate-x-1/2 gap-0.5 rounded-full bg-black/30 px-1 py-0.5">
-                  {images.map((_: any, idx: number) => (
+                <div className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 gap-1 rounded-full bg-black/40 px-1.5 py-0.5">
+                  {allImages.slice(0, 5).map((_, idx: number) => (
                     <button
                       key={idx}
                       type="button"
@@ -168,54 +218,87 @@ function InspectionRow({ inspection }: { inspection: any }) {
                         setCurrentImageIndex(idx);
                       }}
                       className={`h-1 w-1 rounded-full transition-all ${
-                        idx === currentImageIndex ? 'w-2 bg-white' : 'bg-foreground/50'
+                        idx === currentImageIndex ? 'w-2.5 bg-white' : 'bg-white/50'
                       }`}
                     />
                   ))}
+                  {allImages.length > 5 && (
+                    <span className="text-[8px] font-black text-white">+{allImages.length - 5}</span>
+                  )}
                 </div>
               </>
             )}
           </div>
         ) : (
-          <div className="bg-foreground/5 text-muted flex h-48 w-full shrink-0 flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] md:h-24 md:w-32">
+          <div className="bg-foreground/5 text-muted flex h-48 w-full shrink-0 flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] md:h-28 md:w-36">
             <span className="text-xs font-bold tracking-widest uppercase">No Image</span>
           </div>
         )}
 
-        <div className="flex flex-1 flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-4">
-            <h3 className="text-2xl font-black transition-colors group-hover:text-[var(--color-brand-green)]">
-              {listing.tractorBrand} {listing.tractorModel}
+        {/* Info Column */}
+        <div className="flex flex-1 flex-col gap-2.5">
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="text-xl font-black transition-colors group-hover:text-[var(--color-brand-green)] md:text-2xl">
+              {tractorTitle}
             </h3>
+
             <span
-              className={`rounded-full px-4 py-1.5 text-xs font-black tracking-widest uppercase ${
+              className={`rounded-full px-3.5 py-1 text-xs font-black tracking-widest uppercase ${
                 inspection.status === 'ASSIGNED'
-                  ? 'bg-orange-500/10 text-orange-500'
+                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                   : inspection.status === 'CERTIFIED'
-                    ? 'bg-[var(--color-brand-green)] text-white'
-                    : 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+                    ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                    : inspection.status === 'REPORT_UPLOADED'
+                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                      : 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
               }`}
             >
               {inspection.status.replace('_', ' ')}
             </span>
+
+            {inspection.overallScore && (
+              <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-600 dark:text-emerald-400">
+                <Award size={14} /> Score: {inspection.overallScore}/100
+              </span>
+            )}
           </div>
 
-          <div className="text-muted flex flex-wrap items-center gap-6 text-sm font-bold">
-            <span className="flex items-center gap-2">
-              <Calendar size={18} /> Assigned: {new Date(inspection.createdAt).toLocaleDateString()}
+          <div className="text-muted flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-bold md:text-sm">
+            <span className="flex items-center gap-1.5">
+              <Calendar size={16} /> Assigned:{' '}
+              {new Date(inspection.createdAt).toLocaleDateString()}
             </span>
-            <span className="flex items-center gap-2">
-              <MapPin size={18} /> Location: {listing.villageCity || 'Unknown'}, {listing.district}
+            <span className="flex items-center gap-1.5">
+              <MapPin size={16} />{' '}
+              {listing.villageCity ? `${listing.villageCity}, ` : ''}
+              {listing.district || 'Unknown'}, {listing.state || ''}
             </span>
+            {askingPriceFormatted && (
+              <span className="text-foreground flex items-center gap-1 font-extrabold">
+                <IndianRupee size={15} /> {askingPriceFormatted}
+              </span>
+            )}
+            {listing.yearOfManufacture && (
+              <span>Model Year: {listing.yearOfManufacture}</span>
+            )}
+            {listing.hoursUsed && (
+              <span className="flex items-center gap-1">
+                <Gauge size={15} /> {listing.hoursUsed} hrs
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       <Link
         href={`/agent/inspections/${inspection.id}`}
-        className="bg-foreground text-background w-full shrink-0 rounded-xl px-8 py-3.5 text-center text-sm font-black tracking-wider uppercase shadow-lg transition-all hover:scale-105 active:scale-95 md:w-auto"
+        className="bg-foreground text-background w-full shrink-0 rounded-xl px-7 py-3 text-center text-sm font-black tracking-wider uppercase shadow-md transition-all hover:scale-105 active:scale-95 md:w-auto"
       >
-        {inspection.status === 'ASSIGNED' ? 'Start Inspection' : 'View Report'}
+        {inspection.status === 'ASSIGNED'
+          ? 'Start Inspection'
+          : inspection.status === 'REPORT_UPLOADED'
+            ? 'Review / Edit'
+            : 'View Report'}
       </Link>
     </div>
   );

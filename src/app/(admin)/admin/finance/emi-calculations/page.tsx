@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { emiAPI } from '@/lib/api/emi';
 import Pagination from '@/components/shared/Pagination';
+import { toast } from '@/components/ui/toast';
 
 interface EmiCalculationRecord {
   id: number;
@@ -237,10 +238,10 @@ export default function EmiCalculationsAdminPage() {
       if (response.success && response.data) {
         setDetailRecord(response.data);
       } else {
-        alert(response.message || 'Failed to fetch details.');
+        toast.error(response.message || 'Failed to fetch details.');
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || err.message || 'Failed to fetch details.');
+      toast.error(err.response?.data?.message || err.message || 'Failed to fetch details.');
     } finally {
       setLoadingDetail(false);
     }
@@ -293,6 +294,7 @@ export default function EmiCalculationsAdminPage() {
 
       if (response.success) {
         setEditRecord(null);
+        toast.success('Calculation updated successfully');
         fetchCalculations();
       } else {
         setEditError(response.message || 'Failed to update calculation');
@@ -311,12 +313,13 @@ export default function EmiCalculationsAdminPage() {
       const response = await emiAPI.deleteCalculation(deleteId);
       if (response.success) {
         setDeleteId(null);
+        toast.success('Record deleted successfully');
         fetchCalculations();
       } else {
-        alert(response.message || 'Failed to delete record.');
+        toast.error(response.message || 'Failed to delete record.');
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || err.message || 'Failed to delete.');
+      toast.error(err.response?.data?.message || err.message || 'Failed to delete.');
     } finally {
       setSubmittingDelete(false);
     }

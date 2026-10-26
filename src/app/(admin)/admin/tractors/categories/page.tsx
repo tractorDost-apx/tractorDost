@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import CategoryModal from './components/CategoryModal';
 import Pagination from '@/components/shared/Pagination';
+import { toast } from '@/components/ui/toast';
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -101,9 +102,10 @@ export default function CategoriesPage() {
     ) {
       try {
         await categoryAPI.deleteCategory(id);
+        toast.success('Category deleted successfully');
         fetchCategories();
       } catch (error: any) {
-        alert(error?.response?.data?.message || 'Failed to delete category.');
+        toast.error(error?.response?.data?.message || 'Failed to delete category.');
       }
     }
   };

@@ -44,7 +44,8 @@ export default function LeadsPage() {
     const matchesSearch =
       enquiry.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       enquiry.mobile.includes(searchQuery) ||
-      enquiry.listing.tractorModel.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (enquiry.listing?.tractorModel || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (enquiry.listing?.tractorBrand || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       location.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesSearch;
@@ -298,7 +299,7 @@ export default function LeadsPage() {
                         <td className="px-2 lg:px-3 py-3">
                           <div className="text-foreground flex items-center gap-1.5 text-xs font-bold">
                             <Tractor size={14} className="shrink-0 text-[var(--color-brand-green)]" />
-                            {enquiry.listing.tractorBrand} {enquiry.listing.tractorModel}
+                            {enquiry.listing?.tractorBrand || ''} {enquiry.listing?.tractorModel || 'Tractor'}
                           </div>
                         </td>
 
@@ -376,7 +377,7 @@ export default function LeadsPage() {
                     <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-2 text-xs">
                       <span className="text-foreground flex items-center gap-1 font-bold">
                         <Tractor size={12} className="text-[var(--color-brand-green)]" />{' '}
-                        {enquiry.listing.tractorBrand} {enquiry.listing.tractorModel}
+                        {enquiry.listing?.tractorBrand || ''} {enquiry.listing?.tractorModel || 'Tractor'}
                       </span>
                       <span className="text-muted font-mono text-[10px]">
                         {new Date(enquiry.createdAt).toLocaleDateString()}
@@ -444,7 +445,7 @@ export default function LeadsPage() {
                 <div>
                   <span className="text-muted block font-bold">Interested Model</span>
                   <span className="text-foreground mt-0.5 block font-bold">
-                    {selectedEnquiry.listing.tractorBrand} {selectedEnquiry.listing.tractorModel}
+                    {selectedEnquiry.listing?.tractorBrand || ''} {selectedEnquiry.listing?.tractorModel || 'Tractor'}
                   </span>
                 </div>
                 <div>

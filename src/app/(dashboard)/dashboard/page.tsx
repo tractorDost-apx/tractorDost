@@ -17,19 +17,25 @@ import {
   Sparkles,
   Loader2,
   Calendar,
+  Landmark,
+  Calculator,
+  ArrowRightLeft,
+  Inbox,
+  Heart,
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
   const { user } = useAuth();
 
-  // 1. Genuine My Used Listings
+  // 1. My Used Listings
   const { data: myListingsData, loading: loadingListings } = useMyUsedListings({ page: 1, limit: 10 });
 
-  // 2. Genuine My Sent Enquiries
+  // 2. My Sent Enquiries
   const { data: myEnquiriesData, loading: loadingEnquiries } = useMyEnquiries({ page: 1, limit: 10 });
 
-  // 3. Genuine Service / Repair Bookings
+  // 3. Service / Repair Bookings
   const [serviceBookings, setServiceBookings] = useState<ServiceBookingItem[]>([]);
   const [loadingServices, setLoadingServices] = useState<boolean>(true);
 
@@ -55,7 +61,9 @@ export default function DashboardPage() {
 
   // Compute Metrics
   const totalMyListings = myListingsData?.meta?.total ?? (myListingsData?.data?.length || 0);
-  const activeListings = (myListingsData?.data ?? []).filter((l) => l.status === 'ACTIVE').length;
+  const activeListings = (myListingsData?.data ?? []).filter(
+    (l) => l.listingStatus === 'ACTIVE' || l.status === 'ACTIVE'
+  ).length;
 
   const totalEnquiries = myEnquiriesData?.meta?.total ?? (myEnquiriesData?.data?.length || 0);
   const pendingEnquiries = (myEnquiriesData?.data ?? []).filter(
@@ -112,7 +120,59 @@ export default function DashboardPage() {
     },
   ];
 
-  // Combined Genuine Recent Activity Feed
+  // Quick Action Shortcuts Hub
+  const quickActions = [
+    {
+      title: 'Sell Used Tractor',
+      desc: 'Free listing to thousands of verified buyers',
+      icon: PlusCircle,
+      href: '/sell-used-tractor',
+      color: 'text-[var(--color-brand-green)]',
+      bg: 'bg-[var(--color-brand-green)]/10',
+    },
+    {
+      title: 'Book Doorstep Repair',
+      desc: 'Expert mechanics at your farm / home',
+      icon: Wrench,
+      href: '/dashboard/tractor-repair',
+      color: 'text-blue-500',
+      bg: 'bg-blue-500/10',
+    },
+    {
+      title: 'TrueVal Price Check',
+      desc: 'Get accurate resale market valuation',
+      icon: Calculator,
+      href: '/used-tractor-valuation',
+      color: 'text-amber-500',
+      bg: 'bg-amber-500/10',
+    },
+    {
+      title: 'Compare Tractors',
+      desc: 'Side-by-side specs, price & mileage',
+      icon: ArrowRightLeft,
+      href: '/compare',
+      color: 'text-purple-500',
+      bg: 'bg-purple-500/10',
+    },
+    {
+      title: 'Received Enquiries',
+      desc: 'View buyers interested in your tractors',
+      icon: Inbox,
+      href: '/dashboard/listing-enquiries',
+      color: 'text-rose-500',
+      bg: 'bg-rose-500/10',
+    },
+    {
+      title: 'Tractor Loans & EMI',
+      desc: 'Fast financing & EMI calculations',
+      icon: Landmark,
+      href: '/dashboard/loans',
+      color: 'text-cyan-500',
+      bg: 'bg-cyan-500/10',
+    },
+  ];
+
+  // Combined Activity Feed
   const combinedActivity = useMemo(() => {
     const items: Array<{
       id: string;
@@ -127,13 +187,14 @@ export default function DashboardPage() {
 
     // Enquiries
     (myEnquiriesData?.data ?? []).forEach((enq) => {
+      const tractorTitle = `${enq.listing?.tractorBrand ? `${enq.listing.tractorBrand} ` : ''}${enq.listing?.tractorModel || 'Tractor'}`.trim();
       items.push({
         id: `enq-${enq.id}`,
-        title: `Enquiry on ${enq.listing?.tractorModel || 'Tractor'}`,
-        desc: `Status: ${enq.status} · Location: ${enq.city || 'Local'}`,
+        title: `Enquiry on ${tractorTitle}`,
+        desc: `Status: ${enq.status.replace(/_/g, ' ')} · Location: ${enq.city || 'Maharashtra'}`,
         time: formatRelativeTime(enq.createdAt),
         date: new Date(enq.createdAt),
-        badge: enq.status,
+        badge: enq.status.replace(/_/g, ' '),
         badgeColor:
           enq.status === 'NEW'
             ? 'text-amber-500 border-amber-500/20 bg-amber-500/10'
@@ -147,10 +208,10 @@ export default function DashboardPage() {
       items.push({
         id: `service-${b.bookingId}`,
         title: `Repair: ${b.tractorBrand} ${b.tractorModel}`,
-        desc: `${b.serviceType.replace(/_/g, ' ')} · ${b.serviceCenterName || 'TractorDost Service'}`,
+        desc: `${b.serviceType.replace(/_/g, ' ')} · ${b.serviceCenterName || 'Doorstep Service'}`,
         time: formatRelativeTime(b.createdAt),
         date: new Date(b.createdAt),
-        badge: b.status,
+        badge: b.status.replace(/_/g, ' '),
         badgeColor:
           b.status === 'COMPLETED'
             ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10'
@@ -161,13 +222,16 @@ export default function DashboardPage() {
 
     // Listings
     (myListingsData?.data ?? []).forEach((l) => {
+      const listingTitle = `${l.tractorBrand || ''} ${l.tractorModel || ''}`.trim() || 'Tractor Listing';
+      const priceVal = l.askingPrice ?? l.price;
+      const formattedPrice = priceVal ? `₹${Number(priceVal).toLocaleString('en-IN')}` : 'N/A';
       items.push({
         id: `listing-${l.id}`,
-        title: `Listing: ${l.tractorModel}`,
-        desc: `Listed for ₹${(l.askingPrice ?? l.price) ? (l.askingPrice ?? l.price)!.toLocaleString('en-IN') : 'N/A'} · ${l.district || 'Maharashtra'}`,
+        title: `Listing: ${listingTitle}`,
+        desc: `Listed for ${formattedPrice} · ${l.district || 'Maharashtra'}`,
         time: formatRelativeTime(l.createdAt),
         date: new Date(l.createdAt),
-        badge: l.listingStatus || l.status || 'PENDING',
+        badge: (l.listingStatus || l.status || 'PENDING').replace(/_/g, ' '),
         badgeColor:
           (l.listingStatus || l.status) === 'ACTIVE'
             ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10'
@@ -177,7 +241,7 @@ export default function DashboardPage() {
     });
 
     items.sort((a, b) => b.date.getTime() - a.date.getTime());
-    return items.slice(0, 5);
+    return items.slice(0, 6);
   }, [myEnquiriesData, serviceBookings, myListingsData]);
 
   const isActivityLoading = loadingListings && loadingEnquiries && loadingServices;
@@ -185,6 +249,7 @@ export default function DashboardPage() {
   const getRoleDisplay = () => {
     if (user?.role?.name === 'ADMIN') return 'Admin';
     if (user?.role?.name === 'DEALER') return 'Dealer';
+    if (user?.role?.name === 'AGENT') return 'Agent';
     return 'Customer';
   };
 
@@ -202,7 +267,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <p className="text-muted text-xs font-medium sm:text-sm">
-            Here is an overview of your activity on TractorDost.
+            Here is an overview of your tractor activities, listings, and service bookings.
           </p>
         </div>
 
@@ -244,6 +309,42 @@ export default function DashboardPage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Quick Access Services Hub */}
+      <div>
+        <h2 className="text-foreground mb-4 flex items-center gap-2 text-lg font-black tracking-tight">
+          <Sparkles className="text-[var(--color-brand-green)]" size={20} /> Quick Services Hub
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {quickActions.map((action, idx) => {
+            const Icon = action.icon;
+            return (
+              <Link
+                key={idx}
+                href={action.href}
+                className="bg-foreground/5 group flex items-start gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-green)]/40 hover:shadow-sm"
+              >
+                <div
+                  className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${action.bg} ${action.color}`}
+                >
+                  <Icon size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <p className="text-foreground group-hover:text-[var(--color-brand-green)] text-sm font-black transition-colors">
+                      {action.title}
+                    </p>
+                    <ChevronRight size={14} className="text-muted group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <p className="text-muted mt-0.5 line-clamp-1 text-xs font-medium">
+                    {action.desc}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* Recent Activity */}

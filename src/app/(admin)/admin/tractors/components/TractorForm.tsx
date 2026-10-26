@@ -21,6 +21,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 interface TractorFormProps {
   initialData?: Tractor;
@@ -173,22 +174,22 @@ export default function TractorForm({
     // Check mandatory fields before proceeding
     if (!formData.brandId || formData.brandId === 0) {
       setActiveTab('basic');
-      alert('Please select a valid brand.');
+      toast.warning('Please select a valid brand.');
       return;
     }
     if (!formData.modelName?.trim()) {
       setActiveTab('basic');
-      alert('Please enter a Model Name.');
+      toast.warning('Please enter a Model Name.');
       return;
     }
     if (!formData.slug?.trim()) {
       setActiveTab('basic');
-      alert('Please enter a Slug.');
+      toast.warning('Please enter a Slug.');
       return;
     }
     if (!formData.categoryIds || formData.categoryIds.length === 0) {
       setActiveTab('basic');
-      alert('Please select at least one category.');
+      toast.warning('Please select at least one category.');
       return;
     }
 
@@ -203,19 +204,19 @@ export default function TractorForm({
       if (!spec.engineCc) {
         setTouched((prev) => ({ ...prev, spec_engineCc: true }));
         setActiveTab('specs');
-        alert('Engine CC is required in Specifications.');
+        toast.warning('Engine CC is required in Specifications.');
         return;
       }
       if (!spec.cylinders) {
         setTouched((prev) => ({ ...prev, spec_cylinders: true }));
         setActiveTab('specs');
-        alert('Cylinders is required in Specifications.');
+        toast.warning('Cylinders is required in Specifications.');
         return;
       }
       if (!spec.liftingCapacityKg) {
         setTouched((prev) => ({ ...prev, spec_liftingCapacityKg: true }));
         setActiveTab('specs');
-        alert('Lifting Capacity is required in Specifications.');
+        toast.warning('Lifting Capacity is required in Specifications.');
         return;
       }
       // Define specific maximums based on Prisma schema (DECIMAL bounds)
@@ -239,7 +240,7 @@ export default function TractorForm({
           if (val > maxAllowed) {
             setTouched((prev) => ({ ...prev, [`spec_${key}`]: true }));
             setActiveTab('specs');
-            alert(
+            toast.warning(
               `${key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} must be less than or equal to ${maxAllowed.toLocaleString()}.`
             );
             return;
@@ -247,7 +248,7 @@ export default function TractorForm({
           if (val < 0) {
             setTouched((prev) => ({ ...prev, [`spec_${key}`]: true }));
             setActiveTab('specs');
-            alert(
+            toast.warning(
               `${key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} must be a positive number.`
             );
             return;
@@ -259,12 +260,12 @@ export default function TractorForm({
     // Validate general vehicle pricing
     if (formData.exShowroomPriceMin && Number(formData.exShowroomPriceMin) < 0) {
       setActiveTab('pricing');
-      alert('Minimum ex-showroom price cannot be negative.');
+      toast.warning('Minimum ex-showroom price cannot be negative.');
       return;
     }
     if (formData.exShowroomPriceMax && Number(formData.exShowroomPriceMax) < 0) {
       setActiveTab('pricing');
-      alert('Maximum ex-showroom price cannot be negative.');
+      toast.warning('Maximum ex-showroom price cannot be negative.');
       return;
     }
     if (
@@ -273,7 +274,7 @@ export default function TractorForm({
       Number(formData.exShowroomPriceMin) > Number(formData.exShowroomPriceMax)
     ) {
       setActiveTab('pricing');
-      alert('Minimum ex-showroom price cannot be greater than maximum ex-showroom price.');
+      toast.warning('Minimum ex-showroom price cannot be greater than maximum ex-showroom price.');
       return;
     }
 
@@ -282,12 +283,12 @@ export default function TractorForm({
       for (const p of formData.priceByState) {
         if (!p.exShowroom || Number(p.exShowroom) <= 0) {
           setActiveTab('pricing');
-          alert(`Invalid pricing for ${p.state}: Ex-showroom price must be greater than 0. Negative or zero pricing is not allowed.`);
+          toast.warning(`Invalid pricing for ${p.state}: Ex-showroom price must be greater than 0. Negative or zero pricing is not allowed.`);
           return;
         }
         if (Number(p.rtoCharges) < 0 || Number(p.insuranceEst) < 0 || Number(p.dealerCharges) < 0) {
           setActiveTab('pricing');
-          alert(`Invalid pricing for ${p.state}: Additional charges cannot be negative.`);
+          toast.warning(`Invalid pricing for ${p.state}: Additional charges cannot be negative.`);
           return;
         }
       }
@@ -333,13 +334,13 @@ export default function TractorForm({
       }
 
       if (!sanitizedData.brandId) {
-        alert('Please select a valid brand.');
+        toast.warning('Please select a valid brand.');
         setLoading(false);
         return;
       }
 
       if (!sanitizedData.categoryIds || sanitizedData.categoryIds.length === 0) {
-        alert('Please select at least one category.');
+        toast.warning('Please select at least one category.');
         setLoading(false);
         return;
       }
@@ -395,11 +396,12 @@ export default function TractorForm({
           await mediaAPI.createMedia(brochureData);
         }
 
+        toast.success(isEdit ? 'Tractor updated successfully!' : 'Tractor created successfully!');
         router.push('/admin/tractors');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save tractor', error);
-      alert('Error saving tractor. Check console for details.');
+      toast.error(error?.response?.data?.message || 'Error saving tractor. Check console for details.');
     } finally {
       setLoading(false);
     }

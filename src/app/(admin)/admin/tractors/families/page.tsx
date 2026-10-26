@@ -23,6 +23,7 @@ import {
 import FamilyModal from './components/FamilyModal';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import Pagination from '@/components/shared/Pagination';
+import { toast } from '@/components/ui/toast';
 
 export default function TractorFamiliesPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -152,11 +153,12 @@ export default function TractorFamiliesPage() {
       try {
         const response = await tractorFamilyAPI.deleteFamily(id);
         if (response.success) {
+          toast.success('Tractor family deleted successfully');
           fetchFamilies();
         }
       } catch (error: any) {
         console.error('Failed to delete family', error);
-        alert(
+        toast.error(
           error?.response?.data?.message ||
             'Failed to delete tractor family. Please make sure no tractors are linked to it.'
         );

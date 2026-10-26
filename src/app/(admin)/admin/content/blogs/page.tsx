@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cmsAPI, ContentPost } from '@/lib/api/cms';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 export default function AdminBlogsListPage() {
   const [blogs, setBlogs] = useState<ContentPost[]>([]);
@@ -95,8 +96,10 @@ export default function AdminBlogsListPage() {
 
       if (editingBlog) {
         await cmsAPI.updatePost(editingBlog.id, payload);
+        toast.success('Blog post updated successfully');
       } else {
         await cmsAPI.createPost(payload);
+        toast.success('Blog post created successfully');
       }
 
       setIsModalOpen(false);
@@ -104,6 +107,7 @@ export default function AdminBlogsListPage() {
     } catch (err: any) {
       console.error('Failed to save blog:', err);
       setFormError(err?.response?.data?.message || 'Failed to save blog post.');
+      toast.error(err?.response?.data?.message || 'Failed to save blog post.');
     } finally {
       setSubmitting(false);
     }
@@ -113,9 +117,10 @@ export default function AdminBlogsListPage() {
     if (!window.confirm('Are you sure you want to delete this blog post?')) return;
     try {
       await cmsAPI.deletePost(id);
+      toast.success('Blog post deleted successfully');
       await loadBlogs();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete blog post.');
+      toast.error(err?.response?.data?.message || 'Failed to delete blog post.');
     }
   };
 

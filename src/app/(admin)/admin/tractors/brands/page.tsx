@@ -24,6 +24,7 @@ import {
 import BrandModal from './components/BrandModal';
 import BrandModelsModal from './components/BrandModelsModal';
 import Pagination from '@/components/shared/Pagination';
+import { toast } from '@/components/ui/toast';
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -117,9 +118,10 @@ export default function BrandsPage() {
     if (confirm('Are you sure you want to delete this brand?')) {
       try {
         await brandAPI.deleteBrand(id);
+        toast.success('Brand deleted successfully');
         fetchBrands();
       } catch (error) {
-        alert('Failed to delete brand.');
+        toast.error('Failed to delete brand.');
       }
     }
   };

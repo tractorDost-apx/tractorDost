@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cmsAPI, ContentPost } from '@/lib/api/cms';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 export default function AdminNewsListPage() {
   const [news, setNews] = useState<ContentPost[]>([]);
@@ -87,8 +88,10 @@ export default function AdminNewsListPage() {
 
       if (editingNews) {
         await cmsAPI.updatePost(editingNews.id, payload);
+        toast.success('News article updated successfully');
       } else {
         await cmsAPI.createPost(payload);
+        toast.success('News article created successfully');
       }
 
       setIsModalOpen(false);
@@ -96,6 +99,7 @@ export default function AdminNewsListPage() {
     } catch (err: any) {
       console.error('Failed to save news article:', err);
       setFormError(err?.response?.data?.message || 'Failed to save news article.');
+      toast.error(err?.response?.data?.message || 'Failed to save news article.');
     } finally {
       setSubmitting(false);
     }
@@ -105,9 +109,10 @@ export default function AdminNewsListPage() {
     if (!window.confirm('Are you sure you want to delete this news article?')) return;
     try {
       await cmsAPI.deletePost(id);
+      toast.success('News article deleted successfully');
       await loadNews();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete news article.');
+      toast.error(err?.response?.data?.message || 'Failed to delete news article.');
     }
   };
 

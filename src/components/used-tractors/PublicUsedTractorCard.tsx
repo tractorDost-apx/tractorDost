@@ -37,6 +37,14 @@ export function PublicUsedTractorCard({
     (Array.isArray((listing as any).documents) && (listing as any).documents[0]?.url) ||
     null;
 
+  const formatOwnership = (owner: number | undefined) => {
+    if (!owner) return '1st';
+    if (owner === 1) return '1st';
+    if (owner === 2) return '2nd';
+    if (owner === 3) return '3rd';
+    return `${owner}th`;
+  };
+
   const fullTitle = `${listing.tractorBrand} ${listing.tractorModel}`;
 
   if (viewMode === 'list') {
@@ -97,7 +105,7 @@ export function PublicUsedTractorCard({
                 <Calendar size={13} className="text-muted" /> {listing.yearOfManufacture}
               </span>
               <span className="bg-foreground/5 text-foreground flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1 font-bold">
-                <User size={13} className="text-muted" /> {listing.ownership}st Owner
+                <User size={13} className="text-muted" /> {formatOwnership(listing.ownership)} Owner
               </span>
               <span className="bg-foreground/5 text-foreground flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1 font-bold">
                 <Clock size={13} className="text-muted" /> {listing.hoursUsed ? `${listing.hoursUsed} hrs` : 'N/A'}
@@ -205,7 +213,7 @@ export function PublicUsedTractorCard({
           </div>
           <div className="border-x border-[var(--border-subtle)]">
             <span className="text-muted text-[10px] font-bold block">Owner</span>
-            <span className="text-foreground font-black">{listing.ownership}st</span>
+            <span className="text-foreground font-black">{formatOwnership(listing.ownership)}</span>
           </div>
           <div>
             <span className="text-muted text-[10px] font-bold block">Hours Run</span>

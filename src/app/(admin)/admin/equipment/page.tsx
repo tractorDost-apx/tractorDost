@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { implementAPI, Implement } from '@/lib/api/implements';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { toast } from '@/components/ui/toast';
 
 export default function AdminEquipmentPage() {
   const [implementsList, setImplementsList] = useState<Implement[]>([]);
@@ -122,9 +123,10 @@ export default function AdminEquipmentPage() {
     if (!window.confirm('Are you sure you want to delete this farm equipment?')) return;
     try {
       await implementAPI.deleteImplement(id);
+      toast.success('Equipment deleted successfully');
       await loadImplements();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete equipment.');
+      toast.error(err?.response?.data?.message || 'Failed to delete equipment.');
     }
   };
 

@@ -891,9 +891,19 @@ function SellUsedTractorForm() {
             )}
 
             {error && (
-              <div className="animate-in fade-in mt-8 flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4 font-bold text-red-500">
-                <AlertCircle size={20} />
-                {error}
+              <div className="animate-in fade-in mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 font-bold text-red-500">
+                <div className="flex items-center gap-3">
+                  <AlertCircle size={20} className="shrink-0" />
+                  <span>{error}</span>
+                </div>
+                {!isAuthenticated && (
+                  <Link
+                    href={`/login?callbackUrl=${encodeURIComponent('/sell-used-tractor')}`}
+                    className="shrink-0 rounded-xl bg-red-600 px-4 py-2 text-xs font-black uppercase text-white hover:bg-red-500 transition-colors shadow-sm"
+                  >
+                    Log In Now
+                  </Link>
+                )}
               </div>
             )}
 
