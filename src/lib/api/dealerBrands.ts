@@ -45,31 +45,40 @@ export const dealerBrandAPI = {
   },
 
   /**
-   * Admin: Add brands to a dealer
+   * Admin/Dealer Owner: Add brands to a dealer
    * POST /dealerBrand/admin/dealers/:dealerId/brands
    */
   addBrandsToDealerAdmin: async (
     dealerId: number,
     payload: AddDealerBrandsPayload
   ): Promise<{ success: boolean; message: string; data: any }> => {
+    const brandIds = Array.from(new Set(payload.brandIds.map(Number))).filter((id) => id > 0);
     const response = await apiClient.post<{ success: boolean; message: string; data: any }>(
       `/dealerBrand/admin/dealers/${dealerId}/brands`,
-      payload
+      { ...payload, brandIds }
     );
     return response.data;
   },
 
   /**
-   * Admin: Replace all assigned brands for a dealer
+   * Admin/Dealer Owner: Replace all assigned brands for a dealer
    * PATCH /dealerBrand/admin/dealers/:dealerId/brands
    */
   replaceDealerBrands: async (
     dealerId: number,
     payload: ReplaceDealerBrandsPayload
   ): Promise<{ success: boolean; message: string; data: any }> => {
+    const brandIds = Array.from(new Set(payload.brandIds.map(Number))).filter((id) => id > 0);
+    let primaryBrandId =
+      payload.primaryBrandId && Number(payload.primaryBrandId) > 0
+        ? Number(payload.primaryBrandId)
+        : undefined;
+    if (primaryBrandId && !brandIds.includes(primaryBrandId)) {
+      primaryBrandId = brandIds[0] || undefined;
+    }
     const response = await apiClient.patch<{ success: boolean; message: string; data: any }>(
       `/dealerBrand/admin/dealers/${dealerId}/brands`,
-      payload
+      { brandIds, primaryBrandId }
     );
     return response.data;
   },

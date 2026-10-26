@@ -240,11 +240,21 @@ function EmiCalculatorContent() {
   useEffect(() => {
     // 1. If there are validation errors or price is out of bounds, do not save
     const validationErrors = validateEmiInputs(inputs);
-    if (Object.keys(validationErrors).length > 0) return;
-    if (inputs.vehiclePrice < 50000 || inputs.vehiclePrice > 5000000) return;
-
     const tenureMonths =
       inputs.tenureUnit === 'years' ? inputs.tenureValue * 12 : inputs.tenureValue;
+
+    if (
+      inputs.vehiclePrice < 50000 ||
+      inputs.vehiclePrice > 5000000 ||
+      tenureMonths < 6 ||
+      tenureMonths > 84 ||
+      inputs.interestRate < 0 ||
+      inputs.interestRate > 30 ||
+      inputs.downPayment < 0 ||
+      inputs.downPayment >= inputs.vehiclePrice
+    ) {
+      return;
+    }
 
     // 2. Prepare payload
     const payload = {

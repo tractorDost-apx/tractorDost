@@ -265,7 +265,7 @@ export default function LoginPage() {
                 type="text"
                 autoComplete="one-time-code"
                 maxLength={6}
-                placeholder="0 0 0 0 0 0"
+                placeholder="A B C 1 2 3"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
                 className="bg-background/50 text-foreground placeholder:text-muted/40 hover:border-[var(--border-brand)] h-14 w-full rounded-xl border border-[var(--border-subtle)] px-5 text-center text-2xl font-black tracking-[0.5em] transition-all placeholder:tracking-widest focus:border-[var(--color-brand-green)] focus:ring-4 focus:ring-[var(--color-brand-green)]/10 focus:outline-none"

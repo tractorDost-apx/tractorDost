@@ -1188,7 +1188,8 @@ export default function TractorRepairPage() {
         notes: bookingForm.notes.trim() || undefined,
       };
 
-      const res = await serviceBookingAPI.createBooking(selectedCenter.serviceCenterId, payload);
+      const targetCenterId = selectedCenter.serviceCenterId || (selectedCenter as any).id;
+      const res = await serviceBookingAPI.createBooking(targetCenterId, payload);
 
       if (res.success) {
         setFormSuccess('Tractor repair request submitted successfully!');

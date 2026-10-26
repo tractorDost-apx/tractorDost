@@ -221,7 +221,9 @@ export function EditDealerModal({ dealer, onClose, onSuccess }: EditDealerModalP
       pincode: pincode.trim() || null,
       latitude: latitude.trim() ? Number(latitude) : null,
       longitude: longitude.trim() ? Number(longitude) : null,
-      serviceRadiusKm: serviceRadiusKm.trim() ? Number(serviceRadiusKm) : 50,
+      serviceRadiusKm: serviceRadiusKm.trim()
+        ? Math.min(500, Math.max(20, Math.round(Number(serviceRadiusKm) || 50)))
+        : 50,
       workingHours: parsedWorkingHours,
       serviceAreas: parsedServiceAreas,
       verificationStatus,

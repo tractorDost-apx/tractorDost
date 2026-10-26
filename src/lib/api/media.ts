@@ -47,6 +47,17 @@ export const mediaAPI = {
   },
 
   /**
+   * Fetch media items by target ID
+   * GET /media/getByTargetId/:id
+   */
+  getByTargetId: async (id: number) => {
+    const response = await apiClient.get<{ success: boolean; data: Media[] }>(
+      `/media/getByTargetId/${id}`
+    );
+    return response.data;
+  },
+
+  /**
    * Delete a media item
    */
   deleteMedia: async (id: number) => {
@@ -56,3 +67,4 @@ export const mediaAPI = {
     return response.data;
   },
 };
+

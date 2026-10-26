@@ -1,7 +1,7 @@
 import type { SendOtpFormValues, VerifyOtpFormValues, RegisterUserFormValues, UpdateProfileFormValues } from '@/types/forms/auth-forms';
 
 export const MOBILE_REGEX = /^[6-9]\d{9}$/;
-export const OTP_REGEX = /^\d{4,6}$/;
+export const OTP_REGEX = /^[A-Za-z0-9]{4,6}$/;
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PINCODE_REGEX = /^\d{6}$/;
 

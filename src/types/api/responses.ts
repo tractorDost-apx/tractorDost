@@ -5,4 +5,7 @@ export interface ApiResult<T> {
   data?: T;
   /** Zod issues on validation failures */
   error?: unknown;
+  /** HTTP status code returned by the server */
+  statusCode?: number;
 }
+

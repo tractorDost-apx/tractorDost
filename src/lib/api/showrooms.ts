@@ -1,3 +1,5 @@
+import { apiClient } from './axios/axios';
+
 export interface ShowroomBrand {
   id: number;
   name: string;
@@ -35,8 +37,30 @@ export interface Showroom {
   reviewsCount?: number;
 }
 
+export interface CreateShowroomPayload {
+  showroomName: string;
+  slug?: string;
+  brandId?: number;
+  address: string;
+  state: string;
+  district: string;
+  pincode?: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  email?: string;
+  workingHours?: any;
+  totalArea?: string;
+  parkingAvailable?: boolean;
+  testDriveAvailable?: boolean;
+  description?: string;
+  isActive?: boolean;
+}
+
+export type UpdateShowroomPayload = Partial<CreateShowroomPayload>;
+
 // ----------------------------------------------------------------------
-// MOCK DATA GENERATOR (Strictly matching Prisma Schema)
+// MOCK DATA GENERATOR (Strictly matching Prisma Schema fallback)
 // ----------------------------------------------------------------------
 
 const MOCK_SHOWROOMS: Showroom[] = [
@@ -126,10 +150,71 @@ const MOCK_SHOWROOMS: Showroom[] = [
 ];
 
 export const showroomAPI = {
-  getAllShowrooms: async (params?: { state?: string; brandId?: number; search?: string }) => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 600));
+  /**
+   * Get showroom belonging to a specific dealer
+   * GET /showroom/dealers/:dealerId/showroom
+   */
+  getShowroomByDealer: async (dealerId: number): Promise<{ success: boolean; data: Showroom }> => {
+    const response = await apiClient.get<{ success: boolean; data: Showroom }>(
+      `/showroom/dealers/${dealerId}/showroom`
+    );
+    return response.data;
+  },
 
+  /**
+   * Find nearby showrooms based on latitude & longitude
+   * GET /showroom/showrooms/nearby
+   */
+  getNearbyShowrooms: async (params: {
+    latitude: number;
+    longitude: number;
+    radius?: number;
+    brand?: number;
+    limit?: number;
+  }) => {
+    const response = await apiClient.get('/showroom/showrooms/nearby', { params });
+    return response.data;
+  },
+
+  /**
+   * Create showroom for a dealer (Dealer Owner or DEALER_MANAGEMENT staff)
+   * POST /showroom/admin/dealers/:dealerId/showroom
+   */
+  createShowroom: async (dealerId: number, payload: CreateShowroomPayload) => {
+    const response = await apiClient.post<{ success: boolean; message: string; data: Showroom }>(
+      `/showroom/admin/dealers/${dealerId}/showroom`,
+      payload
+    );
+    return response.data;
+  },
+
+  /**
+   * Update showroom for a dealer (Dealer Owner or DEALER_MANAGEMENT staff)
+   * PATCH /showroom/admin/dealers/:dealerId/showroom
+   */
+  updateShowroom: async (dealerId: number, payload: UpdateShowroomPayload) => {
+    const response = await apiClient.patch<{ success: boolean; message: string; data: Showroom }>(
+      `/showroom/admin/dealers/${dealerId}/showroom`,
+      payload
+    );
+    return response.data;
+  },
+
+  /**
+   * Delete showroom for a dealer (Dealer Owner or DEALER_MANAGEMENT staff)
+   * DELETE /showroom/admin/dealers/:dealerId/showroom
+   */
+  deleteShowroom: async (dealerId: number) => {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(
+      `/showroom/admin/dealers/${dealerId}/showroom`
+    );
+    return response.data;
+  },
+
+  /**
+   * Public list of showrooms with filtering
+   */
+  getAllShowrooms: async (params?: { state?: string; brandId?: number; search?: string }) => {
     let filtered = [...MOCK_SHOWROOMS];
 
     if (params?.state) {
@@ -158,7 +243,6 @@ export const showroomAPI = {
   },
 
   getShowroomBySlug: async (slug: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
     const showroom = MOCK_SHOWROOMS.find((s) => s.slug === slug);
 
     if (!showroom) {
@@ -168,3 +252,4 @@ export const showroomAPI = {
     return { success: true, data: showroom };
   },
 };
+

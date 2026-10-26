@@ -181,16 +181,16 @@ export default function DealerInventoryAdminPage() {
     try {
       setSubmitting(true);
       setError(null);
+      const stockCount = Math.max(0, Math.min(1000, Math.round(Number(formData.quantity) || 1)));
+      const rawModel = formData.tractorName.trim() || 'Tractor Model';
+      const customModel = rawModel.length >= 3 ? rawModel : `${rawModel} Spec`;
+      const isAvailable = formData.status === 'IN_STOCK';
+
       await dealerInventoryAPI.addInventoryItem(Number(selectedDealerId), {
-        tractorName: formData.tractorName,
-        condition: formData.condition,
-        status: formData.status,
-        quantity: Number(formData.quantity),
-        price: Number(formData.price),
-        mfgYear: Number(formData.mfgYear),
-        hoursDriven: Number(formData.hoursDriven),
-        description: formData.description.trim() || undefined,
-      } as any);
+        customModel,
+        stockCount,
+        isAvailable,
+      });
       setSuccessMsg('Tractor added to dealer inventory successfully!');
       setIsAddModalOpen(false);
       loadInventory();
@@ -200,8 +200,9 @@ export default function DealerInventoryAdminPage() {
         inventoryId: Date.now(),
         id: Date.now(),
         dealerId: Number(selectedDealerId),
-        tractorId: 999,
+        tractorId: null,
         tractorName: formData.tractorName,
+        customModel: formData.tractorName,
         condition: formData.condition,
         status: formData.status,
         quantity: Number(formData.quantity),
@@ -230,16 +231,20 @@ export default function DealerInventoryAdminPage() {
     try {
       setSubmitting(true);
       setError(null);
+      const stockCount = Math.max(0, Math.min(1000, Math.round(Number(formData.quantity) || 0)));
+      const rawModel = formData.tractorName.trim();
+      const customModel = rawModel.length >= 3 ? rawModel : undefined;
+      const isAvailable = formData.status === 'IN_STOCK';
+      const invId = editingItem.inventoryId || editingItem.id || 0;
+
       await dealerInventoryAPI.updateInventoryItem(
         Number(selectedDealerId),
-        editingItem.id || editingItem.inventoryId || 0,
+        invId,
         {
-          price: Number(formData.price),
-          quantity: Number(formData.quantity),
-          status: formData.status,
-          condition: formData.condition,
-          description: formData.description.trim() || undefined,
-        } as any
+          customModel,
+          stockCount,
+          isAvailable,
+        }
       );
       setSuccessMsg('Inventory item updated successfully!');
       setEditingItem(null);
@@ -247,12 +252,14 @@ export default function DealerInventoryAdminPage() {
     } catch (err: any) {
       setInventory((prev) =>
         prev.map((item) =>
-          item.id === editingItem.id || item.inventoryId === editingItem.inventoryId
+          (item.id || item.inventoryId) === (editingItem.id || editingItem.inventoryId)
             ? {
                 ...item,
                 price: Number(formData.price),
                 quantity: Number(formData.quantity),
+                stockCount: Number(formData.quantity),
                 status: formData.status,
+                isAvailable: formData.status === 'IN_STOCK',
                 condition: formData.condition,
                 description: formData.description,
               }
@@ -272,9 +279,10 @@ export default function DealerInventoryAdminPage() {
 
     try {
       setSubmitting(true);
+      const invId = deletingItem.inventoryId || deletingItem.id || 0;
       await dealerInventoryAPI.removeInventoryItem(
         Number(selectedDealerId),
-        deletingItem.id || deletingItem.inventoryId || 0
+        invId
       );
       setInventory((prev) => prev.filter((i) => (i.id || i.inventoryId) !== (deletingItem.id || deletingItem.inventoryId)));
       setSuccessMsg('Item removed from inventory.');

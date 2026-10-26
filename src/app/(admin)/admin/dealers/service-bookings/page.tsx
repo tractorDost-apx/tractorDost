@@ -20,6 +20,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { dealerAPI } from '@/lib/api/dealers';
+import { serviceCenterAPI } from '@/lib/api/serviceCenters';
 import {
   serviceBookingAPI,
   ServiceBookingStatus,
@@ -60,6 +61,7 @@ const STATUS_META: Record<
 export default function ServiceBookingsAdminPage() {
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [selectedDealerId, setSelectedDealerId] = useState<number | ''>('');
+  const [serviceCenterId, setServiceCenterId] = useState<number | null>(null);
   const [bookings, setBookings] = useState<AdminServiceBookingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -102,7 +104,32 @@ export default function ServiceBookingsAdminPage() {
     try {
       setRefreshing(true);
       setError(null);
-      const res = await serviceBookingAPI.getAdminBookings(Number(selectedDealerId));
+
+      // Resolve dealer's service center
+      let scId: number | null = null;
+      const currentDealer = dealers.find((d) => d.id === Number(selectedDealerId));
+      if (currentDealer?.serviceCenter?.id) {
+        scId = currentDealer.serviceCenter.id;
+      } else {
+        try {
+          const scRes = await serviceCenterAPI.getServiceCenterByDealer(Number(selectedDealerId));
+          if (scRes.success && scRes.data) {
+            const scData: any = scRes.data;
+            scId = scData.serviceCenterId || scData.id;
+          }
+        } catch {
+          scId = null;
+        }
+      }
+
+      setServiceCenterId(scId);
+
+      if (!scId) {
+        setBookings([]);
+        return;
+      }
+
+      const res = await serviceBookingAPI.getAdminBookings(scId);
       if (res?.data?.bookings) {
         setBookings(res.data.bookings);
       } else {
@@ -155,7 +182,7 @@ export default function ServiceBookingsAdminPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [selectedDealerId]);
+  }, [selectedDealerId, dealers]);
 
   useEffect(() => {
     loadBookings();
@@ -163,13 +190,14 @@ export default function ServiceBookingsAdminPage() {
 
   const handleUpdateStatus = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!updatingItem || !selectedDealerId) return;
+    if (!updatingItem) return;
+    const targetScId = serviceCenterId || Number(selectedDealerId);
 
     try {
       setSubmitting(true);
       setError(null);
       await serviceBookingAPI.updateBookingStatus(
-        Number(selectedDealerId),
+        targetScId,
         updatingItem.bookingId,
         {
           status: newStatus,
@@ -197,9 +225,13 @@ export default function ServiceBookingsAdminPage() {
   };
 
   const handleCancelBooking = async (booking: AdminServiceBookingItem) => {
-    if (!selectedDealerId) return;
+    const targetScId = serviceCenterId || Number(selectedDealerId);
     try {
-      await serviceBookingAPI.cancelBooking(Number(selectedDealerId), booking.bookingId);
+      await serviceBookingAPI.cancelBooking(
+        targetScId,
+        booking.bookingId,
+        'Cancelled by admin dashboard administrator'
+      );
       setBookings((prev) =>
         prev.map((b) =>
           b.bookingId === booking.bookingId ? { ...b, status: 'CANCELLED' } : b

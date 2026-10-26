@@ -21,7 +21,8 @@ export const authAPI = {
   },
 
   verifyOtp: async (param: string | { otp: string; mobile?: string }) => {
-    const otp = typeof param === 'string' ? param : param.otp;
+    const rawOtp = typeof param === 'string' ? param : param.otp;
+    const otp = rawOtp.trim().toUpperCase();
     let mtToken: string | undefined;
     if (typeof window !== 'undefined') {
       try {

@@ -210,9 +210,13 @@ export const serviceBookingAPI = {
     bookingId: number,
     cancellationReason?: string
   ): Promise<{ success: boolean; message: string }> => {
+    const reason =
+      cancellationReason && cancellationReason.trim().length >= 10
+        ? cancellationReason.trim()
+        : 'Service booking cancelled by administrator or user request.';
     const response = await apiClient.delete(
       `/serviceBooking/admin/service-centers/${serviceCenterId}/bookings/${bookingId}`,
-      { data: { cancellationReason } }
+      { data: { cancellationReason: reason } }
     );
     return response.data;
   },

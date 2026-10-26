@@ -38,7 +38,11 @@ export function useOtp(initialMobile = '') {
           return false;
         }
       } catch (err: unknown) {
-        setError((err as Error).message || 'Network error occurred');
+        const msg =
+          (err as any)?.response?.data?.message ||
+          (err as Error).message ||
+          'Failed to send OTP';
+        setError(msg);
         return false;
       } finally {
         setIsSending(false);
@@ -49,7 +53,7 @@ export function useOtp(initialMobile = '') {
 
   const verifyOtp = useCallback(
     async (code?: string) => {
-      const targetOtp = code || otp;
+      const targetOtp = (code || otp).trim().toUpperCase();
       if (!targetOtp || targetOtp.length < 4) {
         setError('Enter a valid OTP');
         return false;
@@ -65,7 +69,11 @@ export function useOtp(initialMobile = '') {
           return false;
         }
       } catch (err: unknown) {
-        setError((err as Error).message || 'Verification failed');
+        const msg =
+          (err as any)?.response?.data?.message ||
+          (err as Error).message ||
+          'Verification failed';
+        setError(msg);
         return false;
       } finally {
         setIsVerifying(false);

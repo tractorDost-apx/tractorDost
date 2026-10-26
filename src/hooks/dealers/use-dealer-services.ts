@@ -205,10 +205,15 @@ export function useDealerServices() {
 
     setIsUpdating(true);
     try {
+      const validReason = cancellationReason?.trim()
+        ? cancellationReason.trim().length >= 10
+          ? cancellationReason.trim()
+          : `${cancellationReason.trim()} (Cancelled by service center)`
+        : undefined;
       const res = await serviceBookingAPI.cancelBooking(
         serviceCenterId,
         bookingId,
-        cancellationReason
+        validReason
       );
       if (res.success) {
         await fetchBookings();

@@ -206,7 +206,7 @@ export function CreateDealerModal({ onClose, onSuccess }: CreateDealerModalProps
       pincode: pincode.trim() || undefined,
       latitude: latitude ? Number(latitude) : undefined,
       longitude: longitude ? Number(longitude) : undefined,
-      serviceRadiusKm: serviceRadiusKm ? Number(serviceRadiusKm) : 50,
+      serviceRadiusKm: serviceRadiusKm ? Math.min(500, Math.max(1, Math.round(Number(serviceRadiusKm) || 50))) : 50,
       aboutDealer: aboutDealer.trim() || undefined,
       seoTitle: seoTitle.trim() || undefined,
       seoDescription: seoDescription.trim() || undefined,
