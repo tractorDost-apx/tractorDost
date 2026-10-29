@@ -131,9 +131,9 @@ export default function LoanPage() {
   };
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-12 pb-24 sm:px-6 lg:px-8">
+    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
       {/* Header */}
-      <section className="relative flex flex-col items-center justify-center pt-8 pb-14 text-center">
+      <section className="relative flex flex-col items-center justify-center pb-12 text-center">
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <Banknote size={14} /> Tractor Finance & Loans

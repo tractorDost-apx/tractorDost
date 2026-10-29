@@ -120,7 +120,7 @@ export default function SingleVideoPage({ params }: { params: Promise<{ slug: st
   }
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-6xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
+    <div className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-24 sm:px-6 lg:px-8">
       {/* Back Button */}
       <div className="mb-6">
         <Link

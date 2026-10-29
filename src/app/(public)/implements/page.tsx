@@ -369,7 +369,7 @@ function ImplementsListingContent() {
   };
 
   return (
-    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pt-8 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pb-24 sm:px-6 lg:px-8">
       {/* BREADCRUMBS */}
       <nav className="text-muted mb-6 flex items-center gap-2 text-xs font-bold">
         <Link href="/" className="transition-colors hover:text-[var(--color-brand-green)]">

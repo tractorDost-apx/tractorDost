@@ -103,7 +103,7 @@ export default function BlogListClient() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-3.5 pb-16 sm:px-6 lg:px-8">
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 text-center border border-zinc-200 bg-white/70 dark:border-white/10 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent shadow-sm dark:shadow-2xl">
         <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-96 rounded-full bg-[var(--color-brand-green)]/15 blur-[80px]" />

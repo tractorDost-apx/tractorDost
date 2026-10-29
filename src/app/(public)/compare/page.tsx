@@ -143,7 +143,7 @@ function CompareContent() {
   const maxFreq = comparisons.length > 0 ? Math.max(...comparisons.map((c) => c.frequency)) : 1;
 
   return (
-    <div className="animate-fade-in mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+    <div className="animate-fade-in mx-auto w-full max-w-[1400px] px-3.5 pb-16 sm:px-6 lg:px-8">
       {tractors.length >= 2 ? (
         <div className="space-y-6">
           <button

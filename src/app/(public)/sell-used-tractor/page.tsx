@@ -291,7 +291,7 @@ function SellUsedTractorForm() {
 
   if (isSuccess) {
     return (
-      <div className="bg-background flex min-h-screen items-center justify-center px-4 pt-24 pb-16">
+      <div className="bg-background flex min-h-screen items-center justify-center px-4 pb-16">
         <div className="bg-foreground/5 relative w-full max-w-md overflow-hidden rounded-3xl border border-[var(--border-subtle)] p-10 text-center shadow-xl">
           <div className="absolute top-0 left-0 h-2 w-full bg-[var(--color-brand-green)]"></div>
 
@@ -345,7 +345,7 @@ function SellUsedTractorForm() {
   }
 
   return (
-    <div className="bg-background min-h-screen pt-24 pb-16">
+    <div className="bg-background min-h-screen pb-16">
       <div className="mx-auto max-w-4xl px-4">
         {/* Header */}
         <div className="mb-10 text-center">

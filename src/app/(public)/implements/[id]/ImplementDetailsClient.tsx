@@ -187,7 +187,7 @@ export default function ImplementDetailsClient({
   }
 
   return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pt-6 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pb-24 sm:px-6 lg:px-8">
       <Link
         href="/implements"
         className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
@@ -274,7 +274,7 @@ function ImplementDetailsView({
   const groupedSpecs = parseAdditionalSpecs(implement.additionalSpecs);
 
   return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pt-6 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pb-24 sm:px-6 lg:px-8">
       {/* BREADCRUMBS & BACK BUTTON */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <Link

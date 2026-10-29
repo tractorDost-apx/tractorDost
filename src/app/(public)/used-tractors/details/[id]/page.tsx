@@ -208,7 +208,7 @@ export default function UsedTractorDetailPage({
 
   if (loading) {
     return (
-      <div className="bg-background flex min-h-screen items-center justify-center pt-24">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <TractorLoader className="text-[var(--color-brand-green)]" size={64} />
       </div>
     );
@@ -216,7 +216,7 @@ export default function UsedTractorDetailPage({
 
   if (!tractor) {
     return (
-      <div className="bg-background flex min-h-screen flex-col items-center justify-center pt-24">
+      <div className="bg-background flex min-h-screen flex-col items-center justify-center">
         <h1 className="mb-4 text-3xl font-black">Tractor Not Found</h1>
         <p className="text-muted text-sm mb-6">This used tractor listing may have been sold or removed.</p>
         <Link
@@ -243,7 +243,7 @@ export default function UsedTractorDetailPage({
   const catalogTractor = tractor.tractor || {};
 
   return (
-    <div className="bg-background min-h-screen pt-24 pb-20">
+    <div className="bg-background min-h-screen pb-20">
       {/* Breadcrumbs */}
       <div className="mx-auto mb-6 max-w-7xl px-4">
         <div className="text-muted flex items-center text-xs sm:text-sm font-medium">

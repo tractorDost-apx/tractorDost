@@ -231,7 +231,7 @@ export default function LoanTypePage({ params }: { params: Promise<{ type: strin
   };
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-12 pb-24 sm:px-6 lg:px-8">
+    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
       {/* Breadcrumb / Back */}
       <div className="mb-6">
         <Link
