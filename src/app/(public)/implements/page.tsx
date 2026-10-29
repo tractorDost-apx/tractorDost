@@ -411,7 +411,7 @@ function ImplementsListingContent() {
 
       {/* HERO SECTION */}
       {activeBrandDetails ? (
-        <div className="relative mb-10 flex flex-col items-start gap-8 overflow-hidden rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 p-8 md:p-12">
+        <div className="relative mb-5 sm:mb-8 md:mb-10 flex flex-col items-start gap-4 sm:gap-6 md:gap-8 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 p-4 sm:p-6 md:p-10 lg:p-12">
           <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[80px]" />
 
           <div className="z-10 flex w-full flex-col items-center gap-8 md:flex-row md:items-start">
@@ -461,7 +461,7 @@ function ImplementsListingContent() {
           </div>
         </div>
       ) : (
-        <div className="relative mb-10 flex flex-col items-center justify-between overflow-hidden rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 p-8 md:flex-row md:p-12">
+        <div className="relative mb-5 sm:mb-8 md:mb-10 flex flex-col items-start justify-between overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 p-4 sm:p-6 md:p-10 lg:p-12 md:flex-row md:items-center">
           <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[80px]" />
 
           <div className="z-10 flex flex-col gap-3">
