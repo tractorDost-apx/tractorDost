@@ -67,10 +67,10 @@ export function Navbar() {
   return (
     <>
       <div
-        className={`pointer-events-none fixed top-4 right-0 left-0 z-50 flex justify-center px-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-6 ${scrolled ? 'top-2' : 'top-5'}`}
+        className={`pointer-events-none fixed top-3.5 right-0 left-0 z-50 flex justify-center px-3.5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-6 ${scrolled ? 'top-2' : 'top-3.5 sm:top-5'}`}
       >
         <nav
-          className={`pointer-events-auto flex w-full max-w-[1380px] items-center justify-between !rounded-2xl px-6 py-2 transition-all duration-300 border backdrop-blur-2xl ${
+          className={`pointer-events-auto flex w-full max-w-[1380px] items-center justify-between rounded-full lg:rounded-2xl px-3.5 py-1.5 sm:px-6 sm:py-2 transition-all duration-300 border backdrop-blur-2xl ${
             scrolled
               ? 'border-black/10 bg-white/98 shadow-[0_15px_40px_-8px_rgba(0,0,0,0.18),0_2px_4px_rgba(0,0,0,0.06)] dark:border-white/20 dark:bg-[#0c100e]/98 dark:shadow-[0_20px_50px_-8px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.1)]'
               : 'border-black/10 bg-white/95 shadow-[0_10px_35px_-5px_rgba(0,0,0,0.14),0_1px_3px_rgba(0,0,0,0.06)] dark:border-white/15 dark:bg-[#0c100e]/95 dark:shadow-[0_15px_45px_-8px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)]'
@@ -281,12 +281,12 @@ export function Navbar() {
               </div>
             ) : (
               /* Auth Buttons */
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   suppressHydrationWarning
                   onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)}
-                  className="shrink-0 rounded-full bg-[var(--color-brand-green)] px-6 py-2 text-sm font-bold text-white whitespace-nowrap shadow-md transition-all duration-200 hover:bg-[var(--color-brand-green-dark)] hover:shadow-lg active:scale-95"
+                  className="shrink-0 rounded-full bg-[var(--color-brand-green)] px-4 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-sm font-bold text-white whitespace-nowrap shadow-md transition-all duration-200 hover:bg-[var(--color-brand-green-dark)] hover:shadow-lg active:scale-95"
                 >
                   Login
                 </button>
@@ -297,10 +297,10 @@ export function Navbar() {
             <button
               type="button"
               suppressHydrationWarning
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 text-zinc-700 transition-all hover:bg-black/10 hover:text-black xl:hidden dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15 dark:hover:text-white"
+              className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/5 text-zinc-700 transition-all hover:bg-black/10 hover:text-black xl:hidden dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15 dark:hover:text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </nav>
