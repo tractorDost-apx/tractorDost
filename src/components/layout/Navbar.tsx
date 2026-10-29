@@ -49,6 +49,18 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Prevent background scrolling when mobile menu drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -67,7 +79,9 @@ export function Navbar() {
   return (
     <>
       <div
-        className={`pointer-events-none fixed top-3.5 right-0 left-0 z-50 flex justify-center px-3.5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-6 ${scrolled ? 'top-2' : 'top-3.5 sm:top-5'}`}
+        className={`pointer-events-none fixed top-3.5 right-0 left-0 z-50 flex justify-center px-3.5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-6 ${
+          mobileMenuOpen ? 'hidden xl:flex' : 'flex'
+        } ${scrolled ? 'top-2' : 'top-3.5 sm:top-5'}`}
       >
         <nav
           className={`pointer-events-auto flex w-full max-w-[1380px] items-center justify-between rounded-full lg:rounded-2xl px-3.5 py-1.5 sm:px-6 sm:py-2 transition-all duration-300 border backdrop-blur-2xl ${
@@ -308,42 +322,66 @@ export function Navbar() {
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed inset-0 z-50 flex flex-col overflow-y-auto bg-[var(--background)]/98 px-5 pt-20 pb-10 backdrop-blur-3xl transition-all duration-500 xl:hidden ${
-          mobileMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        className={`fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background/98 px-5 pt-3.5 pb-8 backdrop-blur-3xl transition-all duration-300 xl:hidden dark:bg-[#0c100e]/98 ${
+          mobileMenuOpen ? 'pointer-events-auto opacity-100 translate-y-0' : 'pointer-events-none opacity-0 -translate-y-4'
         }`}
       >
         {/* Top Header inside Drawer */}
-        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4 mb-4">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3 mb-3">
           <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
             <img src="/TD%20Black.png" alt="TractorDost" className="logo-light h-7 w-auto" />
             <img src="/TD%20White.png" alt="TractorDost" className="logo-dark h-7 w-auto" />
           </Link>
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close Menu"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-200 transition-colors"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close Menu"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-200 transition-colors hover:bg-black/10 active:scale-95"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Search inside Drawer */}
+        <div className="relative mb-3">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted">
+            <Search size={15} />
+          </div>
+          <input
+            type="text"
+            placeholder="Search tractors, brands, tools..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const target = e.target as HTMLInputElement;
+                if (target.value.trim()) {
+                  router.push(`/tractors?search=${encodeURIComponent(target.value.trim())}`);
+                  setMobileMenuOpen(false);
+                }
+              }
+            }}
+            className="w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.04] py-2 pl-9 pr-3 text-xs font-medium placeholder:text-muted focus:border-[var(--color-brand-green)] focus:outline-none"
+          />
         </div>
 
         {/* Sell CTA Banner at top of Drawer */}
         <Link
           href="/sell-used-tractor"
           onClick={() => setMobileMenuOpen(false)}
-          className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-brand-orange)] to-[#d46b3f] p-3.5 text-white shadow-md transition-transform active:scale-98"
+          className="mb-3 flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-brand-orange)] to-[#d46b3f] p-3 text-white shadow-md transition-transform active:scale-98"
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md">
-              <span className="text-xl font-black">+</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md">
+              <span className="text-lg font-black">+</span>
             </div>
             <div>
-              <p className="text-sm font-black uppercase tracking-wider">Sell Your Tractor</p>
-              <p className="text-[11px] text-white/85">Get best verified market price</p>
+              <p className="text-xs font-black uppercase tracking-wider">Sell Your Tractor</p>
+              <p className="text-[10px] text-white/85">Get best verified market price</p>
             </div>
           </div>
-          <ChevronRight size={18} className="text-white/80" />
+          <ChevronRight size={16} className="text-white/80" />
         </Link>
 
         {/* Navigation Categories */}
@@ -351,138 +389,137 @@ export function Navbar() {
           <Link
             href="/tractors"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <TractorIcon size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <TractorIcon size={15} />
               </div>
-              <span>New Tractors</span>
+              <span className="text-xs">New Tractors</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/used-tractors"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
-                <Handshake size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
+                <Handshake size={15} />
               </div>
-              <span>Used Tractors</span>
+              <span className="text-xs">Used Tractors</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/compare"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <ArrowLeftRight size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <ArrowLeftRight size={15} />
               </div>
               <div className="flex items-center gap-2">
-                <span>Compare Tractors</span>
-                <span className="rounded-full bg-[var(--color-brand-orange)]/15 px-2 py-0.5 text-[9px] font-black uppercase text-[var(--color-brand-orange)]">
+                <span className="text-xs">Compare Tractors</span>
+                <span className="rounded-full bg-[var(--color-brand-orange)]/15 px-1.5 py-0.5 text-[8.5px] font-black uppercase text-[var(--color-brand-orange)]">
                   HOT
                 </span>
               </div>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/brands"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <Sparkles size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Sparkles size={15} />
               </div>
-              <span>Explore Brands</span>
+              <span className="text-xs">Explore Brands</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/loan"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
-                <Landmark size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
+                <Landmark size={15} />
               </div>
-              <span>Finance & EMI Calculator</span>
+              <span className="text-xs">Finance & EMI Calculator</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/implements"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <Wrench size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Wrench size={15} />
               </div>
-              <span>Implements & Tools</span>
+              <span className="text-xs">Implements & Tools</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/dealers"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
-                <MapPin size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
+                <MapPin size={15} />
               </div>
-              <span>Find Verified Dealers</span>
+              <span className="text-xs">Find Verified Dealers</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/news"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <Newspaper size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Newspaper size={15} />
               </div>
-              <span>News, Reviews & Guides</span>
+              <span className="text-xs">News, Reviews & Guides</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
 
           <Link
             href="/faq"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-500/10 text-zinc-500">
-                <HelpCircle size={16} />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-500/10 text-zinc-500">
+                <HelpCircle size={15} />
               </div>
-              <span>FAQ & Support</span>
+              <span className="text-xs">FAQ & Support</span>
             </div>
-            <ChevronRight size={16} className="text-muted" />
+            <ChevronRight size={15} className="text-muted" />
           </Link>
         </div>
 
-        {/* Bottom User / Theme Row */}
-        <div className="mt-8 flex items-center justify-between border-t border-[var(--border-subtle)] pt-5">
-          <ThemeToggle />
+        {/* Bottom User Account Section */}
+        <div className="mt-6 border-t border-[var(--border-subtle)] pt-4">
           {!isAuthenticated ? (
             <button
               type="button"
@@ -491,22 +528,36 @@ export function Navbar() {
                 router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
                 setMobileMenuOpen(false);
               }}
-              className="rounded-full bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] py-2.5 text-xs font-bold text-white shadow-md transition-all active:scale-98"
             >
-              Log In to Account →
+              <span>Log In to Account</span>
+              <ChevronRight size={15} />
             </button>
           ) : (
-            <button
-              type="button"
-              suppressHydrationWarning
-              onClick={() => {
-                logout();
-                setMobileMenuOpen(false);
-              }}
-              className="text-sm font-bold text-red-500"
-            >
-              Log Out
-            </button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <UserAvatar photoUrl={user?.profilePhoto} name={user?.fullName} size={36} />
+                <div>
+                  <p className="text-xs font-bold text-foreground truncate max-w-[180px]">
+                    {user?.fullName || 'User'}
+                  </p>
+                  <p className="text-[10px] text-muted">
+                    {user?.role?.name || 'Customer'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                suppressHydrationWarning
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="text-xs font-bold text-red-500 rounded-lg px-2.5 py-1 hover:bg-red-500/10 transition-colors"
+              >
+                Log Out
+              </button>
+            </div>
           )}
         </div>
       </div>

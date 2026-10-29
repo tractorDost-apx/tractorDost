@@ -464,7 +464,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
         <div className="mx-auto flex max-w-lg flex-col gap-3.5">
           {/* 1. Curved Hero Banner Slider Card */}
           <div
-            className="group/card relative w-full aspect-[16/10] sm:aspect-[2/1] min-h-[220px] max-h-[300px] overflow-hidden rounded-[26px] sm:rounded-[32px] border border-black/10 bg-stone-900 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.35)] dark:border-white/15 select-none"
+            className="group/card relative w-full aspect-[16/9] sm:aspect-[2.2/1] min-h-[175px] max-h-[235px] overflow-hidden rounded-[24px] sm:rounded-[30px] border border-black/10 bg-stone-900 shadow-[0_12px_32px_-8px_rgba(0,0,0,0.35)] dark:border-white/15 select-none"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -499,63 +499,45 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
             <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/60 via-transparent to-transparent pointer-events-none" />
 
             {/* Banner Content inside Card */}
-            <div className="relative z-20 flex h-full flex-col justify-between p-4 sm:p-5 pointer-events-none">
+            <div className="relative z-20 flex h-full flex-col justify-between p-3.5 sm:p-4 pointer-events-none">
               {/* Top Dynamic Badge */}
               {activeSlide.badge && (
-                <div className="inline-flex self-start items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 py-1 backdrop-blur-md">
+                <div className="inline-flex self-start items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2 py-0.5 backdrop-blur-md">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-brand-green)] opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-brand-green)]" />
                   </span>
-                  <span className="text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-wider line-clamp-1 max-w-[220px]">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider line-clamp-1 max-w-[200px]">
                     {activeSlide.badge}
                   </span>
                 </div>
               )}
 
               {/* Title & Banner CTA */}
-              <div className="mt-auto mb-4 sm:mb-5">
-                <h2 className="text-xl sm:text-2xl font-black text-white leading-tight drop-shadow-sm">
+              <div className="mt-auto mb-3 sm:mb-4">
+                <h2 className="text-lg sm:text-xl font-black text-white leading-tight drop-shadow-sm">
                   Find the Perfect <span className="text-[var(--color-brand-green)]">Tractor</span>
                 </h2>
-                <p className="mt-0.5 text-[11px] sm:text-xs text-white/85 line-clamp-1 font-medium">
+                <p className="mt-0.5 text-[10px] sm:text-[11px] text-white/85 line-clamp-1 font-medium">
                   Verified dealers, lowest EMI loans & best price offers
                 </p>
                 {cta && (
-                  <div className="mt-2.5 pointer-events-auto">
+                  <div className="mt-1.5 pointer-events-auto">
                     <Link
                       href={cta.href}
                       onClick={() => trackBannerEvent(cta.bannerId, 'click')}
-                      className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-green)] px-3.5 py-1.5 text-xs font-bold text-white shadow transition-all active:scale-95"
+                      className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-green)] px-3 py-1 text-[11px] font-bold text-white shadow transition-all active:scale-95"
                     >
                       <span>{cta.label}</span>
-                      <ChevronRight size={13} />
+                      <ChevronRight size={12} />
                     </Link>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Left & Right Subtle Tap Arrows */}
-            <button
-              type="button"
-              onClick={prevSlide}
-              aria-label="Previous Slide"
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-black/45 text-white/90 backdrop-blur-md border border-white/10 active:scale-90"
-            >
-              <ChevronLeft size={15} />
-            </button>
-            <button
-              type="button"
-              onClick={nextSlide}
-              aria-label="Next Slide"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-black/45 text-white/90 backdrop-blur-md border border-white/10 active:scale-90"
-            >
-              <ChevronRight size={15} />
-            </button>
-
             {/* Bottom Capsule Pill Indicator (Exact Match to User's Reference Image) */}
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 rounded-full bg-black/65 px-3 py-1 backdrop-blur-md border border-white/20 shadow-md">
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 rounded-full bg-black/65 px-2.5 py-0.5 backdrop-blur-md border border-white/20 shadow-md">
               {slides.map((_, idx) => {
                 const isActive = idx === currentSlide;
                 return (
@@ -566,8 +548,8 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                     aria-label={`Go to slide ${idx + 1}`}
                     className={`transition-all duration-300 ${
                       isActive
-                        ? 'h-2 w-5 rounded-full bg-[var(--color-brand-orange)] shadow-[0_0_8px_var(--color-brand-orange)]'
-                        : 'h-2 w-2 rounded-full bg-white/50 hover:bg-white/80'
+                        ? 'h-1.5 w-4 rounded-full bg-[var(--color-brand-orange)] shadow-[0_0_8px_var(--color-brand-orange)]'
+                        : 'h-1.5 w-1.5 rounded-full bg-white/50 hover:bg-white/80'
                     }`}
                   />
                 );
@@ -643,7 +625,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
         {/* =========================================
             HERO CONTENT CONTAINER (LEFT TEXT & RIGHT VERTICAL CARD)
             ========================================= */}
-        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-row items-start justify-between gap-10 xl:gap-14 px-8 pt-36 pb-16 lg:min-h-[760px] xl:min-h-[800px] xl:px-14 xl:pt-40 xl:pb-20">
+        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-row items-start justify-between gap-10 xl:gap-14 px-8 pt-32 pb-12 lg:min-h-[640px] xl:min-h-[680px] xl:px-14 xl:pt-34 xl:pb-14">
           {/* -----------------------------------------
               LEFT SIDE: HEADINGS, BADGES & HIGHLIGHTS
               ----------------------------------------- */}
@@ -728,29 +710,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
             </div>
 
             {/* Slide Navigation Controls & Progress Indicator */}
-            <div className="mt-8 flex items-center gap-4">
-              {/* Prev / Next Arrows */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={prevSlide}
-                  aria-label="Previous Slide"
-                  suppressHydrationWarning
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-black/70 hover:text-white active:scale-95"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <button
-                  type="button"
-                  onClick={nextSlide}
-                  aria-label="Next Slide"
-                  suppressHydrationWarning
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-black/70 hover:text-white active:scale-95"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-
+            <div className="mt-7 flex items-center gap-3">
               {/* Slide Indicator Bars */}
               <div className="flex items-center gap-2">
                 {slides.map((_, idx) => {
