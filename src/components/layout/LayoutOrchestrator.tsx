@@ -6,6 +6,7 @@ import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { DashboardFooter } from './DashboardFooter';
 import { LeadAttributionTracker } from '@/components/analytics/LeadAttributionTracker';
+import { MobileBottomNav } from './MobileBottomNav';
 
 export function LayoutOrchestrator({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,12 +26,13 @@ export function LayoutOrchestrator({ children }: { children: React.ReactNode }) 
         className={`flex flex-1 flex-col min-h-0 ${
           isDashboardRoute
             ? 'px-3 pt-3 pb-2 sm:px-5 sm:pt-3.5 sm:pb-2.5'
-            : 'pt-0 px-0 pb-0'
+            : 'pt-0 px-0 pb-16 md:pb-0'
         }`}
       >
         {children}
       </main>
       {isDashboardRoute ? <DashboardFooter /> : <Footer />}
+      <MobileBottomNav />
     </div>
   );
 }

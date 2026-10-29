@@ -14,6 +14,16 @@ import {
   X,
   Search,
   Bell,
+  Tractor as TractorIcon,
+  Handshake,
+  ArrowLeftRight,
+  Landmark,
+  Wrench,
+  MapPin,
+  Newspaper,
+  Sparkles,
+  ChevronRight,
+  HelpCircle,
 } from 'lucide-react';
 import { DashboardNavbar } from './DashboardNavbar';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -298,46 +308,180 @@ export function Navbar() {
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed inset-0 z-40 flex flex-col overflow-y-auto bg-[var(--background)]/95 px-6 pt-24 backdrop-blur-3xl transition-all duration-500 xl:hidden ${mobileMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+        className={`fixed inset-0 z-50 flex flex-col overflow-y-auto bg-[var(--background)]/98 px-5 pt-20 pb-10 backdrop-blur-3xl transition-all duration-500 xl:hidden ${
+          mobileMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
       >
-        <div className="flex flex-col gap-5 text-2xl font-black">
+        {/* Top Header inside Drawer */}
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4 mb-4">
+          <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+            <img src="/TD%20Black.png" alt="TractorDost" className="logo-light h-7 w-auto" />
+            <img src="/TD%20White.png" alt="TractorDost" className="logo-dark h-7 w-auto" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close Menu"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-200 transition-colors"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Sell CTA Banner at top of Drawer */}
+        <Link
+          href="/sell-used-tractor"
+          onClick={() => setMobileMenuOpen(false)}
+          className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-brand-orange)] to-[#d46b3f] p-3.5 text-white shadow-md transition-transform active:scale-98"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md">
+              <span className="text-xl font-black">+</span>
+            </div>
+            <div>
+              <p className="text-sm font-black uppercase tracking-wider">Sell Your Tractor</p>
+              <p className="text-[11px] text-white/85">Get best verified market price</p>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-white/80" />
+        </Link>
+
+        {/* Navigation Categories */}
+        <div className="flex flex-col gap-1 text-sm font-bold">
           <Link
             href="/tractors"
-            className="transition-colors hover:text-[var(--color-brand-green)]"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
-            New Tractors
-          </Link>
-          <Link
-            href="/used-tractors"
-            className="transition-colors hover:text-[var(--color-brand-green)]"
-          >
-            Used Tractors
-          </Link>
-          <Link
-            href="/implements"
-            className="transition-colors hover:text-[var(--color-brand-green)]"
-          >
-            Implements & Tyres
-          </Link>
-          <Link href="/dealers" className="transition-colors hover:text-[var(--color-brand-green)]">
-            Find Dealers
-          </Link>
-          <Link href="/loan" className="transition-colors hover:text-[var(--color-brand-green)]">
-            Finance & EMI
-          </Link>
-          <Link href="/news" className="transition-colors hover:text-[var(--color-brand-green)]">
-            News & Reviews
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <TractorIcon size={16} />
+              </div>
+              <span>New Tractors</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
           </Link>
 
-          <div className="my-2 h-[1px] bg-[var(--border-subtle)]" />
           <Link
-            href="/sell-used-tractor"
-            className="flex items-center gap-2 text-[var(--color-brand-orange)]"
+            href="/used-tractors"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
-            <span>+</span> Sell Your Tractor
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
+                <Handshake size={16} />
+              </div>
+              <span>Used Tractors</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/compare"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <ArrowLeftRight size={16} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span>Compare Tractors</span>
+                <span className="rounded-full bg-[var(--color-brand-orange)]/15 px-2 py-0.5 text-[9px] font-black uppercase text-[var(--color-brand-orange)]">
+                  HOT
+                </span>
+              </div>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/brands"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Sparkles size={16} />
+              </div>
+              <span>Explore Brands</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/loan"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
+                <Landmark size={16} />
+              </div>
+              <span>Finance & EMI Calculator</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/implements"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Wrench size={16} />
+              </div>
+              <span>Implements & Tools</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/dealers"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
+                <MapPin size={16} />
+              </div>
+              <span>Find Verified Dealers</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/news"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Newspaper size={16} />
+              </div>
+              <span>News, Reviews & Guides</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/faq"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-500/10 text-zinc-500">
+                <HelpCircle size={16} />
+              </div>
+              <span>FAQ & Support</span>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
           </Link>
         </div>
-        <div className="mt-auto mb-10 flex items-center justify-between border-t border-[var(--border-subtle)] pt-6">
+
+        {/* Bottom User / Theme Row */}
+        <div className="mt-8 flex items-center justify-between border-t border-[var(--border-subtle)] pt-5">
           <ThemeToggle />
           {!isAuthenticated ? (
             <button
@@ -347,7 +491,7 @@ export function Navbar() {
                 router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
                 setMobileMenuOpen(false);
               }}
-              className="text-lg font-bold text-[var(--color-brand-green)]"
+              className="rounded-full bg-[var(--color-brand-green)] px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all active:scale-95"
             >
               Log In to Account →
             </button>
@@ -359,7 +503,7 @@ export function Navbar() {
                 logout();
                 setMobileMenuOpen(false);
               }}
-              className="text-lg font-bold text-red-500"
+              className="text-sm font-bold text-red-500"
             >
               Log Out
             </button>
