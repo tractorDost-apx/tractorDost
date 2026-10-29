@@ -16,7 +16,6 @@ import {
   ShieldCheck,
   BadgePercent,
   Sparkles,
-  CheckCircle2,
 } from 'lucide-react';
 import { AnimatedWord } from '@/components/ui/AnimatedWord';
 import { isExternalLink, trackBannerEvent } from '@/lib/api/banners';
@@ -197,7 +196,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
       aria-label="Hero Tractor Slider"
     >
       {/* =========================================
-          BACKGROUND SLIDES CAROUSEL
+          BACKGROUND SLIDES CAROUSEL (Full-Bleed, Edge-to-Edge)
           ========================================= */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-stone-950">
         {slides.map((slide, idx) => {
@@ -223,7 +222,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                     src={slide.image}
                     alt={slide.alt}
                     loading={idx === 0 ? 'eager' : 'lazy'}
-                    className="h-full w-full object-cover object-center"
+                    className="absolute inset-0 block h-full w-full object-cover object-center"
                   />
                 </picture>
               ) : (
@@ -240,59 +239,60 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
           );
         })}
 
-        {/* Clean, Sharp Photographic Dark Gradients for Text Contrast (No Blurs or Hazy Glows) */}
+        {/* Clean, Sharp Photographic Dark Gradients for Text Contrast (Edge-to-Edge) */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25" />
+        <div className="absolute inset-0 bg-black/25 sm:bg-transparent" />
       </div>
 
       {/* =========================================
           HERO CONTENT CONTAINER (LEFT TEXT & RIGHT VERTICAL CARD)
           ========================================= */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col justify-between gap-12 px-6 pt-36 pb-14 sm:px-10 sm:pt-40 sm:pb-16 md:min-h-[780px] lg:min-h-[800px] lg:flex-row lg:items-start lg:gap-14 lg:pt-40 lg:pb-20 xl:px-14">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col justify-between gap-10 px-4 pt-28 pb-12 sm:gap-12 sm:px-8 sm:pt-36 sm:pb-14 md:px-10 md:pt-36 lg:min-h-[760px] xl:min-h-[800px] lg:flex-row lg:items-start lg:gap-10 xl:gap-14 lg:pt-36 xl:pt-40 lg:pb-16 xl:pb-20 xl:px-14">
         {/* -----------------------------------------
             LEFT SIDE: HEADINGS, BADGES & HIGHLIGHTS
             ----------------------------------------- */}
-        <div className="flex flex-1 flex-col items-start justify-start text-left pt-2">
+        <div className="flex flex-1 flex-col items-start justify-start text-left pt-2 w-full">
           {/* Active Dynamic Badge (banner title on banner slides, static badge otherwise) */}
           {activeSlide.badge && (
-            <div className="inline-flex cursor-default items-center gap-2.5 rounded-full border border-white/20 bg-black/40 px-4 py-1.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:bg-black/60">
+            <div className="inline-flex cursor-default items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:bg-black/60 sm:gap-2.5 sm:px-4">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-brand-green)] opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-brand-green)]" />
               </span>
-              <span className="text-xs font-semibold tracking-wider text-white/90 uppercase">
+              <span className="text-[11px] sm:text-xs font-semibold tracking-wider text-white/90 uppercase line-clamp-1 max-w-[280px] sm:max-w-none">
                 {activeSlide.badge}
               </span>
             </div>
           )}
 
           {/* Main Hero Title */}
-          <h1 className="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[4.2rem] lg:leading-[1.1]">
+          <h1 className="mt-4 sm:mt-5 text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] xl:text-[4.2rem] font-black tracking-tight text-white lg:leading-[1.1]">
             <span className="block">Find the Perfect</span>
-            <div className="my-1.5 flex h-[1.15em] items-center justify-start text-left overflow-visible text-[var(--color-brand-green)]">
+            <div className="my-1 sm:my-1.5 flex h-[1.15em] items-center justify-start text-left overflow-visible text-[var(--color-brand-green)]">
               <AnimatedWord />
             </div>
-            <span className="block text-2xl font-bold tracking-tight text-white/95 sm:text-4xl md:text-5xl">
+            <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white/95">
               for Your Farm
             </span>
           </h1>
 
           {/* Subtitle Paragraph */}
-          <p className="mt-5 max-w-xl text-base leading-relaxed font-normal text-white/80 sm:text-lg">
+          <p className="mt-3.5 sm:mt-5 max-w-xl text-sm leading-relaxed font-normal text-white/80 sm:text-base md:text-lg">
             Discover, buy, and finance premium new and used tractors. Compare models and connect
             with verified dealers instantly.
           </p>
 
           {/* Banner call-to-action. Only on slides from a managed banner that has both a label and a link. */}
           {cta && (
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               {cta.external ? (
                 <a
                   href={cta.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackBannerEvent(cta.bannerId, 'click')}
-                  className="inline-flex items-center rounded-full bg-[var(--color-brand-green)] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)]"
+                  className="inline-flex items-center rounded-full bg-[var(--color-brand-green)] px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)] active:scale-95"
                 >
                   {cta.label}
                 </a>
@@ -300,7 +300,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                 <Link
                   href={cta.href}
                   onClick={() => trackBannerEvent(cta.bannerId, 'click')}
-                  className="inline-flex items-center rounded-full bg-[var(--color-brand-green)] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)]"
+                  className="inline-flex items-center rounded-full bg-[var(--color-brand-green)] px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)] active:scale-95"
                 >
                   {cta.label}
                 </Link>
@@ -309,31 +309,31 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
           )}
 
           {/* Farmer Trust Badges */}
-          <div className="mt-7 flex flex-wrap items-center gap-4 pt-1 sm:gap-6">
-            <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-black/30 px-3.5 py-1.5 backdrop-blur-md">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)]">
-                <ShieldCheck className="h-3.5 w-3.5" />
+          <div className="mt-5 sm:mt-7 flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 pt-1">
+            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 backdrop-blur-md sm:gap-2.5 sm:px-3.5">
+              <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-[var(--color-brand-green)]/20 text-[var(--color-brand-green)]">
+                <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </div>
-              <span className="text-xs font-medium text-white/90">100% Verified Dealers</span>
+              <span className="text-[11px] sm:text-xs font-medium text-white/90">100% Verified Dealers</span>
             </div>
 
-            <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-black/30 px-3.5 py-1.5 backdrop-blur-md">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-brand-orange)]/20 text-[var(--color-brand-orange)]">
-                <BadgePercent className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 backdrop-blur-md sm:gap-2.5 sm:px-3.5">
+              <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-[var(--color-brand-orange)]/20 text-[var(--color-brand-orange)]">
+                <BadgePercent className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </div>
-              <span className="text-xs font-medium text-white/90">Lowest EMI & Loans</span>
+              <span className="text-[11px] sm:text-xs font-medium text-white/90">Lowest EMI & Loans</span>
             </div>
 
-            <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-black/30 px-3.5 py-1.5 backdrop-blur-md">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
-                <Sparkles className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 backdrop-blur-md sm:gap-2.5 sm:px-3.5">
+              <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+                <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </div>
-              <span className="text-xs font-medium text-white/90">Zero Hidden Brokerage</span>
+              <span className="text-[11px] sm:text-xs font-medium text-white/90">Zero Hidden Brokerage</span>
             </div>
           </div>
 
           {/* Slide Navigation Controls & Progress Indicator */}
-          <div className="mt-8 flex items-center gap-4">
+          <div className="mt-6 sm:mt-8 flex items-center gap-3 sm:gap-4">
             {/* Prev / Next Arrows */}
             <div className="flex items-center gap-2">
               <button
@@ -341,23 +341,25 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                 onClick={prevSlide}
                 aria-label="Previous Slide"
                 suppressHydrationWarning
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-black/70 hover:text-white"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-black/70 hover:text-white active:scale-95"
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={16} className="sm:hidden" />
+                <ChevronLeft size={18} className="hidden sm:block" />
               </button>
               <button
                 type="button"
                 onClick={nextSlide}
                 aria-label="Next Slide"
                 suppressHydrationWarning
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-black/70 hover:text-white"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-black/70 hover:text-white active:scale-95"
               >
-                <ChevronRight size={18} />
+                <ChevronRight size={16} className="sm:hidden" />
+                <ChevronRight size={18} className="hidden sm:block" />
               </button>
             </div>
 
             {/* Slide Indicator Bars */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {slides.map((_, idx) => {
                 const isActive = idx === currentSlide;
                 return (
@@ -369,8 +371,8 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                     suppressHydrationWarning
                     className={`h-2 rounded-full transition-all duration-300 ${
                       isActive
-                        ? 'w-8 bg-[var(--color-brand-green)]'
-                        : 'w-2.5 bg-white/30 hover:bg-white/60'
+                        ? 'w-7 sm:w-8 bg-[var(--color-brand-green)]'
+                        : 'w-2 sm:w-2.5 bg-white/30 hover:bg-white/60'
                     }`}
                   />
                 );
@@ -378,7 +380,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
             </div>
 
             {/* Slide Index Counter */}
-            <span className="ml-2 font-mono text-xs font-semibold tracking-wider text-white/70">
+            <span className="ml-1 sm:ml-2 font-mono text-[11px] sm:text-xs font-semibold tracking-wider text-white/70">
               0{currentSlide + 1} / 0{slideCount}
             </span>
           </div>
@@ -388,22 +390,22 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
             RIGHT SIDE: VERTICAL RECTANGLE CARD
             (Search Brand, HP, Budget, Explore & Quick Links)
             ----------------------------------------- */}
-        <div className="w-full shrink-0 md:max-w-md lg:w-[410px] xl:w-[440px]">
-          <div className="rounded-[2rem] border border-black/10 bg-white/95 p-5 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] backdrop-blur-2xl transition-all duration-300 sm:p-6 dark:border-white/15 dark:bg-[#0c100e]/90">
+        <div className="w-full shrink-0 max-w-lg mx-auto lg:mx-0 lg:w-[400px] xl:w-[440px]">
+          <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/10 bg-white/95 p-4 sm:p-5 md:p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] backdrop-blur-2xl transition-all duration-300 dark:border-white/15 dark:bg-[#0c100e]/90">
             {/* Card Header */}
-            <div className="mb-4 flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+            <div className="mb-3.5 sm:mb-4 flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]">
-                  <Search className="h-4.5 w-4.5" />
+                <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]">
+                  <Search className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
                 </div>
                 <div>
-                  <h3 className="text-foreground text-sm font-bold tracking-tight">
+                  <h3 className="text-foreground text-xs sm:text-sm font-bold tracking-tight">
                     Smart Tractor Matcher
                   </h3>
-                  <p className="text-muted text-[11px] font-medium">Find models matching your needs</p>
+                  <p className="text-muted text-[10px] sm:text-[11px] font-medium">Find models matching your needs</p>
                 </div>
               </div>
-              <span className="rounded-full border border-[var(--color-brand-orange)]/25 bg-[var(--color-brand-orange)]/10 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-[var(--color-brand-orange)] uppercase">
+              <span className="rounded-full border border-[var(--color-brand-orange)]/25 bg-[var(--color-brand-orange)]/10 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-bold tracking-wider text-[var(--color-brand-orange)] uppercase">
                 Instant
               </span>
             </div>
@@ -411,7 +413,8 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
             {/* Search Input */}
             <div className="relative mb-3">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--color-brand-green)] opacity-85">
-                <Search size={18} />
+                <Search size={16} className="sm:hidden" />
+                <Search size={18} className="hidden sm:block" />
               </div>
               <input
                 type="text"
@@ -419,22 +422,22 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleExplore()}
                 placeholder="Search Brand, HP, Budget..."
-                className="text-foreground placeholder:text-muted/60 w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.04] py-3 pr-4 pl-10 text-sm font-medium transition-all duration-200 focus:border-[var(--color-brand-green)] focus:bg-background focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
+                className="text-foreground placeholder:text-muted/60 w-full rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.04] py-2.5 sm:py-3 pr-4 pl-9 sm:pl-10 text-xs sm:text-sm font-medium transition-all duration-200 focus:border-[var(--color-brand-green)] focus:bg-background focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                 suppressHydrationWarning
               />
             </div>
 
             {/* Dropdowns Row (Budget & HP) */}
-            <div className="mb-3.5 grid grid-cols-2 gap-2.5">
+            <div className="mb-3 sm:mb-3.5 grid grid-cols-2 gap-2 sm:gap-2.5">
               <div>
-                <label className="text-muted mb-1 block text-[11px] font-bold tracking-wider uppercase">
+                <label className="text-muted mb-1 block text-[10px] sm:text-[11px] font-bold tracking-wider uppercase">
                   Any Budget
                 </label>
                 <div className="relative">
                   <select
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
-                    className="text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.04] px-3 py-2.5 pr-8 text-xs font-semibold transition-all duration-200 hover:border-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] focus:bg-background focus:outline-none"
+                    className="text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.04] px-2.5 sm:px-3 py-2 sm:py-2.5 pr-7 sm:pr-8 text-xs font-semibold transition-all duration-200 hover:border-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] focus:bg-background focus:outline-none"
                     suppressHydrationWarning
                   >
                     <option value="" className="bg-background text-foreground">
@@ -450,21 +453,21 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                       Above 8 Lakh
                     </option>
                   </select>
-                  <div className="text-muted pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
+                  <div className="text-muted pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-2.5">
                     <ChevronRight size={14} className="rotate-90" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-muted mb-1 block text-[11px] font-bold tracking-wider uppercase">
+                <label className="text-muted mb-1 block text-[10px] sm:text-[11px] font-bold tracking-wider uppercase">
                   Any HP
                 </label>
                 <div className="relative">
                   <select
                     value={hp}
                     onChange={(e) => setHp(e.target.value)}
-                    className="text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.04] px-3 py-2.5 pr-8 text-xs font-semibold transition-all duration-200 hover:border-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] focus:bg-background focus:outline-none"
+                    className="text-foreground w-full cursor-pointer appearance-none rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.04] px-2.5 sm:px-3 py-2 sm:py-2.5 pr-7 sm:pr-8 text-xs font-semibold transition-all duration-200 hover:border-[var(--color-brand-green)]/50 focus:border-[var(--color-brand-green)] focus:bg-background focus:outline-none"
                     suppressHydrationWarning
                   >
                     <option value="" className="bg-background text-foreground">
@@ -480,7 +483,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                       Above 50 HP
                     </option>
                   </select>
-                  <div className="text-muted pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
+                  <div className="text-muted pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-2.5">
                     <ChevronRight size={14} className="rotate-90" />
                   </div>
                 </div>
@@ -491,7 +494,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
             <button
               type="button"
               onClick={() => handleExplore()}
-              className="group/btn relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-[var(--color-brand-green)] py-3 text-sm font-bold tracking-wider text-white uppercase shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)] hover:shadow-[0_8px_20px_rgba(74,118,53,0.35)] active:scale-[0.99]"
+              className="group/btn relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-[var(--color-brand-green)] py-2.5 sm:py-3 text-xs sm:text-sm font-bold tracking-wider text-white uppercase shadow-md transition-all duration-300 hover:bg-[var(--color-brand-green-dark)] hover:shadow-[0_8px_20px_rgba(74,118,53,0.35)] active:scale-[0.99]"
               suppressHydrationWarning
             >
               <span>Explore Tractors</span>
@@ -499,86 +502,86 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
             </button>
 
             {/* Subtle Divider */}
-            <div className="relative my-4 flex items-center justify-center">
+            <div className="relative my-3 sm:my-4 flex items-center justify-center">
               <div className="border-border w-full border-t" />
-              <span className="text-muted bg-white px-2.5 text-[10px] font-bold tracking-wider uppercase dark:bg-[#0c100e]">
+              <span className="text-muted bg-white px-2.5 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase dark:bg-[#0c100e]">
                 Quick Services
               </span>
             </div>
 
             {/* Quick Action Links inside the Vertical Rectangle */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
               {/* 1. New Tractors */}
               <Link
                 href="/tractors"
-                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
+                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
-                  <Tractor className="h-4 w-4" />
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
+                  <Tractor className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-green)]">
+                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-green)] truncate">
                     New Tractors
                   </p>
-                  <p className="text-muted text-[10px] font-medium">Latest models</p>
+                  <p className="text-muted text-[10px] font-medium truncate">Latest models</p>
                 </div>
               </Link>
 
               {/* 2. Used Tractors */}
               <Link
                 href="/used-tractors"
-                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2.5 transition-all duration-200 hover:border-[var(--color-brand-orange)]/40 hover:bg-[var(--color-brand-orange)]/10 hover:shadow-sm"
+                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-orange)]/40 hover:bg-[var(--color-brand-orange)]/10 hover:shadow-sm"
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] transition-transform duration-200 group-hover:scale-110">
-                  <Handshake className="h-4 w-4" />
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] transition-transform duration-200 group-hover:scale-110">
+                  <Handshake className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-orange)]">
+                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-orange)] truncate">
                     Used Tractors
                   </p>
-                  <p className="text-muted text-[10px] font-medium">Verified pre-owned</p>
+                  <p className="text-muted text-[10px] font-medium truncate">Verified pre-owned</p>
                 </div>
               </Link>
 
               {/* 3. Sell Tractor */}
               <Link
-                href="/sell"
-                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
+                href="/sell-used-tractor"
+                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
-                  <CircleDollarSign className="h-4 w-4" />
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
+                  <CircleDollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-green)]">
+                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-green)] truncate">
                     Sell Tractor
                   </p>
-                  <p className="text-muted text-[10px] font-medium">Best price offer</p>
+                  <p className="text-muted text-[10px] font-medium truncate">Best price offer</p>
                 </div>
               </Link>
 
               {/* 4. Tractor Loan */}
               <Link
                 href="/loan"
-                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2.5 transition-all duration-200 hover:border-[var(--color-brand-orange)]/40 hover:bg-[var(--color-brand-orange)]/10 hover:shadow-sm"
+                className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-orange)]/40 hover:bg-[var(--color-brand-orange)]/10 hover:shadow-sm"
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] transition-transform duration-200 group-hover:scale-110">
-                  <Landmark className="h-4 w-4" />
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] transition-transform duration-200 group-hover:scale-110">
+                  <Landmark className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-orange)]">
+                  <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-orange)] truncate">
                     Tractor Loan
                   </p>
-                  <p className="text-muted text-[10px] font-medium">Low interest EMI</p>
+                  <p className="text-muted text-[10px] font-medium truncate">Low interest EMI</p>
                 </div>
               </Link>
 
               {/* 5. Implements (Full Width 5th item) */}
               <Link
                 href="/implements"
-                className="group col-span-2 flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
+                className="group col-span-2 flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
-                  <Wrench className="h-4 w-4" />
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
+                  <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
@@ -589,7 +592,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
                       Explore All &rarr;
                     </span>
                   </div>
-                  <p className="text-muted text-[10px] font-medium">
+                  <p className="text-muted text-[10px] font-medium truncate">
                     Rotavators, cultivators, trolleys & farm equipment
                   </p>
                 </div>
