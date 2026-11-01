@@ -32,8 +32,9 @@ export function middleware(request: NextRequest) {
   // If the route is protected and the user is NOT authenticated, redirect to login
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
-    // Optional: add a callback URL so they return to the page they tried to access
-    loginUrl.searchParams.set('callbackUrl', encodeURIComponent(pathname + request.nextUrl.search));
+    // Optional: add a callback URL so they return to the page they tried to access.
+    // searchParams.set() already percent-encodes the value; encoding it here too makes the login page read "%2Fdashboard".
+    loginUrl.searchParams.set('callbackUrl', pathname + request.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 

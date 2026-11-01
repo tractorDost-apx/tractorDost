@@ -24,7 +24,11 @@ export default function LoginPage() {
   const [isResending, setIsResending] = useState(false);
   const [devOtpHint, setDevOtpHint] = useState<string | null>(null);
 
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  // Only same-site relative paths are honoured. Anything else (e.g. a double-encoded "%2Fdashboard"
+  // from an older redirect, or an absolute URL) falls back to the role-based dashboard.
+  const rawCallbackUrl = searchParams.get('callbackUrl');
+  const callbackUrl =
+    rawCallbackUrl && rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') ? rawCallbackUrl : '/';
 
   // Auto-redirect if already logged in
   React.useEffect(() => {
