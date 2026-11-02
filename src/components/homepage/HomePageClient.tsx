@@ -110,33 +110,36 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8">
+          <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-4 lg:grid-cols-8">
             {loading
               ? Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-foreground/5 aspect-square animate-pulse rounded-2xl"
-                />
+                <div key={i} className="flex flex-col items-center gap-2.5">
+                  <div className="bg-foreground/5 aspect-square w-full animate-pulse rounded-2xl" />
+                  <div className="bg-foreground/5 h-3.5 w-16 animate-pulse rounded-md" />
+                </div>
               ))
               : brands.map((brand) => (
                 <Link
                   key={brand.id}
                   href={`/tractors?brand=${brand.id}`}
-                  className="group relative flex aspect-square flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-3.5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg dark:border-white/10 dark:bg-card"
+                  className="group flex flex-col items-center gap-2.5 transition-transform duration-300 hover:-translate-y-1"
                 >
-                  <div className="relative mb-2.5 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-2.5 shadow-xs transition-all duration-300 group-hover:scale-108 group-hover:shadow-md dark:border-white/10 dark:bg-white/95">
+                  {/* Edge-to-Edge Image Container */}
+                  <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-white shadow-xs transition-all duration-300 group-hover:border-[var(--color-brand-green)]/40 group-hover:shadow-lg dark:border-white/10 dark:bg-card">
                     {brand.logoUrl ? (
                       <img
                         src={brand.logoUrl}
                         alt={brand.name}
-                        className="h-full w-full object-contain rounded-xl transition-transform duration-300"
+                        className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-108"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-lg sm:text-xl font-black text-[var(--color-brand-green)]">
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-2xl font-black text-[var(--color-brand-green)]">
                         {brand.name.charAt(0)}
                       </div>
                     )}
                   </div>
+
+                  {/* Brand Name Below Image */}
                   <span className="text-foreground group-hover:text-[var(--color-brand-green)] text-center text-xs font-black tracking-wider uppercase transition-colors line-clamp-1">
                     {brand.name}
                   </span>

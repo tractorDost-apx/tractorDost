@@ -451,7 +451,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
   return (
     <section
       ref={sectionRef}
-      className="group relative w-full overflow-hidden transition-all duration-500"
+      className="group relative w-full overflow-hidden transition-all duration-500 lg:min-h-screen lg:min-h-[100dvh]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       aria-label="Hero Tractor Slider"
@@ -575,7 +575,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
       {/* ========================================================
           DESKTOP VIEW (>= lg): FULL IMMERSIVE EDGE-TO-EDGE HERO
           ======================================================== */}
-      <div className="relative hidden w-full overflow-hidden lg:block">
+      <div className="relative hidden w-full overflow-hidden lg:flex lg:min-h-screen lg:min-h-[100dvh] lg:flex-col lg:justify-center">
         {/* =========================================
             BACKGROUND SLIDES CAROUSEL (Full-Bleed, Edge-to-Edge)
             ========================================= */}
@@ -625,11 +625,11 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
         {/* =========================================
             HERO CONTENT CONTAINER (LEFT TEXT & RIGHT VERTICAL CARD)
             ========================================= */}
-        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-row items-start justify-between gap-10 xl:gap-14 px-8 pt-32 pb-12 lg:min-h-[640px] xl:min-h-[680px] xl:px-14 xl:pt-34 xl:pb-14">
+        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-row items-center justify-between gap-10 xl:gap-14 px-8 pt-24 pb-10 xl:px-14 xl:pt-28 xl:pb-12">
           {/* -----------------------------------------
               LEFT SIDE: HEADINGS, BADGES & HIGHLIGHTS
               ----------------------------------------- */}
-          <div className="flex flex-1 flex-col items-start justify-start text-left pt-2 w-full">
+          <div className="flex flex-1 flex-col items-start justify-center text-left w-full">
             {/* Active Dynamic Badge */}
             {activeSlide.badge && (
               <div className="inline-flex cursor-default items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:bg-black/60 sm:gap-2.5 sm:px-4">
