@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import {
   AlertCircle,
   AlertTriangle,
@@ -113,7 +114,7 @@ function Section({
         >
           {count.toLocaleString('en-IN')}
         </span>
-        <span className="text-muted text-xs transition-transform group-open:rotate-90">▶</span>
+        <ChevronRight size={13} className="text-muted transition-transform group-open:rotate-90 shrink-0" />
       </summary>
       <div className="flex max-h-72 flex-col gap-2 overflow-y-auto px-4 pt-1 pb-4">{children}</div>
     </details>

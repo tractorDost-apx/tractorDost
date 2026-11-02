@@ -263,7 +263,7 @@ export default function DealerDashboardPage() {
           <div>
             <div className="flex flex-wrap items-center gap-2.5">
               <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
-                Welcome back, {user?.fullName?.split(' ')[0] || dealerName || 'Dealer'}! 👋
+                Welcome back, {user?.fullName?.split(' ')[0] || dealerName || 'Dealer'}!
               </h1>
               <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
                 {dealerName ? `${dealerName} Hub` : 'Dealership Hub'}

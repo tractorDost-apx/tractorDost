@@ -15,6 +15,7 @@ import {
   Camera,
 } from 'lucide-react';
 import { usedTractorDocumentAPI } from '@/lib/api/used-documents';
+import { validateImageFile, validateDocumentFile } from '@/lib/utils/file-validation';
 import {
   ALLOWED_DOCUMENT_MIME,
   MAX_DOCUMENT_BYTES,
@@ -230,7 +231,7 @@ export function DealerListingDocumentsModal({
 
               <div className="sm:col-span-5">
                 <label className="block text-[11px] font-bold text-muted mb-1">
-                  Select Files (Max 5MB each)
+                  {isPhotoDocType(docType) ? "Select Photos (Max 5MB each)" : "Select Documents (Max 10MB each)"}
                 </label>
                 <input
                   type="file"

@@ -602,7 +602,7 @@ export function LeadTable({
                           title="Click to reassign agent"
                           className="inline-flex items-center gap-1 rounded-lg border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 text-[11px] font-bold text-sky-400 hover:bg-sky-500/20 hover:border-sky-500/40 transition-all cursor-pointer"
                         >
-                          👤 {lead.assignedAgent.fullName}
+                          {lead.assignedAgent.fullName}
                         </button>
                       ) : (
                         <button
@@ -613,7 +613,7 @@ export function LeadTable({
                           }}
                           className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-400 hover:bg-amber-500/20 transition-colors cursor-pointer"
                         >
-                          ⚡ Unassigned
+                          Unassigned
                         </button>
                       )}
                       {lead.dealer && (

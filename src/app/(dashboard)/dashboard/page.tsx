@@ -325,7 +325,7 @@ export default function DashboardPage() {
         <div>
           <div className="mb-2 flex items-center gap-3">
             <h1 className="text-foreground text-2xl font-black sm:text-3xl">
-              Welcome back, {user?.fullName?.split(' ')[0] || 'Farmer'}! 👋
+              Welcome back, {user?.fullName?.split(' ')[0] || 'Farmer'}!
             </h1>
             <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
               {getRoleDisplay()}
