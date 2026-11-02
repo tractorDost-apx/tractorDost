@@ -93,20 +93,20 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-4 pt-14 pb-4 sm:px-6 lg:px-8">
         {/* 1. TOP BRANDS CAROUSEL */}
         <section className="flex flex-col gap-8">
-          <div className="flex items-end justify-between">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-foreground text-3xl font-black tracking-tight md:text-4xl">
+          <div className="flex flex-wrap items-end justify-between gap-3 px-1 sm:px-2">
+            <div className="flex flex-col gap-1 sm:gap-2">
+              <h2 className="text-foreground text-2xl sm:text-3xl font-black tracking-tight md:text-4xl">
                 Explore Top Brands
               </h2>
-              <p className="text-muted font-bold">
+              <p className="text-muted text-xs sm:text-base font-semibold">
                 Discover the most trusted manufacturers in India.
               </p>
             </div>
             <Link
               href="/brands"
-              className="hidden items-center gap-2 text-sm font-bold tracking-wider text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)] md:flex"
+              className="flex shrink-0 items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold tracking-wider text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)]"
             >
-              View All Brands <ChevronRight size={16} />
+              View All Brands <ChevronRight size={14} className="sm:size-4" />
             </Link>
           </div>
 
@@ -152,21 +152,21 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           {/* LEFT COLUMN: Featured Tractors */}
           <div className="flex min-w-0 flex-1 flex-col gap-12">
             <section>
-              <div className="mb-8 flex items-end justify-between px-2">
+              <div className="mb-6 sm:mb-8 flex flex-wrap items-end justify-between gap-3 px-1 sm:px-2">
                 <div>
-                  <div className="mb-2 flex items-center gap-3">
-                    <div className="h-2 w-8 rounded-full bg-[var(--color-brand-orange)]" />
-                    <p className="text-xs font-black tracking-widest text-[var(--color-brand-orange)] uppercase">
+                  <div className="mb-1.5 sm:mb-2 flex items-center gap-2.5 sm:gap-3">
+                    <div className="h-1.5 sm:h-2 w-6 sm:w-8 rounded-full bg-[var(--color-brand-orange)]" />
+                    <p className="text-[11px] sm:text-xs font-black tracking-widest text-[var(--color-brand-orange)] uppercase">
                       Premium Selection
                     </p>
                   </div>
-                  <h2 className="text-foreground text-3xl font-black tracking-tight md:text-4xl">
+                  <h2 className="text-foreground text-2xl sm:text-3xl font-black tracking-tight md:text-4xl">
                     Featured Tractors
                   </h2>
                 </div>
                 <Link
                   href="/tractors"
-                  className="flex items-center gap-1 text-sm font-bold text-[var(--color-brand-green)] transition-colors hover:text-[var(--color-brand-orange)]"
+                  className="flex shrink-0 items-center gap-1 text-xs sm:text-sm font-bold text-[var(--color-brand-green)] whitespace-nowrap transition-colors hover:text-[var(--color-brand-orange)]"
                 >
                   View All Tractors <span>→</span>
                 </Link>
