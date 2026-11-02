@@ -100,7 +100,7 @@ export default function BrandsListingPage() {
               className="group relative flex cursor-pointer flex-col overflow-hidden rounded-3xl border border-black/8 dark:border-white/10 bg-white dark:bg-[#151c18] shadow-sm transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-xl"
             >
               {/* Logo Stage */}
-              <div className="relative flex h-40 w-full items-center justify-center bg-white dark:bg-[#121814] p-6 border-b border-black/5 dark:border-white/5">
+              <div className="relative flex h-48 sm:h-52 w-full items-center justify-center bg-white dark:bg-white/95 p-3 sm:p-4 border-b border-black/5 dark:border-white/5 overflow-hidden">
                 {brand.isFeatured && (
                   <div className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full bg-yellow-500 px-2.5 py-0.5 text-[10px] font-bold tracking-widest text-white uppercase shadow-sm">
                     <Star size={10} className="fill-current" /> Featured
@@ -110,10 +110,10 @@ export default function BrandsListingPage() {
                   <img
                     src={brand.logoUrl}
                     alt={brand.name}
-                    className="max-h-24 max-w-[80%] object-contain transition-transform duration-500 group-hover:scale-110"
+                    className="h-full w-full object-contain p-2 sm:p-3 transition-transform duration-500 group-hover:scale-108"
                   />
                 ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-3xl font-black text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shadow-xs group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-4xl font-black text-[var(--color-brand-green)] border border-[var(--color-brand-green)]/20 shadow-xs group-hover:scale-110 transition-transform duration-300">
                     {brand.name.charAt(0)}
                   </div>
                 )}
