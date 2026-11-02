@@ -168,7 +168,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                   href="/tractors"
                   className="flex items-center gap-1 text-sm font-bold text-[var(--color-brand-green)] transition-colors hover:text-[var(--color-brand-orange)]"
                 >
-                  View All Catalog <span>→</span>
+                  View All Tractors <span>→</span>
                 </Link>
               </div>
 
