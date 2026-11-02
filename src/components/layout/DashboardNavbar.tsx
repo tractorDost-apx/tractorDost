@@ -5,12 +5,25 @@ import Link from 'next/link';
 import { useAuth } from '@/store/AuthContext';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { User as UserIcon, LogOut, Bell, Search, Settings, Heart, Globe } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 
 export function DashboardNavbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const userRole = user?.role?.name?.toUpperCase();
+  const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+  const isDealer = userRole === 'DEALER' || userRole === 'DEALER_STAFF' || userRole === 'SELLER';
+  const isAgent = userRole === 'AGENT';
+
+  const portalLabel = pathname?.startsWith('/admin')
+    ? 'Admin Panel'
+    : pathname?.startsWith('/dealer')
+      ? 'Dealer Hub'
+      : pathname?.startsWith('/agent')
+        ? 'Agent Portal'
+        : 'Customer Hub';
 
   const handleLogout = async () => {
     await logout();
@@ -26,8 +39,8 @@ export function DashboardNavbar() {
             <img src="/TD%20Black.png" alt="TractorDost Logo" className="logo-light h-8 w-auto" />
             <img src="/TD%20White.png" alt="TractorDost Logo" className="logo-dark h-8 w-auto" />
           </div>
-          <span className="ml-2 hidden rounded-md border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase sm:block">
-            Portal
+          <span className="ml-2 hidden rounded-md border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-2.5 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase sm:block">
+            {portalLabel}
           </span>
         </Link>
 
@@ -77,13 +90,17 @@ export function DashboardNavbar() {
               type="button"
               suppressHydrationWarning
               onClick={() =>
-                router.push(
-                  user?.role?.name === 'ADMIN'
-                    ? '/admin/dashboard'
-                    : user?.role?.name === 'DEALER'
-                      ? '/dealer/dashboard'
-                      : '/dashboard'
-                )
+                {
+                  if (isAdmin) {
+                    router.push('/admin/dashboard');
+                  } else if (isDealer) {
+                    router.push('/dealer/dashboard');
+                  } else if (isAgent) {
+                    router.push('/agent/dashboard');
+                  } else {
+                    router.push('/dashboard');
+                  }
+                }
               }
               className="flex cursor-pointer items-center justify-center rounded-full focus:outline-none"
             >
@@ -112,6 +129,46 @@ export function DashboardNavbar() {
                   </span>
                 </div>
               </div>
+              {isAdmin && (
+                <>
+                  <Link
+                    href="/admin/dashboard"
+                    className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-[var(--color-brand-green)] transition-colors"
+                  >
+                    <UserIcon size={16} /> Admin Panel
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                  >
+                    <UserIcon size={16} /> Personal Customer Hub
+                  </Link>
+                </>
+              )}
+              {isDealer && (
+                <>
+                  <Link
+                    href="/dealer/dashboard"
+                    className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-blue-500 transition-colors"
+                  >
+                    <UserIcon size={16} /> Dealer Hub
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                  >
+                    <UserIcon size={16} /> Personal Customer Hub
+                  </Link>
+                </>
+              )}
+              {!isAdmin && !isDealer && (
+                <Link
+                  href="/dashboard"
+                  className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                >
+                  <UserIcon size={16} /> My Dashboard
+                </Link>
+              )}
               <Link
                 href="/profile?edit=true"
                 className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"

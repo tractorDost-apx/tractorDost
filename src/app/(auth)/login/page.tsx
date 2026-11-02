@@ -36,20 +36,37 @@ export default function LoginPage() {
       const roleName = user?.role?.name?.toUpperCase();
       const isDealer =
         roleName === 'DEALER' ||
+        roleName === 'DEALER_STAFF' ||
+        roleName === 'SELLER' ||
         user?.sellerType?.toLowerCase() === 'dealer' ||
         Boolean(user?.dealer);
       const isAdmin = roleName === 'ADMIN' || roleName === 'SUPER_ADMIN';
 
-      if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/login') {
-        window.location.href = callbackUrl;
-      } else if (isAdmin) {
-        window.location.href = '/admin/dashboard';
+      if (isAdmin) {
+        // Admins default to admin panel unless navigating to a specific subpage other than /dashboard
+        if (callbackUrl && callbackUrl.startsWith('/admin')) {
+          window.location.href = callbackUrl;
+        } else {
+          window.location.href = '/admin/dashboard';
+        }
       } else if (isDealer) {
-        window.location.href = '/dealer/dashboard';
+        if (callbackUrl && callbackUrl.startsWith('/dealer')) {
+          window.location.href = callbackUrl;
+        } else {
+          window.location.href = '/dealer/dashboard';
+        }
       } else if (roleName === 'AGENT') {
-        window.location.href = '/agent/dashboard';
+        if (callbackUrl && callbackUrl.startsWith('/agent')) {
+          window.location.href = callbackUrl;
+        } else {
+          window.location.href = '/agent/dashboard';
+        }
       } else {
-        window.location.href = '/dashboard';
+        if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/login' && !callbackUrl.startsWith('/admin') && !callbackUrl.startsWith('/dealer')) {
+          window.location.href = callbackUrl;
+        } else {
+          window.location.href = '/dashboard';
+        }
       }
     }
   }, [authLoading, isAuthenticated, user, callbackUrl]);
@@ -113,25 +130,27 @@ export default function LoginPage() {
       const loggedInUser = await refreshUser();
       const targetUser = loggedInUser || user;
 
-      let targetPath = callbackUrl && callbackUrl !== '/' ? callbackUrl : '';
+      const uRole = targetUser?.role?.name?.toUpperCase();
+      const isUserAdmin = uRole === 'ADMIN' || uRole === 'SUPER_ADMIN';
+      const isUserDealer = uRole === 'DEALER' || uRole === 'DEALER_STAFF' || uRole === 'SELLER' || targetUser?.sellerType?.toLowerCase() === 'dealer';
+      const isUserAgent = uRole === 'AGENT';
 
-      if (!targetPath && targetUser?.role?.name) {
-        switch (targetUser.role.name) {
-          case 'ADMIN':
-            targetPath = '/admin/dashboard';
-            break;
-          case 'DEALER':
-            targetPath = '/dealer/dashboard';
-            break;
-          case 'CUSTOMER':
-            targetPath = '/dashboard';
-            break;
-          default:
-            targetPath = '/dashboard';
+      let targetPath = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/login' ? callbackUrl : '';
+
+      if (isUserAdmin) {
+        targetPath = targetPath && targetPath.startsWith('/admin') ? targetPath : '/admin/dashboard';
+      } else if (isUserDealer) {
+        targetPath = targetPath && targetPath.startsWith('/dealer') ? targetPath : '/dealer/dashboard';
+      } else if (isUserAgent) {
+        targetPath = targetPath && targetPath.startsWith('/agent') ? targetPath : '/agent/dashboard';
+      } else {
+        // Customer / User - prevent sending them to admin or dealer routes
+        if (!targetPath || targetPath.startsWith('/admin') || targetPath.startsWith('/dealer') || targetPath.startsWith('/agent')) {
+          targetPath = '/dashboard';
         }
       }
 
-      window.location.href = targetPath || '/dashboard';
+      window.location.href = targetPath;
     } catch (err: unknown) {
       const errorResponse = err as { response?: { data?: { message?: string } } };
       setError(errorResponse.response?.data?.message || 'Invalid OTP. Please try again.');

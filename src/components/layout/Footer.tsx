@@ -23,11 +23,7 @@ export function Footer() {
   const [contactInput, setContactInput] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const isDashboardRoute =
-    pathname?.startsWith('/dashboard') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/dealer') ||
-    pathname?.startsWith('/agent');
+  const isDashboardRoute = /^\/(dashboard|admin|dealer|agent)(\/|$)/.test(pathname || '');
 
   if (isDashboardRoute) {
     return null;

@@ -169,17 +169,17 @@ export default function OnRoadPricePage() {
                     <button
                       key={brand.id}
                       onClick={() => handleBrandSelect(brand)}
-                      className="group relative flex flex-col items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-4 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg dark:border-white/10 dark:bg-card"
+                      className="group relative flex flex-col items-center justify-center gap-2.5 rounded-2xl sm:rounded-3xl border border-black/8 dark:border-white/10 bg-white dark:bg-[#151c18] p-4 sm:p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-md cursor-pointer"
                     >
-                      <div className="relative mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white p-2.5 shadow-xs transition-all duration-300 group-hover:scale-108 group-hover:shadow-md dark:border-white/10 dark:bg-white/95">
+                      <div className="relative flex h-14 sm:h-16 w-full items-center justify-center">
                         {brand.logoUrl ? (
                           <img
                             src={brand.logoUrl}
                             alt={brand.name}
-                            className="h-full w-full object-contain rounded-xl transition-transform duration-300"
+                            className="max-h-12 max-w-[85%] object-contain transition-transform duration-300 group-hover:scale-110"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-xl font-black text-[var(--color-brand-green)]">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/10 text-xl font-black text-[var(--color-brand-green)]">
                             {brand.name.charAt(0)}
                           </div>
                         )}

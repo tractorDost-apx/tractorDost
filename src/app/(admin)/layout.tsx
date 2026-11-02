@@ -5,7 +5,7 @@ import { ToastContainer } from '@/components/ui/toast';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']}>
+    <ProtectedRoute allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
       <ToastContainer />
       <div className="mx-auto flex flex-1 w-full max-w-[1920px] flex-col gap-4 md:flex-row min-h-[calc(100dvh-7rem)] md:h-[calc(100dvh-7rem)] p-2 sm:p-4">
         <AdminSidebar />

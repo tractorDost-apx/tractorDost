@@ -61,14 +61,23 @@ export default function DashboardSidebar() {
     });
   };
 
+  const userRole = user?.role?.name?.toUpperCase();
+  const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+  const isDealer = userRole === 'DEALER' || userRole === 'DEALER_STAFF' || userRole === 'SELLER';
+  const isAgent = userRole === 'AGENT';
+
   // Determine dashboard title based on role
-  let dashboardTitle = 'Customer Dashboard';
-  if (user?.role?.name === 'ADMIN') {
-    dashboardTitle = 'Admin Dashboard';
-  } else if (user?.role?.name === 'DEALER') {
-    dashboardTitle = 'Dealer Hub';
-  } else if (user?.role?.name === 'AGENT') {
-    dashboardTitle = 'Agent Portal';
+  let dashboardTitle = 'Customer Hub';
+  let dashboardSubtitle = 'Farmer Portal';
+  if (isAdmin) {
+    dashboardTitle = 'Personal Hub';
+    dashboardSubtitle = 'Customer View';
+  } else if (isDealer) {
+    dashboardTitle = 'Personal Hub';
+    dashboardSubtitle = 'Customer View';
+  } else if (isAgent) {
+    dashboardTitle = 'Personal Hub';
+    dashboardSubtitle = 'Customer View';
   }
 
   return (
@@ -95,7 +104,7 @@ export default function DashboardSidebar() {
                     {dashboardTitle}
                   </h2>
                   <p className="text-muted text-[10px] font-bold tracking-wider uppercase truncate">
-                    Control Center
+                    {dashboardSubtitle}
                   </p>
                 </div>
               )}
@@ -113,6 +122,46 @@ export default function DashboardSidebar() {
               {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
             </button>
           </div>
+
+          {/* Admin Switcher Card */}
+          {!isCollapsed && isAdmin && (
+            <div className="mb-3 rounded-2xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 p-2.5">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-brand-green)]">
+                  Admin Account
+                </span>
+                <Link
+                  href="/admin/dashboard"
+                  className="rounded-lg bg-[var(--color-brand-green)] px-2.5 py-1 text-[10px] font-black uppercase text-white shadow-xs hover:scale-105 transition-all"
+                >
+                  Admin Panel →
+                </Link>
+              </div>
+              <p className="mt-1 text-[10px] font-medium text-muted">
+                Viewing personal customer activities.
+              </p>
+            </div>
+          )}
+
+          {/* Dealer Switcher Card */}
+          {!isCollapsed && isDealer && (
+            <div className="mb-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-2.5">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-blue-500">
+                  Dealer Account
+                </span>
+                <Link
+                  href="/dealer/dashboard"
+                  className="rounded-lg bg-blue-600 px-2.5 py-1 text-[10px] font-black uppercase text-white shadow-xs hover:scale-105 transition-all"
+                >
+                  Dealer Hub →
+                </Link>
+              </div>
+              <p className="mt-1 text-[10px] font-medium text-muted">
+                Viewing personal customer activities.
+              </p>
+            </div>
+          )}
 
           {/* Navigation Links */}
           <nav className="flex flex-col gap-1 border-t border-[var(--border-subtle)] pt-2.5">

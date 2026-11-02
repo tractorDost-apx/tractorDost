@@ -246,15 +246,80 @@ export default function DashboardPage() {
 
   const isActivityLoading = loadingListings && loadingEnquiries && loadingServices;
 
+  const userRole = user?.role?.name?.toUpperCase();
+  const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+  const isDealer = userRole === 'DEALER' || userRole === 'DEALER_STAFF' || userRole === 'SELLER';
+
   const getRoleDisplay = () => {
-    if (user?.role?.name === 'ADMIN') return 'Admin';
-    if (user?.role?.name === 'DEALER') return 'Dealer';
-    if (user?.role?.name === 'AGENT') return 'Agent';
+    if (isAdmin) return 'Admin';
+    if (isDealer) return 'Dealer';
+    if (userRole === 'AGENT') return 'Agent';
     return 'Customer';
   };
 
   return (
     <div className="animate-fade-in flex h-full flex-col space-y-8 pb-8">
+      {/* Role Notice & Switcher Banner */}
+      {isAdmin && (
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 p-4 sm:p-5 backdrop-blur-md">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-brand-green)] text-white shadow-md">
+              <Sparkles size={22} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-black text-foreground">
+                  Personal Activity Hub (Customer View)
+                </h4>
+                <span className="rounded-full bg-[var(--color-brand-green)]/20 px-2 py-0.5 text-[10px] font-black uppercase text-[var(--color-brand-green)]">
+                  Admin
+                </span>
+              </div>
+              <p className="mt-0.5 text-xs font-medium text-muted">
+                You are viewing personal tractor listings and enquiries. For system and catalog administration, open the Admin Panel.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/admin/dashboard"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)] px-4 py-2.5 text-xs font-black text-white shadow-md hover:scale-105 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <span>Open Admin Panel</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+      )}
+
+      {isDealer && (
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4 sm:p-5 backdrop-blur-md">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md">
+              <Sparkles size={22} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-black text-foreground">
+                  Personal Activity Hub (Customer View)
+                </h4>
+                <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-black uppercase text-blue-500">
+                  Dealer
+                </span>
+              </div>
+              <p className="mt-0.5 text-xs font-medium text-muted">
+                You are viewing personal customer activities. For dealership showroom inventory and incoming leads, open the Dealer Hub.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/dealer/dashboard"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black text-white shadow-md hover:scale-105 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <span>Open Dealer Hub</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
