@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
   ChevronRight,
+  ChevronLeft,
   Star,
   Tractor,
   Handshake,
@@ -29,13 +30,41 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
   const [comparisons, setComparisons] = useState<CompareFrequencyRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Horizontal scroll controls for brands
+  const brandScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkBrandScroll = useCallback(() => {
+    const el = brandScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  const scrollBrands = (direction: 'left' | 'right') => {
+    const el = brandScrollRef.current;
+    if (!el) return;
+    const scrollAmount = Math.max(280, el.clientWidth * 0.75);
+    el.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  };
+
+  useEffect(() => {
+    checkBrandScroll();
+    window.addEventListener('resize', checkBrandScroll);
+    return () => window.removeEventListener('resize', checkBrandScroll);
+  }, [brands, checkBrandScroll]);
+
   useEffect(() => {
     const fetchHomeData = async () => {
       setLoading(true);
       try {
         const [tractorsRes, brandsRes, compareRes] = await Promise.all([
           tractorAPI.getAllTractors({ limit: 6 }), // Fetch latest for featured
-          brandAPI.getAllBrands({ limit: 8 }),
+          brandAPI.getAllBrands({ limit: 20 }),
           compareAPI.getFrequencyOfCompare({ limit: 3, sort: 'desc' }),
         ]);
 
@@ -91,10 +120,12 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           DYNAMIC MAIN CONTENT (Synced with Backend)
           ========================================= */}
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-4 pt-14 pb-4 sm:px-6 lg:px-8">
-        {/* 1. TOP BRANDS CAROUSEL */}
-        <section className="flex flex-col gap-8">
+        {/* =========================================
+            1. TOP BRANDS HORIZONTAL SCROLL CAROUSEL (Mobile & Desktop)
+            ========================================= */}
+        <section className="flex flex-col gap-4 sm:gap-6">
           <div className="flex flex-wrap items-end justify-between gap-3 px-1 sm:px-2">
-            <div className="flex flex-col gap-1 sm:gap-2">
+            <div className="flex flex-col gap-1 sm:gap-1.5">
               <h2 className="text-foreground text-2xl sm:text-3xl font-black tracking-tight md:text-4xl">
                 Explore Top Brands
               </h2>
@@ -102,18 +133,59 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                 Discover the most trusted manufacturers in India.
               </p>
             </div>
-            <Link
-              href="/brands"
-              className="flex shrink-0 items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold tracking-wider text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)]"
-            >
-              View All Brands <ChevronRight size={14} className="sm:size-4" />
-            </Link>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                href="/brands"
+                className="flex shrink-0 items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold tracking-wider text-[var(--color-brand-green)] uppercase transition-colors hover:text-[var(--color-brand-orange)]"
+              >
+                View All <ChevronRight size={14} className="sm:size-4" />
+              </Link>
+
+              {/* Desktop / Tablet Scroll Navigation Arrows */}
+              <div className="hidden sm:flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => scrollBrands('left')}
+                  disabled={!canScrollLeft}
+                  aria-label="Previous Brands"
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 ${
+                    canScrollLeft
+                      ? 'border-black/10 dark:border-white/10 bg-white dark:bg-card text-foreground hover:bg-[var(--color-brand-green)] hover:text-white hover:border-[var(--color-brand-green)] shadow-xs hover:shadow-md active:scale-95'
+                      : 'border-black/5 dark:border-white/5 bg-foreground/5 text-muted opacity-30 cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollBrands('right')}
+                  disabled={!canScrollRight}
+                  aria-label="Next Brands"
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 ${
+                    canScrollRight
+                      ? 'border-black/10 dark:border-white/10 bg-white dark:bg-card text-foreground hover:bg-[var(--color-brand-green)] hover:text-white hover:border-[var(--color-brand-green)] shadow-xs hover:shadow-md active:scale-95'
+                      : 'border-black/5 dark:border-white/5 bg-foreground/5 text-muted opacity-30 cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-4 lg:grid-cols-8">
+          {/* Horizontal Scrolling Track (Edge-to-Edge Logos in Mobile & Desktop) */}
+          <div
+            ref={brandScrollRef}
+            onScroll={checkBrandScroll}
+            className="flex w-full items-start gap-3 sm:gap-4 lg:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-proximity py-2 px-1 sm:px-2 -mx-1 sm:mx-0"
+          >
             {loading
               ? Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex flex-col items-center gap-2.5">
+                <div
+                  key={i}
+                  className="flex w-[125px] sm:w-[140px] lg:w-[155px] shrink-0 snap-start flex-col items-center gap-2.5"
+                >
                   <div className="bg-foreground/5 aspect-square w-full animate-pulse rounded-2xl" />
                   <div className="bg-foreground/5 h-3.5 w-16 animate-pulse rounded-md" />
                 </div>
@@ -122,7 +194,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                 <Link
                   key={brand.id}
                   href={`/tractors?brand=${brand.id}`}
-                  className="group flex flex-col items-center gap-2.5 transition-transform duration-300 hover:-translate-y-1"
+                  className="group flex w-[125px] sm:w-[140px] lg:w-[155px] shrink-0 snap-start flex-col items-center gap-2.5 transition-transform duration-300 hover:-translate-y-1"
                 >
                   {/* Edge-to-Edge Image Container */}
                   <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-white shadow-xs transition-all duration-300 group-hover:border-[var(--color-brand-green)]/40 group-hover:shadow-lg dark:border-white/10 dark:bg-card">
@@ -130,7 +202,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                       <img
                         src={brand.logoUrl}
                         alt={brand.name}
-                        className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-108"
+                        className="h-full w-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-108"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-2xl font-black text-[var(--color-brand-green)]">
@@ -140,7 +212,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                   </div>
 
                   {/* Brand Name Below Image */}
-                  <span className="text-foreground group-hover:text-[var(--color-brand-green)] text-center text-xs font-black tracking-wider uppercase transition-colors line-clamp-1">
+                  <span className="text-foreground group-hover:text-[var(--color-brand-green)] text-center text-xs font-black tracking-wider uppercase transition-colors line-clamp-1 w-full px-1">
                     {brand.name}
                   </span>
                 </Link>
