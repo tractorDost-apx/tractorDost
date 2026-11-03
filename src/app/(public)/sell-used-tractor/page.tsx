@@ -10,6 +10,7 @@ import { brandAPI } from '@/lib/api/brands';
 import { useAuth } from '@/store/AuthContext';
 import { INDIAN_STATES, STATE_DISTRICTS } from '@/lib/constants/states-districts';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { validateImageFile } from '@/lib/utils/file-validation';
 import {
   Tractor,
   MapPin,

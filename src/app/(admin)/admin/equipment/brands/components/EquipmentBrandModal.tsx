@@ -5,6 +5,7 @@ import { equipmentBrandAPI, EquipmentBrand } from '@/lib/api/equipmentBrands';
 import { X, Upload } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import { toast } from '@/components/ui/toast';
+import { validateImageFile } from '@/lib/utils/file-validation';
 
 interface EquipmentBrandModalProps {
   brand: EquipmentBrand | null;

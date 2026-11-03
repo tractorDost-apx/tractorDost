@@ -357,7 +357,7 @@ function TractorsListingContent() {
                       : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
                   }`}
                 >
-                  ⚡ Under ₹5 Lakh
+                  <span className="inline-flex items-center gap-1.5"><Zap size={12} className="text-amber-500 shrink-0" /> Under ₹5 Lakh</span>
                 </button>
                 <button
                   onClick={() => {
@@ -370,7 +370,7 @@ function TractorsListingContent() {
                       : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
                   }`}
                 >
-                  💪 50+ HP Heavy
+                  <span className="inline-flex items-center gap-1.5"><Gauge size={12} className="text-blue-500 shrink-0" /> 50+ HP Heavy</span>
                 </button>
                 <button
                   onClick={() => {
@@ -383,7 +383,7 @@ function TractorsListingContent() {
                       : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
                   }`}
                 >
-                  🚜 4WD Drive
+                  <span className="inline-flex items-center gap-1.5"><Tractor size={12} className="text-[var(--color-brand-green)] shrink-0" /> 4WD Drive</span>
                 </button>
                 <button
                   onClick={() => {
@@ -396,7 +396,7 @@ function TractorsListingContent() {
                       : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
                   }`}
                 >
-                  🌾 30-50 HP Utility
+                  <span className="inline-flex items-center gap-1.5"><SlidersHorizontal size={12} className="text-emerald-500 shrink-0" /> 30-50 HP Utility</span>
                 </button>
               </div>
             </div>

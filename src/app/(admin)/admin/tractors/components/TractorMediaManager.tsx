@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { mediaAPI, Media } from '@/lib/api/media';
 import {
+  Info,
   Image as ImageIcon,
   Upload,
   Trash2,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import { toast } from '@/components/ui/toast';
+import { validateImageFile, validateDocumentFile } from '@/lib/utils/file-validation';
 
 interface TractorMediaManagerProps {
   tractorId?: number;
@@ -161,6 +163,12 @@ export default function TractorMediaManager({
       toast.warning('Tractor ID is required to replace media.');
       return;
     }
+    const check = validateImageFile(file);
+    if (!check.valid) {
+      toast.error(check.error || 'Invalid image file.');
+      setMessage({ type: 'error', text: check.error || 'Invalid image file.' });
+      return;
+    }
 
     setActionLoadingId(item.id);
     setMessage(null);
@@ -216,6 +224,12 @@ export default function TractorMediaManager({
   const handleReplaceBrochure = async (existingBrochureItem: Media | null, file: File) => {
     if (!tractorId) {
       toast.warning('Tractor ID is required.');
+      return;
+    }
+    const check = validateDocumentFile(file);
+    if (!check.valid) {
+      toast.error(check.error || 'Invalid brochure PDF file.');
+      setMessage({ type: 'error', text: check.error || 'Invalid brochure PDF file.' });
       return;
     }
 
@@ -301,11 +315,30 @@ export default function TractorMediaManager({
     }
   };
 
-  // Add files to staged list
+  // Add files to staged list with 5MB validation
   const handleAddNewFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const added = Array.from(e.target.files);
-      onNewMediaFilesChange([...newMediaFiles, ...added]);
+      const validFiles: File[] = [];
+      const errors: string[] = [];
+
+      for (const file of added) {
+        const check = validateImageFile(file);
+        if (!check.valid) {
+          errors.push(check.error || `"${file.name}" is invalid`);
+        } else {
+          validFiles.push(file);
+        }
+      }
+
+      if (errors.length > 0) {
+        toast.error(errors[0]);
+        setMessage({ type: 'error', text: errors.slice(0, 2).join(' | ') });
+      }
+
+      if (validFiles.length > 0) {
+        onNewMediaFilesChange([...newMediaFiles, ...validFiles]);
+      }
       e.target.value = '';
     }
   };
@@ -536,7 +569,7 @@ export default function TractorMediaManager({
               Click to browse or drag and drop photos here
             </p>
             <p className="text-muted mt-1 text-xs font-medium">
-              PNG, JPG, WEBP • Max 10MB per image
+              PNG, JPG, WEBP • Max 5MB per image
             </p>
           </div>
         </div>
@@ -595,7 +628,7 @@ export default function TractorMediaManager({
             </div>
             {!tractorId && (
               <p className="text-muted text-[11px] font-bold">
-                ℹ️ These photos will be uploaded automatically when you click &apos;Create Tractor&apos;.
+                <span className="inline-flex items-center gap-1.5"><Info size={13} className="text-blue-500 shrink-0" /> These photos will be uploaded automatically when you click &apos;Create Tractor&apos;.</span>
               </p>
             )}
           </div>
@@ -716,10 +749,18 @@ export default function TractorMediaManager({
                 accept=".pdf,application/pdf"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const check = validateDocumentFile(file);
+                    if (!check.valid) {
+                      toast.error(check.error || 'Invalid brochure PDF file.');
+                      setMessage({ type: 'error', text: check.error || 'Invalid brochure PDF file.' });
+                      e.target.value = '';
+                      return;
+                    }
                     if (tractorId) {
-                      handleReplaceBrochure(null, e.target.files[0]);
+                      handleReplaceBrochure(null, file);
                     } else {
-                      onNewBrochureFilesChange([e.target.files[0]]);
+                      onNewBrochureFilesChange([file]);
                     }
                     e.target.value = '';
                   }

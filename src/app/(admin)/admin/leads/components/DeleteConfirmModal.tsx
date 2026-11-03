@@ -72,9 +72,12 @@ export function DeleteConfirmModal({
           <p className="text-xs text-foreground/90 font-medium">
             Are you sure you want to permanently delete lead <strong className="text-foreground">#{lead.id} ({lead.name})</strong>?
           </p>
-          <div className="rounded-xl bg-rose-500/10 p-3 text-[11px] font-medium text-rose-300">
-            ⚠️ <strong>Warning:</strong> All associated call logs and lead notes will be permanently removed.
-            This action cannot be undone. Converted leads cannot be deleted.
+          <div className="rounded-xl bg-rose-500/10 p-3 text-[11px] font-medium text-rose-300 flex items-start gap-2">
+            <AlertTriangle size={15} className="shrink-0 text-rose-400 mt-0.5" />
+            <div>
+              <strong>Warning:</strong> All associated call logs and lead notes will be permanently removed.
+              This action cannot be undone. Converted leads cannot be deleted.
+            </div>
           </div>
         </div>
 

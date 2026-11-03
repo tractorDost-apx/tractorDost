@@ -101,7 +101,7 @@ export default function AgentDashboardOverview() {
     <div className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-500">
       <div>
         <h1 className="mb-2 text-3xl font-black">
-          Welcome, {user?.fullName?.split(' ')[0] || (isAdmin ? 'Admin' : 'Agent')}! 👋
+          Welcome, {user?.fullName?.split(' ')[0] || (isAdmin ? 'Admin' : 'Agent')}!
         </h1>
         <p className="text-muted font-medium">
           {isAdmin

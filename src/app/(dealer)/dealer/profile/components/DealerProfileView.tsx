@@ -635,7 +635,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
             <div className="text-muted flex items-center justify-between text-xs font-bold">
               <span>PAN Number</span>
               <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500">
-                <Lock size={10} /> 🔒 Verified KYC
+                <Lock size={10} /> Verified KYC
               </span>
             </div>
             <div className="text-foreground font-mono text-xl font-black tracking-wider uppercase">
@@ -647,7 +647,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
             <div className="text-muted flex items-center justify-between text-xs font-bold">
               <span>GSTIN Number</span>
               <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500">
-                <Lock size={10} /> 🔒 Verified KYC
+                <Lock size={10} /> Verified KYC
               </span>
             </div>
             <div className="text-foreground font-mono text-xl font-black tracking-wider uppercase">
@@ -674,7 +674,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
             <label className="text-muted mb-1 block text-xs font-bold">Verification Status</label>
             <div className="bg-foreground/5 flex items-center justify-between rounded-xl border border-[var(--border-subtle)] p-4">
               <VerificationBadge status={dealer.verificationStatus} />
-              <span className="text-muted font-mono text-[10px]">🔒 Admin Only</span>
+              <span className="text-muted font-mono text-[10px]">Admin Only</span>
             </div>
           </div>
 
@@ -682,7 +682,7 @@ export function DealerProfileView({ dealer, profile, onEdit }: DealerProfileView
             <label className="text-muted mb-1 block text-xs font-bold">Certified Status</label>
             <div className="bg-foreground/5 flex items-center justify-between rounded-xl border border-[var(--border-subtle)] p-4 font-bold">
               <span>{dealer.isCertified ? 'CERTIFIED' : 'NOT CERTIFIED'}</span>
-              <span className="text-muted font-mono text-[10px]">🔒 Admin Only</span>
+              <span className="text-muted font-mono text-[10px]">Admin Only</span>
             </div>
           </div>
 

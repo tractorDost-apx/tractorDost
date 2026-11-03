@@ -23,11 +23,7 @@ export function Footer() {
   const [contactInput, setContactInput] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const isDashboardRoute =
-    pathname?.startsWith('/dashboard') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/dealer') ||
-    pathname?.startsWith('/agent');
+  const isDashboardRoute = /^\/(dashboard|admin|dealer|agent)(\/|$)/.test(pathname || '');
 
   if (isDashboardRoute) {
     return null;
@@ -372,33 +368,50 @@ export function Footer() {
           </div>
         </div>
 
-        {/* 5. Bottom Copyright Bar */}
-        <div className="mt-5 flex flex-col items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-5 text-xs text-muted sm:flex-row">
-          <p>© {currentYear} TractorDost Technologies Pvt. Ltd. All rights reserved.</p>
+        {/* 5. Bottom Copyright & Development Attribution Bar */}
+        <div className="mt-8 border-t border-[var(--border-subtle)] pt-6">
+          <div className="flex flex-col items-center justify-between gap-4 text-xs text-muted md:flex-row">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+              <p>© {currentYear} TractorDost Technologies Pvt. Ltd. All rights reserved.</p>
+              <span className="hidden sm:inline text-muted/30">|</span>
+              <p className="flex items-center gap-1.5 font-medium text-foreground">
+                Built with{' '}
+                <Heart className="h-3.5 w-3.5 animate-pulse fill-rose-500 text-rose-500 inline-block" />{' '}
+                for Indian Farmers
+              </p>
+            </div>
 
-          <div className="flex items-center gap-5">
-            <Link href="/privacy" className="transition-colors hover:text-foreground">
-              Privacy Policy
-            </Link>
-            <span>•</span>
-            <Link href="/terms" className="transition-colors hover:text-foreground">
-              Terms of Service
-            </Link>
-            <span>•</span>
-            <Link href="/faqs" className="transition-colors hover:text-foreground">
-              FAQs
-            </Link>
-            <span>•</span>
-            <Link href="/contact" className="transition-colors hover:text-foreground">
-              Contact
-            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-4 font-medium">
+              <Link href="/privacy" className="transition-colors hover:text-foreground">
+                Privacy Policy
+              </Link>
+              <span className="text-muted/40">•</span>
+              <Link href="/terms" className="transition-colors hover:text-foreground">
+                Terms of Service
+              </Link>
+              <span className="text-muted/40">•</span>
+              <Link href="/faqs" className="transition-colors hover:text-foreground">
+                FAQs
+              </Link>
+              <span className="text-muted/40">•</span>
+              <Link href="/contact" className="transition-colors hover:text-foreground">
+                Contact
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-1.5 font-medium text-muted">
+              <span>Design & Developed by</span>
+              <a
+                href="https://www.apxteck.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="APXTECK - Leading Web, Mobile & Software Development Company"
+                className="font-bold text-[var(--color-brand-green)] transition-all hover:text-[var(--color-brand-orange)] hover:underline underline-offset-4"
+              >
+                APXTECK
+              </a>
+            </div>
           </div>
-
-          <p className="flex items-center gap-1.5 font-medium text-foreground">
-            Built with{' '}
-            <Heart className="h-3.5 w-3.5 animate-pulse fill-rose-500 text-rose-500 inline-block" />{' '}
-            for Indian Farmers
-          </p>
         </div>
       </div>
     </footer>

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from '@/components/ui/toast';
+import { validateImageFile, validateDocumentFile } from '@/lib/utils/file-validation';
 import {
   X,
   Tractor,
@@ -161,6 +163,26 @@ export function CreateDealerUsedListingModal({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [uploadProgressText, setUploadProgressText] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+
+  const validateAndSetDoc = (file: File | null, setter: (f: File | null) => void) => {
+    if (!file) { setter(null); return; }
+    const check = validateDocumentFile(file, { allowImages: true, maxSizeMB: 10 });
+    if (!check.valid) {
+      toast.error(check.error || 'Document must be under 10MB');
+      return;
+    }
+    setter(file);
+  };
+
+  const validateAndSetPhoto = (file: File | null, setter: (f: File | null) => void) => {
+    if (!file) { setter(null); return; }
+    const check = validateImageFile(file, { maxSizeMB: 5 });
+    if (!check.valid) {
+      toast.error(check.error || 'Photo must be under 5MB');
+      return;
+    }
+    setter(file);
+  };
 
   if (!isOpen) return null;
 
@@ -667,7 +689,7 @@ export function CreateDealerUsedListingModal({
                 <input
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
-                  onChange={(e) => setRcDocumentFile(e.target.files?.[0] || null)}
+                  onChange={(e) => validateAndSetDoc(e.target.files?.[0] || null, setRcDocumentFile)}
                   className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {rcDocumentFile && (
@@ -697,7 +719,7 @@ export function CreateDealerUsedListingModal({
                 <input
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
-                  onChange={(e) => setInsuranceDocumentFile(e.target.files?.[0] || null)}
+                  onChange={(e) => validateAndSetDoc(e.target.files?.[0] || null, setInsuranceDocumentFile)}
                   className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {insuranceDocumentFile && (
@@ -849,7 +871,7 @@ export function CreateDealerUsedListingModal({
                 <input
                   type="file"
                   accept="image/jpeg,image/png"
-                  onChange={(e) => setFrontPhoto(e.target.files?.[0] || null)}
+                  onChange={(e) => validateAndSetPhoto(e.target.files?.[0] || null, setFrontPhoto)}
                   className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-2.5 file:py-1 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {frontPhoto && (
@@ -867,7 +889,7 @@ export function CreateDealerUsedListingModal({
                 <input
                   type="file"
                   accept="image/jpeg,image/png"
-                  onChange={(e) => setRearPhoto(e.target.files?.[0] || null)}
+                  onChange={(e) => validateAndSetPhoto(e.target.files?.[0] || null, setRearPhoto)}
                   className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-2.5 file:py-1 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {rearPhoto && (
@@ -885,7 +907,7 @@ export function CreateDealerUsedListingModal({
                 <input
                   type="file"
                   accept="image/jpeg,image/png"
-                  onChange={(e) => setLeftPhoto(e.target.files?.[0] || null)}
+                  onChange={(e) => validateAndSetPhoto(e.target.files?.[0] || null, setLeftPhoto)}
                   className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-2.5 file:py-1 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {leftPhoto && (
@@ -903,7 +925,7 @@ export function CreateDealerUsedListingModal({
                 <input
                   type="file"
                   accept="image/jpeg,image/png"
-                  onChange={(e) => setRightPhoto(e.target.files?.[0] || null)}
+                  onChange={(e) => validateAndSetPhoto(e.target.files?.[0] || null, setRightPhoto)}
                   className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-2.5 file:py-1 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {rightPhoto && (
@@ -921,7 +943,7 @@ export function CreateDealerUsedListingModal({
                 <input
                   type="file"
                   accept="image/jpeg,image/png"
-                  onChange={(e) => setMeterPhoto(e.target.files?.[0] || null)}
+                  onChange={(e) => validateAndSetPhoto(e.target.files?.[0] || null, setMeterPhoto)}
                   className="w-full text-xs text-muted file:mr-2 file:rounded-lg file:border-0 file:bg-lime-400/10 file:px-2.5 file:py-1 file:text-xs file:font-bold file:text-lime-400 hover:file:bg-lime-400/20"
                 />
                 {meterPhoto && (

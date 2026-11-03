@@ -190,10 +190,10 @@ function TractorDetailsView({
     const specs = [hpText, cylinders, lift].filter(Boolean).join(' • ');
 
     const text = [
-      `🚜 *${tractor.brand?.name || ''} ${tractor.modelName}*`,
-      specs ? `⚡ *Specs:* ${specs}` : '',
-      `💰 *Price:* Starting at ${priceText}`,
-      tractor.isFeatured ? `⭐ Featured Model on TractorDost` : '',
+      `*${tractor.brand?.name || ''} ${tractor.modelName}*`,
+      specs ? `*Specs:* ${specs}` : '',
+      `*Price:* Starting at ${priceText}`,
+      tractor.isFeatured ? '[Featured Model on TractorDost]' : '',
       '',
       `Check out full specifications, features, photos & on-road pricing:`,
       url,

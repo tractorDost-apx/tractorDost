@@ -37,9 +37,10 @@ export default function UsedTractorValuationPage() {
   });
 
   useEffect(() => {
-    brandAPI.getAllBrands().then((res) => {
-      if (res.success && res.data && Array.isArray(res.data.data)) {
-        setBrands(res.data.data);
+    brandAPI.getAllBrands({ limit: 100 }).then((res) => {
+      if (res.success && res.data) {
+        const list = (res.data as any).data || (res.data as any).brands || (Array.isArray(res.data) ? res.data : []);
+        setBrands(list);
       }
     });
   }, []);

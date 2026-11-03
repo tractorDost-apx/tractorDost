@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, StickyNote, Edit3, Check, X, RefreshCw, Sparkles, MessageSquare } from 'lucide-react';
+import { Loader2, StickyNote, Edit3, Check, X, RefreshCw, Sparkles, MessageSquare, AlertCircle } from 'lucide-react';
 import { SpatialButton } from '@/components/ui/spatial-button';
 import { useLeadNotes, useLeadNoteActions } from '@/hooks/leads/use-lead-notes';
 import { formatDateTime } from '@/lib/utils/format-date';
@@ -16,12 +16,12 @@ const INPUT_CLASS =
   'w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-[var(--color-brand-green)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-500 dark:focus:border-lime-400 dark:focus:bg-white/10 dark:focus:ring-lime-400/20 resize-y';
 
 const QUICK_TAGS = [
-  '📞 Called - Buyer interested',
-  '🤝 Negotiating final price',
-  '🚜 Scheduled tractor inspection',
-  '⏳ Waiting for financing/loan approval',
-  '🔄 Requested callback tomorrow',
-  '✅ Deal finalized',
+  'Called - Buyer interested',
+  'Negotiating final price',
+  'Scheduled tractor inspection',
+  'Waiting for financing/loan approval',
+  'Requested callback tomorrow',
+  'Deal finalized',
 ];
 
 export default function LeadNotesPanel({ leadId }: LeadNotesPanelProps) {
@@ -183,7 +183,7 @@ export default function LeadNotesPanel({ leadId }: LeadNotesPanelProps) {
       {/* Alerts */}
       {error && (
         <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs font-semibold text-red-400">
-          ⚠️ {error}
+          <span className="inline-flex items-center gap-1.5"><AlertCircle size={14} className="shrink-0" /> {error}</span>
         </div>
       )}
       {successMsg && (

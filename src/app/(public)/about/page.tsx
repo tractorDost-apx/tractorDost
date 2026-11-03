@@ -155,6 +155,42 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Technology & Digital Engineering Partner */}
+      <section className="mb-20 rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 to-card/40 p-8 md:p-10 shadow-lg backdrop-blur-xl">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl text-center md:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-3.5 py-1 text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+              <Cpu size={13} /> Technology & Innovation Partner
+            </div>
+            <h3 className="text-foreground text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Designed & Engineered with APXTECK
+            </h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              TractorDost's cutting-edge digital infrastructure, responsive farmer portal, high-speed comparative engine, and dealer management systems are designed, architected, and continuously developed by{' '}
+              <a
+                href="https://www.apxteck.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-[var(--color-brand-green)] hover:underline"
+              >
+                APXTECK
+              </a>
+              .
+            </p>
+          </div>
+          <a
+            href="https://www.apxteck.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Visit APXTECK Official Website"
+            className="group shrink-0 inline-flex items-center gap-2.5 rounded-2xl border border-[var(--color-brand-green)]/40 bg-[var(--color-brand-green)]/10 px-6 py-3.5 text-xs font-black uppercase text-[var(--color-brand-green)] transition-all hover:bg-[var(--color-brand-green)] hover:text-white hover:shadow-lg hover:shadow-[var(--color-brand-green)]/20"
+          >
+            <span>Visit APXTECK</span>
+            <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
+        </div>
+      </section>
+
       {/* CTA Footer */}
       <section className="rounded-3xl border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/5 p-8 md:p-14 text-center backdrop-blur-xl">
         <h2 className="text-foreground text-3xl md:text-4xl font-extrabold mb-4">

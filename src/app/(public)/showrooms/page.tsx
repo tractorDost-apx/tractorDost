@@ -52,6 +52,7 @@ export default function ShowroomsPage() {
   const [selectedState, setSelectedState] = useState('');
   const [needsTestDrive, setNeedsTestDrive] = useState(false);
   const [needsParking, setNeedsParking] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     brandAPI.getAllBrands({ limit: 50 }).then((res) => {
@@ -168,9 +169,26 @@ export default function ShowroomsPage() {
         </p>
       </div>
 
+      {/* Mobile Filter Toggle Button */}
+      <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
+        <button
+          onClick={() => setShowMobileFilters((prev) => !prev)}
+          className="flex items-center gap-2 rounded-2xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#151c18]/90 px-5 py-3 text-xs font-black text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 cursor-pointer"
+        >
+          <Filter size={16} className="text-[var(--color-brand-green)]" />
+          <span>{showMobileFilters ? 'Hide Filters' : 'Filter Showrooms'}</span>
+          {(selectedBrand || selectedState || needsTestDrive || needsParking || searchQuery) && (
+            <span className="h-2 w-2 rounded-full bg-[var(--color-brand-green)]" />
+          )}
+        </button>
+        <span className="text-xs font-bold text-muted">
+          {showrooms.length} Found
+        </span>
+      </div>
+
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Left Column: Filters */}
-        <div className="animate-slide-in flex w-full flex-col gap-6 lg:w-1/4">
+        <div className={`animate-slide-in flex w-full flex-col gap-6 lg:w-1/4 ${showMobileFilters ? 'flex' : 'hidden lg:flex'}`}>
           <div className="spatial-panel bg-background/50 sticky top-24 rounded-3xl border border-[var(--border-subtle)] p-6 backdrop-blur-xl">
             <div className="text-foreground mb-6 flex items-center justify-between font-black">
               <div className="flex items-center gap-2">

@@ -430,6 +430,19 @@ export default function AdminSidebar() {
           <LogOut size={18} className="shrink-0" />
           {!isCollapsed && <span className="overflow-hidden whitespace-nowrap">Sign Out</span>}
         </button>
+        {!isCollapsed && (
+          <div className="mt-3 pt-2.5 border-t border-[var(--border-subtle)] flex items-center justify-center text-[10px] text-muted">
+            <span>Engineered by </span>
+            <a
+              href="https://www.apxteck.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 font-bold text-[var(--color-brand-green)] hover:underline"
+            >
+              APXTECK
+            </a>
+          </div>
+        )}
       </div>
     </aside>
   );

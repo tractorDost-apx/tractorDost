@@ -1328,7 +1328,7 @@ export default function TractorRepairPage() {
                 <div className="flex items-center gap-2">
                   <AlertCircle size={16} className="shrink-0 text-amber-400" />
                   <span>
-                    <strong>Browser Location Access Blocked:</strong> To use accurate satellite GPS, click the 🔒 icon in your browser address bar and select <em>&ldquo;Allow Location&rdquo;</em>, or choose your district below.
+                    <strong>Browser Location Access Blocked:</strong> To use accurate satellite GPS, click the lock icon in your browser address bar and select <em>&ldquo;Allow Location&rdquo;</em>, or choose your district below.
                   </span>
                 </div>
                 <button

@@ -530,7 +530,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               {dealer.panNumber || 'NOT PROVIDED'}
             </span>
             <span className="mt-0.5 block font-sans text-[10px] text-emerald-500">
-              🔒 Verified KYC
+              Verified KYC
             </span>
           </div>
 
@@ -540,7 +540,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
               {dealer.gstNumber || 'NOT PROVIDED'}
             </span>
             <span className="mt-0.5 block font-sans text-[10px] text-emerald-500">
-              🔒 Verified KYC
+              Verified KYC
             </span>
           </div>
 
@@ -551,7 +551,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
             <span className="text-foreground mt-0.5 block font-sans text-sm font-bold">
               {dealer.verificationStatus}
             </span>
-            <span className="text-muted block font-sans text-[10px]">🔒 Managed by Admin</span>
+            <span className="text-muted block font-sans text-[10px]">Managed by Admin</span>
           </div>
 
           <div className="bg-foreground/5 rounded-xl border border-[var(--border-subtle)] p-3.5">
@@ -561,7 +561,7 @@ export function DealerProfileEdit({ dealer, onCancel, onSaveSuccess }: DealerPro
             <span className="mt-0.5 block font-sans text-sm font-bold text-amber-500">
               {Number(dealer.rating || 0).toFixed(1)} ★ ({dealer.reviewsCount})
             </span>
-            <span className="text-muted block font-sans text-[10px]">🔒 System Metric</span>
+            <span className="text-muted block font-sans text-[10px]">System Metric</span>
           </div>
         </div>
       </div>

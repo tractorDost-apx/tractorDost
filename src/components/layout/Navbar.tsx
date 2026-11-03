@@ -66,11 +66,7 @@ export function Navbar() {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  const isDashboardRoute =
-    pathname?.startsWith('/dashboard') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/dealer') ||
-    pathname?.startsWith('/agent');
+  const isDashboardRoute = /^\/(dashboard|admin|dealer|agent)(\/|$)/.test(pathname || '');
 
   if (isDashboardRoute) {
     return <DashboardNavbar />;
@@ -231,13 +227,18 @@ export function Navbar() {
                     type="button"
                     suppressHydrationWarning
                     onClick={() =>
-                      router.push(
-                        user?.role?.name === 'ADMIN'
-                          ? '/admin/dashboard'
-                          : user?.role?.name === 'DEALER'
-                            ? '/dealer/dashboard'
-                            : '/dashboard'
-                      )
+                      {
+                        const r = user?.role?.name?.toUpperCase();
+                        if (r === 'ADMIN' || r === 'SUPER_ADMIN') {
+                          router.push('/admin/dashboard');
+                        } else if (r === 'DEALER' || r === 'DEALER_STAFF' || r === 'SELLER') {
+                          router.push('/dealer/dashboard');
+                        } else if (r === 'AGENT') {
+                          router.push('/agent/dashboard');
+                        } else {
+                          router.push('/dashboard');
+                        }
+                      }
                     }
                     className="flex cursor-pointer items-center justify-center rounded-full focus:outline-none"
                   >
@@ -256,19 +257,72 @@ export function Navbar() {
                       </p>
                     </div>
 
-                    {/* Dashboard Link based on role */}
-                    <Link
-                      href={
-                        user?.role?.name === 'ADMIN'
-                          ? '/admin/dashboard'
-                          : user?.role?.name === 'DEALER'
-                            ? '/dealer/dashboard'
-                            : '/dashboard'
+                    {/* Role-Aware Dashboard Links */}
+                    {(() => {
+                      const r = user?.role?.name?.toUpperCase();
+                      if (r === 'ADMIN' || r === 'SUPER_ADMIN') {
+                        return (
+                          <>
+                            <Link
+                              href="/admin/dashboard"
+                              className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-[var(--color-brand-green)] transition-colors"
+                            >
+                              <LayoutDashboard size={16} /> Admin Panel
+                            </Link>
+                            <Link
+                              href="/dashboard"
+                              className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                            >
+                              <UserIcon size={16} /> Personal Customer Hub
+                            </Link>
+                          </>
+                        );
                       }
-                      className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
-                    >
-                      <LayoutDashboard size={16} /> My Dashboard
-                    </Link>
+                      if (r === 'DEALER' || r === 'DEALER_STAFF' || r === 'SELLER') {
+                        return (
+                          <>
+                            <Link
+                              href="/dealer/dashboard"
+                              className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-blue-500 transition-colors"
+                            >
+                              <LayoutDashboard size={16} /> Dealer Hub
+                            </Link>
+                            <Link
+                              href="/dashboard"
+                              className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                            >
+                              <UserIcon size={16} /> Personal Customer Hub
+                            </Link>
+                          </>
+                        );
+                      }
+                      if (r === 'AGENT') {
+                        return (
+                          <>
+                            <Link
+                              href="/agent/dashboard"
+                              className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                            >
+                              <LayoutDashboard size={16} /> Agent Portal
+                            </Link>
+                            <Link
+                              href="/dashboard"
+                              className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                            >
+                              <UserIcon size={16} /> Personal Customer Hub
+                            </Link>
+                          </>
+                        );
+                      }
+                      return (
+                        <Link
+                          href="/dashboard"
+                          className="text-foreground hover:bg-foreground/10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors hover:text-[var(--color-brand-green)]"
+                        >
+                          <LayoutDashboard size={16} /> My Dashboard
+                        </Link>
+                      );
+                    })()}
 
                     <Link
                       href="/profile"

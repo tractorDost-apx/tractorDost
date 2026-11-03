@@ -23,7 +23,7 @@ export const EmiCalculatorResult: React.FC<EmiCalculatorResultProps> = ({ inputs
   };
 
   const handleShare = () => {
-    const shareText = `🚜 Tractor Dost - EMI Calculation Summary 🚜
+    const shareText = `TractorDost - EMI Calculation Summary
 ---------------------------------------------
 Tractor Price     : ${formatIndianCurrency(vehiclePrice)}
 Down Payment      : ${formatIndianCurrency(downPayment)} (${downPaymentPercent}%)

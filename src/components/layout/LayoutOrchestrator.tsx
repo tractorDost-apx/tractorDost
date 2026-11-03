@@ -9,11 +9,7 @@ import { LeadAttributionTracker } from '@/components/analytics/LeadAttributionTr
 
 export function LayoutOrchestrator({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isDashboardRoute =
-    pathname?.startsWith('/dashboard') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/dealer') ||
-    pathname?.startsWith('/agent');
+  const isDashboardRoute = /^\/(dashboard|admin|dealer|agent)(\/|$)/.test(pathname || '');
 
   return (
     <div className={`flex w-full flex-1 flex-col ${isDashboardRoute ? 'spatial-background' : ''}`}>

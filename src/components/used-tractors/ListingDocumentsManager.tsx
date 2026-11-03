@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, FileText, ImagePlus, Loader2, Lock, Trash2, Upload } from 'lucide-react';
 import { usedTractorDocumentAPI } from '@/lib/api/used-documents';
+import { validateImageFile, validateDocumentFile } from '@/lib/utils/file-validation';
 import { useApiQuery } from '@/hooks/ui/use-api-query';
 import {
   ALLOWED_DOCUMENT_MIME,

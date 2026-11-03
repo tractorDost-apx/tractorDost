@@ -143,7 +143,7 @@ export function BulkAssignModal({
                 </option>
                 {agents.map((ag) => (
                   <option key={ag.id} value={ag.id}>
-                    👤 {ag.fullName}
+                    {ag.fullName}
                   </option>
                 ))}
               </select>

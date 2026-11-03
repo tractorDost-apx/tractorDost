@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Loader2, MessageSquareText, Phone, Tractor, MapPin, Eye, X, StickyNote } from 'lucide-react';
+import { Loader2, MessageSquareText, Phone, Tractor, MapPin, Eye, X, StickyNote, Info } from 'lucide-react';
 import { SpatialButton } from '@/components/ui/spatial-button';
 import { LeadStatusBadge } from '@/components/used-tractors/status-badges';
 import LeadNotesPanel from '@/components/used-tractors/LeadNotesPanel';
@@ -333,7 +333,7 @@ export default function SellerEnquiryInbox({
             {/* Note about GPS coordinates */}
             <div className="mt-6 pt-6 border-t border-border text-xs text-muted">
               <p>
-                ℹ️ GPS coordinates are not displayed for privacy reasons. Address information above is sufficient for
+                <span className="inline-flex items-center gap-1.5"><Info size={14} className="text-blue-500 shrink-0" /> GPS coordinates are not displayed for privacy reasons. Address information above is sufficient for</span>
                 follow-up.
               </p>
             </div>

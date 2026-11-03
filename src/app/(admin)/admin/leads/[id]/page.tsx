@@ -616,12 +616,12 @@ export default function LeadDetailPage({
                   {lead.assignedAgent &&
                     !agents.some((ag) => ag.id === lead.assignedAgent!.id) && (
                       <option value={lead.assignedAgent.id}>
-                        👤 {lead.assignedAgent.fullName} (Current)
+                        {lead.assignedAgent.fullName} (Current)
                       </option>
                     )}
                   {agents.map((ag) => (
                     <option key={ag.id} value={ag.id}>
-                      👤 {ag.fullName}
+                      {ag.fullName}
                     </option>
                   ))}
                 </select>
@@ -642,7 +642,7 @@ export default function LeadDetailPage({
                   <option value="">-- No Dealer --</option>
                   {dealers.map((d) => (
                     <option key={d.id} value={d.id}>
-                      🏢 {d.businessName}
+                      {d.businessName}
                     </option>
                   ))}
                 </select>

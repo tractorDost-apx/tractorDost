@@ -16,8 +16,11 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   const pathname = usePathname();
 
   const userRole = user?.role?.name?.toUpperCase();
+  const isAdminUser = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
   const isDealerUser =
     userRole === 'DEALER' ||
+    userRole === 'DEALER_STAFF' ||
+    userRole === 'SELLER' ||
     user?.sellerType?.toLowerCase() === 'dealer' ||
     Boolean(user?.dealer);
 
@@ -28,7 +31,8 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
     !normalizedAllowedRoles ||
     normalizedAllowedRoles.length === 0 ||
     (userRole && normalizedAllowedRoles.includes(userRole)) ||
-    (isDealerUser && normalizedAllowedRoles.includes('DEALER'));
+    (isAdminUser && (normalizedAllowedRoles.includes('ADMIN') || normalizedAllowedRoles.includes('SUPER_ADMIN'))) ||
+    (isDealerUser && (normalizedAllowedRoles.includes('DEALER') || normalizedAllowedRoles.includes('SELLER')));
 
   useEffect(() => {
     if (!isLoading) {
@@ -36,26 +40,29 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         // Redirect to login if not authenticated, saving the current path to return to
         router.replace(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
       } else if (!isAuthorized) {
-        // User is authenticated but lacks required role
-        switch (user?.role?.name) {
+        // User is authenticated but lacks required role -> redirect to their role dashboard
+        switch (userRole) {
           case 'ADMIN':
+          case 'SUPER_ADMIN':
             router.replace('/admin/dashboard');
             break;
           case 'AGENT':
             router.replace('/agent/dashboard');
             break;
           case 'DEALER':
+          case 'DEALER_STAFF':
+          case 'SELLER':
             router.replace('/dealer/dashboard');
             break;
           case 'CUSTOMER':
+          case 'USER':
+          default:
             router.replace('/dashboard');
             break;
-          default:
-            router.replace('/');
         }
       }
     }
-  }, [isLoading, isAuthenticated, isAuthorized, userRole, isDealerUser, router, pathname]);
+  }, [isLoading, isAuthenticated, isAuthorized, userRole, isAdminUser, isDealerUser, router, pathname]);
 
   if (isLoading) {
     return (

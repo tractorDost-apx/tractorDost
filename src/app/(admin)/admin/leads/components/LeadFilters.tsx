@@ -306,7 +306,7 @@ export function LeadFilters({
               All Assignments
             </option>
             <option value="unassigned" className="bg-background text-foreground">
-              ⚡ Unassigned Only
+              Unassigned Only
             </option>
             <option value="assigned" className="bg-background text-foreground">
               ✓ Assigned Leads
@@ -319,7 +319,7 @@ export function LeadFilters({
                     value={`agent:${ag.id}`}
                     className="bg-background text-foreground"
                   >
-                    👤 {ag.fullName}
+                    {ag.fullName}
                   </option>
                 ))}
               </optgroup>

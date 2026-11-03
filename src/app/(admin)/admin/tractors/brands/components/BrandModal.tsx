@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Brand, brandAPI } from '@/lib/api/brands';
 import { X, Upload, Check, AlertCircle, FileText, BarChart, Settings2 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
+import { validateImageFile } from '@/lib/utils/file-validation';
 
 interface BrandModalProps {
   brand: Brand | null;
@@ -190,7 +191,7 @@ export default function BrandModal({ brand, onClose }: BrandModalProps) {
                       <div className="text-muted flex flex-col items-center gap-3 p-6 text-center transition-colors group-hover:text-[var(--color-brand-green)]">
                         <Upload size={32} />
                         <span className="text-xs leading-relaxed font-bold">
-                          Click to upload high-res transparent PNG
+                          Click to upload transparent logo (Max 5MB)
                         </span>
                       </div>
                     )}
