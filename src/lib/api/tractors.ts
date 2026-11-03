@@ -143,7 +143,7 @@ export interface TractorSpec {
   linkageCategory?: string | null;
   auxHydraulicPorts?: number | null;
 
-  steeringType?: SteeringType | null;
+  steeringType?: SteeringType | string | null;
   brakeType?: BrakeType | null;
   parkingBrake?: ParkingBrakeType | null;
   suspendedPedal?: string | null;
@@ -152,7 +152,7 @@ export interface TractorSpec {
   overallLengthMm?: number | null;
   overallWidthMm?: number | null;
   overallHeightMm?: number | null;
-  wheelbaseMm?: number | null;
+  wheelbaseMm?: number | string | null;
   groundClearanceMm?: number | null;
   turningRadiusM?: number | null;
   totalWeightKg?: number | null;
@@ -187,7 +187,7 @@ export interface TractorSpec {
   hasGps?: boolean;
   hasTpms?: boolean;
   connectivity?: string | null;
-  digitalDisplay?: DisplayType | null;
+  digitalDisplay?: DisplayType | string | null;
   includedAccessories?: any | null;
 }
 

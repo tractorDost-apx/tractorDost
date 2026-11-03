@@ -63,7 +63,7 @@ export interface Implement {
   ptoInputSpeedRpm?: number | null;
   travellingSpeed?: number | null;
   tyreSize?: string | null;
-  wheelbaseMm?: number | null;
+  wheelbaseMm?: number | string | null;
   groundClearanceMm?: number | null;
   steeringType?: string | null;
   brakes?: string | null;

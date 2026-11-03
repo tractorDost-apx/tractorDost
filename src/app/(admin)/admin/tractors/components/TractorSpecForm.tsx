@@ -79,6 +79,7 @@ const SelectField = ({
   touched,
 }: any) => {
   const value = spec[name as keyof TractorSpec];
+  const selectOptions = Array.from(new Set([...(options || []), ...(value ? [String(value)] : [])]));
   const isMissing = required && (!value || value === '');
   const isError = isMissing && touched?.[`spec_${name}`];
 
@@ -99,7 +100,7 @@ const SelectField = ({
         }`}
       >
         <option value="">Not Specified</option>
-        {options.map((opt: string) => (
+        {selectOptions.map((opt: string) => (
           <option key={opt} value={opt}>
             {opt.replace(/_/g, ' ')}
           </option>
@@ -386,7 +387,11 @@ export default function TractorSpecForm({ spec, onChange, touched }: TractorSpec
         <SelectField
           label="Steering Type"
           name="steeringType"
-          options={Object.values(SteeringType)}
+          options={[
+            ...Object.values(SteeringType),
+            'MECHANICAL / HYDRAULIC_POWER',
+            'POWER / MECHANICAL',
+          ]}
           spec={spec}
           handleChange={handleChange}
           touched={touched}
@@ -456,7 +461,7 @@ export default function TractorSpecForm({ spec, onChange, touched }: TractorSpec
         <InputField
           label="Wheelbase (Mm)"
           name="wheelbaseMm"
-          type="number"
+          type="text"
           spec={spec}
           handleChange={handleChange}
           touched={touched}
@@ -684,7 +689,10 @@ export default function TractorSpecForm({ spec, onChange, touched }: TractorSpec
         <SelectField
           label="Digital Display"
           name="digitalDisplay"
-          options={Object.values(DisplayType)}
+          options={[
+            ...Object.values(DisplayType),
+            'ANALOG / DIGITAL',
+          ]}
           spec={spec}
           handleChange={handleChange}
           touched={touched}
