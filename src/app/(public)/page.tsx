@@ -46,7 +46,7 @@ export default function PublicHomePage() {
             try {
                 const [tractorsRes, brandsRes, compareRes, usedRes] = await Promise.allSettled([
                     tractorAPI.getAllTractors({ limit: 6 }), // Fetch latest for featured
-                    brandAPI.getAllBrands({ limit: 8 }),
+                    brandAPI.getAllBrands({ limit: 100, sortBy: 'sortOrder', sortOrder: 'asc' }),
                     compareAPI.getFrequencyOfCompare({ limit: 6, sort: 'desc' }),
                     usedTractorListingAPI.getAllListings({ limit: 4, sortBy: 'newest' }),
                 ]);
@@ -56,8 +56,16 @@ export default function PublicHomePage() {
                     setTractors(list);
                 }
                 if (brandsRes.status === 'fulfilled' && brandsRes.value.success) {
-                    const list = brandsRes.value.data?.data || (brandsRes.value.data as any)?.brands || [];
-                    setBrands(list);
+                    const bData = brandsRes.value.data as unknown as { brands?: Brand[]; data?: Brand[] };
+                    const rawList = (bData?.data || bData?.brands || []) as Brand[];
+                    setBrands(
+                        [...rawList].sort((a, b) => {
+                            const orderA = a.sortOrder ?? 0;
+                            const orderB = b.sortOrder ?? 0;
+                            if (orderA !== orderB) return orderA - orderB;
+                            return (a.id ?? 0) - (b.id ?? 0);
+                        })
+                    );
                 }
                 if (compareRes.status === 'fulfilled' && compareRes.value.success) {
                     const records = compareRes.value.data?.records || [];

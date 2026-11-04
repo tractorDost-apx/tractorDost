@@ -32,6 +32,22 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface SwapBrandSortOrderResult {
+  swapped: boolean;
+  brands: {
+    id: number;
+    name: string;
+    previousSortOrder: number;
+    sortOrder: number;
+  }[];
+}
+
+export interface SwapBrandSortOrderResponse {
+  success: boolean;
+  message: string;
+  data: SwapBrandSortOrderResult;
+}
+
 export const brandAPI = {
   /**
    * Fetch all brands with pagination and search
@@ -42,6 +58,8 @@ export const brandAPI = {
     search?: string;
     isActive?: string;
     isFeatured?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }) => {
     const response = await apiClient.get<PaginatedResponse<Brand>>('/brand/get-all-brand', {
       params,
@@ -50,7 +68,15 @@ export const brandAPI = {
   },
 
   /** Alias for getAllBrands */
-  getBrands: async (params?: { page?: number; limit?: number; search?: string; isActive?: string; isFeatured?: string }) => {
+  getBrands: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    isActive?: string;
+    isFeatured?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }) => {
     return brandAPI.getAllBrands(params);
   },
 
@@ -96,6 +122,17 @@ export const brandAPI = {
   deleteBrand: async (id: number) => {
     const response = await apiClient.delete<{ success: boolean; data: Brand }>(
       `/brand/delete-brand/${id}`
+    );
+    return response.data;
+  },
+
+  /**
+   * Swap sort order between two brands
+   */
+  swapBrandSortOrder: async (firstBrandId: number, secondBrandId: number) => {
+    const response = await apiClient.patch<SwapBrandSortOrderResponse>(
+      '/brand/swap-brand-sort-order',
+      { firstBrandId, secondBrandId }
     );
     return response.data;
   },

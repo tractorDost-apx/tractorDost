@@ -17,9 +17,10 @@ import {
   Activity,
   Filter,
   X,
-  ChevronLeft,
-  ChevronRight,
   Eye,
+  GripVertical,
+  Loader2,
+  ArrowUpDown,
 } from 'lucide-react';
 import BrandModal from './components/BrandModal';
 import BrandModelsModal from './components/BrandModelsModal';
@@ -35,10 +36,17 @@ export default function BrandsPage() {
   const [isFeaturedFilter, setIsFeaturedFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(50);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [detailBrand, setDetailBrand] = useState<Brand | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Drag and drop / reordering state
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isReordering, setIsReordering] = useState(false);
+  const [swappingIds, setSwappingIds] = useState<[number, number] | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -63,28 +71,6 @@ export default function BrandsPage() {
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [modelsBrand, setModelsBrand] = useState<Brand | null>(null);
 
-  const fetchBrands = async () => {
-    setLoading(true);
-    try {
-      const response = await brandAPI.getAllBrands({
-        page,
-        limit,
-        search,
-        isActive: isActiveFilter || undefined,
-        isFeatured: isFeaturedFilter || undefined,
-      });
-      if (response.success) {
-        setBrands(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setTotalCount(response.data.totalCount);
-      }
-    } catch (error) {
-      console.error('Failed to fetch brands', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Debounce search slightly
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -95,8 +81,46 @@ export default function BrandsPage() {
   }, [searchTerm]);
 
   useEffect(() => {
-    fetchBrands();
-  }, [search, page, limit, isActiveFilter, isFeaturedFilter]);
+    let ignore = false;
+    // Asynchronously fetch brands without cascading setState in render phase
+    const loadBrands = async () => {
+      setLoading(true);
+      try {
+        const response = await brandAPI.getAllBrands({
+          page,
+          limit,
+          search,
+          isActive: isActiveFilter || undefined,
+          isFeatured: isFeaturedFilter || undefined,
+          sortBy: 'sortOrder',
+          sortOrder: 'asc',
+        });
+        if (!ignore && response.success) {
+          const fetchedBrands = [...response.data.data].sort(
+            (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)
+          );
+          setBrands(fetchedBrands);
+          setTotalPages(response.data.totalPages);
+          setTotalCount(response.data.totalCount);
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Failed to fetch brands', error);
+          toast.error('Failed to fetch brands.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadBrands();
+
+    return () => {
+      ignore = true;
+    };
+  }, [search, page, limit, isActiveFilter, isFeaturedFilter, refreshTrigger]);
 
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -104,7 +128,7 @@ export default function BrandsPage() {
     setIsActiveFilter('');
     setIsFeaturedFilter('');
     setPage(1);
-    setLimit(10);
+    setLimit(50);
   };
 
   const handleEdit = (brand: Brand, e: React.MouseEvent) => {
@@ -119,8 +143,8 @@ export default function BrandsPage() {
       try {
         await brandAPI.deleteBrand(id);
         toast.success('Brand deleted successfully');
-        fetchBrands();
-      } catch (error) {
+        setRefreshTrigger((k) => k + 1);
+      } catch {
         toast.error('Failed to delete brand.');
       }
     }
@@ -129,9 +153,152 @@ export default function BrandsPage() {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedBrand(null);
-    fetchBrands(); // Refresh list after add/edit
+    setRefreshTrigger((k) => k + 1); // Refresh list after add/edit
   };
 
+  // ___________________DRAG & DROP REORDERING___________________
+
+  const executeSwap = async (sourceBrand: Brand, targetBrand: Brand) => {
+    if (sourceBrand.id === targetBrand.id || isReordering) return;
+
+    // Check if both brands share the same sortOrder before calling API
+    if (sourceBrand.sortOrder === targetBrand.sortOrder) {
+      toast.error(
+        `Both "${sourceBrand.name}" and "${targetBrand.name}" share sortOrder #${sourceBrand.sortOrder}. Edit their sortOrder values to assign distinct positions before swapping.`
+      );
+      return;
+    }
+
+    // Save previous snapshot for rollback on error or failed swap
+    const previousBrands = [...brands];
+
+    // Optimistic UI update: exchange sortOrder values and sort
+    const optimisticBrands = brands
+      .map((b) => {
+        if (b.id === sourceBrand.id) return { ...b, sortOrder: targetBrand.sortOrder };
+        if (b.id === targetBrand.id) return { ...b, sortOrder: sourceBrand.sortOrder };
+        return b;
+      })
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+
+    setBrands(optimisticBrands);
+    setIsReordering(true);
+    setSwappingIds([sourceBrand.id, targetBrand.id]);
+
+    try {
+      const response = await brandAPI.swapBrandSortOrder(sourceBrand.id, targetBrand.id);
+
+      if (response.success && response.data?.swapped) {
+        // Confirmed by backend database transaction
+        const updatedBrandsMap = new Map(
+          response.data.brands.map((b) => [b.id, b.sortOrder])
+        );
+
+        setBrands((current) => {
+          const confirmed = current.map((b) => {
+            if (updatedBrandsMap.has(b.id)) {
+              return { ...b, sortOrder: updatedBrandsMap.get(b.id)! };
+            }
+            return b;
+          });
+          return [...confirmed].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+        });
+
+        toast.success(
+          `Swapped order: ${sourceBrand.name} (#${targetBrand.sortOrder}) ⇄ ${targetBrand.name} (#${sourceBrand.sortOrder})`
+        );
+      } else {
+        // Backend indicated swapped = false (e.g. concurrent change caused equal sortOrder)
+        setBrands(previousBrands);
+        toast.error(
+          response.message || 'Brands share the same sort order; reordering rolled back.'
+        );
+      }
+    } catch (error: unknown) {
+      // Rollback on any API or network failure
+      setBrands(previousBrands);
+      let errorMessage = 'Failed to update brand order. Rolled back to previous order.';
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
+        errorMessage = err.response?.data?.message || err.message || errorMessage;
+      }
+      toast.error(errorMessage);
+    } finally {
+      setIsReordering(false);
+      setSwappingIds(null);
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+    }
+  };
+
+  const handleDragStart = (index: number, e: React.DragEvent) => {
+    if (isReordering) {
+      e.preventDefault();
+      return;
+    }
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(index));
+  };
+
+  const handleDragOver = (index: number, e: React.DragEvent) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index || isReordering) return;
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDragLeave = (index: number, e: React.DragEvent) => {
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    if (dragOverIndex === index) {
+      setDragOverIndex(null);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = async (targetIndex: number, e: React.DragEvent) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex || isReordering) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const sourceBrand = brands[draggedIndex];
+    const targetBrand = brands[targetIndex];
+
+    if (!sourceBrand || !targetBrand) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    await executeSwap(sourceBrand, targetBrand);
+  };
+
+  const handleMoveUp = async (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (index <= 0 || isReordering) return;
+    const current = brands[index];
+    const previous = brands[index - 1];
+    await executeSwap(current, previous);
+  };
+
+  const handleMoveDown = async (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (index >= brands.length - 1 || isReordering) return;
+    const current = brands[index];
+    const next = brands[index + 1];
+    await executeSwap(current, next);
+  };
+
+  const isFilteringActive = Boolean(searchTerm || search || isActiveFilter || isFeaturedFilter);
 
   return (
     <div className="animate-fade-in flex flex-1 h-full w-full flex-col gap-6 pb-2">
@@ -140,7 +307,7 @@ export default function BrandsPage() {
         <div>
           <h1 className="text-foreground text-3xl font-black tracking-tight">Brand Management</h1>
           <p className="text-muted mt-1 text-sm font-bold">
-            Deep analysis & master view of tractor and equipment brands.
+            Deep analysis & master view of tractor and equipment brands. Drag rows to customize catalog display order.
           </p>
         </div>
         <button
@@ -148,7 +315,7 @@ export default function BrandsPage() {
             setSelectedBrand(null);
             setIsModalOpen(true);
           }}
-          className="spatial-button flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg"
+          className="spatial-button flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-lg cursor-pointer"
         >
           <Plus size={16} /> Add New Brand
         </button>
@@ -158,12 +325,26 @@ export default function BrandsPage() {
       <div className="glass-panel flex flex-col gap-4 rounded-2xl p-4">
         {/* Main container */}
         <div className="flex w-full flex-col items-center justify-between gap-4 lg:flex-row">
-          {/* Left: Stats */}
-          <div className="flex w-full shrink-0 items-center gap-4 text-sm font-bold lg:w-auto">
+          {/* Left: Stats & Reordering Status */}
+          <div className="flex w-full flex-wrap shrink-0 items-center gap-3 text-sm font-bold lg:w-auto">
             <div className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-green)]/10 px-4 py-2 text-[var(--color-brand-green)]">
               <ShieldCheck size={18} />
               Total Brands: {totalCount}
             </div>
+
+            {isReordering && (
+              <div className="flex items-center gap-2 rounded-xl bg-[var(--color-brand-orange)]/15 px-3 py-2 text-xs font-bold text-[var(--color-brand-orange)] animate-pulse">
+                <Loader2 size={14} className="animate-spin" />
+                Persisting brand sort order...
+              </div>
+            )}
+
+            {isFilteringActive && (
+              <div className="text-muted text-xs font-semibold flex items-center gap-1.5">
+                <Filter size={13} className="text-[var(--color-brand-orange)]" />
+                <span>Filters active</span>
+              </div>
+            )}
           </div>
 
           {/* Right: Search, Filters, Reset */}
@@ -250,7 +431,7 @@ export default function BrandsPage() {
             {(searchTerm || isActiveFilter || isFeaturedFilter) && (
               <button
                 onClick={handleResetFilters}
-                className="flex w-full items-center justify-center gap-1.5 rounded-full bg-red-500/10 px-4 py-2 text-xs font-bold text-red-500 transition-colors hover:bg-red-500/20 sm:w-auto"
+                className="flex w-full items-center justify-center gap-1.5 rounded-full bg-red-500/10 px-4 py-2 text-xs font-bold text-red-500 transition-colors hover:bg-red-500/20 sm:w-auto cursor-pointer"
               >
                 <X size={14} /> Reset Filters
               </button>
@@ -259,13 +440,19 @@ export default function BrandsPage() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table with Horizontal Brand Rows */}
       <div className="glass-panel flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl md:min-h-[530px]">
         <div className="min-h-[350px] flex-1 overflow-x-auto overflow-y-auto md:min-h-[460px]">
           <table className="relative w-full text-left text-xs">
             <thead className="bg-background/95 text-muted sticky top-0 z-10 border-b border-[var(--border-subtle)] text-[11px] font-black tracking-wider uppercase backdrop-blur-md">
               <tr>
-                <th className="w-10 px-6 py-4"></th>
+                <th className="w-16 px-4 py-4 text-center">
+                  <span className="sr-only">Reorder</span>
+                  <div className="flex items-center justify-center gap-1" title="Drag row or use arrows to reorder">
+                    <ArrowUpDown size={14} />
+                  </div>
+                </th>
+                <th className="w-24 px-4 py-4 text-center">Sort Order</th>
                 <th className="px-6 py-4">Brand</th>
                 <th className="px-6 py-4">Founded / Country</th>
                 <th className="px-6 py-4">Models</th>
@@ -276,125 +463,218 @@ export default function BrandsPage() {
             <tbody className="divide-y divide-[var(--border-subtle)]">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="text-muted px-6 py-12 text-center font-bold">
-                    Loading deep brand insights...
+                  <td colSpan={7} className="text-muted px-6 py-12 text-center font-bold">
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="animate-spin text-[var(--color-brand-green)]" size={18} />
+                      Loading deep brand insights...
+                    </div>
                   </td>
                 </tr>
               ) : brands.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-muted px-6 py-12 text-center font-bold">
+                  <td colSpan={7} className="text-muted px-6 py-12 text-center font-bold">
                     No brands found matching your search.
                   </td>
                 </tr>
               ) : (
-                brands.map((brand) => (
-                  <tr
-                    key={brand.id}
-                    className="hover:bg-[var(--color-brand-green)]/[0.04] group cursor-pointer transition-colors"
-                    onClick={() => setDetailBrand(brand)}
-                  >
-                    <td className="text-muted px-6 py-4">
-                      <div
-                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground/5 text-muted transition-colors group-hover:bg-[var(--color-brand-green)]/15 group-hover:text-[var(--color-brand-green)]"
-                        title="Click to view brand profile"
+                brands.map((brand, index) => {
+                  const isBeingDragged = draggedIndex === index;
+                  const isDropTarget = dragOverIndex === index && draggedIndex !== index;
+                  const isSwapping =
+                    swappingIds &&
+                    (swappingIds[0] === brand.id || swappingIds[1] === brand.id);
+
+                  return (
+                    <tr
+                      key={brand.id}
+                      draggable={!isReordering}
+                      onDragStart={(e) => handleDragStart(index, e)}
+                      onDragOver={(e) => handleDragOver(index, e)}
+                      onDragLeave={(e) => handleDragLeave(index, e)}
+                      onDrop={(e) => handleDrop(index, e)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => setDetailBrand(brand)}
+                      className={`group cursor-pointer transition-all duration-150 select-none ${
+                        isBeingDragged
+                          ? 'opacity-40 bg-[var(--color-brand-green)]/10 border-2 border-dashed border-[var(--color-brand-green)]/40 scale-[0.99]'
+                          : isDropTarget
+                          ? 'bg-[var(--color-brand-green)]/15 ring-2 ring-[var(--color-brand-green)] ring-inset scale-[1.005]'
+                          : isSwapping
+                          ? 'bg-[var(--color-brand-orange)]/10 animate-pulse'
+                          : 'hover:bg-[var(--color-brand-green)]/[0.04]'
+                      }`}
+                    >
+                      {/* Drag Handle & Quick Reorder Controls */}
+                      <td
+                        className="px-4 py-4 text-center"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <Eye size={16} />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm transition-transform group-hover:scale-105">
-                          {brand.logoUrl ? (
-                            <img
-                              src={brand.logoUrl}
-                              alt={brand.name}
-                              className="max-h-full max-w-full object-contain rounded-lg"
+                        <div className="flex items-center justify-center gap-1">
+                          <div
+                            className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                              isReordering
+                                ? 'text-muted/40 cursor-not-allowed'
+                                : 'cursor-grab active:cursor-grabbing text-muted hover:text-foreground hover:bg-foreground/5'
+                            }`}
+                            title="Drag up or down to reorder"
+                          >
+                            <GripVertical size={16} />
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <button
+                              type="button"
+                              disabled={index === 0 || isReordering}
+                              onClick={(e) => handleMoveUp(index, e)}
+                              className="text-muted hover:text-foreground disabled:opacity-20 disabled:hover:text-muted p-0.5 rounded hover:bg-foreground/5 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                              title="Move brand up"
+                              aria-label={`Move ${brand.name} up`}
+                            >
+                              <ChevronUp size={12} strokeWidth={2.5} />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === brands.length - 1 || isReordering}
+                              onClick={(e) => handleMoveDown(index, e)}
+                              className="text-muted hover:text-foreground disabled:opacity-20 disabled:hover:text-muted p-0.5 rounded hover:bg-foreground/5 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                              title="Move brand down"
+                              aria-label={`Move ${brand.name} down`}
+                            >
+                              <ChevronDown size={12} strokeWidth={2.5} />
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Sort Order Display */}
+                      <td className="px-4 py-4 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          {isSwapping ? (
+                            <Loader2
+                              size={14}
+                              className="animate-spin text-[var(--color-brand-orange)]"
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-xs font-black text-[var(--color-brand-green)]">
-                              {brand.name.charAt(0)}
-                            </div>
+                            <span
+                              className="inline-flex items-center justify-center font-mono font-black text-xs px-2.5 py-1 rounded-xl bg-foreground/5 text-foreground border border-[var(--border-subtle)] shadow-xs"
+                              title={`Current Sort Order: ${brand.sortOrder ?? 0}`}
+                            >
+                              #{brand.sortOrder ?? 0}
+                            </span>
                           )}
                         </div>
-                        <div className="flex flex-col gap-0.5">
-                          <div className="text-foreground text-base font-black tracking-tight transition-colors group-hover:text-[var(--color-brand-green)]">
-                            {brand.name}
+                      </td>
+
+                      {/* Brand Info (Logo + Name + Slug) */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1.5 shadow-sm transition-transform group-hover:scale-105">
+                            {brand.logoUrl ? (
+                              <img
+                                src={brand.logoUrl}
+                                alt={brand.name}
+                                className="max-h-full max-w-full object-contain rounded-lg"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-[var(--color-brand-green)]/15 to-[var(--color-brand-green)]/5 text-xs font-black text-[var(--color-brand-green)]">
+                                {brand.name.charAt(0)}
+                              </div>
+                            )}
                           </div>
-                          <div
-                            className="text-muted/70 max-w-[150px] truncate text-[10px] font-bold tracking-wider uppercase sm:max-w-[200px]"
-                            title={brand.slug}
-                          >
-                            {brand.slug}
+                          <div className="flex flex-col gap-0.5">
+                            <div className="text-foreground text-base font-black tracking-tight transition-colors group-hover:text-[var(--color-brand-green)]">
+                              {brand.name}
+                            </div>
+                            <div
+                              className="text-muted/70 max-w-[150px] truncate text-[10px] font-bold tracking-wider uppercase sm:max-w-[200px]"
+                              title={brand.slug}
+                            >
+                              {brand.slug}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1 text-xs">
-                        <span className="text-foreground/80 flex items-center gap-1.5 font-bold">
-                          <Globe size={12} className="text-muted" /> {brand.country || 'N/A'}
-                        </span>
-                        <span className="text-muted font-medium">
-                          Est. {brand.foundedYear || 'Unknown'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setModelsBrand(brand);
-                        }}
-                        className="bg-foreground/5 text-foreground/80 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black tracking-wide transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] cursor-pointer"
-                      >
-                        {brand.totalModels || 0} Models
-                      </button>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-widest uppercase ${brand.isActive ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'bg-red-500/10 text-red-500'}`}
-                        >
-                          {brand.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                        {brand.isFeatured && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-black tracking-widest text-blue-500 uppercase">
-                            Featured
+                      </td>
+
+                      {/* Founded & Country */}
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1 text-xs">
+                          <span className="text-foreground/80 flex items-center gap-1.5 font-bold">
+                            <Globe size={12} className="text-muted" /> {brand.country || 'N/A'}
                           </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                          <span className="text-muted font-medium">
+                            Est. {brand.foundedYear || 'Unknown'}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Models */}
+                      <td className="px-6 py-4">
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setDetailBrand(brand);
+                            setModelsBrand(brand);
                           }}
-                          className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] cursor-pointer"
-                          title="View Brand Profile"
+                          className="bg-foreground/5 text-foreground/80 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black tracking-wide transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] cursor-pointer"
                         >
-                          <Eye size={16} />
+                          {brand.totalModels || 0} Models
                         </button>
-                        <button
-                          onClick={(e) => handleEdit(brand, e)}
-                          className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)] cursor-pointer"
-                          title="Edit Brand"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={(e) => handleDelete(brand.id, e)}
-                          className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500 cursor-pointer"
-                          title="Delete Brand"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black tracking-widest uppercase ${
+                              brand.isActive
+                                ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+                                : 'bg-red-500/10 text-red-500'
+                            }`}
+                          >
+                            {brand.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                          {brand.isFeatured && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-black tracking-widest text-blue-500 uppercase">
+                              Featured
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDetailBrand(brand);
+                            }}
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] cursor-pointer"
+                            title="View Brand Profile"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleEdit(brand, e)}
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-[var(--color-brand-orange)]/10 hover:text-[var(--color-brand-orange)] cursor-pointer"
+                            title="Edit Brand"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDelete(brand.id, e)}
+                            className="text-foreground/70 rounded-xl p-2 transition-colors hover:bg-red-500/10 hover:text-red-500 cursor-pointer"
+                            title="Delete Brand"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -460,7 +740,7 @@ export default function BrandsPage() {
                     )}
                   </div>
                   <p className="text-muted text-xs font-semibold mt-0.5">
-                    Slug: <code className="text-foreground/80 font-mono text-[11px]">{detailBrand.slug}</code> • ID: #{detailBrand.id}
+                    Slug: <code className="text-foreground/80 font-mono text-[11px]">{detailBrand.slug}</code> • ID: #{detailBrand.id} • Order: #{detailBrand.sortOrder ?? 0}
                   </p>
                 </div>
               </div>
@@ -511,8 +791,8 @@ export default function BrandsPage() {
                   <span className="text-muted block text-[10px] font-black tracking-wider uppercase">
                     Display Sort Order
                   </span>
-                  <div className="text-foreground text-base font-black mt-1">
-                    {detailBrand.sortOrder || 0}
+                  <div className="text-foreground text-base font-black mt-1 font-mono font-bold">
+                    #{detailBrand.sortOrder ?? 0}
                   </div>
                 </div>
               </div>

@@ -15,10 +15,18 @@ export default function BrandsListingPage() {
     const fetchBrands = async () => {
       setLoading(true);
       try {
-        const res = await brandAPI.getAllBrands({ limit: 200 }); // Fetch all brands
+        const res = await brandAPI.getAllBrands({ limit: 200, sortBy: 'sortOrder', sortOrder: 'asc' }); // Fetch all brands
         if (res.success) {
-          const payload = res.data as any;
-          setBrands(payload.brands || payload.data || []);
+          const payload = res.data as { brands?: Brand[]; data?: Brand[] };
+          const list = (payload.brands || payload.data || []) as Brand[];
+          setBrands(
+            [...list].sort((a, b) => {
+              const orderA = a.sortOrder ?? 0;
+              const orderB = b.sortOrder ?? 0;
+              if (orderA !== orderB) return orderA - orderB;
+              return (a.id ?? 0) - (b.id ?? 0);
+            })
+          );
         }
       } catch (err) {
         console.error('Failed to load brands', err);

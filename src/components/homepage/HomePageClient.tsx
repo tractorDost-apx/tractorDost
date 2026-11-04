@@ -64,7 +64,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
       try {
         const [tractorsRes, brandsRes, compareRes] = await Promise.all([
           tractorAPI.getAllTractors({ limit: 6 }), // Fetch latest for featured
-          brandAPI.getAllBrands({ limit: 20 }),
+          brandAPI.getAllBrands({ limit: 100, sortBy: 'sortOrder', sortOrder: 'asc' }),
           compareAPI.getFrequencyOfCompare({ limit: 3, sort: 'desc' }),
         ]);
 
@@ -80,7 +80,14 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
             brands?: Brand[];
             data?: Brand[];
           };
-          setBrands(bPayload?.brands || bPayload?.data || []);
+          const rawBrands = (bPayload?.brands || bPayload?.data || []) as Brand[];
+          const sortedBrands = [...rawBrands].sort((a, b) => {
+            const orderA = a.sortOrder ?? 0;
+            const orderB = b.sortOrder ?? 0;
+            if (orderA !== orderB) return orderA - orderB;
+            return (a.id ?? 0) - (b.id ?? 0);
+          });
+          setBrands(sortedBrands);
         }
         if (compareRes.success) {
           const cPayload = compareRes.data as unknown as
