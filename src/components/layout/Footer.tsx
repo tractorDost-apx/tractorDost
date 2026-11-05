@@ -4,10 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  ShieldCheck,
-  BadgePercent,
-  Tractor,
-  Headphones,
   Phone,
   Mail,
   MapPin,
@@ -49,57 +45,6 @@ export function Footer() {
       <div className="pointer-events-none absolute -top-40 right-1/4 -z-10 h-72 w-72 rounded-full bg-[var(--color-brand-orange)]/5 blur-[120px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* 1. Value Propositions & Trust Bar */}
-        <div className="mb-14 grid grid-cols-1 gap-6 border-b border-[var(--border-subtle)] pb-12 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex items-start gap-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-5 transition-all duration-300 hover:border-[var(--color-brand-green)]/30 hover:bg-foreground/[0.04]">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-              <ShieldCheck className="h-6 w-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">100% Verified Tractors</h4>
-              <p className="mt-1 text-xs text-muted leading-relaxed">
-                Certified physical inspection & authentic dealer documentation.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-5 transition-all duration-300 hover:border-[var(--color-brand-orange)]/30 hover:bg-foreground/[0.04]">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
-              <BadgePercent className="h-6 w-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">Easy Tractor Loans</h4>
-              <p className="mt-1 text-xs text-muted leading-relaxed">
-                Lowest interest rates, flexible EMIs & fast paperless approval.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-5 transition-all duration-300 hover:border-[var(--color-brand-green)]/30 hover:bg-foreground/[0.04]">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-              <Tractor className="h-6 w-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">Accurate Valuation</h4>
-              <p className="mt-1 text-xs text-muted leading-relaxed">
-                AI-driven fair market price evaluation for used tractors & tools.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-5 transition-all duration-300 hover:border-[var(--color-brand-orange)]/30 hover:bg-foreground/[0.04]">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
-              <Headphones className="h-6 w-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">Kisan Helpline</h4>
-              <p className="mt-1 text-xs text-muted leading-relaxed">
-                Free advisory & guidance from experienced agricultural experts.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* 2. Advisory Newsletter / Updates Strip */}
         <div className="glass-panel relative mb-14 overflow-hidden border border-[var(--border-subtle)] p-6 sm:p-8">
           <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
@@ -279,10 +224,10 @@ export function Footer() {
             </h3>
             <div className="flex flex-col gap-2 pt-1">
               <FooterLink href="/tractors">New Tractors</FooterLink>
+              <FooterLink href="/implements">Farm Equipment</FooterLink>
               <FooterLink href="/used-tractors" badge="Hot">
                 Used Tractors
               </FooterLink>
-              <FooterLink href="/implements">Implements &amp; Tools</FooterLink>
               <FooterLink href="/harvesters">Harvesters</FooterLink>
               <FooterLink href="/tyres">Tractor Tyres</FooterLink>
               <FooterLink href="/compare">Compare Models</FooterLink>

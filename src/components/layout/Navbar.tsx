@@ -119,6 +119,19 @@ export function Navbar() {
             />
 
             <NavDropdownMenu
+              label="Farm Equipment"
+              pathname={pathname}
+              items={[
+                { title: 'BRANDS', desc: '', href: '#brands' },
+                { title: 'ALL IMPLEMENTS', desc: '', href: '/implements' },
+                { title: 'POPULAR IMPLEMENTS', desc: '', href: '/implements/popular' },
+                { title: 'LATEST IMPLEMENTS', desc: '', href: '/implements/latest' },
+                { title: 'ELECTRIC IMPLEMENTS', desc: '', href: '/implements/electric' },
+                { title: 'CNG IMPLEMENTS', desc: '', href: '/implements/cng' },
+              ]}
+            />
+
+            <NavDropdownMenu
               label="Used Tractors"
               pathname={pathname}
               items={[
@@ -126,11 +139,6 @@ export function Navbar() {
                   title: 'Buy Used Tractors',
                   desc: 'Verified second-hand tractors',
                   href: '/used-tractors',
-                },
-                {
-                  title: 'Sell Your Tractor',
-                  desc: 'Get the best market price',
-                  href: '/sell-used-tractor',
                 },
                 {
                   title: 'Valuation Tool',
@@ -142,31 +150,7 @@ export function Navbar() {
 
             <NavLink href="/compare" label="Compare" pathname={pathname} highlight={true} />
 
-            <NavDropdownMenu
-              label="Finance"
-              pathname={pathname}
-              items={[
-                { title: 'Tractor Loan', desc: 'Low interest financing', href: '/loan' },
-                {
-                  title: 'EMI Calculator',
-                  desc: 'Calculate monthly payments',
-                  href: '/emi-calculator',
-                },
-              ]}
-            />
-
-            <NavDropdownMenu
-              label="Implements"
-              pathname={pathname}
-              items={[
-                { title: 'BRANDS', desc: '', href: '#brands' },
-                { title: 'ALL IMPLEMENTS', desc: '', href: '/implements' },
-                { title: 'POPULAR IMPLEMENTS', desc: '', href: '/implements/popular' },
-                { title: 'LATEST IMPLEMENTS', desc: '', href: '/implements/latest' },
-                { title: 'ELECTRIC IMPLEMENTS', desc: '', href: '/implements/electric' },
-                { title: 'CNG IMPLEMENTS', desc: '', href: '/implements/cng' },
-              ]}
-            />
+            <NavLink href="/emi-calculator" label="EMI Calculator" pathname={pathname} />
 
             <NavLink href="/news" label="News" pathname={pathname} />
 
@@ -187,14 +171,6 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-4">
-            {/* Primary Sell CTA */}
-            <Link
-              href="/sell-used-tractor"
-              className="hidden items-center gap-1.5 rounded-full border border-[#ba5b34]/40 bg-[#ba5b34]/10 px-4 py-1.5 text-xs font-black tracking-wider text-[#ba5b34] uppercase transition-all duration-200 hover:border-[#ba5b34] hover:bg-[#ba5b34] hover:text-white hover:shadow-[0_4px_16px_rgba(186,91,52,0.35)] active:scale-95 sm:flex dark:border-[#ea580c]/50 dark:bg-[#ea580c]/15 dark:text-[#fb923c] dark:hover:border-[#ea580c] dark:hover:bg-[#ea580c] dark:hover:text-white dark:hover:shadow-[0_4px_16px_rgba(234,88,12,0.4)]"
-            >
-              <span className="mb-[1px] text-sm leading-none font-black">+</span> SELL
-            </Link>
-
             <div className="ml-1 hidden sm:block">
               <ThemeToggle />
             </div>
@@ -420,24 +396,6 @@ export function Navbar() {
           />
         </div>
 
-        {/* Sell CTA Banner at top of Drawer */}
-        <Link
-          href="/sell-used-tractor"
-          onClick={() => setMobileMenuOpen(false)}
-          className="mb-3 flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-brand-orange)] to-[#d46b3f] p-3 text-white shadow-md transition-transform active:scale-98"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md">
-              <span className="text-lg font-black">+</span>
-            </div>
-            <div>
-              <p className="text-xs font-black uppercase tracking-wider">Sell Your Tractor</p>
-              <p className="text-[10px] text-white/85">Get best verified market price</p>
-            </div>
-          </div>
-          <ChevronRight size={16} className="text-white/80" />
-        </Link>
-
         {/* Navigation Categories */}
         <div className="flex flex-col gap-1 text-sm font-bold">
           <Link
@@ -450,6 +408,20 @@ export function Navbar() {
                 <TractorIcon size={15} />
               </div>
               <span className="text-xs">New Tractors</span>
+            </div>
+            <ChevronRight size={15} className="text-muted" />
+          </Link>
+
+          <Link
+            href="/implements"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Wrench size={15} />
+              </div>
+              <span className="text-xs">Farm Equipment</span>
             </div>
             <ChevronRight size={15} className="text-muted" />
           </Link>
@@ -502,7 +474,7 @@ export function Navbar() {
           </Link>
 
           <Link
-            href="/loan"
+            href="/emi-calculator"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
@@ -510,21 +482,7 @@ export function Navbar() {
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
                 <Landmark size={15} />
               </div>
-              <span className="text-xs">Finance & EMI Calculator</span>
-            </div>
-            <ChevronRight size={15} className="text-muted" />
-          </Link>
-
-          <Link
-            href="/implements"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <Wrench size={15} />
-              </div>
-              <span className="text-xs">Implements & Tools</span>
+              <span className="text-xs">EMI Calculator</span>
             </div>
             <ChevronRight size={15} className="text-muted" />
           </Link>
@@ -828,7 +786,7 @@ function NavDropdownMenu({
   }, [label]);
 
   useEffect(() => {
-    if (label === 'Implements') {
+    if (label === 'Implements' || label === 'Farm Equipment') {
       const fetchEqBrands = async () => {
         try {
           const res = await equipmentBrandAPI.getAllEquipmentBrands({
@@ -1018,7 +976,7 @@ function NavDropdownMenu({
               );
             }
 
-            if (label === 'Implements') {
+            if (label === 'Implements' || label === 'Farm Equipment') {
               const activeBrandCategories =
                 activeEqBrandId !== null ? categoriesByBrand[activeEqBrandId] || [] : [];
               const activeCategory =

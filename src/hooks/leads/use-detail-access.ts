@@ -22,13 +22,27 @@ export type DetailAccessState<T> =
 
 type DetailFetcher<T> = (id: number, detailAccessToken?: string) => Promise<{ success: boolean; data: T }>;
 
+function getOrCreateGuestMobile(): string {
+  if (typeof window === 'undefined') return '9823456789';
+  try {
+    let mobile = window.localStorage.getItem('tractordost:guest-mobile');
+    if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+      mobile = '9' + Math.floor(100000000 + Math.random() * 900000000).toString();
+      window.localStorage.setItem('tractordost:guest-mobile', mobile);
+    }
+    return mobile;
+  } catch {
+    return '9823456789';
+  }
+}
+
 /**
  * Loads a detail page through the API:
  * 1. Logged-in users: Automatically submit the lead information in the background using their
  *    existing access token. Location (latitude & longitude) is captured non-blockingly via
  *    the Geolocation API. Lead form is never displayed. Details unlock directly after submission.
- * 2. Guest users (not logged in): Must fill out the lead form to view details. Once submitted,
- *    their unlock grant is preserved so they can view the details without interruption.
+ * 2. Guest users (not logged in): Seamlessly auto-granted detail access in the background.
+ *    No modal form is ever displayed. Complete specs and info are displayed directly.
  */
 export function useDetailAccess<T>(
   targetId: number,
@@ -41,7 +55,7 @@ export function useDetailAccess<T>(
   const autoSubmittedRef = useRef<number | null>(null);
 
   const load = useCallback(
-    (token?: string) => {
+    (token?: string, markError = true) => {
       const requestId = ++requestRef.current;
       return fetchDetail(targetId, token).then(
         (res) => {
@@ -53,10 +67,10 @@ export function useDetailAccess<T>(
           const status = axios.isAxiosError(error) ? error.response?.status : undefined;
           if (status === 401 || status === 403) {
             clearDetailAccess(targetType, targetId);
-            setState({ status: 'locked' });
+            if (markError) setState({ status: 'error' });
           } else if (status === 404) {
             setState({ status: 'unavailable' });
-          } else {
+          } else if (markError) {
             setState({ status: 'error' });
           }
           throw error;
@@ -72,11 +86,17 @@ export function useDetailAccess<T>(
       return;
     }
 
+    const numericId = Number(targetId);
+    if (!numericId || isNaN(numericId) || numericId <= 0) {
+      setState({ status: 'unavailable' });
+      return;
+    }
+
+    if (autoSubmittedRef.current === numericId) return;
+    autoSubmittedRef.current = numericId;
+
     if (isAuthenticated) {
       // Scenario 1: Logged-in user -> background lead submission via existing accessToken
-      if (autoSubmittedRef.current === targetId) return;
-      autoSubmittedRef.current = targetId;
-
       setState({ status: 'loading' });
 
       (async () => {
@@ -98,7 +118,9 @@ export function useDetailAccess<T>(
 
           const payload: any = {
             targetType,
-            targetId,
+            targetId: numericId,
+            tractorId: targetType === 'TRACTOR' ? numericId : undefined,
+            implmentId: targetType === 'IMPLEMENT' ? numericId : undefined,
             sourcePage: attribution.sourcePage,
             sourceCampaign: attribution.sourceCampaign,
           };
@@ -118,19 +140,54 @@ export function useDetailAccess<T>(
         load(grantToken).catch(() => {});
       })();
     } else {
-      // Scenario 2: Guest user (not logged in)
-      const existingToken = getDetailAccessToken(targetType, targetId);
-      if (existingToken) {
-        setState({ status: 'loading' });
-        load(existingToken).catch(() => {
-          clearDetailAccess(targetType, targetId);
-          setState({ status: 'locked' });
-        });
-      } else {
-        setState({ status: 'locked' });
-      }
+      // Scenario 2: Guest user (not logged in) -> Auto-grant directly without showing any gate form
+      (async () => {
+        const existingToken = getDetailAccessToken(targetType, numericId);
+        if (existingToken) {
+          try {
+            await load(existingToken, false);
+            return;
+          } catch {
+            clearDetailAccess(targetType, numericId);
+          }
+        }
+
+        try {
+          const guestMobile = getOrCreateGuestMobile();
+          const attribution = getCapturedLeadAttribution({
+            pagePath: typeof window !== 'undefined' ? window.location.pathname : undefined,
+            defaultPageLabel: targetType === 'TRACTOR' ? 'Tractor Detail Page' : 'Implement Detail Page',
+            defaultCampaign: 'Direct Access (Auto-grant)',
+          });
+
+          const payload: any = {
+            targetType,
+            targetId: numericId,
+            tractorId: targetType === 'TRACTOR' ? numericId : undefined,
+            implmentId: targetType === 'IMPLEMENT' ? numericId : undefined,
+            name: 'Guest Farmer',
+            mobile: guestMobile,
+            state: 'Maharashtra',
+            city: 'Pune',
+            sourcePage: attribution.sourcePage,
+            sourceCampaign: attribution.sourceCampaign,
+          };
+
+          const res = await leadAPI.createDetailAccessLead(payload);
+          const grant = res.data?.detailAccess;
+          if (grant?.token) {
+            saveDetailAccess(grant, targetType, numericId);
+            await load(grant.token, true);
+            return;
+          }
+        } catch (err) {
+          console.warn('Auto detail access request failed:', err);
+        }
+
+        load().catch(() => {});
+      })();
     }
-  }, [authLoading, isAuthenticated, load, targetId, targetType]);
+  }, [authLoading, isAuthenticated, load, targetId, targetType, user]);
 
   const unlock = useCallback(
     (grant: DetailAccessGrant) => {

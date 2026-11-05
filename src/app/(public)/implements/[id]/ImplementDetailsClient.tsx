@@ -25,8 +25,6 @@ import {
 import { Implement, ImplementTeaser, implementAPI } from '@/lib/api/implements';
 import ImplementFamilyPopover from '@/components/implements/ImplementFamilyPopover';
 import { useDetailAccess } from '@/hooks/leads/use-detail-access';
-import { DetailAccessGate, DetailGateSummary } from '@/components/leads/detail-access-gate';
-import { TractorLoader } from '@/components/ui/TractorLoader';
 
 export interface ExtraSpecItem {
   name: string;
@@ -153,25 +151,9 @@ function SpecCard({
 const formatLakh = (price: number) =>
   price >= 100000 ? `${(price / 100000).toFixed(2)} Lakh` : price.toLocaleString('en-IN');
 
-/** What the lead gate shows about the implement. Only teaser fields, so nothing gated is shown. */
-function implementGateSummary(teaser: ImplementTeaser): DetailGateSummary {
-  const hpRange =
-    teaser.compatibleHpMin && teaser.compatibleHpMax
-      ? `${teaser.compatibleHpMin}-${teaser.compatibleHpMax} HP`
-      : null;
-
-  return {
-    eyebrow: teaser.brand?.name ?? teaser.category.name,
-    title: teaser.modelName,
-    imageUrl: teaser.brand?.logoUrl ?? null,
-    priceLabel: teaser.priceMin ? `Estimated price from ₹ ${formatLakh(teaser.priceMin)}` : 'Price on request',
-    chips: [hpRange, teaser.usageType, teaser.category.name].filter((chip): chip is string => Boolean(chip)),
-  };
-}
-
 /**
- * Full implement details, behind the lead gate. The teaser is public. The full record loads from the API,
- * which answers 403 until the visitor is signed in or has submitted the enquiry for this implement.
+ * Implement details page. Information loads directly for all visitors (guests and logged-in users).
+ * Complete specs, prices, and media are auto-retrieved and displayed without blocking modal gates.
  */
 export default function ImplementDetailsClient({
   teaser,
@@ -180,44 +162,25 @@ export default function ImplementDetailsClient({
   teaser: ImplementTeaser;
   similarImplements?: Implement[];
 }) {
-  const { state, unlock } = useDetailAccess(teaser.id, implementAPI.getImplementById, 'IMPLEMENT');
+  const { state } = useDetailAccess(teaser.id, implementAPI.getImplementById, 'IMPLEMENT');
 
-  if (state.status === 'granted') {
-    return <ImplementDetailsView implement={state.data} similarImplements={similarImplements} />;
+  if (state.status === 'unavailable') {
+    return (
+      <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
+        <Link
+          href="/implements"
+          className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
+        >
+          <ArrowLeft size={16} /> Back to Implements
+        </Link>
+        <p className="text-muted py-24 text-center font-bold">This implement is no longer available.</p>
+      </div>
+    );
   }
 
-  return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/implements"
-        className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
-      >
-        <ArrowLeft size={16} /> Back to Implements
-      </Link>
+  const activeImplement = (state.status === 'granted' ? state.data : teaser) as Implement;
 
-      {state.status === 'loading' && (
-        <div className="flex justify-center py-24">
-          <TractorLoader size={48} />
-        </div>
-      )}
-      {state.status === 'locked' && (
-        <DetailAccessGate
-          targetType="IMPLEMENT"
-          targetId={teaser.id}
-          summary={implementGateSummary(teaser)}
-          onUnlock={unlock}
-        />
-      )}
-      {state.status === 'unavailable' && (
-        <p className="text-muted py-24 text-center font-bold">This implement is no longer available.</p>
-      )}
-      {state.status === 'error' && (
-        <p className="text-muted py-24 text-center font-bold">
-          We could not load this implement. Please refresh the page and try again.
-        </p>
-      )}
-    </div>
-  );
+  return <ImplementDetailsView implement={activeImplement} similarImplements={similarImplements} />;
 }
 
 function ImplementDetailsView({
@@ -274,17 +237,17 @@ function ImplementDetailsView({
   const groupedSpecs = parseAdditionalSpecs(implement.additionalSpecs);
 
   return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
       {/* BREADCRUMBS & BACK BUTTON */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
         <Link
           href="/implements"
-          className="text-muted hover:text-foreground bg-background/50 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
+          className="text-muted hover:text-foreground bg-background/50 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
         >
-          <ArrowLeft size={16} /> Back to Implements Catalog
+          <ArrowLeft size={15} /> Back to Catalog
         </Link>
 
-        <nav className="text-muted flex items-center gap-2 text-xs font-bold">
+        <nav className="text-muted hidden sm:flex items-center gap-2 text-xs font-bold">
           <Link href="/" className="transition-colors hover:text-[var(--color-brand-green)]">
             Home
           </Link>
@@ -293,7 +256,7 @@ function ImplementDetailsView({
             href="/implements"
             className="transition-colors hover:text-[var(--color-brand-green)]"
           >
-            Implements
+            Farm Equipment
           </Link>
           {implement.brand?.name && (
             <>
@@ -317,12 +280,12 @@ function ImplementDetailsView({
         </nav>
       </div>
 
-      <div className="flex flex-col gap-10 lg:flex-row">
+      <div className="flex flex-col gap-6 lg:gap-10 lg:flex-row">
         {/* LEFT COLUMN: Media Preview, Description & Grouped Specs */}
-        <div className="flex w-full flex-col gap-8 lg:w-[58%]">
+        <div className="flex w-full flex-col gap-6 lg:gap-8 lg:w-[58%]">
           {/* MEDIA BOX */}
-          <div className="spatial-panel flex flex-col gap-4 rounded-[2.5rem] p-4">
-            <div className="from-foreground/5 group relative flex h-[380px] w-full items-center justify-center overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-6 md:h-[480px]">
+          <div className="spatial-panel flex flex-col gap-3 sm:gap-4 rounded-[2rem] sm:rounded-[2.5rem] p-3 sm:p-4">
+            <div className="from-foreground/5 group relative flex h-[260px] sm:h-[360px] md:h-[480px] w-full items-center justify-center overflow-hidden rounded-[1.75rem] sm:rounded-[2rem] border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-4 sm:p-6">
               {/* Floating Top Right Buttons */}
               <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
                 <button
@@ -748,6 +711,24 @@ function ImplementDetailsView({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Mobile Sticky Action Bar */}
+      <div className="bg-background/90 fixed bottom-0 left-0 z-50 flex w-full items-center justify-between border-t border-[var(--border-subtle)] p-3.5 sm:p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] backdrop-blur-xl lg:hidden">
+        <div className="flex flex-col">
+          <span className="text-muted text-[10px] font-bold tracking-widest uppercase">
+            Estimated Price
+          </span>
+          <span className="text-foreground text-base sm:text-lg leading-none font-black">
+            {priceFormatted}
+          </span>
+        </div>
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs sm:text-sm font-black text-white shadow-lg transition-colors hover:bg-[var(--color-brand-orange)] active:scale-95"
+        >
+          <PhoneCall size={15} /> Get Best Price
+        </button>
       </div>
     </div>
   );

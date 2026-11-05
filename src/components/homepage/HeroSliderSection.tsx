@@ -9,10 +9,6 @@ import {
   ChevronRight,
   ChevronLeft,
   Tractor,
-  Handshake,
-  CircleDollarSign,
-  Landmark,
-  Wrench,
   ShieldCheck,
   BadgePercent,
   Sparkles,
@@ -246,104 +242,6 @@ function SmartMatcherCard({
         <span>Explore Tractors</span>
         <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
       </button>
-
-      {/* Subtle Divider */}
-      <div className="relative my-3 sm:my-4 flex items-center justify-center">
-        <div className="border-border w-full border-t" />
-        <span className="text-muted bg-white px-2.5 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase dark:bg-[#0c100e]">
-          Quick Services
-        </span>
-      </div>
-
-      {/* Quick Action Links inside the Vertical Rectangle */}
-      <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
-        {/* 1. New Tractors */}
-        <Link
-          href="/tractors"
-          className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
-        >
-          <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
-            <Tractor className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-green)] truncate">
-              New Tractors
-            </p>
-            <p className="text-muted text-[10px] font-medium truncate">Latest models</p>
-          </div>
-        </Link>
-
-        {/* 2. Used Tractors */}
-        <Link
-          href="/used-tractors"
-          className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-orange)]/40 hover:bg-[var(--color-brand-orange)]/10 hover:shadow-sm"
-        >
-          <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] transition-transform duration-200 group-hover:scale-110">
-            <Handshake className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-orange)] truncate">
-              Used Tractors
-            </p>
-            <p className="text-muted text-[10px] font-medium truncate">Verified pre-owned</p>
-          </div>
-        </Link>
-
-        {/* 3. Sell Tractor */}
-        <Link
-          href="/sell-used-tractor"
-          className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
-        >
-          <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
-            <CircleDollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-green)] truncate">
-              Sell Tractor
-            </p>
-            <p className="text-muted text-[10px] font-medium truncate">Best price offer</p>
-          </div>
-        </Link>
-
-        {/* 4. Tractor Loan */}
-        <Link
-          href="/loan"
-          className="group flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-orange)]/40 hover:bg-[var(--color-brand-orange)]/10 hover:shadow-sm"
-        >
-          <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] transition-transform duration-200 group-hover:scale-110">
-            <Landmark className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-orange)] truncate">
-              Tractor Loan
-            </p>
-            <p className="text-muted text-[10px] font-medium truncate">Low interest EMI</p>
-          </div>
-        </Link>
-
-        {/* 5. Implements (Full Width 5th item) */}
-        <Link
-          href="/implements"
-          className="group col-span-2 flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2 sm:p-2.5 transition-all duration-200 hover:border-[var(--color-brand-green)]/40 hover:bg-[var(--color-brand-green)]/10 hover:shadow-sm"
-        >
-          <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform duration-200 group-hover:scale-110">
-            <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between">
-              <p className="text-foreground text-xs font-bold transition-colors group-hover:text-[var(--color-brand-green)]">
-                Implements & Tools
-              </p>
-              <span className="text-[10px] font-semibold text-[var(--color-brand-green)]">
-                Explore All &rarr;
-              </span>
-            </div>
-            <p className="text-muted text-[10px] font-medium truncate">
-              Rotavators, cultivators, trolleys & farm equipment
-            </p>
-          </div>
-        </Link>
-      </div>
     </div>
   );
 }
@@ -514,7 +412,7 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
               )}
 
               {/* Title & Banner CTA */}
-              <div className="mt-auto mb-3 sm:mb-4">
+              <div className="mt-auto mb-5 sm:mb-6 pb-1">
                 <h2 className="text-lg sm:text-xl font-black text-white leading-tight drop-shadow-sm">
                   Find the Perfect <span className="text-[var(--color-brand-green)]">Tractor</span>
                 </h2>

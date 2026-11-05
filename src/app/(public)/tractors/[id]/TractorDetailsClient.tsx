@@ -26,8 +26,6 @@ import {
 import { Tractor as TractorModel, TractorTeaser, tractorAPI } from '@/lib/api/tractors';
 import { CompareFrequencyRecord } from '@/lib/api/compare';
 import { useDetailAccess } from '@/hooks/leads/use-detail-access';
-import { DetailAccessGate, DetailGateSummary } from '@/components/leads/detail-access-gate';
-import { TractorLoader } from '@/components/ui/TractorLoader';
 import { generateTractorBrochurePdf } from '@/lib/utils/tractorBrochurePdf';
 
 function WhatsAppIcon({ className = 'w-5 h-5' }: { className?: string }) {
@@ -56,25 +54,9 @@ const formatEnum = (val: string | undefined | null) => {
 const formatLakh = (price: number) =>
   price >= 100000 ? `${(price / 100000).toFixed(2)} Lakh` : price.toLocaleString('en-IN');
 
-/** What the lead gate shows about the tractor. Only teaser fields, so nothing gated is shown. */
-function tractorGateSummary(teaser: TractorTeaser): DetailGateSummary {
-  const isImage = (m: { mediaType: string }) => m.mediaType !== 'VIDEO' && m.mediaType !== 'PDF';
-  const image = teaser.media?.find((m) => m.isPrimary && isImage(m)) ?? teaser.media?.find(isImage);
-  const price = Number(teaser.exShowroomPriceMin);
-  const driveLabel = teaser.driveType === 'FOUR_WD' ? '4WD' : teaser.driveType === 'TWO_WD' ? '2WD' : null;
-
-  return {
-    eyebrow: teaser.brand?.name,
-    title: teaser.modelName,
-    imageUrl: image?.url ?? null,
-    priceLabel: price ? `Ex-showroom from ₹ ${formatLakh(price)}` : 'Price on request',
-    chips: [teaser.hp ? `${teaser.hp} HP` : null, driveLabel].filter((chip): chip is string => Boolean(chip)),
-  };
-}
-
 /**
- * Full tractor details, behind the lead gate. The teaser is public. The full record loads from the API,
- * which answers 403 until the visitor is signed in or has submitted the enquiry for this tractor.
+ * Tractor details page. Information loads directly for all visitors (guests and logged-in users).
+ * Complete specs, prices, and media are auto-retrieved and displayed without blocking modal gates.
  */
 export default function TractorDetailsClient({
   teaser,
@@ -85,43 +67,30 @@ export default function TractorDetailsClient({
   rivals: CompareFrequencyRecord[];
   similarTractors: TractorModel[];
 }) {
-  const { state, unlock } = useDetailAccess(teaser.id, tractorAPI.getTractorById, 'TRACTOR');
+  const { state } = useDetailAccess(teaser.id, tractorAPI.getTractorById, 'TRACTOR');
 
-  if (state.status === 'granted') {
-    return <TractorDetailsView tractor={state.data} rivals={rivals} similarTractors={similarTractors} />;
+  if (state.status === 'unavailable') {
+    return (
+      <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
+        <Link
+          href="/tractors"
+          className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
+        >
+          <ArrowLeft size={16} /> Back to Catalog
+        </Link>
+        <p className="text-muted py-24 text-center font-bold">This tractor is no longer available.</p>
+      </div>
+    );
   }
 
-  return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/tractors"
-        className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
-      >
-        <ArrowLeft size={16} /> Back to Catalog
-      </Link>
+  const activeTractor = (state.status === 'granted' ? state.data : teaser) as TractorModel;
 
-      {state.status === 'loading' && (
-        <div className="flex justify-center py-24">
-          <TractorLoader size={48} />
-        </div>
-      )}
-      {state.status === 'locked' && (
-        <DetailAccessGate
-          targetType="TRACTOR"
-          targetId={teaser.id}
-          summary={tractorGateSummary(teaser)}
-          onUnlock={unlock}
-        />
-      )}
-      {state.status === 'unavailable' && (
-        <p className="text-muted py-24 text-center font-bold">This tractor is no longer available.</p>
-      )}
-      {state.status === 'error' && (
-        <p className="text-muted py-24 text-center font-bold">
-          We could not load this tractor. Please refresh the page and try again.
-        </p>
-      )}
-    </div>
+  return (
+    <TractorDetailsView
+      tractor={activeTractor}
+      rivals={rivals}
+      similarTractors={similarTractors}
+    />
   );
 }
 
@@ -138,6 +107,12 @@ function TractorDetailsView({
   const [selectedState, setSelectedState] = useState<string>(
     tractor.priceByState?.[0]?.state || ''
   );
+
+  useEffect(() => {
+    if (!selectedState && tractor.priceByState && tractor.priceByState.length > 0) {
+      setSelectedState(tractor.priceByState[0].state);
+    }
+  }, [tractor.priceByState, selectedState]);
 
   const formatPrice = (price: number | null | undefined) => {
     if (!price) return 'Price on Request';
@@ -238,22 +213,22 @@ function TractorDetailsView({
     : null;
 
   return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
       {/* Back button */}
       <Link
         href="/tractors"
-        className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
+        className="text-muted hover:text-foreground bg-background/50 mb-4 sm:mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
       >
-        <ArrowLeft size={16} /> Back to Catalog
+        <ArrowLeft size={15} /> Back to Catalog
       </Link>
 
-      <div className="flex flex-col gap-10 lg:flex-row">
+      <div className="flex flex-col gap-6 lg:gap-10 lg:flex-row">
         {/* LEFT COLUMN: Gallery & Main Specs */}
-        <div className="flex w-full flex-col gap-8 lg:w-[60%]">
+        <div className="flex w-full flex-col gap-6 lg:gap-8 lg:w-[60%]">
           {/* MEDIA GALLERY */}
-          <div className="spatial-panel flex flex-col gap-4 rounded-[2.5rem] p-4">
+          <div className="spatial-panel flex flex-col gap-3 sm:gap-4 rounded-[2rem] sm:rounded-[2.5rem] p-3 sm:p-4">
             {/* Main Image */}
-            <div className="from-foreground/5 group relative flex h-[400px] w-full items-center justify-center overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] bg-gradient-to-br to-transparent md:h-[500px]">
+            <div className="from-foreground/5 group relative flex h-[280px] sm:h-[380px] md:h-[480px] w-full items-center justify-center overflow-hidden rounded-[1.75rem] sm:rounded-[2rem] border border-[var(--border-subtle)] bg-gradient-to-br to-transparent">
               <div className="absolute top-4 right-4 z-20 flex flex-col gap-2" ref={shareDropdownRef}>
                 <button
                   type="button"
@@ -389,7 +364,7 @@ function TractorDetailsView({
                   <img
                     src={activeMediaUrl}
                     alt={activeMedia.altText || tractor.modelName}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-105"
                   />
                 )
               ) : (

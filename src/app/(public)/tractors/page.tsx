@@ -21,9 +21,13 @@ import {
   Sparkles,
   Check,
   RotateCcw,
+  Layers,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { tractorAPI, Tractor as TractorModel } from '@/lib/api/tractors';
 import { brandAPI, Brand } from '@/lib/api/brands';
+import { tractorFamilyAPI, TractorFamily } from '@/lib/api/tractorFamilies';
 
 function TractorsListingContent() {
   const searchParams = useSearchParams();
@@ -42,6 +46,9 @@ function TractorsListingContent() {
   const [searchQuery, setSearchQuery] = useState(searchQueryParam || '');
   const [selectedBrand, setSelectedBrand] = useState<number | ''>('');
   const [selectedFamily, setSelectedFamily] = useState<number | ''>('');
+  const [families, setFamilies] = useState<TractorFamily[]>([]);
+  const [loadingFamilies, setLoadingFamilies] = useState(false);
+  const [isFamiliesExpanded, setIsFamiliesExpanded] = useState(true);
   const [selectedHp, setSelectedHp] = useState<string>(hpQueryParam || '');
   const [selectedDrive, setSelectedDrive] = useState<string>('');
   const [selectedFuel, setSelectedFuel] = useState<string>('');
@@ -113,6 +120,40 @@ function TractorsListingContent() {
       }
     };
     fetchBrandDetails();
+  }, [selectedBrand]);
+
+  // 1.75 Fetch Families for Selected Brand
+  useEffect(() => {
+    if (!selectedBrand) {
+      setFamilies([]);
+      setSelectedFamily('');
+      return;
+    }
+
+    let isMounted = true;
+    const fetchFamilies = async () => {
+      setLoadingFamilies(true);
+      try {
+        const res = await tractorFamilyAPI.getFamiliesByBrand(selectedBrand as number, {
+          isActive: 'true',
+          limit: 100,
+        });
+        if (isMounted && res.success) {
+          const items = res.data?.items || [];
+          setFamilies(items);
+        }
+      } catch (err) {
+        console.error('Failed to load tractor families', err);
+        if (isMounted) setFamilies([]);
+      } finally {
+        if (isMounted) setLoadingFamilies(false);
+      }
+    };
+
+    fetchFamilies();
+    return () => {
+      isMounted = false;
+    };
   }, [selectedBrand]);
 
   // 2. Fetch Tractors based on filters
@@ -200,13 +241,29 @@ function TractorsListingContent() {
   const activeFiltersCount = useMemo(() => {
     return [
       selectedBrand !== '',
+      selectedFamily !== '',
       selectedHp !== '',
       selectedDrive !== '',
       selectedFuel !== '',
       selectedPrice !== '',
       searchQuery.trim() !== '',
     ].filter(Boolean).length;
-  }, [selectedBrand, selectedHp, selectedDrive, selectedFuel, selectedPrice, searchQuery]);
+  }, [selectedBrand, selectedFamily, selectedHp, selectedDrive, selectedFuel, selectedPrice, searchQuery]);
+
+  const handleSelectFamily = (familyId: number | '') => {
+    const nextFamily = selectedFamily === familyId ? '' : familyId;
+    setSelectedFamily(nextFamily);
+    setPage(1);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (nextFamily !== '') {
+        url.searchParams.set('family', String(nextFamily));
+      } else {
+        url.searchParams.delete('family');
+      }
+      window.history.replaceState(null, '', url.pathname + (url.search ? url.search : ''));
+    }
+  };
 
   const handleClearAll = () => {
     setSelectedBrand('');
@@ -217,6 +274,9 @@ function TractorsListingContent() {
     setSelectedPrice('');
     setSearchQuery('');
     setPage(1);
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   };
 
   const formatPrice = (price: number | null | undefined) => {
@@ -233,7 +293,7 @@ function TractorsListingContent() {
   };
 
   return (
-    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pt-20 sm:pt-24 lg:pt-28 pb-24 sm:px-6 lg:px-8">
       {/* ===================== HERO / BANNER SECTION ===================== */}
       {activeBrandDetails ? (
         <div className="relative mb-5 sm:mb-8 md:mb-10 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white/80 to-amber-500/10 dark:from-emerald-950/40 dark:via-[#111713]/90 dark:to-amber-950/30 p-4 sm:p-6 md:p-10 lg:p-12 shadow-lg dark:shadow-2xl backdrop-blur-xl">
@@ -543,6 +603,63 @@ function TractorsListingContent() {
               </div>
             </div>
 
+            {/* Filter: Series / Families (when brand is selected) */}
+            {selectedBrand !== '' && families.length > 0 && (
+              <div className="flex flex-col gap-2.5 border-t border-black/5 dark:border-white/5 pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted text-[11px] font-black tracking-widest uppercase">
+                    Series / Family
+                  </span>
+                  {selectedFamily !== '' && (
+                    <button
+                      onClick={() => handleSelectFamily('')}
+                      className="text-[10px] font-bold text-[var(--color-brand-orange)] hover:underline"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="custom-scrollbar flex max-h-48 flex-col gap-1 overflow-y-auto pr-1">
+                  <button
+                    onClick={() => handleSelectFamily('')}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-bold transition-all ${
+                      selectedFamily === ''
+                        ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                        : 'text-foreground/80 hover:bg-black/5 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <span>All Families</span>
+                    {selectedFamily === '' && <Check size={15} strokeWidth={2.5} />}
+                  </button>
+
+                  {families.map((family) => {
+                    const isSelected = selectedFamily === family.id;
+                    return (
+                      <button
+                        key={family.id}
+                        onClick={() => handleSelectFamily(family.id)}
+                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-bold transition-all ${
+                          isSelected
+                            ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                            : 'text-foreground/80 hover:bg-black/5 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <span className="truncate">{family.name}</span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {family.tractorCount !== undefined && family.tractorCount > 0 && (
+                            <span className={`text-xs font-bold ${isSelected ? 'text-white/80' : 'text-muted'}`}>
+                              ({family.tractorCount})
+                            </span>
+                          )}
+                          {isSelected && <Check size={15} strokeWidth={2.5} />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Filter: HP Range */}
             <div className="flex flex-col gap-2.5 border-t border-black/5 dark:border-white/5 pt-4">
               <span className="text-muted text-[11px] font-black tracking-widest uppercase">
@@ -703,8 +820,26 @@ function TractorsListingContent() {
                       <button
                         onClick={() => {
                           setSelectedBrand('');
+                          setSelectedFamily('');
                           setPage(1);
+                          if (typeof window !== 'undefined') {
+                            const url = new URL(window.location.href);
+                            url.searchParams.delete('brand');
+                            url.searchParams.delete('family');
+                            window.history.replaceState(null, '', url.pathname + (url.search ? url.search : ''));
+                          }
                         }}
+                        className="hover:text-[var(--color-brand-orange)]"
+                      >
+                        <X size={12} strokeWidth={2.5} />
+                      </button>
+                    </span>
+                  )}
+                  {selectedFamily !== '' && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-xs font-bold text-[var(--color-brand-green)]">
+                      {families.find((f) => f.id === selectedFamily)?.name || 'Series'}
+                      <button
+                        onClick={() => handleSelectFamily('')}
                         className="hover:text-[var(--color-brand-orange)]"
                       >
                         <X size={12} strokeWidth={2.5} />
@@ -855,6 +990,116 @@ function TractorsListingContent() {
             </div>
           </div>
 
+          {/* ===================== TRACTOR FAMILIES / SERIES SELECTOR ===================== */}
+          {selectedBrand !== '' && (loadingFamilies || families.length > 0) && (
+            <div className="animate-fade-in flex flex-col gap-3 rounded-[1.75rem] border border-black/8 dark:border-white/10 bg-white/85 dark:bg-[#121814]/90 p-4 shadow-sm backdrop-blur-xl">
+              {/* Header Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsFamiliesExpanded((prev) => !prev)}
+                  className="flex items-center gap-2.5 text-left group cursor-pointer"
+                  title="Click to toggle families"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform group-hover:scale-105">
+                    <Layers size={17} />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-black text-foreground">
+                      {activeBrandDetails?.name ? `${activeBrandDetails.name} Series & Families` : 'Tractor Families'}
+                    </span>
+                    {families.length > 0 && (
+                      <span className="rounded-full bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-[11px] font-black text-[var(--color-brand-green)]">
+                        {families.length} Series
+                      </span>
+                    )}
+                    {selectedFamily !== '' && (
+                      <span className="rounded-full bg-[var(--color-brand-orange)]/15 px-2.5 py-0.5 text-[11px] font-black text-[var(--color-brand-orange)]">
+                        {families.find((f) => f.id === selectedFamily)?.name || 'Filtered'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-muted ml-0.5 transition-transform">
+                    {isFamiliesExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </div>
+                </button>
+
+                {selectedFamily !== '' && (
+                  <button
+                    type="button"
+                    onClick={() => handleSelectFamily('')}
+                    className="text-xs font-bold text-muted hover:text-[var(--color-brand-orange)] transition-colors underline underline-offset-2"
+                  >
+                    View All {activeBrandDetails?.name || ''} Models
+                  </button>
+                )}
+              </div>
+
+              {/* Families Chips / Cards */}
+              {isFamiliesExpanded && (
+                <div className="pt-1">
+                  {loadingFamilies ? (
+                    <div className="flex flex-wrap items-center gap-2 py-1">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div
+                          key={i}
+                          className="h-9 w-28 animate-pulse rounded-full bg-black/5 dark:bg-white/5"
+                        />
+                      ))}
+                    </div>
+                  ) : families.length > 0 ? (
+                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                      {/* All Models / All Families Pill */}
+                      <button
+                        type="button"
+                        onClick={() => handleSelectFamily('')}
+                        className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition-all cursor-pointer ${
+                          selectedFamily === ''
+                            ? 'bg-[var(--color-brand-green)] text-white shadow-md shadow-[var(--color-brand-green)]/20 ring-2 ring-[var(--color-brand-green)]/40'
+                            : 'border border-black/8 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground'
+                        }`}
+                      >
+                        <span>All {activeBrandDetails?.name || 'Brand'} Models</span>
+                        {selectedFamily === '' && <Check size={13} strokeWidth={2.5} />}
+                      </button>
+
+                      {/* Each Family Pill */}
+                      {families.map((family) => {
+                        const isSelected = selectedFamily === family.id;
+                        return (
+                          <button
+                            key={family.id}
+                            type="button"
+                            onClick={() => handleSelectFamily(family.id)}
+                            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-[var(--color-brand-green)] text-white shadow-md shadow-[var(--color-brand-green)]/20 ring-2 ring-[var(--color-brand-green)]/40'
+                                : 'border border-black/8 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground hover:border-[var(--color-brand-green)]/40'
+                            }`}
+                          >
+                            <span>{family.name}</span>
+                            {family.tractorCount !== undefined && family.tractorCount > 0 && (
+                              <span
+                                className={`rounded-full px-2 py-0.5 text-[10px] font-black ${
+                                  isSelected
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-black/5 dark:bg-white/10 text-muted'
+                                }`}
+                              >
+                                {family.tractorCount}
+                              </span>
+                            )}
+                            {isSelected && <Check size={13} strokeWidth={2.5} />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* ===================== LISTINGS / CARDS ===================== */}
           {loading ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -930,7 +1175,7 @@ function TractorsListingContent() {
                           <img
                             src={primaryImage}
                             alt={tractor.modelName}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-108"
+                            className="h-full w-full object-contain p-2.5 transition-transform duration-500 group-hover/img:scale-108"
                           />
                         ) : (
                           <div className="flex flex-col items-center justify-center gap-2">
@@ -1028,7 +1273,7 @@ function TractorsListingContent() {
                         <img
                           src={primaryImage}
                           alt={tractor.modelName}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-108"
+                          className="h-full w-full object-contain p-2.5 transition-transform duration-500 group-hover/img:scale-108"
                         />
                       ) : (
                         <div className="flex flex-col items-center justify-center gap-2">
