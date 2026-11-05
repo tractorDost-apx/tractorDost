@@ -201,12 +201,6 @@ export default function TractorForm({
 
     // If the user has entered any spec data (or it's an edit with existing specs), we must validate the mandatory spec fields
     if (hasSpecData) {
-      if (!spec.engineCc) {
-        setTouched((prev) => ({ ...prev, spec_engineCc: true }));
-        setActiveTab('specs');
-        toast.warning('Engine CC is required in Specifications.');
-        return;
-      }
       if (!spec.cylinders) {
         setTouched((prev) => ({ ...prev, spec_cylinders: true }));
         setActiveTab('specs');

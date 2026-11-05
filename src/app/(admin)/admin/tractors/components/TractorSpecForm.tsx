@@ -155,7 +155,6 @@ export default function TractorSpecForm({ spec, onChange, touched }: TractorSpec
           type="number"
           spec={spec}
           handleChange={handleChange}
-          required
           touched={touched}
         />
         <InputField
