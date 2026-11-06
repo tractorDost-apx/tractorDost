@@ -673,7 +673,7 @@ export default function UsedTractorDetailPage({
 
         {/* RIGHT COLUMN: Sticky Price Card & Inquiry Form */}
         <div className="relative lg:col-span-4">
-          <div className="sticky top-28 space-y-6">
+          <div className="lg:sticky lg:top-28 space-y-6">
             {/* Pricing Box */}
             <div className="bg-foreground text-background relative overflow-hidden rounded-[2rem] p-6 sm:p-8 shadow-2xl">
               <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-[var(--color-brand-green)] opacity-20 blur-[50px]"></div>

@@ -12,6 +12,8 @@ try {
   // Delete corrupted .next cache types to fix the validator.ts bug
   const nextCacheDir = path.join(process.cwd(), '.next', 'types');
   if (fs.existsSync(nextCacheDir)) fs.rmSync(nextCacheDir, { recursive: true, force: true });
+  const nextDevCacheDir = path.join(process.cwd(), '.next', 'dev', 'types');
+  if (fs.existsSync(nextDevCacheDir)) fs.rmSync(nextDevCacheDir, { recursive: true, force: true });
 } catch (e) {
   // Ignore
 }

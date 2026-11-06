@@ -504,7 +504,7 @@ function TractorsListingContent() {
             showFilters ? 'block' : 'hidden lg:block'
           }`}
         >
-          <div className="sticky top-28 flex flex-col gap-6 rounded-[2rem] border border-black/8 dark:border-white/10 bg-white/90 dark:bg-[#121814]/90 p-6 shadow-xl backdrop-blur-xl">
+          <div className="lg:sticky lg:top-28 flex flex-col gap-6 rounded-[2rem] border border-black/8 dark:border-white/10 bg-white/90 dark:bg-[#121814]/90 p-6 shadow-xl backdrop-blur-xl">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-4">
               <div className="flex items-center gap-2">

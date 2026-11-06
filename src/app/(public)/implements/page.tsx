@@ -505,7 +505,7 @@ function ImplementsListingContent() {
         <aside
           className={`flex w-full flex-shrink-0 flex-col gap-6 lg:w-72 ${showFilters ? 'flex' : 'hidden lg:flex'}`}
         >
-          <div className="spatial-panel sticky top-24 flex flex-col gap-8 rounded-[2rem] p-6">
+          <div className="spatial-panel lg:sticky lg:top-24 flex flex-col gap-8 rounded-[2rem] p-6">
             <div className="flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-xl font-black tracking-tight">
                 <Filter size={18} className="text-[var(--color-brand-green)]" /> Filters

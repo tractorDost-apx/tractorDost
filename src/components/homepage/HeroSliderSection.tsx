@@ -265,9 +265,9 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
   const [inView, setInView] = useState(false);
   const countedImpressions = useRef<Set<number>>(new Set());
 
-  // Touch swipe support for mobile
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+  // Touch swipe support for mobile (using refs to avoid re-renders on touchmove)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const touchEndRef = useRef<{ x: number; y: number } | null>(null);
 
   const activeSlide = slides[currentSlide];
   const cta = activeSlide.cta;
@@ -284,25 +284,41 @@ export default function HeroSliderSection({ banners = NO_BANNERS }: HeroSliderSe
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsPaused(true);
-    setTouchStartX(e.targetTouches[0].clientX);
+    touchStartRef.current = {
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    };
+    touchEndRef.current = null;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEndX(e.targetTouches[0].clientX);
+    touchEndRef.current = {
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    };
   };
 
   const handleTouchEnd = () => {
     setIsPaused(false);
-    if (touchStartX === null || touchEndX === null) return;
-    const distance = touchStartX - touchEndX;
-    const minSwipeDistance = 40;
-    if (distance > minSwipeDistance) {
-      nextSlide();
-    } else if (distance < -minSwipeDistance) {
-      prevSlide();
+    if (!touchStartRef.current || !touchEndRef.current) {
+      touchStartRef.current = null;
+      touchEndRef.current = null;
+      return;
     }
-    setTouchStartX(null);
-    setTouchEndX(null);
+    const diffX = touchStartRef.current.x - touchEndRef.current.x;
+    const diffY = touchStartRef.current.y - touchEndRef.current.y;
+    const minSwipeDistance = 45;
+
+    // Only switch slide if user made an intentional horizontal swipe, not a vertical scroll gesture
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > minSwipeDistance) {
+      if (diffX > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+    touchStartRef.current = null;
+    touchEndRef.current = null;
   };
 
   // An impression counts only while at least half of the hero is on screen, once per banner per page load.

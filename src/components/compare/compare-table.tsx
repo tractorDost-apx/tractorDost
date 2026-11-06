@@ -24,7 +24,7 @@ export default function CompareTable({ tractors, onAddMore }: CompareTableProps)
         setIsSticky(rect.top < -200 && rect.bottom > 200);
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

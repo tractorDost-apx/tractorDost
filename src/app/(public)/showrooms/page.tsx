@@ -189,7 +189,7 @@ export default function ShowroomsPage() {
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Left Column: Filters */}
         <div className={`animate-slide-in flex w-full flex-col gap-6 lg:w-1/4 ${showMobileFilters ? 'flex' : 'hidden lg:flex'}`}>
-          <div className="spatial-panel bg-background/50 sticky top-24 rounded-3xl border border-[var(--border-subtle)] p-6 backdrop-blur-xl">
+          <div className="spatial-panel bg-background/50 lg:sticky lg:top-24 rounded-3xl border border-[var(--border-subtle)] p-6 backdrop-blur-xl">
             <div className="text-foreground mb-6 flex items-center justify-between font-black">
               <div className="flex items-center gap-2">
                 <Filter size={18} />

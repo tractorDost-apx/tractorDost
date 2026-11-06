@@ -144,7 +144,7 @@ function TractorDetailsView({
 
     if (isShareOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
       document.addEventListener('keydown', handleKeyDown);
     }
 
@@ -728,7 +728,7 @@ function TractorDetailsView({
         {/* RIGHT COLUMN: Sticky Information & Leads */}
         <div className="relative flex w-full flex-col gap-8 lg:w-[40%]">
           {/* "At a Glance" & Pricing Banner */}
-          <div className="spatial-panel group sticky top-24 flex flex-col gap-6 overflow-hidden rounded-[2.5rem] border border-[var(--color-brand-green)]/20 p-8 shadow-2xl md:p-10">
+          <div className="spatial-panel group lg:sticky lg:top-24 flex flex-col gap-6 overflow-hidden rounded-[2.5rem] border border-[var(--color-brand-green)]/20 p-8 shadow-2xl md:p-10">
             <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-[var(--color-brand-orange)]/10 blur-[50px] transition-all duration-1000 group-hover:bg-[var(--color-brand-orange)]/20" />
 
             <div className="flex flex-col gap-1">

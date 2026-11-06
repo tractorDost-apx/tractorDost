@@ -219,7 +219,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`${geistSans.variable} ${geistMono.variable} min-h-full`}
       suppressHydrationWarning
     >
       <head>
@@ -249,7 +249,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className="relative flex min-h-screen flex-col overflow-x-hidden selection:bg-[var(--color-spatial-accent-blue)] selection:text-white"
+        className="relative flex min-h-screen min-h-[100dvh] flex-col overflow-x-clip selection:bg-[var(--color-spatial-accent-blue)] selection:text-white"
       >
         <SplashScreen />
         <AuthProvider>

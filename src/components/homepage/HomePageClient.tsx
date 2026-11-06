@@ -282,7 +282,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           <div
             ref={brandScrollRef}
             onScroll={checkBrandScroll}
-            className="flex w-full items-start gap-3 sm:gap-4 lg:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory touch-pan-x py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+            className="flex w-full items-start gap-3 sm:gap-4 lg:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
           >
             {loading
               ? Array.from({ length: 8 }).map((_, i) => (
@@ -451,7 +451,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
             <div
               ref={blogScrollRef}
               onScroll={checkBlogScroll}
-              className="flex w-full items-stretch gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory touch-pan-x py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+              className="flex w-full items-stretch gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
             >
               {posts.map((post) => {
                 const postHref = post.postType === 'NEWS' ? `/news/${post.slug}` : `/blogs/${post.slug}`;
@@ -775,7 +775,7 @@ function TractorCarouselSection({
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory touch-pan-x py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+        className="flex w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
       >
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -971,7 +971,7 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory touch-pan-x py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+        className="flex w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
       >
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (

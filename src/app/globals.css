@@ -123,6 +123,10 @@
     0 20px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.04);
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -132,7 +136,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 
-  @apply min-h-screen overflow-x-hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Ambient Glowing Orbs - Living Background */
@@ -147,6 +154,20 @@ body::after {
   z-index: -1;
   pointer-events: none;
   transition: opacity 1s ease-out;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+/* On mobile, disable expensive continuous full-screen rotation animations to maintain 60/120fps scrolling */
+@media (max-width: 768px) {
+  body::before,
+  body::after {
+    animation: none !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 }
 
 /* Green Orb */
@@ -475,8 +496,10 @@ html.hide-splash #splash-screen {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-/* Hide scrollbar for IE, Edge and Firefox */
+/* Hide scrollbar for IE, Edge and Firefox with smooth momentum touch support */
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
