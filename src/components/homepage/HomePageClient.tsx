@@ -518,7 +518,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           <div
             ref={brandScrollRef}
             onScroll={checkBrandScroll}
-            className="flex w-full items-start gap-3 sm:gap-4 lg:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+            className="flex w-[calc(100%+1.75rem)] sm:w-full items-start gap-3 sm:gap-4 lg:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
           >
             {loading
               ? Array.from({ length: 8 }).map((_, i) => (
@@ -557,6 +557,8 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                   </span>
                 </Link>
               ))}
+            {/* End spacer for mobile scroll so the last item has right padding */}
+            <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
           </div>
         </section>
 
@@ -687,7 +689,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
             <div
               ref={blogScrollRef}
               onScroll={checkBlogScroll}
-              className="flex w-full items-stretch gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+              className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
             >
               {posts.map((post) => {
                 const postHref = post.postType === 'NEWS' ? `/news/${post.slug}` : `/blogs/${post.slug}`;
@@ -762,6 +764,8 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                   </Link>
                 );
               })}
+              {/* End spacer for mobile scroll so the last item has right padding */}
+              <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
             </div>
           </section>
         )}
@@ -1011,7 +1015,7 @@ function TractorCarouselSection({
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+        className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
       >
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -1100,6 +1104,8 @@ function TractorCarouselSection({
                 </Link>
               );
             })}
+        {/* End spacer for mobile scroll so the last item has right padding */}
+        <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
       </div>
     </section>
   );
@@ -1207,7 +1213,7 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5"
+        className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
       >
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -1290,6 +1296,8 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
                 </Link>
               );
             })}
+        {/* End spacer for mobile scroll so the last item has right padding */}
+        <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
       </div>
     </section>
   );
