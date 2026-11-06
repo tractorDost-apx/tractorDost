@@ -349,11 +349,11 @@ function SellUsedTractorForm() {
     <div className="bg-background min-h-screen pb-16">
       <div className="mx-auto max-w-4xl px-4">
         {/* Header */}
-        <div className="mb-10 text-center">
-          <h1 className="mb-4 text-4xl font-black tracking-tight uppercase md:text-5xl">
+        <div className="mb-8 sm:mb-10 text-center">
+          <h1 className="mb-2 sm:mb-4 text-2xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase leading-tight">
             Sell Your <span className="text-[var(--color-brand-green)]">Tractor</span>
           </h1>
-          <p className="text-muted mx-auto max-w-2xl font-medium">
+          <p className="text-muted mx-auto max-w-2xl text-xs sm:text-base font-medium leading-relaxed">
             Get the best price for your used tractor. Fill in the details below to list it on
             Tractor Dost, India's largest tractor marketplace.
           </p>

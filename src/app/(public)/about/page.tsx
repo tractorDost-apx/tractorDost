@@ -64,10 +64,10 @@ export default function AboutPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <Sparkles size={14} /> Our Mission & Story
           </div>
-          <h1 className="text-foreground text-4xl leading-tight font-extrabold tracking-tight md:text-6xl">
+          <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
             Mechanizing Bharat, <span className="text-[var(--color-brand-green)]">One Tractor</span> at a Time
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs sm:text-base md:text-lg leading-relaxed font-medium">
             TractorDost is India's leading digital agricultural machinery platform, bridging the gap between farmers, tractor manufacturers, authorized dealerships, and financial institutions.
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function AboutPage() {
       </section>
 
       {/* Metrics Banner */}
-      <div className="mb-20 grid grid-cols-2 gap-4 rounded-3xl border border-border/50 bg-card/60 p-8 shadow-xl backdrop-blur-xl sm:grid-cols-4">
+      <div className="mb-20 grid grid-cols-2 gap-3 sm:gap-4 rounded-3xl border border-border/50 bg-card/60 p-4 sm:p-6 md:p-8 shadow-xl backdrop-blur-xl sm:grid-cols-4">
         {STATS.map((stat, idx) => (
           <div key={idx} className="text-center">
             <div className="text-3xl font-black text-[var(--color-brand-green)] md:text-4xl">

@@ -28,44 +28,6 @@ interface HomePageClientProps {
 }
 
 /**
- * Fetch tractors across multiple pages up to limit: 100 per page
- * to gather an ample catalog of tractors across all brands.
- */
-async function fetchTractorsPool(params: GetTractorsParams = {}): Promise<TractorModel[]> {
-  try {
-    const page1Res = await tractorAPI.getAllTractors({ ...params, page: 1, limit: 100 }).catch(() => null);
-    if (!page1Res?.success || !page1Res.data) return [];
-
-    const list: TractorModel[] = (page1Res.data.tractors || page1Res.data.data || []) as TractorModel[];
-    const totalPages =
-      page1Res.data.pagination?.totalPages ||
-      page1Res.data.totalPages ||
-      1;
-
-    if (totalPages > 1) {
-      const extraPageNums = Array.from(
-        { length: Math.min(totalPages - 1, 4) },
-        (_, i) => i + 2
-      );
-      const extraRes = await Promise.all(
-        extraPageNums.map((p) =>
-          tractorAPI.getAllTractors({ ...params, page: p, limit: 100 }).catch(() => null)
-        )
-      );
-      extraRes.forEach((r) => {
-        if (r?.success && r.data) {
-          const items = (r.data.tractors || r.data.data || []) as TractorModel[];
-          list.push(...items);
-        }
-      });
-    }
-    return list;
-  } catch {
-    return [];
-  }
-}
-
-/**
  * Orders a list of tractors such that they strictly follow the sequence
  * of the top brands (e.g. Mahindra, Swaraj, Sonalika, TAFE, Massey Ferguson, John Deere, Eicher, Kubota...)
  * using a round-robin interleaving so that each top brand is represented in order,
@@ -207,6 +169,21 @@ function arrangeTractorsByTopBrandSequence(
   return result;
 }
 
+interface HomeDataCache {
+  featured: TractorModel[];
+  popular: TractorModel[];
+  upcoming: TractorModel[];
+  latest: TractorModel[];
+  implementsList: Implement[];
+  brands: Brand[];
+  comparisons: CompareFrequencyRecord[];
+  posts: ContentPost[];
+  timestamp: number;
+}
+
+let cachedHomeData: HomeDataCache | null = null;
+const CACHE_LIFETIME_MS = 2 * 60 * 1000; // 2 minutes in-memory cache
+
 export default function HomePageClient({ children, banners }: HomePageClientProps) {
   const [featuredTractors, setFeaturedTractors] = useState<TractorModel[]>([]);
   const [popularTractors, setPopularTractors] = useState<TractorModel[]>([]);
@@ -233,7 +210,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
   const scrollBrands = (direction: 'left' | 'right') => {
     const el = brandScrollRef.current;
     if (!el) return;
-    const scrollAmount = Math.max(280, el.clientWidth * 0.75);
+    const scrollAmount = el.clientWidth;
     el.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
@@ -261,7 +238,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
   const scrollBlogs = (direction: 'left' | 'right') => {
     const el = blogScrollRef.current;
     if (!el) return;
-    const scrollAmount = Math.max(300, el.clientWidth * 0.75);
+    const scrollAmount = el.clientWidth;
     el.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
@@ -276,29 +253,40 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
 
   useEffect(() => {
     const fetchHomeData = async () => {
+      // 1. Instant Cache hit check (0ms load on back/navigation)
+      if (cachedHomeData && Date.now() - cachedHomeData.timestamp < CACHE_LIFETIME_MS) {
+        setFeaturedTractors(cachedHomeData.featured);
+        setPopularTractors(cachedHomeData.popular);
+        setUpcomingTractors(cachedHomeData.upcoming);
+        setLatestTractors(cachedHomeData.latest);
+        setImplementsList(cachedHomeData.implementsList);
+        setBrands(cachedHomeData.brands);
+        setComparisons(cachedHomeData.comparisons);
+        setPosts(cachedHomeData.posts);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
+        // 2. High-Performance Parallel Batch: Only 6 concurrent queries instead of 23+
         const [
           brandsRes,
-          allTractorsRaw,
-          popularRaw,
-          upcomingRaw,
-          latestRaw,
+          tractorsRes,
+          upcomingRes,
           implementsRes,
           compareRes,
           postsRes,
         ] = await Promise.all([
           brandAPI.getAllBrands({ limit: 100, sortBy: 'sortOrder', sortOrder: 'asc' }).catch(() => null),
-          fetchTractorsPool(),
-          fetchTractorsPool({ launchStatus: LaunchStatus.POPULAR }),
-          fetchTractorsPool({ launchStatus: LaunchStatus.UPCOMING }),
-          fetchTractorsPool({ launchStatus: LaunchStatus.LATEST }),
+          tractorAPI.getAllTractors({ limit: 100, page: 1 }).catch(() => null),
+          tractorAPI.getAllTractors({ limit: 20, launchStatus: LaunchStatus.UPCOMING }).catch(() => null),
           implementAPI.getAllImplements({ limit: 10 }).catch(() => null),
           compareAPI.getFrequencyOfCompare({ limit: 3, sort: 'desc' }).catch(() => null),
           cmsAPI.getPosts({ limit: 8, status: 'PUBLISHED' }).catch(() => null),
         ]);
 
-        // 1. Process Brands and sort according to Explore Top Brands sequence
+        // Process Brands and sort according to Explore Top Brands sequence
         let sortedBrands: Brand[] = [];
         if (brandsRes?.success) {
           const bPayload = brandsRes.data as unknown as {
@@ -315,13 +303,30 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           setBrands(sortedBrands);
         }
 
-        // 2. Build consolidated pool of tractors
+        // Build consolidated pool of tractors
         const tractorMap = new Map<number, TractorModel>();
-        allTractorsRaw.forEach((t) => tractorMap.set(t.id, t));
+        const mainTractors = (
+          tractorsRes?.success
+            ? tractorsRes.data?.tractors || tractorsRes.data?.data || []
+            : []
+        ) as TractorModel[];
+        mainTractors.forEach((t) => tractorMap.set(t.id, t));
 
-        // If any of the top 10 brands don't have tractors in the initial pool, fetch their tractors explicitly
+        // Also add upcoming tractors to pool
+        const upcomingList = (
+          upcomingRes?.success
+            ? upcomingRes.data?.tractors || upcomingRes.data?.data || []
+            : []
+        ) as TractorModel[];
+        upcomingList.forEach((t) => {
+          if (!tractorMap.has(t.id)) {
+            tractorMap.set(t.id, t);
+          }
+        });
+
+        // If any of the top 8 brands don't have tractors in this pool, fetch only those missing ones
         if (sortedBrands.length > 0) {
-          const topBrandsToCheck = sortedBrands.slice(0, 10);
+          const topBrandsToCheck = sortedBrands.slice(0, 8);
           const missingBrandIds = topBrandsToCheck
             .filter((b) => !Array.from(tractorMap.values()).some((t) => t.brandId === b.id || t.brand?.id === b.id))
             .map((b) => b.id);
@@ -356,26 +361,16 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
         setFeaturedTractors(arrangedFeatured);
 
         // 4. Popular Tractors: Arranged strictly by Top Brands sequence
-        const popularMap = new Map<number, TractorModel>();
-        popularRaw.forEach((t) => popularMap.set(t.id, t));
-        const sortedByPopularity = [...consolidatedTractors].sort(
-          (a, b) => ((b.viewsCount || 0) + (b.leadsCount || 0) * 2) - ((a.viewsCount || 0) + (a.leadsCount || 0) * 2)
-        );
-        sortedByPopularity.forEach((t) => {
-          if (popularMap.size < 60) {
-            popularMap.set(t.id, t);
-          }
-        });
         const arrangedPopular = arrangeTractorsByTopBrandSequence(
-          Array.from(popularMap.values()),
+          consolidatedTractors,
           sortedBrands,
           { sortBy: 'popular' }
         );
         setPopularTractors(arrangedPopular);
 
         // 5. Upcoming Tractors: Arranged strictly by Top Brands sequence
-        const upcomingSource = upcomingRaw.length > 0
-          ? upcomingRaw
+        const upcomingSource = upcomingList.length > 0
+          ? upcomingList
           : consolidatedTractors.filter((t) => t.launchStatus === LaunchStatus.UPCOMING);
         const finalUpcoming = upcomingSource.length > 0
           ? upcomingSource
@@ -388,50 +383,51 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
         setUpcomingTractors(arrangedUpcoming);
 
         // 6. Latest Tractors: Arranged strictly by Top Brands sequence
-        const latestMap = new Map<number, TractorModel>();
-        latestRaw.forEach((t) => latestMap.set(t.id, t));
-        const sortedByNewest = [...consolidatedTractors].sort((a, b) => {
-          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          if (dateA !== dateB) return dateB - dateA;
-          return (b.id || 0) - (a.id || 0);
-        });
-        sortedByNewest.forEach((t) => {
-          if (latestMap.size < 60) {
-            latestMap.set(t.id, t);
-          }
-        });
         const arrangedLatest = arrangeTractorsByTopBrandSequence(
-          Array.from(latestMap.values()),
+          consolidatedTractors,
           sortedBrands,
           { sortBy: 'latest' }
         );
         setLatestTractors(arrangedLatest);
 
         // 7. Farm Equipment (Implements)
+        let impItems: Implement[] = [];
         if (implementsRes?.success && implementsRes.data) {
-          const impItems = (implementsRes.data.data || implementsRes.data.implements || []) as Implement[];
+          impItems = (implementsRes.data.data || implementsRes.data.implements || []) as Implement[];
           setImplementsList(impItems);
         }
 
         // 8. Comparisons
+        let compItems: CompareFrequencyRecord[] = [];
         if (compareRes?.success) {
           const cPayload = compareRes.data as unknown as
             | CompareFrequencyRecord[]
             | { records?: CompareFrequencyRecord[] };
-          setComparisons(
-            Array.isArray(cPayload)
-              ? cPayload
-              : cPayload?.records || []
-          );
+          compItems = Array.isArray(cPayload) ? cPayload : cPayload?.records || [];
+          setComparisons(compItems);
         }
 
         // 9. CMS Posts
+        let postItems: ContentPost[] = [];
         if (postsRes?.success && Array.isArray(postsRes?.data)) {
-          setPosts(postsRes.data);
+          postItems = postsRes.data;
+          setPosts(postItems);
         } else {
           setPosts([]);
         }
+
+        // Save to cache for instant future loads
+        cachedHomeData = {
+          featured: arrangedFeatured,
+          popular: arrangedPopular,
+          upcoming: arrangedUpcoming,
+          latest: arrangedLatest,
+          implementsList: impItems,
+          brands: sortedBrands,
+          comparisons: compItems,
+          posts: postItems,
+          timestamp: Date.now(),
+        };
       } catch (error) {
         console.error('Failed to load home data', error);
       } finally {
@@ -518,13 +514,13 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           <div
             ref={brandScrollRef}
             onScroll={checkBrandScroll}
-            className="flex w-[calc(100%+1.75rem)] sm:w-full items-start gap-3 sm:gap-4 lg:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
+            className="flex w-[calc(100%+1.75rem)] sm:w-full items-start gap-3 sm:gap-4 lg:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-0 scroll-pl-3.5 sm:scroll-pl-0 scroll-pr-3.5 sm:scroll-pr-0"
           >
             {loading
               ? Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="flex w-[125px] sm:w-[140px] lg:w-[155px] shrink-0 snap-start flex-col items-center gap-2.5"
+                  className="flex w-[calc((100%-2*0.75rem)/3)] sm:w-[calc((100%-3*1rem)/4)] md:w-[calc((100%-5*1rem)/6)] lg:w-[calc((100%-7*1.25rem)/8)] shrink-0 snap-start flex-col items-center gap-2.5"
                 >
                   <div className="bg-foreground/5 aspect-square w-full animate-pulse rounded-2xl" />
                   <div className="bg-foreground/5 h-3.5 w-16 animate-pulse rounded-md" />
@@ -534,7 +530,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                 <Link
                   key={brand.id}
                   href={`/tractors?brand=${brand.id}`}
-                  className="group flex w-[125px] sm:w-[140px] lg:w-[155px] shrink-0 snap-start flex-col items-center gap-2.5 transition-transform duration-300 hover:-translate-y-1"
+                  className="group flex w-[calc((100%-2*0.75rem)/3)] sm:w-[calc((100%-3*1rem)/4)] md:w-[calc((100%-5*1rem)/6)] lg:w-[calc((100%-7*1.25rem)/8)] shrink-0 snap-start flex-col items-center gap-2.5 transition-transform duration-300 hover:-translate-y-1"
                 >
                   {/* Edge-to-Edge Image Container */}
                   <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-white shadow-xs transition-all duration-300 group-hover:border-[var(--color-brand-green)]/40 group-hover:shadow-lg dark:border-white/10 dark:bg-card">
@@ -542,6 +538,8 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                       <img
                         src={brand.logoUrl}
                         alt={brand.name}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-108"
                       />
                     ) : (
@@ -558,7 +556,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                 </Link>
               ))}
             {/* End spacer for mobile scroll so the last item has right padding */}
-            <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
+            <div className="shrink-0 w-3.5 sm:hidden pointer-events-none" aria-hidden="true" />
           </div>
         </section>
 
@@ -689,7 +687,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
             <div
               ref={blogScrollRef}
               onScroll={checkBlogScroll}
-              className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
+              className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-0 scroll-pl-3.5 sm:scroll-pl-0 scroll-pr-3.5 sm:scroll-pr-0"
             >
               {posts.map((post) => {
                 const postHref = post.postType === 'NEWS' ? `/news/${post.slug}` : `/blogs/${post.slug}`;
@@ -705,7 +703,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                   <Link
                     key={post.id}
                     href={postHref}
-                    className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[250px] sm:w-[290px] md:w-[320px] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.75rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
+                    className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[calc(100%-0.5rem)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2*1.25rem)/3)] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.75rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
                   >
                     <div className="group/img relative mb-3 h-40 sm:h-44 w-full overflow-hidden rounded-xl bg-foreground/5">
                       <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
@@ -730,6 +728,8 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                         <img
                           src={post.featuredImage}
                           alt={post.title}
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
                         />
                       ) : (
@@ -765,7 +765,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                 );
               })}
               {/* End spacer for mobile scroll so the last item has right padding */}
-              <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
+              <div className="shrink-0 w-3.5 sm:hidden pointer-events-none" aria-hidden="true" />
             </div>
           </section>
         )}
@@ -922,7 +922,7 @@ function TractorCarouselSection({
   const handleScroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
-    const scrollAmount = Math.max(300, el.clientWidth * 0.75);
+    const scrollAmount = el.clientWidth;
     el.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
@@ -1015,13 +1015,13 @@ function TractorCarouselSection({
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
+        className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-0 scroll-pl-3.5 sm:scroll-pl-0 scroll-pr-3.5 sm:scroll-pr-0"
       >
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-foreground/5 h-[320px] w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start animate-pulse rounded-[1.5rem]"
+                className="bg-foreground/5 h-[320px] w-[calc(100%-0.5rem)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2*1rem)/3)] lg:w-[calc((100%-3*1rem)/4)] shrink-0 snap-start animate-pulse rounded-[1.5rem]"
               />
             ))
           : tractors.map((tractor) => {
@@ -1042,7 +1042,7 @@ function TractorCarouselSection({
                 <Link
                   key={tractor.id}
                   href={`/tractors/${tractor.id}`}
-                  className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[230px] sm:w-[250px] md:w-[270px] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
+                  className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[calc(100%-0.5rem)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2*1rem)/3)] lg:w-[calc((100%-3*1rem)/4)] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
                 >
                   <div className="group/img relative mb-3 h-36 sm:h-40 w-full overflow-hidden rounded-xl bg-foreground/5">
                     <div className="bg-background/85 text-foreground absolute top-2.5 right-2.5 z-10 rounded-full border border-[var(--border-subtle)] px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase shadow-xs backdrop-blur-md">
@@ -1053,6 +1053,8 @@ function TractorCarouselSection({
                       <img
                         src={primaryImage}
                         alt={tractor.modelName}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover/img:scale-105"
                       />
                     ) : (
@@ -1105,7 +1107,7 @@ function TractorCarouselSection({
               );
             })}
         {/* End spacer for mobile scroll so the last item has right padding */}
-        <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
+        <div className="shrink-0 w-3.5 sm:hidden pointer-events-none" aria-hidden="true" />
       </div>
     </section>
   );
@@ -1131,7 +1133,7 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
   const handleScroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
-    const scrollAmount = Math.max(300, el.clientWidth * 0.75);
+    const scrollAmount = el.clientWidth;
     el.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
@@ -1213,13 +1215,13 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-proximity overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-1 scroll-pl-3.5 scroll-pr-3.5"
+        className="flex w-[calc(100%+1.75rem)] sm:w-full items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory overscroll-x-contain py-2 px-3.5 -mx-3.5 sm:mx-0 sm:px-0 scroll-pl-3.5 sm:scroll-pl-0 scroll-pr-3.5 sm:scroll-pr-0"
       >
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-foreground/5 h-[320px] w-[230px] sm:w-[250px] md:w-[270px] shrink-0 snap-start animate-pulse rounded-[1.5rem]"
+                className="bg-foreground/5 h-[320px] w-[calc(100%-0.5rem)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2*1rem)/3)] lg:w-[calc((100%-3*1rem)/4)] shrink-0 snap-start animate-pulse rounded-[1.5rem]"
               />
             ))
           : implementsList.map((item) => {
@@ -1228,7 +1230,7 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
                 <Link
                   key={item.id}
                   href={`/implements/${item.slug || item.id}`}
-                  className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[230px] sm:w-[250px] md:w-[270px] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
+                  className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[calc(100%-0.5rem)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2*1rem)/3)] lg:w-[calc((100%-3*1rem)/4)] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
                 >
                   <div className="group/img relative mb-3 h-36 sm:h-40 w-full overflow-hidden rounded-xl bg-foreground/5">
                     <div className="bg-background/85 text-foreground absolute top-2.5 right-2.5 z-10 rounded-full border border-[var(--border-subtle)] px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase shadow-xs backdrop-blur-md">
@@ -1239,6 +1241,8 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
                       <img
                         src={primaryImage}
                         alt={item.modelName}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-contain p-2.5 transition-transform duration-500 group-hover/img:scale-105"
                       />
                     ) : (
@@ -1297,7 +1301,7 @@ function FarmEquipmentCarousel({ implementsList, loading }: FarmEquipmentCarouse
               );
             })}
         {/* End spacer for mobile scroll so the last item has right padding */}
-        <div className="shrink-0 w-1 sm:hidden pointer-events-none" aria-hidden="true" />
+        <div className="shrink-0 w-3.5 sm:hidden pointer-events-none" aria-hidden="true" />
       </div>
     </section>
   );

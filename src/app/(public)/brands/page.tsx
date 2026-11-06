@@ -43,28 +43,55 @@ export default function BrandsListingPage() {
   );
 
   return (
-    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pt-20 sm:pt-24 lg:pt-28 pb-24 sm:px-6 lg:px-8">
-      {/* HEADER / HERO SECTION */}
-      <div className="relative mb-10 flex flex-col items-center justify-between overflow-hidden rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 p-8 md:flex-row md:p-12">
-        <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[80px]" />
-        <div className="z-10 flex flex-col gap-3">
-          <h1 className="text-foreground text-4xl font-black tracking-tight md:text-5xl">
-            Explore Top Brands
-          </h1>
-          <p className="text-muted max-w-2xl text-lg font-bold">
-            Discover the most trusted tractor manufacturers in India. Find the perfect machine for
-            your farm from top brands.
-          </p>
-        </div>
+    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pt-0 sm:pt-1 lg:pt-2 pb-24 sm:px-6 lg:px-8">
+      {/* HEADER / HERO SECTION (Matching /tractors design) */}
+      <div className="relative mb-5 sm:mb-8 md:mb-10 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white/80 to-amber-500/10 dark:from-emerald-950/40 dark:via-[#111713]/90 dark:to-amber-950/30 p-4 sm:p-6 md:p-10 lg:p-12 shadow-lg dark:shadow-2xl backdrop-blur-xl">
+        <div className="pointer-events-none absolute -top-24 -right-24 h-72 sm:h-96 w-72 sm:w-96 rounded-full bg-[var(--color-brand-green)]/20 dark:bg-[var(--color-brand-green)]/25 blur-[90px]" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 h-60 sm:h-80 w-60 sm:w-80 rounded-full bg-[var(--color-brand-orange)]/15 dark:bg-[var(--color-brand-orange)]/20 blur-[80px]" />
 
-        {/* Total Count Badge */}
-        <div className="bg-background/80 z-10 mt-6 flex flex-col items-center rounded-2xl border border-[var(--border-subtle)] px-6 py-4 backdrop-blur-md md:mt-0">
-          <span className="text-3xl font-black text-[var(--color-brand-green)]">
-            {brands.length}
-          </span>
-          <span className="text-muted text-[10px] font-black tracking-widest uppercase">
-            Brands Found
-          </span>
+        <div className="relative z-10 flex flex-col items-start justify-between gap-4 sm:gap-6 lg:flex-row lg:items-center">
+          <div className="flex w-full max-w-3xl flex-col gap-2 sm:gap-3">
+            {/* Top Row: Badge + Mobile Metric Pill */}
+            <div className="flex w-full items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 self-start rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 text-[10px] sm:text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+                <Star size={11} className="sm:size-[13px] fill-current" /> Leading Manufacturers
+              </span>
+              {/* Mobile-only compact metric pill */}
+              <span className="inline-flex lg:hidden items-center gap-1 rounded-full bg-[var(--color-brand-green)]/15 border border-[var(--color-brand-green)]/30 px-2.5 py-0.5 text-[10.5px] font-black text-[var(--color-brand-green)] shrink-0">
+                <Tractor size={12} /> {brands.length} Brands
+              </span>
+            </div>
+
+            <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-4xl lg:text-5xl leading-tight">
+              Explore{' '}
+              <span className="bg-gradient-to-r from-[var(--color-brand-green)] via-emerald-600 to-[var(--color-brand-orange)] bg-clip-text text-transparent">
+                Top Brands
+              </span>
+            </h1>
+
+            <p className="text-muted text-xs sm:text-base font-medium leading-relaxed sm:text-lg line-clamp-2 md:line-clamp-none">
+              Discover the most trusted tractor manufacturers in India. Find the perfect machine for
+              your farm with official warranty and nationwide dealer support.
+            </p>
+          </div>
+
+          {/* Desktop Right Metric Box */}
+          <div className="z-10 hidden lg:flex shrink-0 items-center gap-4 rounded-3xl border border-black/8 dark:border-white/10 bg-white/80 dark:bg-[#151c17]/90 p-5 shadow-lg backdrop-blur-md">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]">
+              <Tractor size={32} strokeWidth={1.8} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-3xl font-black tracking-tight text-foreground">
+                {brands.length}
+              </span>
+              <span className="text-muted text-[10px] font-black tracking-widest uppercase">
+                Brands Found
+              </span>
+              <span className="mt-0.5 text-[11px] font-bold text-[var(--color-brand-green)]">
+                ✓ Verified OEM Partners
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -90,12 +117,12 @@ export default function BrandsListingPage() {
           ))}
         </div>
       ) : filteredBrands.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="bg-foreground/5 mb-6 flex h-24 w-24 items-center justify-center rounded-full">
-            <Search className="text-muted h-10 w-10" />
+        <div className="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
+          <div className="bg-foreground/5 mb-3 sm:mb-4 flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-full">
+            <Search className="text-muted h-6 w-6 sm:h-9 sm:w-9" />
           </div>
-          <h3 className="text-foreground mb-2 text-2xl font-black">No brands found</h3>
-          <p className="text-muted max-w-md font-medium">
+          <h3 className="text-foreground mb-1.5 text-lg sm:text-2xl font-black">No brands found</h3>
+          <p className="text-muted max-w-sm text-xs sm:text-sm font-medium leading-relaxed">
             We couldn't find any brands matching "{searchQuery}". Try a different search term.
           </p>
         </div>

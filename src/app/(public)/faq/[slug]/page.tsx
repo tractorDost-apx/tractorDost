@@ -70,7 +70,7 @@ export default async function SingleFaqPage({ params }: PageProps) {
       .replace(/\b\w/g, (c) => c.toUpperCase());
 
     return (
-      <div className="mx-auto w-full max-w-4xl px-4 py-12">
+      <div className="mx-auto w-full max-w-4xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-16">
         <div className="mb-6">
           <Link
             href="/faq"
@@ -80,11 +80,11 @@ export default async function SingleFaqPage({ params }: PageProps) {
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-border/50 bg-card/60 p-8 md:p-12 shadow-xl backdrop-blur-xl">
+        <div className="rounded-[24px] sm:rounded-3xl border border-border/50 bg-card/60 p-4 sm:p-8 md:p-12 shadow-xl backdrop-blur-xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <HelpCircle size={14} /> Knowledge Hub
           </div>
-          <h1 className="text-foreground text-3xl sm:text-4xl font-black mb-6 leading-tight">
+          <h1 className="text-foreground text-2xl sm:text-4xl font-black mb-4 sm:mb-6 leading-tight">
             {readableQuestion}?
           </h1>
           <div className="prose dark:prose-invert max-w-none text-muted-foreground text-base leading-relaxed mb-8">
@@ -139,7 +139,7 @@ export default async function SingleFaqPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:py-12">
+      <div className="mx-auto w-full max-w-4xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-16">
         {/* Breadcrumb */}
         <div className="mb-6 flex items-center justify-between text-xs">
           <Link
@@ -154,7 +154,7 @@ export default async function SingleFaqPage({ params }: PageProps) {
         </div>
 
         {/* Main Question & Answer Card */}
-        <article className="rounded-3xl border border-border/50 bg-card/60 p-8 md:p-12 shadow-xl backdrop-blur-xl mb-12">
+        <article className="rounded-[24px] sm:rounded-3xl border border-border/50 bg-card/60 p-4 sm:p-8 md:p-12 shadow-xl backdrop-blur-xl mb-12">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <CheckCircle2 size={14} /> Verified Answer
           </div>

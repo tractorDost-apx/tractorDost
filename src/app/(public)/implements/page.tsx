@@ -21,6 +21,10 @@ import {
   Weight,
   Layers,
   ArrowUpDown,
+  Zap,
+  Star,
+  SlidersHorizontal,
+  Tractor,
 } from 'lucide-react';
 import { implementAPI, Implement } from '@/lib/api/implements';
 import { equipmentBrandAPI, EquipmentBrand } from '@/lib/api/equipmentBrands';
@@ -369,7 +373,7 @@ function ImplementsListingContent() {
   };
 
   return (
-    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pt-20 sm:pt-24 lg:pt-28 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pt-0 sm:pt-1 lg:pt-2 pb-24 sm:px-6 lg:px-8">
       {/* BREADCRUMBS */}
       <nav className="text-muted mb-6 flex items-center gap-2 text-xs font-bold">
         <Link href="/" className="transition-colors hover:text-[var(--color-brand-green)]">
@@ -409,14 +413,16 @@ function ImplementsListingContent() {
         </div>
       )}
 
-      {/* HERO SECTION */}
+      {/* HERO SECTION (Matches /tractors compact & responsive styling) */}
       {activeBrandDetails ? (
-        <div className="relative mb-5 sm:mb-8 md:mb-10 flex flex-col items-start gap-4 sm:gap-6 md:gap-8 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 p-4 sm:p-6 md:p-10 lg:p-12">
-          <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[80px]" />
+        <div className="relative mb-5 sm:mb-8 md:mb-10 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white/80 to-amber-500/10 dark:from-emerald-950/40 dark:via-[#111713]/90 dark:to-amber-950/30 p-4 sm:p-6 md:p-10 lg:p-12 shadow-lg dark:shadow-2xl backdrop-blur-xl">
+          {/* Ambient Glows */}
+          <div className="pointer-events-none absolute -top-24 -right-24 h-72 sm:h-96 w-72 sm:w-96 rounded-full bg-[var(--color-brand-green)]/20 dark:bg-[var(--color-brand-green)]/25 blur-[90px]" />
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-60 sm:h-80 w-60 sm:w-80 rounded-full bg-[var(--color-brand-orange)]/15 dark:bg-[var(--color-brand-orange)]/20 blur-[80px]" />
 
-          <div className="z-10 flex w-full flex-col items-center gap-8 md:flex-row md:items-start">
-            {/* Brand Logo */}
-            <div className="bg-background group relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm md:h-40 md:w-40">
+          <div className="relative z-10 flex flex-col items-center gap-4 sm:gap-6 md:flex-row md:items-start">
+            {/* Brand Logo Box */}
+            <div className="group relative flex h-20 w-20 sm:h-28 sm:w-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl md:rounded-[2rem] border border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#151c17] p-3 sm:p-4 shadow-md md:h-40 md:w-40">
               {activeBrandDetails.logoUrl ? (
                 <img
                   src={activeBrandDetails.logoUrl}
@@ -424,7 +430,7 @@ function ImplementsListingContent() {
                   className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <span className="text-foreground/30 text-5xl font-black">
+                <span className="text-foreground/30 text-3xl sm:text-4xl md:text-5xl font-black">
                   {activeBrandDetails.name.charAt(0)}
                 </span>
               )}
@@ -432,61 +438,157 @@ function ImplementsListingContent() {
 
             {/* Brand Details */}
             <div className="flex flex-1 flex-col items-center text-center md:items-start md:text-left">
-              <div className="mb-1 flex items-center gap-2">
-                <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-[10px] font-black tracking-widest text-[var(--color-brand-green)] uppercase">
-                  Verified Brand
+              <div className="mb-1.5 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:justify-start">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+                  <Sparkles size={11} className="sm:size-[12px]" /> Equipment Partner
                 </span>
-              </div>
-              <h1 className="text-foreground mb-2 text-4xl font-black tracking-tight md:text-5xl">
-                {activeBrandDetails.name} Implements
-              </h1>
-
-              <div className="mb-4 flex flex-wrap items-center justify-center gap-3 md:justify-start">
                 {activeBrandDetails.country && (
-                  <span className="bg-background/60 text-muted flex items-center gap-1.5 rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs font-bold tracking-wider uppercase backdrop-blur-md">
-                    <span className="h-2 w-2 rounded-full bg-[var(--color-brand-orange)]"></span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-bold text-foreground/80 uppercase">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand-orange)]" />
                     {activeBrandDetails.country}
                   </span>
                 )}
-                <span className="rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-bold tracking-wider text-[var(--color-brand-green)] uppercase">
-                  {totalImplements} Implements Available
-                </span>
               </div>
 
-              <p className="text-muted max-w-4xl text-sm leading-relaxed font-medium md:text-base">
-                Explore high-performance {activeBrandDetails.name} agricultural implements
-                engineered for maximum durability, field efficiency, and high yield productivity.
+              <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+                {activeBrandDetails.name} Implements
+              </h1>
+
+              <p className="text-muted text-xs sm:text-base font-medium leading-relaxed sm:text-lg line-clamp-2 md:line-clamp-none mt-2">
+                Explore high-performance {activeBrandDetails.name} agricultural implements engineered for maximum durability, field efficiency, and crop yield.
               </p>
+
+              <div className="mt-3 sm:mt-5 flex items-center gap-2.5 sm:gap-3">
+                <span className="rounded-full bg-[var(--color-brand-green)] px-3 py-0.5 sm:px-3.5 sm:py-1 text-[11px] sm:text-xs font-black text-white shadow-sm">
+                  {totalImplements} Models Available
+                </span>
+                <button
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-1 rounded-full border border-black/10 dark:border-white/10 bg-white/80 dark:bg-white/10 px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-foreground/80 hover:bg-black/5 dark:hover:bg-white/15 transition-colors"
+                >
+                  <X size={12} className="sm:size-[13px]" /> View All Brands
+                </button>
+              </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="relative mb-5 sm:mb-8 md:mb-10 flex flex-col items-start justify-between overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 to-[var(--color-brand-orange)]/10 p-4 sm:p-6 md:p-10 lg:p-12 md:flex-row md:items-center">
-          <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[80px]" />
+        <div className="relative mb-5 sm:mb-8 md:mb-10 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white/80 to-amber-500/10 dark:from-emerald-950/40 dark:via-[#111713]/90 dark:to-amber-950/30 p-4 sm:p-6 md:p-10 lg:p-12 shadow-lg dark:shadow-2xl backdrop-blur-xl">
+          {/* Ambient Glows */}
+          <div className="pointer-events-none absolute -top-24 -right-24 h-72 sm:h-96 w-72 sm:w-96 rounded-full bg-[var(--color-brand-green)]/20 dark:bg-[var(--color-brand-green)]/25 blur-[90px]" />
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-60 sm:h-80 w-60 sm:w-80 rounded-full bg-[var(--color-brand-orange)]/15 dark:bg-[var(--color-brand-orange)]/20 blur-[80px]" />
 
-          <div className="z-10 flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-brand-green)]/20 bg-[var(--color-brand-green)]/10 px-3 py-1 text-[10px] font-black tracking-widest text-[var(--color-brand-green)] uppercase">
-                <Wrench size={12} /> Agricultural Machinery Catalog
-              </span>
+          <div className="relative z-10 flex flex-col items-start justify-between gap-4 sm:gap-6 lg:flex-row lg:items-center">
+            {/* Left Content */}
+            <div className="flex w-full max-w-3xl flex-col gap-2 sm:gap-3">
+              {/* Top Row: Official Badge + Mobile Metric Pill */}
+              <div className="flex w-full items-center justify-between gap-2">
+                <div className="inline-flex items-center gap-1.5 self-start rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 text-[10px] sm:text-xs font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+                  <Wrench size={11} className="sm:size-[13px]" /> Agricultural Machinery Catalog
+                </div>
+                {/* Mobile-only compact metric pill */}
+                <span className="inline-flex lg:hidden items-center gap-1 rounded-full bg-[var(--color-brand-green)]/15 border border-[var(--color-brand-green)]/30 px-2.5 py-0.5 text-[10.5px] font-black text-[var(--color-brand-green)] shrink-0">
+                  <Wrench size={12} /> {totalImplements} Implements
+                </span>
+              </div>
+
+              <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-4xl lg:text-5xl leading-tight">
+                Explore{' '}
+                <span className="bg-gradient-to-r from-[var(--color-brand-green)] via-emerald-600 to-[var(--color-brand-orange)] bg-clip-text text-transparent">
+                  Farm Implements
+                </span>
+              </h1>
+
+              <p className="text-muted text-xs sm:text-base font-medium leading-relaxed sm:text-lg line-clamp-2 md:line-clamp-none">
+                Discover top-rated rotavators, cultivators, plows, threshers, and specialized farm
+                machinery to enhance your farming output.
+              </p>
+
+              {/* Quick Filter Shortcuts (Horizontal scrollable on mobile, wrapping on desktop) */}
+              <div className="mt-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap">
+                <span className="text-muted text-[10px] sm:text-xs font-bold tracking-wider uppercase shrink-0">
+                  Quick Filters:
+                </span>
+                <button
+                  onClick={() => {
+                    const next = selectedPrice === 'under50k' ? '' : 'under50k';
+                    setSelectedPrice(next);
+                    setPage(1);
+                    updateUrlParams({ price: next || null, page: 1 });
+                  }}
+                  className={`shrink-0 whitespace-nowrap rounded-full px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-bold transition-all ${
+                    selectedPrice === 'under50k'
+                      ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                      : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
+                  }`}
+                >
+                  <span className="inline-flex items-center gap-1.5"><Zap size={12} className="text-amber-500 shrink-0" /> Under ₹50,000</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const next = selectedHp === 'under30' ? '' : 'under30';
+                    setSelectedHp(next);
+                    setPage(1);
+                    updateUrlParams({ hp: next || null, page: 1 });
+                  }}
+                  className={`shrink-0 whitespace-nowrap rounded-full px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-bold transition-all ${
+                    selectedHp === 'under30'
+                      ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                      : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
+                  }`}
+                >
+                  <span className="inline-flex items-center gap-1.5"><Gauge size={12} className="text-blue-500 shrink-0" /> Under 30 HP</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const next = selectedHp === '30to50' ? '' : '30to50';
+                    setSelectedHp(next);
+                    setPage(1);
+                    updateUrlParams({ hp: next || null, page: 1 });
+                  }}
+                  className={`shrink-0 whitespace-nowrap rounded-full px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-bold transition-all ${
+                    selectedHp === '30to50'
+                      ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                      : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
+                  }`}
+                >
+                  <span className="inline-flex items-center gap-1.5"><SlidersHorizontal size={12} className="text-emerald-500 shrink-0" /> 30-50 HP</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const next = selectedUsage === 'Land Preparation' ? '' : 'Land Preparation';
+                    setSelectedUsage(next);
+                    setPage(1);
+                    updateUrlParams({ usage: next || null, page: 1 });
+                  }}
+                  className={`shrink-0 whitespace-nowrap rounded-full px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-bold transition-all ${
+                    selectedUsage === 'Land Preparation'
+                      ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                      : 'border border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/5 text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
+                  }`}
+                >
+                  <span className="inline-flex items-center gap-1.5"><Wrench size={12} className="text-[var(--color-brand-green)] shrink-0" /> Land Prep</span>
+                </button>
+              </div>
             </div>
-            <h1 className="text-foreground text-4xl font-black tracking-tight md:text-5xl">
-              Explore Farm Implements
-            </h1>
-            <p className="text-muted max-w-2xl text-lg font-bold">
-              Discover top-rated rotavators, cultivators, plows, threshers, and specialized farm
-              machinery to enhance your farming output.
-            </p>
-          </div>
 
-          {/* Total Count Badge */}
-          <div className="bg-background/80 z-10 mt-6 flex flex-col items-center rounded-2xl border border-[var(--border-subtle)] px-6 py-4 backdrop-blur-md md:mt-0">
-            <span className="text-3xl font-black text-[var(--color-brand-green)]">
-              {totalImplements}
-            </span>
-            <span className="text-muted text-[10px] font-black tracking-widest uppercase">
-              Implements Found
-            </span>
+            {/* Right Metric Box: Shown on Desktop, seamlessly complements layout */}
+            <div className="z-10 hidden lg:flex shrink-0 items-center gap-4 rounded-3xl border border-black/8 dark:border-white/10 bg-white/80 dark:bg-[#151c17]/90 p-5 shadow-lg backdrop-blur-md">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]">
+                <Wrench size={32} strokeWidth={1.8} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-3xl font-black tracking-tight text-foreground">
+                  {totalImplements}
+                </span>
+                <span className="text-muted text-[10px] font-black tracking-widest uppercase">
+                  Implements Found
+                </span>
+                <span className="mt-0.5 text-[11px] font-bold text-[var(--color-brand-green)]">
+                  ✓ Certified Machinery
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -941,6 +1043,7 @@ function ImplementsListingContent() {
               {/* Sort Control */}
               <div className="relative flex items-center">
                 <select
+                  suppressHydrationWarning
                   value={sortBy}
                   onChange={(e) => {
                     const newSort = e.target.value as any;
@@ -959,6 +1062,7 @@ function ImplementsListingContent() {
               {/* View Switcher */}
               <div className="bg-background flex items-center gap-1 rounded-xl border border-[var(--border-subtle)] p-1">
                 <button
+                  suppressHydrationWarning
                   onClick={() => {
                     setViewMode('grid');
                     updateUrlParams({ view: 'grid' });
@@ -969,6 +1073,7 @@ function ImplementsListingContent() {
                   <Grid3X3 size={18} />
                 </button>
                 <button
+                  suppressHydrationWarning
                   onClick={() => {
                     setViewMode('list');
                     updateUrlParams({ view: 'list' });
@@ -1017,16 +1122,15 @@ function ImplementsListingContent() {
             </div>
           ) : implementsList.length === 0 ? (
             /* EMPTY STATE */
-            <div className="bg-foreground/5 my-4 flex flex-col items-center justify-center rounded-[2.5rem] border border-dashed border-[var(--border-subtle)] p-16 text-center">
-              <Wrench size={64} className="text-muted mb-4 opacity-30" strokeWidth={1.2} />
-              <h3 className="text-foreground mb-2 text-2xl font-black">No implements found</h3>
-              <p className="text-muted max-w-md font-medium">
-                We couldn't find any implements matching your current filter choices or search
-                query.
+            <div className="bg-foreground/5 my-4 flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-[var(--border-subtle)] p-6 sm:p-10 md:p-14 text-center">
+              <Wrench size={36} className="text-muted mb-3 sm:mb-4 opacity-30 sm:size-12" strokeWidth={1.2} />
+              <h3 className="text-foreground mb-1.5 sm:mb-2 text-lg sm:text-2xl font-black">No implements found</h3>
+              <p className="text-muted max-w-sm text-xs sm:text-sm font-medium">
+                We couldn't find any implements matching your current filter choices or search query.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-6 rounded-xl bg-[var(--color-brand-green)] px-6 py-3 text-sm font-bold text-white shadow-[var(--color-brand-green)]/30 shadow-xl transition-all hover:scale-105 active:scale-95"
+                className="mt-4 sm:mt-6 rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-bold text-white shadow-[var(--color-brand-green)]/30 shadow-lg sm:shadow-xl transition-all hover:scale-105 active:scale-95"
               >
                 Clear All Filters
               </button>

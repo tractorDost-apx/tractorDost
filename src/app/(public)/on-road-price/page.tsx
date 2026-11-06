@@ -118,13 +118,13 @@ export default function OnRoadPricePage() {
   };
 
   return (
-    <div className="animate-fade-in mx-auto min-h-screen w-full max-w-[1200px] px-4 py-12 sm:px-6">
+    <div className="animate-fade-in mx-auto min-h-screen w-full max-w-[1200px] px-4 pt-0 sm:pt-1 lg:pt-2 pb-16 sm:px-6">
       {/* Header */}
-      <div className="mb-12 text-center">
-        <h1 className="text-foreground mb-4 text-4xl font-black tracking-tight md:text-5xl">
+      <div className="mb-8 sm:mb-12 text-center">
+        <h1 className="text-foreground mb-2 sm:mb-4 text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
           Check <span className="text-[var(--color-brand-green)]">On-Road Price</span>
         </h1>
-        <p className="text-muted mx-auto max-w-2xl text-lg font-bold">
+        <p className="text-muted mx-auto max-w-2xl text-xs sm:text-base md:text-lg font-medium leading-relaxed">
           Get the exact price breakdown including Ex-Showroom, RTO, and Insurance for your state.
         </p>
       </div>

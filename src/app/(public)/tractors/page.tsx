@@ -293,7 +293,7 @@ function TractorsListingContent() {
   };
 
   return (
-    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pt-20 sm:pt-24 lg:pt-28 pb-24 sm:px-6 lg:px-8">
+    <div className="animate-fade-in mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 pt-0 sm:pt-1 lg:pt-2 pb-24 sm:px-6 lg:px-8">
       {/* ===================== HERO / BANNER SECTION ===================== */}
       {activeBrandDetails ? (
         <div className="relative mb-5 sm:mb-8 md:mb-10 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white/80 to-amber-500/10 dark:from-emerald-950/40 dark:via-[#111713]/90 dark:to-amber-950/30 p-4 sm:p-6 md:p-10 lg:p-12 shadow-lg dark:shadow-2xl backdrop-blur-xl">
@@ -940,6 +940,7 @@ function TractorsListingContent() {
               <div className="flex items-center gap-1.5 rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] px-3 py-1.5">
                 <ArrowUpDown size={14} className="text-muted shrink-0" />
                 <select
+                  suppressHydrationWarning
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="bg-transparent text-xs font-bold text-foreground focus:outline-none cursor-pointer"
@@ -965,6 +966,7 @@ function TractorsListingContent() {
               {/* View Mode Toggle */}
               <div className="flex items-center rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/[0.04] p-1">
                 <button
+                  suppressHydrationWarning
                   onClick={() => setViewMode('grid')}
                   title="Grid View"
                   className={`rounded-lg p-1.5 transition-all ${
@@ -976,6 +978,7 @@ function TractorsListingContent() {
                   <Grid3X3 size={17} />
                 </button>
                 <button
+                  suppressHydrationWarning
                   onClick={() => setViewMode('list')}
                   title="List View"
                   className={`rounded-lg p-1.5 transition-all ${
@@ -1122,20 +1125,20 @@ function TractorsListingContent() {
               ))}
             </div>
           ) : sortedTractors.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[2.5rem] border border-dashed border-black/10 dark:border-white/10 bg-white/40 dark:bg-[#121814]/40 p-16 text-center backdrop-blur-md">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <Tractor size={40} strokeWidth={1.5} />
+            <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-black/10 dark:border-white/10 bg-white/40 dark:bg-[#121814]/40 p-6 sm:p-10 md:p-14 text-center backdrop-blur-md">
+              <div className="mb-3 sm:mb-4 flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                <Tractor size={28} className="sm:size-10" strokeWidth={1.5} />
               </div>
-              <h3 className="text-foreground text-2xl font-black">No Tractors Found</h3>
-              <p className="text-muted mt-1 max-w-md text-sm font-medium">
+              <h3 className="text-foreground text-lg sm:text-2xl font-black">No Tractors Found</h3>
+              <p className="text-muted mt-1 max-w-sm text-xs sm:text-sm font-medium">
                 We couldn't find any tractors matching your current filters. Try resetting filters or
                 adjusting search keywords.
               </p>
               <button
                 onClick={handleClearAll}
-                className="mt-6 flex items-center gap-2 rounded-full bg-[var(--color-brand-green)] px-6 py-3 text-sm font-black text-white shadow-lg shadow-[var(--color-brand-green)]/25 transition-all hover:scale-105 active:scale-95"
+                className="mt-4 sm:mt-6 flex items-center gap-2 rounded-full bg-[var(--color-brand-green)] px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-black text-white shadow-lg shadow-[var(--color-brand-green)]/25 transition-all hover:scale-105 active:scale-95"
               >
-                <RotateCcw size={15} /> Clear All Filters
+                <RotateCcw size={14} className="sm:size-4" /> Clear All Filters
               </button>
             </div>
           ) : (

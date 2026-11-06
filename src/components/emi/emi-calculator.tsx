@@ -319,10 +319,10 @@ function EmiCalculatorContent() {
         <div className="flex items-center gap-2 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
           <ShieldCheck size={14} /> Smart Finance Tool
         </div>
-        <h1 className="text-foreground text-3xl font-black tracking-tight uppercase md:text-5xl">
+        <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase leading-tight">
           Tractor EMI Calculator
         </h1>
-        <p className="text-muted max-w-2xl text-sm font-bold md:text-base">
+        <p className="text-muted max-w-2xl text-xs sm:text-base font-medium leading-relaxed">
           Estimate monthly EMIs, total interest, and visualize your amortization schedule for easy
           agricultural and commercial vehicle loans.
         </p>

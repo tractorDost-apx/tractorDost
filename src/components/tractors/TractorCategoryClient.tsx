@@ -94,17 +94,17 @@ export function TractorCategoryClient({
   };
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-12 pb-24 sm:px-6 lg:px-8">
+    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-24 sm:px-6 lg:px-8">
       {/* Hero Header */}
-      <section className="relative flex flex-col items-center justify-center pt-8 pb-12 text-center">
+      <section className="relative flex flex-col items-center justify-center pt-2 pb-8 text-center">
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <Sparkles size={14} /> {badge}
           </div>
-          <h1 className="text-foreground text-4xl leading-tight font-extrabold tracking-tight md:text-6xl">
+          <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
             {title}
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs sm:text-base md:text-lg leading-relaxed font-medium">
             {subtitle}
           </p>
         </div>
@@ -136,15 +136,15 @@ export function TractorCategoryClient({
           <p className="text-muted-foreground mt-4 text-sm font-semibold">Loading tractors...</p>
         </div>
       ) : filteredTractors.length === 0 ? (
-        <div className="rounded-3xl border border-border/50 bg-card/40 p-12 text-center">
-          <Tractor size={48} className="text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-foreground text-lg font-bold">No tractors matching criteria currently</h3>
-          <p className="text-muted-foreground text-xs mt-1 mb-6">
+        <div className="rounded-2xl sm:rounded-3xl border border-border/50 bg-card/40 p-6 sm:p-10 text-center">
+          <Tractor size={36} className="text-muted-foreground mx-auto mb-2 sm:mb-3 sm:size-12" />
+          <h3 className="text-foreground text-base sm:text-lg font-bold">No tractors matching criteria currently</h3>
+          <p className="text-muted-foreground text-xs mt-1 mb-4 sm:mb-6 max-w-sm mx-auto">
             Explore our comprehensive all-tractor catalog to filter by other HP ranges and brands.
           </p>
           <Link
             href="/tractors"
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold text-white"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-green)] px-5 py-2 sm:px-6 sm:py-2.5 text-xs font-bold text-white shadow-md active:scale-95"
           >
             Browse All Tractors &rarr;
           </Link>

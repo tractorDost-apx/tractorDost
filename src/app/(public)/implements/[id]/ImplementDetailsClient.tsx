@@ -166,7 +166,7 @@ export default function ImplementDetailsClient({
 
   if (state.status === 'unavailable') {
     return (
-      <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
+      <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-0 sm:pt-1 lg:pt-2 pb-24">
         <Link
           href="/implements"
           className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
@@ -237,7 +237,7 @@ function ImplementDetailsView({
   const groupedSpecs = parseAdditionalSpecs(implement.additionalSpecs);
 
   return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-0 sm:pt-1 lg:pt-2 pb-24">
       {/* BREADCRUMBS & BACK BUTTON */}
       <div className="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
         <Link
@@ -561,7 +561,7 @@ function ImplementDetailsView({
             </div>
 
             <div>
-              <h1 className="text-foreground text-3xl font-black tracking-tight md:text-4xl">
+              <h1 className="text-foreground text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight">
                 {implement.brand?.name ? `${implement.brand.name} ` : ''}
                 {implement.modelName}
               </h1>

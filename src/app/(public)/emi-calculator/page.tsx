@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function EmiCalculatorPage() {
   return (
-    <div className="flex min-h-screen w-full flex-col items-center pt-20 sm:pt-24 lg:pt-28 pb-16">
+    <div className="flex min-h-screen w-full flex-col items-center pt-0 sm:pt-1 lg:pt-2 pb-16">
       <div className="animate-fade-in relative z-10 mx-auto w-full max-w-7xl px-3.5 sm:px-6">
         {/* Glow orb backdrop decoration */}
         <div className="pointer-events-none absolute top-0 right-1/4 -z-10 h-[300px] w-[300px] rounded-full bg-[var(--color-brand-green)]/5 blur-[120px]" />

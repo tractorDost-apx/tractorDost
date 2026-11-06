@@ -11,7 +11,7 @@ export default function HarvesterTypePage({ params }: { params: Promise<{ type: 
 
   return (
     <div>
-      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pt-0 sm:pt-1 lg:pt-2 sm:px-6 lg:px-8">
         <Link
           href="/harvesters"
           className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"

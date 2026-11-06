@@ -161,8 +161,8 @@ export default function PublicFaqExplorer({ faqs }: PublicFaqExplorerProps) {
         </div>
 
         {filteredFaqs.length === 0 ? (
-          <div className="text-center py-16 rounded-2xl border border-[var(--border-subtle)] bg-background/40">
-            <HelpCircle size={40} className="mx-auto text-muted/40 mb-3" />
+          <div className="text-center py-8 sm:py-16 rounded-2xl border border-[var(--border-subtle)] bg-background/40">
+            <HelpCircle size={32} className="mx-auto text-muted/40 mb-2 sm:mb-3 sm:size-10" />
             <h3 className="text-sm font-bold text-foreground">No questions found</h3>
             <p className="text-xs text-muted mt-1">
               Try adjusting your search terms or filter selection.

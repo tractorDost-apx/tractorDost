@@ -245,40 +245,71 @@ function UsedTractorsListingContent() {
   return (
     <div className="container mx-auto px-3.5 pb-16 max-w-7xl">
       {/* HERO BANNER SECTION (Matching /tractors design) */}
-      <div className="relative mb-5 sm:mb-8 md:mb-10 flex flex-col items-center justify-between overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-[var(--border-subtle)] bg-gradient-to-r from-[var(--color-brand-green)]/10 via-background to-[var(--color-brand-orange)]/10 p-4 sm:p-6 md:p-10 lg:p-12 md:flex-row">
-        <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/20 blur-[80px]" />
+      <div className="relative mb-5 sm:mb-8 md:mb-10 overflow-hidden rounded-[24px] sm:rounded-[30px] md:rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-gradient-to-br from-emerald-500/10 via-white/80 to-amber-500/10 dark:from-emerald-950/40 dark:via-[#111713]/90 dark:to-amber-950/30 p-4 sm:p-6 md:p-10 lg:p-12 shadow-lg dark:shadow-2xl backdrop-blur-xl">
+        <div className="pointer-events-none absolute -top-24 -right-24 h-72 sm:h-96 w-72 sm:w-96 rounded-full bg-[var(--color-brand-green)]/20 dark:bg-[var(--color-brand-green)]/25 blur-[90px]" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 h-60 sm:h-80 w-60 sm:w-80 rounded-full bg-[var(--color-brand-orange)]/15 dark:bg-[var(--color-brand-orange)]/20 blur-[80px]" />
         
-        <div className="z-10 flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs font-bold tracking-wider text-lime-400 uppercase">
-              <ShieldCheck size={14} /> Verified Pre-Owned Marketplace
-            </span>
-          </div>
-          <h1 className="text-foreground text-4xl font-black tracking-tight md:text-5xl">
-            Explore Used Tractors
-          </h1>
-          <p className="text-muted max-w-2xl text-base md:text-lg font-bold">
-            Find certified, reliable pre-owned tractors across India at genuine market prices with verified documentation and direct seller connection.
-          </p>
-        </div>
+        <div className="relative z-10 flex flex-col items-start justify-between gap-4 sm:gap-6 lg:flex-row lg:items-center">
+          <div className="flex w-full max-w-3xl flex-col gap-2 sm:gap-3">
+            {/* Top Row: Badge + Mobile Metric Pill */}
+            <div className="flex w-full items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 self-start rounded-full border border-lime-400/30 bg-lime-400/10 px-2.5 py-0.5 sm:px-3.5 sm:py-1 text-[10px] sm:text-xs font-black tracking-wider text-lime-500 uppercase">
+                <ShieldCheck size={11} className="sm:size-[13px]" /> Verified Pre-Owned Marketplace
+              </span>
+              {/* Mobile-only compact metric pill */}
+              <span className="inline-flex lg:hidden items-center gap-1 rounded-full bg-[var(--color-brand-green)]/15 border border-[var(--color-brand-green)]/30 px-2.5 py-0.5 text-[10.5px] font-black text-[var(--color-brand-green)] shrink-0">
+                <Tractor size={12} /> {totalTractors} Tractors
+              </span>
+            </div>
 
-        {/* Total Count & Sell Action Badge */}
-        <div className="z-10 mt-6 flex flex-col sm:flex-row items-center gap-4 md:mt-0">
-          <div className="bg-background/80 flex flex-col items-center rounded-2xl border border-[var(--border-subtle)] px-6 py-4 backdrop-blur-md">
-            <span className="text-3xl font-black text-[var(--color-brand-green)]">
-              {totalTractors}
-            </span>
-            <span className="text-muted text-[10px] font-black tracking-widest uppercase">
-              Tractors Available
-            </span>
+            <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-4xl lg:text-5xl leading-tight">
+              Explore{' '}
+              <span className="bg-gradient-to-r from-[var(--color-brand-green)] via-emerald-600 to-[var(--color-brand-orange)] bg-clip-text text-transparent">
+                Used Tractors
+              </span>
+            </h1>
+
+            <p className="text-muted text-xs sm:text-base font-medium leading-relaxed sm:text-lg line-clamp-2 md:line-clamp-none">
+              Find certified, reliable pre-owned tractors across India at genuine market prices with verified documentation and direct seller connection.
+            </p>
+
+            {/* Mobile Action Pill Bar */}
+            <div className="mt-1 flex items-center gap-2 sm:hidden">
+              <Link
+                href="/sell-used-tractor"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-orange)] px-3.5 py-1 text-xs font-bold text-white shadow-sm"
+              >
+                <Plus size={13} /> Sell Your Tractor
+              </Link>
+            </div>
           </div>
 
-          <Link
-            href="/sell-used-tractor"
-            className="bg-[var(--color-brand-orange)] hover:opacity-90 text-white flex items-center gap-2 rounded-2xl px-6 py-4 font-black text-sm shadow-lg shadow-[var(--color-brand-orange)]/20 transition-all whitespace-nowrap"
-          >
-            <Plus size={18} /> Sell Tractor
-          </Link>
+          {/* Desktop Metric Box & Sell Button */}
+          <div className="z-10 hidden lg:flex shrink-0 items-center gap-4">
+            <div className="flex items-center gap-4 rounded-3xl border border-black/8 dark:border-white/10 bg-white/80 dark:bg-[#151c17]/90 p-5 shadow-lg backdrop-blur-md">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]">
+                <Tractor size={32} strokeWidth={1.8} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-3xl font-black tracking-tight text-foreground">
+                  {totalTractors}
+                </span>
+                <span className="text-muted text-[10px] font-black tracking-widest uppercase">
+                  Tractors Available
+                </span>
+                <span className="mt-0.5 text-[11px] font-bold text-[var(--color-brand-green)]">
+                  ✓ Verified Sellers
+                </span>
+              </div>
+            </div>
+
+            <Link
+              href="/sell-used-tractor"
+              className="bg-[var(--color-brand-orange)] hover:opacity-90 text-white flex items-center gap-2 rounded-2xl px-6 py-4 font-black text-sm shadow-lg shadow-[var(--color-brand-orange)]/20 transition-all whitespace-nowrap"
+            >
+              <Plus size={18} /> Sell Tractor
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -687,6 +718,7 @@ function UsedTractorsListingContent() {
               <div className="flex items-center gap-2">
                 <ArrowUpDown size={14} className="text-muted" />
                 <select
+                  suppressHydrationWarning
                   value={sortBy}
                   onChange={(e) => {
                     setSortBy(e.target.value as ListingSortBy);
@@ -704,6 +736,7 @@ function UsedTractorsListingContent() {
 
               <div className="bg-foreground/5 flex items-center rounded-xl border border-[var(--border-subtle)] p-1">
                 <button
+                  suppressHydrationWarning
                   onClick={() => setViewMode('grid')}
                   className={`rounded-lg p-1.5 transition-colors ${
                     viewMode === 'grid'
@@ -715,6 +748,7 @@ function UsedTractorsListingContent() {
                   <Grid3X3 size={16} />
                 </button>
                 <button
+                  suppressHydrationWarning
                   onClick={() => setViewMode('list')}
                   className={`rounded-lg p-1.5 transition-colors ${
                     viewMode === 'list'
@@ -736,17 +770,17 @@ function UsedTractorsListingContent() {
               <p className="text-muted mt-3 text-xs font-bold">Finding matching pre-owned tractors...</p>
             </div>
           ) : tractors.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center rounded-[2rem] border border-dashed border-[var(--border-subtle)] bg-background/50 p-12 text-center backdrop-blur-md">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] mb-4">
-                <Tractor size={32} />
+            <div className="flex flex-1 flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-[var(--border-subtle)] bg-background/50 p-6 sm:p-10 md:p-12 text-center backdrop-blur-md">
+              <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-xl sm:rounded-2xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] mb-3 sm:mb-4">
+                <Tractor size={24} className="sm:size-8" />
               </div>
-              <h3 className="text-lg font-black text-foreground">No Used Tractors Match Your Filters</h3>
-              <p className="text-muted text-xs max-w-md mt-1 mb-6">
+              <h3 className="text-base sm:text-lg font-black text-foreground">No Used Tractors Match Your Filters</h3>
+              <p className="text-muted text-xs max-w-sm mt-1 mb-4 sm:mb-6">
                 Try widening your price range, location, or brand selection to discover more tractors.
               </p>
               <button
                 onClick={clearAllFilters}
-                className="bg-[var(--color-brand-green)] text-white rounded-xl px-5 py-2.5 text-xs font-bold hover:opacity-90 transition-all"
+                className="bg-[var(--color-brand-green)] text-white rounded-xl px-4 py-2 sm:px-5 sm:py-2.5 text-xs font-bold hover:opacity-90 active:scale-95 transition-all shadow-md"
               >
                 Reset All Filters
               </button>

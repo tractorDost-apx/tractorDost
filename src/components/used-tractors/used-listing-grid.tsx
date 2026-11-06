@@ -32,8 +32,8 @@ export function UsedListingGrid({
 
   if (listings.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/60 p-12 text-center">
-        <p className="text-sm font-medium text-muted-foreground">{emptyMessage}</p>
+      <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-border/60 p-6 sm:p-10 text-center">
+        <p className="text-xs sm:text-sm font-medium text-muted-foreground">{emptyMessage}</p>
       </div>
     );
   }

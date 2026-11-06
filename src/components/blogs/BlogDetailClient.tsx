@@ -57,7 +57,7 @@ export default function BlogDetailClient({ post }: BlogDetailClientProps) {
   const activeLangOption = INDIAN_LANGUAGES.find((l) => l.code === currentLang) || INDIAN_LANGUAGES[0];
 
   return (
-    <article className="mx-auto flex w-full max-w-4xl flex-col px-4 py-8 sm:px-6 lg:px-8 relative">
+    <article className="mx-auto flex w-full max-w-4xl flex-col px-4 pt-0 sm:pt-1 lg:pt-2 pb-16 sm:px-6 lg:px-8 relative">
       {/* Breadcrumb Navigation */}
       <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500 dark:text-muted">
         <Link href="/" className="hover:text-zinc-900 dark:hover:text-white transition-colors">

@@ -138,10 +138,10 @@ export default function LoanPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <Banknote size={14} /> Tractor Finance & Loans
           </div>
-          <h1 className="text-foreground text-4xl leading-tight font-extrabold tracking-tight md:text-6xl">
+          <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
             Tractor Loans with <span className="text-[var(--color-brand-green)]">Instant Approval</span>
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs sm:text-base md:text-lg leading-relaxed font-medium">
             Low interest rates starting at 8.95%, up to 90% on-road funding, and flexible seasonal repayment schedules tailored for Indian farmers.
           </p>
         </div>

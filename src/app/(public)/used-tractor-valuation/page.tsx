@@ -111,10 +111,10 @@ export default function UsedTractorValuationPage() {
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--color-brand-green)]/10 px-3 py-1 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
               <Sparkles size={14} /> AI Valuation Tool
             </div>
-            <h1 className="mb-4 text-4xl leading-tight font-black tracking-tight md:text-5xl">
+            <h1 className="mb-2 sm:mb-4 text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
               Check True <span className="text-[var(--color-brand-green)]">Market Value</span>
             </h1>
-            <p className="text-muted text-lg font-medium">
+            <p className="text-muted text-xs sm:text-base md:text-lg font-medium leading-relaxed">
               Get an instant, data-driven price estimate for your used tractor before you sell.
             </p>
           </div>
@@ -284,9 +284,9 @@ export default function UsedTractorValuationPage() {
                   <p className="mb-2 text-sm font-bold tracking-widest text-white/80 uppercase">
                     Estimated Market Range
                   </p>
-                  <h2 className="mb-2 flex items-center justify-center gap-2 text-5xl font-black md:text-6xl">
+                  <h2 className="mb-2 flex items-center justify-center gap-2 text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black flex-wrap">
                     {formatPrice(valuationResult.min)}
-                    <span className="text-3xl text-white/50">-</span>
+                    <span className="text-xl sm:text-3xl text-white/50">-</span>
                     {formatPrice(valuationResult.max)}
                   </h2>
                   <p className="font-medium text-white/80">

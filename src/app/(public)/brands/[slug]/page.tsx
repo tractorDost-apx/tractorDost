@@ -102,7 +102,7 @@ export default function SingleBrandPage({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-10">
+    <div className="mx-auto max-w-7xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-16 sm:px-6 lg:px-8 space-y-10">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <Link href="/" className="hover:text-foreground">
@@ -117,9 +117,9 @@ export default function SingleBrandPage({
       </div>
 
       {/* Brand Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 via-card/50 to-background p-6 sm:p-10 backdrop-blur-xl shadow-xl">
+      <div className="relative overflow-hidden rounded-[24px] sm:rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 via-card/50 to-background p-4 sm:p-8 md:p-10 backdrop-blur-xl shadow-xl">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-5 w-full sm:w-auto">
             {brand?.logoUrl ? (
               <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-white p-3 shadow-md">
                 <img src={brand.logoUrl} alt={displayName} className="max-h-full max-w-full object-contain" />
@@ -194,10 +194,10 @@ export default function SingleBrandPage({
 
       {/* Tractor Grid */}
       {filteredTractors.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/60 p-12 text-center">
-          <TractorIcon size={48} className="text-muted-foreground/40 mb-3" />
-          <p className="text-sm font-semibold text-foreground">No tractor models found matching your search</p>
-          <p className="mt-1 text-xs text-muted-foreground">Try searching another model or clearing your search filter.</p>
+        <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-border/60 p-6 sm:p-10 text-center">
+          <TractorIcon size={36} className="text-muted-foreground/40 mb-2 sm:mb-3 sm:size-12" />
+          <p className="text-xs sm:text-sm font-semibold text-foreground">No tractor models found matching your search</p>
+          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">Try searching another model or clearing your search filter.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

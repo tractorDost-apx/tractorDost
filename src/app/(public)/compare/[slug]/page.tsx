@@ -100,7 +100,7 @@ export default function CompareSlugPage({ params }: { params: Promise<{ slug: st
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-[1400px] px-4 pt-0 sm:pt-1 lg:pt-2 pb-16 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center justify-between">
         <Link
           href="/compare"

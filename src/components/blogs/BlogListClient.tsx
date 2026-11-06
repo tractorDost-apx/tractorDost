@@ -105,20 +105,20 @@ export default function BlogListClient() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-3.5 pb-16 sm:px-6 lg:px-8">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 text-center border border-zinc-200 bg-white/70 dark:border-white/10 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent shadow-sm dark:shadow-2xl">
+      <div className="relative overflow-hidden rounded-[24px] sm:rounded-3xl p-4 sm:p-8 md:p-12 text-center border border-zinc-200 bg-white/70 dark:border-white/10 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent shadow-sm dark:shadow-2xl">
         <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-96 rounded-full bg-[var(--color-brand-green)]/15 blur-[80px]" />
 
         <div className="relative z-10 mx-auto max-w-3xl flex flex-col items-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-bold text-[var(--color-brand-green)] mb-4">
-            <Sparkles size={14} />
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-xs font-bold text-[var(--color-brand-green)] mb-3 sm:mb-4">
+            <Sparkles size={13} />
             <span>TRACTORDOST KNOWLEDGE HUB</span>
           </div>
 
-          <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-5xl leading-tight">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
             Farming Insights, Tractor Guides & Industry News
           </h1>
 
-          <p className="mt-4 text-sm sm:text-base text-zinc-600 dark:text-muted leading-relaxed max-w-2xl">
+          <p className="mt-3 sm:mt-4 text-xs sm:text-base text-zinc-600 dark:text-muted leading-relaxed max-w-2xl">
             Explore trusted buying advice, tractor comparisons, maintenance guides, and agricultural
             advancements written for Indian farmers and tractor owners.
           </p>
@@ -164,10 +164,10 @@ export default function BlogListClient() {
           ))}
         </div>
       ) : posts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl p-16 text-center border border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#121814]/40 dark:shadow-xl">
-          <BookOpen size={48} className="text-[var(--color-brand-green)]/40 mb-3" />
-          <h3 className="text-xl font-black text-zinc-900 dark:text-white">No blog posts found</h3>
-          <p className="mt-2 text-xs text-zinc-500 dark:text-muted max-w-md">
+        <div className="flex flex-col items-center justify-center rounded-2xl p-6 sm:p-10 md:p-14 text-center border border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#121814]/40 dark:shadow-xl">
+          <BookOpen size={32} className="text-[var(--color-brand-green)]/40 mb-2 sm:mb-3 sm:size-10" />
+          <h3 className="text-base sm:text-xl font-black text-zinc-900 dark:text-white">No blog posts found</h3>
+          <p className="mt-1.5 sm:mt-2 text-xs text-zinc-500 dark:text-muted max-w-sm">
             We couldn't find any articles matching your search criteria or filters. Try adjusting your search query or reset the filters.
           </p>
           {(searchQuery || filters.categoryId || filters.language || filters.postType) && (
@@ -176,7 +176,7 @@ export default function BlogListClient() {
                 setSearchQuery('');
                 setFilters({ categoryId: '', language: '', postType: '', sortBy: 'latest' });
               }}
-              className="mt-5 rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs font-bold text-white shadow-md hover:opacity-90 transition-all"
+              className="mt-4 sm:mt-5 rounded-xl bg-[var(--color-brand-green)] px-4 py-2 sm:px-5 sm:py-2.5 text-xs font-bold text-white shadow-md hover:opacity-90 active:scale-95 transition-all"
             >
               Reset All Filters
             </button>

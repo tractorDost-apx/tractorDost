@@ -69,10 +69,10 @@ export default function ContactPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <Headphones size={14} /> 24/7 Farmer Support & Inquiries
           </div>
-          <h1 className="text-foreground text-4xl leading-tight font-extrabold tracking-tight md:text-6xl">
+          <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
             Get in Touch with <span className="text-[var(--color-brand-green)]">TractorDost</span>
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs sm:text-base md:text-lg leading-relaxed font-medium">
             Have questions about tractor pricing, loan eligibility, or dealer partnerships? Our agricultural advisors are here to help.
           </p>
         </div>

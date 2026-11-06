@@ -70,7 +70,7 @@ export function UsedLocationClient({
   }, [state, district, isCertifiedOnly]);
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-8 pb-24 sm:px-6 lg:px-8">
+    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-24 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <div className="mb-6 flex items-center gap-2 text-xs font-bold text-muted-foreground">
         <Link href="/used-tractors" className="hover:text-foreground">
@@ -112,10 +112,10 @@ export function UsedLocationClient({
               </>
             )}
           </div>
-          <h1 className="text-foreground text-4xl leading-tight font-extrabold tracking-tight md:text-5xl">
+          <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
             {title}
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-base md:text-lg">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs sm:text-base md:text-lg leading-relaxed font-medium">
             {subtitle}
           </p>
         </div>
@@ -170,22 +170,22 @@ export function UsedLocationClient({
           <p className="text-muted-foreground mt-4 text-sm font-semibold">Loading used tractors...</p>
         </div>
       ) : tractors.length === 0 ? (
-        <div className="rounded-3xl border border-border/50 bg-card/40 p-12 text-center">
-          <Tractor size={48} className="text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-foreground text-lg font-bold">No used tractors listed here yet</h3>
-          <p className="text-muted-foreground text-xs mt-1 mb-6">
+        <div className="rounded-2xl sm:rounded-3xl border border-border/50 bg-card/40 p-6 sm:p-10 text-center">
+          <Tractor size={36} className="text-muted-foreground mx-auto mb-2 sm:mb-3 sm:size-12" />
+          <h3 className="text-foreground text-base sm:text-lg font-bold">No used tractors listed here yet</h3>
+          <p className="text-muted-foreground text-xs mt-1 mb-4 sm:mb-6 max-w-sm mx-auto">
             Be the first to list your tractor in this location or explore all pre-owned listings across India.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <Link
               href="/sell-used-tractor"
-              className="rounded-full bg-[var(--color-brand-orange)] px-6 py-2.5 text-xs font-bold text-white shadow-md"
+              className="rounded-full bg-[var(--color-brand-orange)] px-5 py-2 sm:px-6 sm:py-2.5 text-xs font-bold text-white shadow-md active:scale-95 text-center"
             >
               Sell Your Tractor
             </Link>
             <Link
               href="/used-tractors"
-              className="rounded-full border border-border/60 bg-card px-6 py-2.5 text-xs font-bold text-foreground hover:bg-secondary"
+              className="rounded-full border border-border/60 bg-card px-5 py-2 sm:px-6 sm:py-2.5 text-xs font-bold text-foreground hover:bg-secondary active:scale-95 text-center"
             >
               Browse All Listings
             </Link>

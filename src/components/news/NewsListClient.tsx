@@ -96,10 +96,10 @@ export default function NewsListClient() {
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <Newspaper size={14} /> Agri & Tractor News
           </div>
-          <h1 className="text-foreground text-4xl leading-tight font-extrabold tracking-tight md:text-6xl">
+          <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
             Latest Farm Mechanization <span className="text-[var(--color-brand-green)]">Updates</span>
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs sm:text-base md:text-lg leading-relaxed font-medium">
             Stay ahead with breaking tractor launches, government subsidy policies, price revisions, and Indian agriculture tech news.
           </p>
         </div>
@@ -161,10 +161,10 @@ export default function NewsListClient() {
           <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
         </div>
       ) : posts.length === 0 ? (
-        <div className="rounded-3xl border border-border/40 bg-card/40 p-16 text-center">
-          <Newspaper size={48} className="text-muted-foreground mx-auto mb-4 opacity-40" />
-          <h3 className="text-foreground text-xl font-bold">No News Found</h3>
-          <p className="text-muted-foreground mt-1 text-sm">
+        <div className="rounded-2xl sm:rounded-3xl border border-border/40 bg-card/40 p-6 sm:p-10 md:p-14 text-center">
+          <Newspaper size={36} className="text-muted-foreground mx-auto mb-3 sm:mb-4 opacity-40 sm:size-12" />
+          <h3 className="text-foreground text-lg sm:text-xl font-bold">No News Found</h3>
+          <p className="text-muted-foreground mt-1 text-xs sm:text-sm max-w-sm mx-auto">
             Try adjusting your search query or check back soon for breaking farm updates.
           </p>
         </div>

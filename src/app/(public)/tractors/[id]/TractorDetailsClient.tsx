@@ -71,7 +71,7 @@ export default function TractorDetailsClient({
 
   if (state.status === 'unavailable') {
     return (
-      <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
+      <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-0 sm:pt-1 lg:pt-2 pb-24">
         <Link
           href="/tractors"
           className="text-muted hover:text-foreground bg-background/50 mb-6 inline-flex w-max items-center gap-2 rounded-full border border-[var(--border-subtle)] px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-md transition-colors"
@@ -213,7 +213,7 @@ function TractorDetailsView({
     : null;
 
   return (
-    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-28 pb-24">
+    <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-0 sm:pt-1 lg:pt-2 pb-24">
       {/* Back button */}
       <Link
         href="/tractors"
@@ -722,11 +722,77 @@ function TractorDetailsView({
                   )}
                 </div>
               )}
+
+              {/* 4. AUTO-SUGGESTED RIVALS / TOP COMPETITORS */}
+              {rivals.length > 0 && (
+                <div className="spatial-panel flex flex-col gap-6 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10">
+                      <Flame size={20} className="animate-pulse text-red-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-foreground text-xl font-black tracking-tight uppercase">
+                        Top Competitors
+                      </h3>
+                      <p className="text-muted text-xs font-bold">
+                        Compare {tractor.modelName} against popular market alternatives
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {rivals.map((rival, i) => {
+                      const isLeftMe = rival.tractorLeft?.id === tractor.id;
+                      const competitor = isLeftMe ? rival.tractorRight : rival.tractorLeft;
+
+                      if (!competitor) return null;
+
+                      const compImage =
+                        competitor.media?.find((m: any) => m.isPrimary)?.url ||
+                        competitor.media?.[0]?.url;
+
+                      return (
+                        <Link
+                          key={i}
+                          href={`/compare?ids=${tractor.id},${competitor.id}`}
+                          className="bg-background group flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-orange)]/40 hover:shadow-lg"
+                        >
+                          <div className="from-foreground/5 flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-2">
+                            {compImage ? (
+                              <img
+                                src={compImage}
+                                alt={competitor.modelName}
+                                className="h-full w-full object-contain mix-blend-multiply transition-transform group-hover:scale-110 dark:mix-blend-normal"
+                              />
+                            ) : (
+                              <TractorIcon className="text-muted h-8 w-8" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[10px] font-black tracking-widest text-[var(--color-brand-green)] uppercase">
+                              {competitor.brand?.name}
+                            </p>
+                            <h4 className="text-foreground truncate text-sm font-black">
+                              {competitor.modelName}
+                            </h4>
+                            <p className="text-muted mt-0.5 text-xs font-bold">
+                              {competitor.hp || '--'} HP {competitor.exShowroomPriceMin ? `• ₹${formatLakh(competitor.exShowroomPriceMin)}` : ''}
+                            </p>
+                          </div>
+                          <div className="bg-foreground/5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-[var(--color-brand-orange)] italic transition-colors group-hover:bg-[var(--color-brand-orange)] group-hover:text-white">
+                            VS
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
           </div>
         </div>
 
         {/* RIGHT COLUMN: Sticky Information & Leads */}
-        <div className="relative flex w-full flex-col gap-8 lg:w-[40%]">
+        <div className="w-full lg:w-[40%]">
           {/* "At a Glance" & Pricing Banner */}
           <div className="spatial-panel group lg:sticky lg:top-24 flex flex-col gap-6 overflow-hidden rounded-[2.5rem] border border-[var(--color-brand-green)]/20 p-8 shadow-2xl md:p-10">
             <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-[var(--color-brand-orange)]/10 blur-[50px] transition-all duration-1000 group-hover:bg-[var(--color-brand-orange)]/20" />
@@ -750,7 +816,7 @@ function TractorDetailsView({
                   {formatEnum(tractor.launchStatus)}
                 </span>
               </div>
-              <h1 className="text-foreground text-4xl leading-tight font-black tracking-tight lg:text-5xl">
+              <h1 className="text-foreground text-2xl sm:text-3xl lg:text-4xl xl:text-5xl leading-tight font-black tracking-tight">
                 {tractor.modelName}
               </h1>
             </div>
@@ -897,67 +963,6 @@ function TractorDetailsView({
               & Secure Financing
             </p>
           </div>
-
-          {/* Auto-Suggested Rivals */}
-          {rivals.length > 0 && (
-            <div className="spatial-panel relative flex flex-col gap-6 overflow-hidden rounded-[2.5rem] p-8">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10">
-                  <Flame size={20} className="animate-pulse text-red-500" />
-                </div>
-                <h3 className="text-foreground text-xl font-black tracking-tight uppercase">
-                  Top Competitors
-                </h3>
-              </div>
-
-              <div className="relative z-10 flex flex-col gap-4">
-                {rivals.map((rival, i) => {
-                  const isLeftMe = rival.tractorLeft?.id === tractor.id;
-                  const competitor = isLeftMe ? rival.tractorRight : rival.tractorLeft;
-
-                  if (!competitor) return null;
-
-                  const compImage =
-                    competitor.media?.find((m: any) => m.isPrimary)?.url ||
-                    competitor.media?.[0]?.url;
-
-                  return (
-                    <Link
-                      key={i}
-                      href={`/compare?ids=${tractor.id},${competitor.id}`}
-                      className="bg-background group flex items-center gap-4 rounded-[1.5rem] border border-[var(--border-subtle)] p-4 transition-all hover:border-[var(--color-brand-orange)]/30 hover:shadow-lg"
-                    >
-                      <div className="from-foreground/5 flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-2">
-                        {compImage ? (
-                          <img
-                            src={compImage}
-                            alt={competitor.modelName}
-                            className="h-full w-full object-contain mix-blend-multiply transition-transform group-hover:scale-110 dark:mix-blend-normal"
-                          />
-                        ) : (
-                          <TractorIcon className="text-muted h-8 w-8" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[9px] font-black tracking-widest text-[var(--color-brand-green)] uppercase">
-                          {competitor.brand?.name}
-                        </p>
-                        <h4 className="text-foreground truncate text-sm font-black">
-                          {competitor.modelName}
-                        </h4>
-                        <p className="text-muted mt-1 text-[11px] font-bold">
-                          {competitor.hp || '--'} HP
-                        </p>
-                      </div>
-                      <div className="bg-foreground/5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-[var(--color-brand-orange)] italic transition-colors group-hover:bg-[var(--color-brand-orange)] group-hover:text-white">
-                        VS
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

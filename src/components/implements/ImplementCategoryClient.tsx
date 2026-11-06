@@ -109,7 +109,7 @@ export function ImplementCategoryClient({
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-10">
+    <div className="mx-auto max-w-7xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-16 sm:px-6 lg:px-8 space-y-10">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <Link href="/" className="hover:text-foreground">
@@ -124,7 +124,7 @@ export function ImplementCategoryClient({
       </div>
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 via-card/50 to-background p-6 sm:p-10 backdrop-blur-xl shadow-xl">
+      <div className="relative overflow-hidden rounded-[24px] sm:rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 via-card/50 to-background p-4 sm:p-8 md:p-10 backdrop-blur-xl shadow-xl">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-black tracking-wider text-emerald-400 uppercase">
@@ -177,10 +177,10 @@ export function ImplementCategoryClient({
           <TractorLoader />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/60 p-12 text-center">
-          <Wrench size={48} className="text-muted-foreground/40 mb-3" />
-          <p className="text-sm font-semibold text-foreground">No agricultural implements found</p>
-          <p className="mt-1 text-xs text-muted-foreground">Try clearing your search query or check all implements.</p>
+        <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-border/60 p-6 sm:p-10 text-center">
+          <Wrench size={36} className="text-muted-foreground/40 mb-2 sm:mb-3 sm:size-12" />
+          <p className="text-xs sm:text-sm font-semibold text-foreground">No agricultural implements found</p>
+          <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground">Try clearing your search query or check all implements.</p>
           <Link
             href="/implements"
             className="mt-4 rounded-xl bg-muted px-4 py-2 text-xs font-bold text-foreground hover:bg-muted/80"

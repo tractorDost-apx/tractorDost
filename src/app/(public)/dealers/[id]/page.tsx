@@ -128,7 +128,7 @@ export default function SingleDealerPublicPage({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-10">
+    <div className="mx-auto max-w-7xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-16 sm:px-6 lg:px-8 space-y-10">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <Link href="/" className="hover:text-foreground">
@@ -245,7 +245,7 @@ export default function SingleDealerPublicPage({
         </div>
 
         {inventory.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-xs text-muted-foreground">
+          <div className="rounded-2xl border border-dashed border-border/60 p-5 sm:p-8 text-center text-xs text-muted-foreground">
             Contact dealer directly for current showroom stock and delivery schedule.
           </div>
         ) : (

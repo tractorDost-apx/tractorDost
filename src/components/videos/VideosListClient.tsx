@@ -175,17 +175,17 @@ export function VideosListClient() {
   const featuredVideo = videos[0] || (CURATED_VIDEOS[0] as ContentPost);
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-12 pb-24 sm:px-6 lg:px-8">
+    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-24 sm:px-6 lg:px-8">
       {/* Header */}
-      <section className="relative flex flex-col items-center justify-center pt-8 pb-12 text-center">
+      <section className="relative flex flex-col items-center justify-center pt-2 pb-8 text-center">
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-brand-green)]/30 bg-[var(--color-brand-green)]/10 px-4 py-1.5 text-xs font-black tracking-widest text-[var(--color-brand-green)] uppercase">
             <Tv size={14} /> TractorDost TV & Reviews
           </div>
-          <h1 className="text-foreground text-4xl leading-tight font-extrabold tracking-tight md:text-6xl">
+          <h1 className="text-foreground text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
             Tractor Videos & <span className="text-[var(--color-brand-green)]">Expert Reviews</span>
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-xs sm:text-base md:text-lg leading-relaxed font-medium">
             Watch unbiased farm trials, mileage tests, implement compatibility demos, and head-to-head comparisons before buying.
           </p>
         </div>
@@ -285,8 +285,8 @@ export function VideosListClient() {
           <p className="text-muted-foreground mt-4 text-sm font-semibold">Loading tractor video library...</p>
         </div>
       ) : filteredVideos.length === 0 ? (
-        <div className="rounded-3xl border border-border/50 bg-card/40 p-12 text-center">
-          <h3 className="text-foreground text-lg font-bold">No videos found</h3>
+        <div className="rounded-2xl sm:rounded-3xl border border-border/50 bg-card/40 p-6 sm:p-10 text-center">
+          <h3 className="text-foreground text-base sm:text-lg font-bold">No videos found</h3>
           <p className="text-muted-foreground text-xs mt-1">Try adjusting your search or category filter.</p>
         </div>
       ) : (

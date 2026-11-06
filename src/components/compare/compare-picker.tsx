@@ -75,8 +75,8 @@ export default function ComparePicker({ onCompare, initialIds = [] }: ComparePic
       <div className="pointer-events-none absolute top-[-20%] right-[-10%] h-[150px] w-[150px] rounded-full bg-[var(--color-brand-green)]/10 blur-[60px]" />
 
       <div className="relative z-10 space-y-2 text-center">
-        <h2 className="text-foreground text-3xl font-black">Compare Tractors</h2>
-        <p className="text-muted font-medium">
+        <h2 className="text-foreground text-2xl sm:text-3xl font-black">Compare Tractors</h2>
+        <p className="text-muted text-xs sm:text-base font-medium">
           Select up to 4 tractors to compare their specifications side-by-side.
         </p>
       </div>

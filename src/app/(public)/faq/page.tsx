@@ -59,7 +59,7 @@ export default async function FaqPage() {
         />
       )}
 
-      <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:py-12">
+      <div className="mx-auto w-full max-w-4xl px-4 pt-0 sm:pt-1 lg:pt-2 pb-16">
         {/* Breadcrumb / Back button */}
         <div className="mb-6">
           <Link
@@ -80,7 +80,7 @@ export default async function FaqPage() {
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-foreground">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
             Frequently Asked <span className="text-[var(--color-brand-green)]">Questions</span>
           </h1>
 
@@ -94,9 +94,9 @@ export default async function FaqPage() {
         {displayFaqs.length > 0 ? (
           <PublicFaqExplorer faqs={displayFaqs} />
         ) : (
-          <div className="text-center py-16 rounded-2xl border border-[var(--border-subtle)] bg-background/40">
-            <HelpCircle size={40} className="mx-auto text-muted/40 mb-3" />
-            <h3 className="text-base font-bold text-foreground">No FAQs Published Yet</h3>
+          <div className="text-center py-8 sm:py-16 rounded-2xl border border-[var(--border-subtle)] bg-background/40">
+            <HelpCircle size={32} className="mx-auto text-muted/40 mb-2 sm:mb-3 sm:size-10" />
+            <h3 className="text-sm sm:text-base font-bold text-foreground">No FAQs Published Yet</h3>
             <p className="text-xs text-muted mt-1 max-w-sm mx-auto">
               Our team is currently preparing helpful guides and answers. Please check back soon or
               contact support directly.

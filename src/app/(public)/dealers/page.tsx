@@ -149,16 +149,16 @@ export default function DealersPage() {
   };
 
   return (
-    <div className="relative mx-auto min-h-screen w-full max-w-[1400px] px-4 py-10 sm:px-6">
+    <div className="relative mx-auto min-h-screen w-full max-w-[1400px] px-4 pt-0 sm:pt-1 lg:pt-2 pb-16 sm:px-6">
       {/* Header Section */}
-      <div className="animate-fade-in mb-12 flex flex-col items-center text-center">
-        <div className="mb-4 inline-flex items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/10 p-3 text-[var(--color-brand-green)]">
-          <Store size={28} />
+      <div className="animate-fade-in mb-8 sm:mb-12 flex flex-col items-center text-center">
+        <div className="mb-3 sm:mb-4 inline-flex items-center justify-center rounded-2xl bg-[var(--color-brand-green)]/10 p-2.5 sm:p-3 text-[var(--color-brand-green)]">
+          <Store size={24} className="sm:size-7" />
         </div>
-        <h1 className="text-foreground mb-4 text-4xl font-black tracking-tight md:text-5xl">
+        <h1 className="text-foreground mb-2 sm:mb-4 text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
           Find a <span className="text-[var(--color-brand-green)]">Tractor Dealer</span>
         </h1>
-        <p className="text-muted max-w-2xl text-lg font-bold">
+        <p className="text-muted max-w-2xl text-xs sm:text-base md:text-lg font-medium leading-relaxed">
           Locate certified showrooms, authorized service centers, and trusted used tractor dealers
           across India.
         </p>
@@ -167,6 +167,7 @@ export default function DealersPage() {
       {/* Mobile Filter Toggle Button */}
       <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
         <button
+          suppressHydrationWarning
           onClick={() => setShowMobileFilters((prev) => !prev)}
           className="flex items-center gap-2 rounded-2xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#151c18]/90 px-5 py-3 text-xs font-black text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 cursor-pointer"
         >
@@ -191,6 +192,7 @@ export default function DealersPage() {
                 <h3>Advanced Filters</h3>
               </div>
               <button
+                suppressHydrationWarning
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedBrand(null);
@@ -211,6 +213,7 @@ export default function DealersPage() {
               <div className="relative">
                 <Search size={18} className="text-muted absolute top-1/2 left-4 -translate-y-1/2" />
                 <input
+                  suppressHydrationWarning
                   type="text"
                   placeholder="Dealer name or city..."
                   value={searchQuery}
@@ -226,6 +229,7 @@ export default function DealersPage() {
                 Location
               </label>
               <select
+                suppressHydrationWarning
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
                 className="bg-foreground/5 text-foreground w-full appearance-none rounded-xl border-none px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
@@ -243,6 +247,7 @@ export default function DealersPage() {
             <div className="mb-6">
               <label className="bg-foreground/5 hover:bg-foreground/10 flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors">
                 <input
+                  suppressHydrationWarning
                   type="checkbox"
                   checked={showOnlyOpen}
                   onChange={(e) => setShowOnlyOpen(e.target.checked)}
@@ -261,6 +266,7 @@ export default function DealersPage() {
               </label>
               <div className="custom-scrollbar flex max-h-60 flex-col gap-2 overflow-y-auto pr-2">
                 <button
+                  suppressHydrationWarning
                   onClick={() => setSelectedBrand(null)}
                   className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-all ${!selectedBrand ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' : 'bg-foreground/5 text-foreground hover:bg-foreground/10 border-transparent'}`}
                 >
@@ -268,6 +274,7 @@ export default function DealersPage() {
                 </button>
                 {brands.map((brand) => (
                   <button
+                    suppressHydrationWarning
                     key={brand.id}
                     onClick={() => setSelectedBrand(brand.id)}
                     className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-all ${selectedBrand === brand.id ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-inner' : 'bg-foreground/5 text-foreground hover:bg-foreground/10 border-transparent'}`}
@@ -305,6 +312,7 @@ export default function DealersPage() {
 
             <div className="flex w-full items-center gap-2 sm:w-auto">
               <select
+                suppressHydrationWarning
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="bg-background text-foreground appearance-none rounded-xl border-none px-4 py-2.5 text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-[var(--color-brand-green)]"
@@ -315,12 +323,14 @@ export default function DealersPage() {
 
               <div className="bg-background flex rounded-xl p-1 shadow-sm">
                 <button
+                  suppressHydrationWarning
                   onClick={() => setViewMode('list')}
                   className={`rounded-lg p-2 transition-colors ${viewMode === 'list' ? 'bg-foreground/10 text-foreground' : 'text-muted hover:text-foreground'}`}
                 >
                   <LayoutList size={18} />
                 </button>
                 <button
+                  suppressHydrationWarning
                   onClick={() => setViewMode('map')}
                   className={`rounded-lg p-2 transition-colors ${viewMode === 'map' ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]' : 'text-muted hover:text-[var(--color-brand-green)]'}`}
                 >
@@ -335,21 +345,22 @@ export default function DealersPage() {
               <TractorLoader size={48} className="text-[var(--color-brand-green)]" />
             </div>
           ) : dealers.length === 0 ? (
-            <div className="spatial-panel animate-fade-in bg-background/50 flex flex-col items-center justify-center rounded-3xl border border-[var(--border-subtle)] p-16 text-center backdrop-blur-xl">
-              <Store size={64} className="text-muted mb-6 opacity-40" />
-              <h3 className="text-foreground mb-3 text-2xl font-black">No Dealerships Found</h3>
-              <p className="text-muted mb-8 max-w-md text-base font-bold">
+            <div className="spatial-panel animate-fade-in bg-background/50 flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-[var(--border-subtle)] p-6 sm:p-10 md:p-14 text-center backdrop-blur-xl">
+              <Store size={36} className="text-muted mb-3 sm:mb-4 opacity-40 sm:size-12" />
+              <h3 className="text-foreground mb-1.5 sm:mb-2 text-lg sm:text-2xl font-black">No Dealerships Found</h3>
+              <p className="text-muted mb-5 sm:mb-6 max-w-sm text-xs sm:text-sm font-medium leading-relaxed">
                 Try adjusting your advanced filters or searching for a different area to find
                 authorized dealers near you.
               </p>
               <button
+                suppressHydrationWarning
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedBrand(null);
                   setSelectedState('');
                   setShowOnlyOpen(false);
                 }}
-                className="rounded-2xl bg-[var(--color-brand-green)] px-8 py-4 font-black text-white shadow-[var(--color-brand-green)]/20 shadow-lg transition-transform hover:-translate-y-1 hover:bg-[var(--color-brand-green)]/90"
+                className="rounded-xl sm:rounded-2xl bg-[var(--color-brand-green)] px-5 py-2.5 sm:px-7 sm:py-3.5 text-xs sm:text-sm font-bold text-white shadow-md shadow-[var(--color-brand-green)]/20 transition-transform active:scale-95 hover:-translate-y-0.5 hover:bg-[var(--color-brand-green)]/90"
               >
                 Reset All Filters
               </button>
@@ -569,6 +580,7 @@ export default function DealersPage() {
                     Your Name *
                   </label>
                   <input
+                    suppressHydrationWarning
                     required
                     type="text"
                     value={inquiryForm.name}
@@ -584,6 +596,7 @@ export default function DealersPage() {
                     Mobile Number *
                   </label>
                   <input
+                    suppressHydrationWarning
                     required
                     type="tel"
                     maxLength={10}
@@ -600,6 +613,7 @@ export default function DealersPage() {
                     Interest / Message (Optional)
                   </label>
                   <textarea
+                    suppressHydrationWarning
                     rows={3}
                     value={inquiryForm.message}
                     onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
@@ -610,6 +624,7 @@ export default function DealersPage() {
                 </div>
 
                 <button
+                  suppressHydrationWarning
                   type="submit"
                   disabled={submittingInquiry}
                   className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] py-3.5 font-black text-white shadow-lg shadow-[var(--color-brand-green)]/30 transition-all hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 disabled:opacity-60"
