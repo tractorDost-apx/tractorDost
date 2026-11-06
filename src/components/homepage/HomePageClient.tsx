@@ -11,7 +11,7 @@ import {
   BookOpen,
   Wrench,
 } from 'lucide-react';
-import { tractorAPI, Tractor as TractorModel, LaunchStatus } from '@/lib/api/tractors';
+import { tractorAPI, Tractor as TractorModel, LaunchStatus, GetTractorsParams } from '@/lib/api/tractors';
 import { implementAPI, Implement } from '@/lib/api/implements';
 import { brandAPI, Brand } from '@/lib/api/brands';
 import { compareAPI, CompareFrequencyRecord } from '@/lib/api/compare';
@@ -25,6 +25,186 @@ interface HomePageClientProps {
   children?: React.ReactNode;
   /** Live hero banners from the Banner Management module, fetched on the server. */
   banners?: PublicBanner[];
+}
+
+/**
+ * Fetch tractors across multiple pages up to limit: 100 per page
+ * to gather an ample catalog of tractors across all brands.
+ */
+async function fetchTractorsPool(params: GetTractorsParams = {}): Promise<TractorModel[]> {
+  try {
+    const page1Res = await tractorAPI.getAllTractors({ ...params, page: 1, limit: 100 }).catch(() => null);
+    if (!page1Res?.success || !page1Res.data) return [];
+
+    const list: TractorModel[] = (page1Res.data.tractors || page1Res.data.data || []) as TractorModel[];
+    const totalPages =
+      page1Res.data.pagination?.totalPages ||
+      page1Res.data.totalPages ||
+      1;
+
+    if (totalPages > 1) {
+      const extraPageNums = Array.from(
+        { length: Math.min(totalPages - 1, 4) },
+        (_, i) => i + 2
+      );
+      const extraRes = await Promise.all(
+        extraPageNums.map((p) =>
+          tractorAPI.getAllTractors({ ...params, page: p, limit: 100 }).catch(() => null)
+        )
+      );
+      extraRes.forEach((r) => {
+        if (r?.success && r.data) {
+          const items = (r.data.tractors || r.data.data || []) as TractorModel[];
+          list.push(...items);
+        }
+      });
+    }
+    return list;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Orders a list of tractors such that they strictly follow the sequence
+ * of the top brands (e.g. Mahindra, Swaraj, Sonalika, TAFE, Massey Ferguson, John Deere, Eicher, Kubota...)
+ * using a round-robin interleaving so that each top brand is represented in order,
+ * followed by subsequent models in the same brand sequence.
+ */
+function arrangeTractorsByTopBrandSequence(
+  tractorsList: TractorModel[],
+  orderedBrands: Brand[],
+  options: {
+    sortBy?: 'featured' | 'popular' | 'latest' | 'upcoming';
+  } = {}
+): TractorModel[] {
+  if (!tractorsList || tractorsList.length === 0) return [];
+  if (!orderedBrands || orderedBrands.length === 0) return tractorsList;
+
+  const { sortBy = 'featured' } = options;
+
+  // Build lookups for fast brand resolution
+  const brandById = new Map<number, Brand>();
+  const brandByName = new Map<string, Brand>();
+  orderedBrands.forEach((b) => {
+    brandById.set(b.id, b);
+    if (b.name) {
+      brandByName.set(b.name.trim().toLowerCase(), b);
+    }
+  });
+
+  // Group tractors into buckets for each brand in orderedBrands
+  const brandBuckets = new Map<number, TractorModel[]>();
+  orderedBrands.forEach((b) => brandBuckets.set(b.id, []));
+  const unmappedTractors: TractorModel[] = [];
+
+  for (const t of tractorsList) {
+    let matchedBrand: Brand | undefined;
+    if (t.brandId && brandById.has(t.brandId)) {
+      matchedBrand = brandById.get(t.brandId);
+    } else if (t.brand?.id && brandById.has(t.brand.id)) {
+      matchedBrand = brandById.get(t.brand.id);
+    } else if (t.brand?.name && brandByName.has(t.brand.name.trim().toLowerCase())) {
+      matchedBrand = brandByName.get(t.brand.name.trim().toLowerCase());
+    } else if (t.modelName) {
+      const lowerModel = t.modelName.toLowerCase();
+      for (const b of orderedBrands) {
+        if (b.name && lowerModel.startsWith(b.name.toLowerCase())) {
+          matchedBrand = b;
+          break;
+        }
+      }
+    }
+
+    const enrichedTractor: TractorModel = {
+      ...t,
+      brand: (t.brand?.name
+        ? t.brand
+        : matchedBrand
+        ? {
+            id: matchedBrand.id,
+            name: matchedBrand.name,
+            slug: matchedBrand.slug,
+            logoUrl: matchedBrand.logoUrl,
+          }
+        : t.brand) as any,
+      brandId: t.brandId || matchedBrand?.id || t.brand?.id || 0,
+    };
+
+    if (matchedBrand && brandBuckets.has(matchedBrand.id)) {
+      brandBuckets.get(matchedBrand.id)!.push(enrichedTractor);
+    } else {
+      unmappedTractors.push(enrichedTractor);
+    }
+  }
+
+  // Sort within each brand bucket according to section criteria
+  orderedBrands.forEach((b) => {
+    const bucket = brandBuckets.get(b.id);
+    if (bucket && bucket.length > 1) {
+      bucket.sort((a, bItem) => {
+        if (sortBy === 'latest') {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = bItem.createdAt ? new Date(bItem.createdAt).getTime() : 0;
+          if (dateA !== dateB) return dateB - dateA;
+          return (bItem.id || 0) - (a.id || 0);
+        }
+
+        if (sortBy === 'upcoming') {
+          if (a.expectedLaunchDate && bItem.expectedLaunchDate) {
+            return new Date(a.expectedLaunchDate).getTime() - new Date(bItem.expectedLaunchDate).getTime();
+          }
+          if (a.expectedLaunchDate && !bItem.expectedLaunchDate) return -1;
+          if (!a.expectedLaunchDate && bItem.expectedLaunchDate) return 1;
+          return (bItem.id || 0) - (a.id || 0);
+        }
+
+        if (sortBy === 'popular') {
+          const scoreA = (a.viewsCount || 0) + (a.leadsCount || 0) * 2;
+          const scoreB = (bItem.viewsCount || 0) + (bItem.leadsCount || 0) * 2;
+          if (scoreA !== scoreB) return scoreB - scoreA;
+          if (a.isFeatured !== bItem.isFeatured) return a.isFeatured ? -1 : 1;
+          return (a.id || 0) - (bItem.id || 0);
+        }
+
+        // 'featured'
+        if (a.isFeatured !== bItem.isFeatured) return a.isFeatured ? -1 : 1;
+        const scoreA = (a.viewsCount || 0) + (a.leadsCount || 0) * 2;
+        const scoreB = (bItem.viewsCount || 0) + (bItem.leadsCount || 0) * 2;
+        if (scoreA !== scoreB) return scoreB - scoreA;
+        const aHasImg = a.media && a.media.length > 0 ? 1 : 0;
+        const bHasImg = bItem.media && bItem.media.length > 0 ? 1 : 0;
+        if (aHasImg !== bHasImg) return bHasImg - aHasImg;
+        return (a.id || 0) - (bItem.id || 0);
+      });
+    }
+  });
+
+  // Interleave round-robin according to the exact sequence in orderedBrands
+  const result: TractorModel[] = [];
+  let hasMore = true;
+  let round = 0;
+
+  while (hasMore) {
+    hasMore = false;
+    for (const b of orderedBrands) {
+      const bucket = brandBuckets.get(b.id);
+      if (bucket && round < bucket.length) {
+        result.push(bucket[round]);
+        if (round + 1 < bucket.length) {
+          hasMore = true;
+        }
+      }
+    }
+    round++;
+  }
+
+  // Append any unmapped tractors at the end
+  if (unmappedTractors.length > 0) {
+    result.push(...unmappedTractors);
+  }
+
+  return result;
 }
 
 export default function HomePageClient({ children, banners }: HomePageClientProps) {
@@ -99,77 +279,34 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
       setLoading(true);
       try {
         const [
-          featuredRes,
-          popularRes,
-          upcomingRes,
-          latestRes,
-          implementsRes,
           brandsRes,
+          allTractorsRaw,
+          popularRaw,
+          upcomingRaw,
+          latestRaw,
+          implementsRes,
           compareRes,
           postsRes,
         ] = await Promise.all([
-          tractorAPI.getAllTractors({ limit: 10 }),
-          tractorAPI.getAllTractors({ limit: 10, launchStatus: LaunchStatus.POPULAR }).catch(() => null),
-          tractorAPI.getAllTractors({ limit: 10, launchStatus: LaunchStatus.UPCOMING }).catch(() => null),
-          tractorAPI.getAllTractors({ limit: 10, launchStatus: LaunchStatus.LATEST }).catch(() => null),
+          brandAPI.getAllBrands({ limit: 100, sortBy: 'sortOrder', sortOrder: 'asc' }).catch(() => null),
+          fetchTractorsPool(),
+          fetchTractorsPool({ launchStatus: LaunchStatus.POPULAR }),
+          fetchTractorsPool({ launchStatus: LaunchStatus.UPCOMING }),
+          fetchTractorsPool({ launchStatus: LaunchStatus.LATEST }),
           implementAPI.getAllImplements({ limit: 10 }).catch(() => null),
-          brandAPI.getAllBrands({ limit: 100, sortBy: 'sortOrder', sortOrder: 'asc' }),
-          compareAPI.getFrequencyOfCompare({ limit: 3, sort: 'desc' }),
+          compareAPI.getFrequencyOfCompare({ limit: 3, sort: 'desc' }).catch(() => null),
           cmsAPI.getPosts({ limit: 8, status: 'PUBLISHED' }).catch(() => null),
         ]);
 
-        // Featured Tractors
-        const allTractors = (featuredRes?.success
-          ? featuredRes.data?.tractors || featuredRes.data?.data || []
-          : []) as TractorModel[];
-        setFeaturedTractors(allTractors);
-
-        // Popular Tractors
-        const popData = (popularRes?.success
-          ? popularRes.data?.tractors || popularRes.data?.data || []
-          : []) as TractorModel[];
-        if (popData.length > 0) {
-          setPopularTractors(popData);
-        } else if (allTractors.length > 0) {
-          setPopularTractors(allTractors.slice(0, 10));
-        }
-
-        // Upcoming Tractors
-        const upData = (upcomingRes?.success
-          ? upcomingRes.data?.tractors || upcomingRes.data?.data || []
-          : []) as TractorModel[];
-        if (upData.length > 0) {
-          setUpcomingTractors(upData);
-        } else if (allTractors.length > 2) {
-          setUpcomingTractors(allTractors.slice(2, 12));
-        } else {
-          setUpcomingTractors(allTractors);
-        }
-
-        // Latest Tractors
-        const latData = (latestRes?.success
-          ? latestRes.data?.tractors || latestRes.data?.data || []
-          : []) as TractorModel[];
-        if (latData.length > 0) {
-          setLatestTractors(latData);
-        } else if (allTractors.length > 0) {
-          setLatestTractors(allTractors);
-        }
-
-        // Farm Equipment (Implements)
-        if (implementsRes?.success && implementsRes.data) {
-          const impItems = (implementsRes.data.data || implementsRes.data.implements || []) as Implement[];
-          setImplementsList(impItems);
-        }
-
-        // Brands
-        if (brandsRes.success) {
+        // 1. Process Brands and sort according to Explore Top Brands sequence
+        let sortedBrands: Brand[] = [];
+        if (brandsRes?.success) {
           const bPayload = brandsRes.data as unknown as {
             brands?: Brand[];
             data?: Brand[];
           };
           const rawBrands = (bPayload?.brands || bPayload?.data || []) as Brand[];
-          const sortedBrands = [...rawBrands].sort((a, b) => {
+          sortedBrands = [...rawBrands].sort((a, b) => {
             const orderA = a.sortOrder ?? 0;
             const orderB = b.sortOrder ?? 0;
             if (orderA !== orderB) return orderA - orderB;
@@ -178,8 +315,107 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           setBrands(sortedBrands);
         }
 
-        // Comparisons
-        if (compareRes.success) {
+        // 2. Build consolidated pool of tractors
+        const tractorMap = new Map<number, TractorModel>();
+        allTractorsRaw.forEach((t) => tractorMap.set(t.id, t));
+
+        // If any of the top 10 brands don't have tractors in the initial pool, fetch their tractors explicitly
+        if (sortedBrands.length > 0) {
+          const topBrandsToCheck = sortedBrands.slice(0, 10);
+          const missingBrandIds = topBrandsToCheck
+            .filter((b) => !Array.from(tractorMap.values()).some((t) => t.brandId === b.id || t.brand?.id === b.id))
+            .map((b) => b.id);
+
+          if (missingBrandIds.length > 0) {
+            const extraBrandResponses = await Promise.all(
+              missingBrandIds.map((bId) =>
+                tractorAPI.getAllTractors({ brandId: bId, limit: 10 }).catch(() => null)
+              )
+            );
+            extraBrandResponses.forEach((res) => {
+              if (res?.success && res.data) {
+                const bTractors = (res.data.tractors || res.data.data || []) as TractorModel[];
+                bTractors.forEach((t) => {
+                  if (!tractorMap.has(t.id)) {
+                    tractorMap.set(t.id, t);
+                  }
+                });
+              }
+            });
+          }
+        }
+
+        const consolidatedTractors = Array.from(tractorMap.values());
+
+        // 3. Featured Tractors: Arranged strictly by Top Brands sequence
+        const arrangedFeatured = arrangeTractorsByTopBrandSequence(
+          consolidatedTractors,
+          sortedBrands,
+          { sortBy: 'featured' }
+        );
+        setFeaturedTractors(arrangedFeatured);
+
+        // 4. Popular Tractors: Arranged strictly by Top Brands sequence
+        const popularMap = new Map<number, TractorModel>();
+        popularRaw.forEach((t) => popularMap.set(t.id, t));
+        const sortedByPopularity = [...consolidatedTractors].sort(
+          (a, b) => ((b.viewsCount || 0) + (b.leadsCount || 0) * 2) - ((a.viewsCount || 0) + (a.leadsCount || 0) * 2)
+        );
+        sortedByPopularity.forEach((t) => {
+          if (popularMap.size < 60) {
+            popularMap.set(t.id, t);
+          }
+        });
+        const arrangedPopular = arrangeTractorsByTopBrandSequence(
+          Array.from(popularMap.values()),
+          sortedBrands,
+          { sortBy: 'popular' }
+        );
+        setPopularTractors(arrangedPopular);
+
+        // 5. Upcoming Tractors: Arranged strictly by Top Brands sequence
+        const upcomingSource = upcomingRaw.length > 0
+          ? upcomingRaw
+          : consolidatedTractors.filter((t) => t.launchStatus === LaunchStatus.UPCOMING);
+        const finalUpcoming = upcomingSource.length > 0
+          ? upcomingSource
+          : consolidatedTractors.slice(4, 20);
+        const arrangedUpcoming = arrangeTractorsByTopBrandSequence(
+          finalUpcoming,
+          sortedBrands,
+          { sortBy: 'upcoming' }
+        );
+        setUpcomingTractors(arrangedUpcoming);
+
+        // 6. Latest Tractors: Arranged strictly by Top Brands sequence
+        const latestMap = new Map<number, TractorModel>();
+        latestRaw.forEach((t) => latestMap.set(t.id, t));
+        const sortedByNewest = [...consolidatedTractors].sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          if (dateA !== dateB) return dateB - dateA;
+          return (b.id || 0) - (a.id || 0);
+        });
+        sortedByNewest.forEach((t) => {
+          if (latestMap.size < 60) {
+            latestMap.set(t.id, t);
+          }
+        });
+        const arrangedLatest = arrangeTractorsByTopBrandSequence(
+          Array.from(latestMap.values()),
+          sortedBrands,
+          { sortBy: 'latest' }
+        );
+        setLatestTractors(arrangedLatest);
+
+        // 7. Farm Equipment (Implements)
+        if (implementsRes?.success && implementsRes.data) {
+          const impItems = (implementsRes.data.data || implementsRes.data.implements || []) as Implement[];
+          setImplementsList(impItems);
+        }
+
+        // 8. Comparisons
+        if (compareRes?.success) {
           const cPayload = compareRes.data as unknown as
             | CompareFrequencyRecord[]
             | { records?: CompareFrequencyRecord[] };
@@ -190,7 +426,7 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
           );
         }
 
-        // CMS Posts
+        // 9. CMS Posts
         if (postsRes?.success && Array.isArray(postsRes?.data)) {
           setPosts(postsRes.data);
         } else {
