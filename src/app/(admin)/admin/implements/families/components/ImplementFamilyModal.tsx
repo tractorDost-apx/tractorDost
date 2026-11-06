@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ImplementFamily,
   implementFamilyAPI,
@@ -8,17 +8,20 @@ import {
   UpdateImplementFamilyInput,
 } from '@/lib/api/implementFamilies';
 import { EquipmentBrand } from '@/lib/api/equipmentBrands';
+import { mediaAPI } from '@/lib/api/media';
+import { validateImageFile } from '@/lib/utils/file-validation';
 import {
   X,
   AlertCircle,
   FileText,
-  Settings2,
   Maximize2,
   Minimize2,
   FolderOpen,
-  Link as LinkIcon,
-  Search,
   Sparkles,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
+  CheckCircle2,
 } from 'lucide-react';
 import { TractorLoader } from '@/components/ui/TractorLoader';
 import { toast } from '@/components/ui/toast';
@@ -51,14 +54,28 @@ export default function ImplementFamilyModal({
     name: family?.name || '',
     slug: family?.slug || '',
     description: family?.description || '',
-    logoUrl: family?.logoUrl || '',
     isActive: family ? family.isActive : true,
     sortOrder: family?.sortOrder !== undefined ? String(family.sortOrder) : '0',
     seoTitle: family?.seoTitle || '',
     seoDescription: family?.seoDescription || '',
   });
 
+  // Direct image upload states
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(
+    family?.logoUrl || null
+  );
+  const [existingLogoUrl, setExistingLogoUrl] = useState<string | null>(
+    family?.logoUrl || null
+  );
+  const [existingLogoId, setExistingLogoId] = useState<string | null>(
+    family?.logoId || null
+  );
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [loading, setLoading] = useState(false);
+  const [uploadStep, setUploadStep] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sortOrderTouched, setSortOrderTouched] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -86,12 +103,15 @@ export default function ImplementFamilyModal({
         name: family.name,
         slug: family.slug,
         description: family.description || '',
-        logoUrl: family.logoUrl || '',
         isActive: family.isActive,
         sortOrder: String(family.sortOrder ?? 0),
         seoTitle: family.seoTitle || '',
         seoDescription: family.seoDescription || '',
       });
+      setLogoPreview(family.logoUrl || null);
+      setExistingLogoUrl(family.logoUrl || null);
+      setExistingLogoId(family.logoId || null);
+      setLogoFile(null);
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -101,6 +121,10 @@ export default function ImplementFamilyModal({
             ? String(brands[0].id)
             : '',
       }));
+      setLogoPreview(null);
+      setExistingLogoUrl(null);
+      setExistingLogoId(null);
+      setLogoFile(null);
     }
   }, [family, initialBrandId, brands]);
 
@@ -152,6 +176,63 @@ export default function ImplementFamilyModal({
     }
   };
 
+  // Image Selection Handler
+  const handleSelectImage = (file: File) => {
+    const validation = validateImageFile(file, { isLogo: true, maxSizeMB: 5 });
+    if (!validation.valid) {
+      const err = validation.error || 'Invalid image file';
+      setError(err);
+      toast.error(err);
+      return;
+    }
+
+    setError(null);
+    setLogoFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setLogoPreview(objectUrl);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleSelectImage(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleSelectImage(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLogoFile(null);
+    setLogoPreview(null);
+    setExistingLogoUrl(null);
+    setExistingLogoId(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSortOrderTouched(true);
@@ -187,18 +268,45 @@ export default function ImplementFamilyModal({
     setError(null);
 
     try {
+      let finalLogoUrl = existingLogoUrl || '';
+      let finalLogoId = existingLogoId || '';
+
+      // 1. Upload new image file if selected
+      if (logoFile) {
+        setUploadStep('Uploading family image...');
+        const mediaForm = new FormData();
+        mediaForm.append('file', logoFile);
+        mediaForm.append('targetType', 'IMPLEMENT');
+        mediaForm.append('targetId', String(brandIdNum));
+        mediaForm.append('mediaType', 'image');
+
+        const mediaRes = await mediaAPI.createMedia(mediaForm);
+
+        if (mediaRes.success && mediaRes.data && mediaRes.data.length > 0) {
+          finalLogoUrl = mediaRes.data[0].url;
+          finalLogoId = mediaRes.data[0].fileId || '';
+        } else {
+          throw new Error('Image upload failed. Please try again.');
+        }
+      }
+
+      // 2. Create or Update Implement Family with the uploaded image URL
+      setUploadStep(isEditing ? 'Updating family details...' : 'Creating family...');
+
       if (isEditing && family) {
         const payload: UpdateImplementFamilyInput = {
           brandId: brandIdNum,
           name: formData.name.trim(),
           slug: formData.slug.trim() || undefined,
           description: formData.description.trim() || undefined,
-          logoUrl: formData.logoUrl.trim() || undefined,
+          logoUrl: finalLogoUrl || '',
+          logoId: finalLogoId || undefined,
           sortOrder: parseInt(formData.sortOrder.trim(), 10) || 0,
           isActive: formData.isActive,
           seoTitle: formData.seoTitle.trim() || undefined,
           seoDescription: formData.seoDescription.trim() || undefined,
         };
+
         const res = await implementFamilyAPI.updateImplementFamily(
           family.id,
           payload
@@ -213,11 +321,13 @@ export default function ImplementFamilyModal({
           name: formData.name.trim(),
           slug: formData.slug.trim() || undefined,
           description: formData.description.trim() || undefined,
-          logoUrl: formData.logoUrl.trim() || undefined,
+          logoUrl: finalLogoUrl || undefined,
+          logoId: finalLogoId || undefined,
           sortOrder: parseInt(formData.sortOrder.trim(), 10) || 0,
           seoTitle: formData.seoTitle.trim() || undefined,
           seoDescription: formData.seoDescription.trim() || undefined,
         };
+
         const res = await implementFamilyAPI.createImplementFamily(payload);
         if (res.success) {
           toast.success('Implement family created successfully');
@@ -225,10 +335,10 @@ export default function ImplementFamilyModal({
         }
       }
     } catch (err: any) {
-      console.error('ImplementFamily error:', err);
+      console.error('ImplementFamily save error:', err);
       const apiError = err?.response?.data;
       const issues = apiError?.error;
-      let msg = apiError?.message || 'Failed to save implement family';
+      let msg = apiError?.message || err?.message || 'Failed to save implement family';
       if (Array.isArray(issues) && issues.length > 0) {
         msg = issues.map((i: any) => i.message || i).join(', ');
       }
@@ -236,6 +346,7 @@ export default function ImplementFamilyModal({
       toast.error(msg);
     } finally {
       setLoading(false);
+      setUploadStep(null);
     }
   };
 
@@ -307,9 +418,111 @@ export default function ImplementFamilyModal({
             </div>
           )}
 
-          <form id="implementFamilyForm" onSubmit={handleSubmit} className="space-y-6">
-            {/* SECTION 1: Brand & Basic Info */}
-            <div className="space-y-4">
+          <form
+            id="implementFamilyForm"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            {/* SECTION 1: Family Logo (Direct Upload) */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[var(--color-brand-green)] font-black text-xs tracking-wider uppercase">
+                  <ImageIcon size={16} />
+                  <span>Family Logo / Photo</span>
+                </div>
+                <span className="text-[11px] text-muted">
+                  Max size: 5MB (PNG, JPG, WebP, SVG)
+                </span>
+              </div>
+
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                onChange={handleFileInputChange}
+              />
+
+              {/* Upload Dropzone / Preview */}
+              {logoPreview ? (
+                <div className="relative flex flex-col sm:flex-row items-center gap-4 rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-4">
+                  {/* Image Display */}
+                  <div className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white p-2 shadow-sm overflow-hidden">
+                    <img
+                      src={logoPreview}
+                      alt="Logo preview"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+
+                  {/* Image Metadata & Controls */}
+                  <div className="flex flex-1 flex-col gap-1 text-center sm:text-left min-w-0">
+                    <div className="flex items-center justify-center sm:justify-start gap-2">
+                      <span className="text-foreground text-sm font-bold truncate">
+                        {logoFile ? logoFile.name : 'Current Family Logo'}
+                      </span>
+                      {logoFile && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-green)]/15 px-2 py-0.5 text-[10px] font-black text-[var(--color-brand-green)]">
+                          <CheckCircle2 size={12} /> Ready
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-muted text-xs font-medium">
+                      {logoFile
+                        ? `File size: ${formatFileSize(logoFile.size)} • Type: ${logoFile.type || 'Image'}`
+                        : 'Image is linked to this family'}
+                    </span>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-background px-3 py-1.5 text-xs font-bold text-foreground transition-colors hover:bg-foreground/5 cursor-pointer shadow-sm"
+                      >
+                        <Upload size={14} /> Change Image
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="flex items-center gap-1.5 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 transition-colors hover:bg-red-500/20 cursor-pointer"
+                      >
+                        <Trash2 size={14} /> Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`group flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-8 text-center transition-all cursor-pointer ${
+                    isDragging
+                      ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 scale-[0.99]'
+                      : 'border-[var(--border-subtle)] bg-foreground/[0.02] hover:border-[var(--color-brand-green)] hover:bg-[var(--color-brand-green)]/5'
+                  }`}
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-background text-muted shadow-sm transition-transform group-hover:scale-110 group-hover:text-[var(--color-brand-green)]">
+                    <Upload size={22} />
+                  </div>
+                  <div>
+                    <div className="text-foreground text-sm font-bold">
+                      Click to choose an image or drag & drop here
+                    </div>
+                    <div className="text-muted text-xs mt-1">
+                      PNG, JPG, WebP, or SVG up to 5MB
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 2: Brand & Identity Details */}
+            <div className="space-y-4 pt-4 border-t border-[var(--border-subtle)]">
               <div className="flex items-center gap-2 text-[var(--color-brand-green)] font-black text-xs tracking-wider uppercase">
                 <FileText size={16} />
                 <span>Family Details</span>
@@ -328,7 +541,11 @@ export default function ImplementFamilyModal({
                     required
                     className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold shadow-sm transition-all focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none cursor-pointer"
                   >
-                    <option value="" disabled className="bg-background text-foreground">
+                    <option
+                      value=""
+                      disabled
+                      className="bg-background text-foreground"
+                    >
                       -- Select Equipment Brand --
                     </option>
                     {brands.map((b) => (
@@ -354,7 +571,7 @@ export default function ImplementFamilyModal({
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    placeholder="e.g. Shaktiman Regular Series"
+                    placeholder="e.g. Regular Series Rotavator"
                     className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-bold shadow-sm transition-all focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                   />
                 </div>
@@ -369,7 +586,7 @@ export default function ImplementFamilyModal({
                     name="slug"
                     value={formData.slug}
                     onChange={handleChange}
-                    placeholder="shaktiman-regular-series"
+                    placeholder="regular-series-rotavator"
                     className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-sm font-medium font-mono shadow-sm transition-all focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
                   />
                   <span className="text-muted text-[11px]">
@@ -400,48 +617,6 @@ export default function ImplementFamilyModal({
                       {sortOrderError}
                     </span>
                   )}
-                </div>
-              </div>
-
-              {/* Logo URL with Live Preview */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-muted text-xs font-bold tracking-wider uppercase flex items-center justify-between">
-                  <span>Logo / Banner Image URL</span>
-                  <span className="text-[11px] normal-case text-muted">
-                    Direct image link (HTTPS)
-                  </span>
-                </label>
-                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                  <div className="relative flex-1 w-full">
-                    <LinkIcon
-                      size={16}
-                      className="text-muted pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2"
-                    />
-                    <input
-                      type="url"
-                      name="logoUrl"
-                      value={formData.logoUrl}
-                      onChange={handleChange}
-                      placeholder="https://example.com/images/family-logo.png"
-                      className="bg-foreground/5 text-foreground focus:bg-background w-full rounded-xl border border-[var(--border-subtle)] py-3 pr-4 pl-10 text-sm font-medium shadow-sm transition-all focus:border-[var(--color-brand-green)] focus:ring-2 focus:ring-[var(--color-brand-green)]/20 focus:outline-none"
-                    />
-                  </div>
-
-                  {/* Logo Preview Box */}
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-white p-1 shadow-sm">
-                    {formData.logoUrl ? (
-                      <img
-                        src={formData.logoUrl}
-                        alt="Preview"
-                        className="max-h-full max-w-full object-contain"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <FolderOpen size={20} className="text-muted/60" />
-                    )}
-                  </div>
                 </div>
               </div>
 
@@ -481,8 +656,8 @@ export default function ImplementFamilyModal({
               </div>
             </div>
 
-            {/* SECTION 2: SEO Optimization */}
-            <div className="space-y-4 pt-2 border-t border-[var(--border-subtle)]">
+            {/* SECTION 3: SEO Optimization */}
+            <div className="space-y-4 pt-4 border-t border-[var(--border-subtle)]">
               <div className="flex items-center gap-2 text-[var(--color-brand-green)] font-black text-xs tracking-wider uppercase">
                 <Sparkles size={16} />
                 <span>Search Engine Optimization (SEO)</span>
@@ -565,7 +740,7 @@ export default function ImplementFamilyModal({
             {loading ? (
               <>
                 <TractorLoader size={16} />
-                <span>Saving...</span>
+                <span>{uploadStep || 'Saving...'}</span>
               </>
             ) : isEditing ? (
               'Save Changes'
@@ -578,4 +753,3 @@ export default function ImplementFamilyModal({
     </div>
   );
 }
-
