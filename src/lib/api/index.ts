@@ -19,6 +19,12 @@ export { newsAPI } from './news';
 export { cmsAPI } from './cms';
 export { leadAPI } from './leads';
 export { equipmentBrandAPI } from './equipmentBrands';
+export { implementFamilyAPI } from './implementFamilies';
+export type {
+  ImplementFamily,
+  CreateImplementFamilyInput,
+  UpdateImplementFamilyInput,
+} from './implementFamilies';
 export { implementCategoryAPI } from './implementCategories';
 export { implementAPI } from './implements';
 export { reviewAPI } from './reviews';

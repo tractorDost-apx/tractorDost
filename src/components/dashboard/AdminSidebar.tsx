@@ -80,6 +80,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: 'Ecosystem',
     items: [
       { label: 'Equipment Brands', href: '/admin/equipment/brands', icon: Tag },
+      { label: 'Implement Families', href: '/admin/implements/families', icon: FolderOpen },
       { label: 'Implement Categories', href: '/admin/implements/categories', icon: Layers },
       { label: 'Implements', href: '/admin/implements', icon: Wrench },
     ],
