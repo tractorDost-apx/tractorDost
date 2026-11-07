@@ -62,6 +62,33 @@ function TractorsListingContent() {
 
   // Mobile filters toggle
   const [showFilters, setShowFilters] = useState(false);
+  const [showMobileFilterModal, setShowMobileFilterModal] = useState(false);
+  const [showMobileSortModal, setShowMobileSortModal] = useState(false);
+  const [brandSearchInput, setBrandSearchInput] = useState('');
+
+  // Lock body scroll when mobile modals are active
+  useEffect(() => {
+    if (showMobileFilterModal || showMobileSortModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showMobileFilterModal, showMobileSortModal]);
+
+  // Escape key closes modals
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowMobileFilterModal(false);
+        setShowMobileSortModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Synchronize state with URL query parameters
   useEffect(() => {
@@ -249,6 +276,21 @@ function TractorsListingContent() {
       searchQuery.trim() !== '',
     ].filter(Boolean).length;
   }, [selectedBrand, selectedFamily, selectedHp, selectedDrive, selectedFuel, selectedPrice, searchQuery]);
+
+  const currentSortLabel = useMemo(() => {
+    switch (sortBy) {
+      case 'price_asc':
+        return 'Price: Low to High';
+      case 'price_desc':
+        return 'Price: High to Low';
+      case 'hp_desc':
+        return 'HP: High to Low';
+      case 'hp_asc':
+        return 'HP: Low to High';
+      default:
+        return 'Featured';
+    }
+  }, [sortBy]);
 
   const handleSelectFamily = (familyId: number | '') => {
     const nextFamily = selectedFamily === familyId ? '' : familyId;
@@ -482,28 +524,262 @@ function TractorsListingContent() {
         </div>
       )}
 
-      {/* ===================== MAIN CONTENT & SIDEBAR ===================== */}
-      <div className="flex flex-col items-start gap-8 lg:flex-row">
-        {/* MOBILE FILTER BUTTON */}
+      {/* ===================== BRAND SERIES & FAMILIES STRIP ===================== */}
+      {selectedBrand !== '' && (loadingFamilies || families.length > 0) && (
+        <div className="animate-fade-in mb-6 flex flex-col gap-3 rounded-[24px] sm:rounded-[2rem] border border-black/8 dark:border-white/10 bg-white/85 dark:bg-[#121814]/90 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+          <div className="flex flex-wrap items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]">
+                <Layers size={17} />
+              </div>
+              <h2 className="text-sm sm:text-base font-black text-foreground">
+                {activeBrandDetails?.name ? `${activeBrandDetails.name} Series & Families` : 'Tractor Families'}
+              </h2>
+              {families.length > 0 && (
+                <span className="rounded-full bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-[11px] font-black text-[var(--color-brand-green)]">
+                  {families.length} Series
+                </span>
+              )}
+            </div>
+
+            {selectedFamily !== '' && (
+              <button
+                type="button"
+                onClick={() => handleSelectFamily('')}
+                className="text-xs font-bold text-muted hover:text-[var(--color-brand-orange)] transition-colors underline underline-offset-2 cursor-pointer"
+              >
+                View All {activeBrandDetails?.name || ''} Models
+              </button>
+            )}
+          </div>
+
+          {/* Horizontal Scrollable Families Pills (Touch-optimized for Mobile) */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-1 px-1 sm:mx-0 sm:px-0">
+            {loadingFamilies ? (
+              <div className="flex items-center gap-2 py-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-9 w-28 animate-pulse rounded-full bg-black/5 dark:bg-white/5 shrink-0" />
+                ))}
+              </div>
+            ) : families.length > 0 ? (
+              <>
+                {/* All Models Pill */}
+                <button
+                  type="button"
+                  onClick={() => handleSelectFamily('')}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                    selectedFamily === ''
+                      ? 'bg-[var(--color-brand-green)] text-white shadow-md shadow-[var(--color-brand-green)]/20 ring-2 ring-[var(--color-brand-green)]/40'
+                      : 'border border-black/8 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10'
+                  }`}
+                >
+                  <span>All {activeBrandDetails?.name || 'Brand'} Models</span>
+                  {selectedFamily === '' && <Check size={13} strokeWidth={2.5} />}
+                </button>
+
+                {/* Individual Families */}
+                {families.map((family) => {
+                  const isSelected = selectedFamily === family.id;
+                  return (
+                    <button
+                      key={family.id}
+                      type="button"
+                      onClick={() => handleSelectFamily(family.id)}
+                      className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-black transition-all cursor-pointer whitespace-nowrap ${
+                        isSelected
+                          ? 'bg-[var(--color-brand-green)] text-white shadow-md shadow-[var(--color-brand-green)]/20 ring-2 ring-[var(--color-brand-green)]/40'
+                          : 'border border-black/8 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:border-[var(--color-brand-green)]/40'
+                      }`}
+                    >
+                      {family.logoUrl && (
+                        <img src={family.logoUrl} alt="" className="h-4 w-4 object-contain rounded-full bg-white/80" />
+                      )}
+                      <span>{family.name}</span>
+                      {family.tractorCount !== undefined && family.tractorCount > 0 && (
+                        <span
+                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${
+                            isSelected
+                              ? 'bg-white/20 text-white'
+                              : 'bg-black/5 dark:bg-white/10 text-muted'
+                          }`}
+                        >
+                          {family.tractorCount}
+                        </span>
+                      )}
+                      {isSelected && <Check size={13} strokeWidth={2.5} />}
+                    </button>
+                  );
+                })}
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* ===================== MOBILE QUICK FILTERS STRIP (Visible only on Mobile) ===================== */}
+      <div className="mb-4 flex w-full items-center gap-2 overflow-x-auto no-scrollbar py-1 lg:hidden">
+        {/* All Filters Button */}
         <button
-          className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-[#121814]/80 py-4 text-sm font-black text-foreground shadow-sm backdrop-blur-md lg:hidden"
-          onClick={() => setShowFilters(!showFilters)}
+          type="button"
+          onClick={() => setShowMobileFilterModal(true)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 dark:border-white/15 bg-white/95 dark:bg-[#151c17] px-3.5 py-2 text-xs font-black text-foreground shadow-sm backdrop-blur-md active:scale-95 transition-all cursor-pointer"
         >
-          <SlidersHorizontal size={18} className="text-[var(--color-brand-green)]" />
-          {showFilters ? 'Hide Filters' : 'Show Filters'}
+          <SlidersHorizontal size={14} className="text-[var(--color-brand-green)]" />
+          <span>Filters</span>
           {activeFiltersCount > 0 && (
-            <span className="ml-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-brand-green)] text-[11px] font-black text-white">
+            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-brand-green)] px-1 text-[10px] font-black text-white">
               {activeFiltersCount}
             </span>
           )}
         </button>
 
-        {/* ===================== SIDEBAR FILTERS ===================== */}
-        <aside
-          className={`w-full flex-shrink-0 lg:w-72 ${
-            showFilters ? 'block' : 'hidden lg:block'
+        {/* HP Pills */}
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedHp(selectedHp === 'under30' ? '' : 'under30');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedHp === 'under30'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
           }`}
         >
+          <span>&lt; 30 HP</span>
+          {selectedHp === 'under30' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedHp(selectedHp === '30to50' ? '' : '30to50');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedHp === '30to50'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>30-50 HP</span>
+          {selectedHp === '30to50' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedHp(selectedHp === 'over50' ? '' : 'over50');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedHp === 'over50'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&gt; 50 HP</span>
+          {selectedHp === 'over50' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Drive Type Pills */}
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedDrive(selectedDrive === 'TWO_WD' ? '' : 'TWO_WD');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedDrive === 'TWO_WD'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>2WD</span>
+          {selectedDrive === 'TWO_WD' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedDrive(selectedDrive === 'FOUR_WD' ? '' : 'FOUR_WD');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedDrive === 'FOUR_WD'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>4WD</span>
+          {selectedDrive === 'FOUR_WD' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Budget Pills */}
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedPrice(selectedPrice === 'under5' ? '' : 'under5');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === 'under5'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&lt; ₹5 Lakh</span>
+          {selectedPrice === 'under5' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedPrice(selectedPrice === '5to10' ? '' : '5to10');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === '5to10'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>₹5 - 10 Lakh</span>
+          {selectedPrice === '5to10' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedPrice(selectedPrice === 'over10' ? '' : 'over10');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === 'over10'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&gt; ₹10 Lakh</span>
+          {selectedPrice === 'over10' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Clear All pill on Mobile if any filters active */}
+        {activeFiltersCount > 0 && (
+          <button
+            type="button"
+            onClick={handleClearAll}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-red-500/10 px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-500/20 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <RotateCcw size={12} /> Clear
+          </button>
+        )}
+      </div>
+
+      {/* ===================== MAIN CONTENT & SIDEBAR ===================== */}
+      <div className="flex flex-col items-start gap-8 lg:flex-row w-full">
+        {/* ===================== DESKTOP SIDEBAR FILTERS ===================== */}
+        <aside className="hidden lg:block w-full flex-shrink-0 lg:w-72">
           <div className="lg:sticky lg:top-28 flex flex-col gap-6 rounded-[2rem] border border-black/8 dark:border-white/10 bg-white/90 dark:bg-[#121814]/90 p-6 shadow-xl backdrop-blur-xl">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-4">
@@ -993,116 +1269,6 @@ function TractorsListingContent() {
             </div>
           </div>
 
-          {/* ===================== TRACTOR FAMILIES / SERIES SELECTOR ===================== */}
-          {selectedBrand !== '' && (loadingFamilies || families.length > 0) && (
-            <div className="animate-fade-in flex flex-col gap-3 rounded-[1.75rem] border border-black/8 dark:border-white/10 bg-white/85 dark:bg-[#121814]/90 p-4 shadow-sm backdrop-blur-xl">
-              {/* Header Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setIsFamiliesExpanded((prev) => !prev)}
-                  className="flex items-center gap-2.5 text-left group cursor-pointer"
-                  title="Click to toggle families"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] transition-transform group-hover:scale-105">
-                    <Layers size={17} />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-black text-foreground">
-                      {activeBrandDetails?.name ? `${activeBrandDetails.name} Series & Families` : 'Tractor Families'}
-                    </span>
-                    {families.length > 0 && (
-                      <span className="rounded-full bg-[var(--color-brand-green)]/10 px-2.5 py-0.5 text-[11px] font-black text-[var(--color-brand-green)]">
-                        {families.length} Series
-                      </span>
-                    )}
-                    {selectedFamily !== '' && (
-                      <span className="rounded-full bg-[var(--color-brand-orange)]/15 px-2.5 py-0.5 text-[11px] font-black text-[var(--color-brand-orange)]">
-                        {families.find((f) => f.id === selectedFamily)?.name || 'Filtered'}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-muted ml-0.5 transition-transform">
-                    {isFamiliesExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                  </div>
-                </button>
-
-                {selectedFamily !== '' && (
-                  <button
-                    type="button"
-                    onClick={() => handleSelectFamily('')}
-                    className="text-xs font-bold text-muted hover:text-[var(--color-brand-orange)] transition-colors underline underline-offset-2"
-                  >
-                    View All {activeBrandDetails?.name || ''} Models
-                  </button>
-                )}
-              </div>
-
-              {/* Families Chips / Cards */}
-              {isFamiliesExpanded && (
-                <div className="pt-1">
-                  {loadingFamilies ? (
-                    <div className="flex flex-wrap items-center gap-2 py-1">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <div
-                          key={i}
-                          className="h-9 w-28 animate-pulse rounded-full bg-black/5 dark:bg-white/5"
-                        />
-                      ))}
-                    </div>
-                  ) : families.length > 0 ? (
-                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                      {/* All Models / All Families Pill */}
-                      <button
-                        type="button"
-                        onClick={() => handleSelectFamily('')}
-                        className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition-all cursor-pointer ${
-                          selectedFamily === ''
-                            ? 'bg-[var(--color-brand-green)] text-white shadow-md shadow-[var(--color-brand-green)]/20 ring-2 ring-[var(--color-brand-green)]/40'
-                            : 'border border-black/8 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground'
-                        }`}
-                      >
-                        <span>All {activeBrandDetails?.name || 'Brand'} Models</span>
-                        {selectedFamily === '' && <Check size={13} strokeWidth={2.5} />}
-                      </button>
-
-                      {/* Each Family Pill */}
-                      {families.map((family) => {
-                        const isSelected = selectedFamily === family.id;
-                        return (
-                          <button
-                            key={family.id}
-                            type="button"
-                            onClick={() => handleSelectFamily(family.id)}
-                            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black transition-all cursor-pointer ${
-                              isSelected
-                                ? 'bg-[var(--color-brand-green)] text-white shadow-md shadow-[var(--color-brand-green)]/20 ring-2 ring-[var(--color-brand-green)]/40'
-                                : 'border border-black/8 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground hover:border-[var(--color-brand-green)]/40'
-                            }`}
-                          >
-                            <span>{family.name}</span>
-                            {family.tractorCount !== undefined && family.tractorCount > 0 && (
-                              <span
-                                className={`rounded-full px-2 py-0.5 text-[10px] font-black ${
-                                  isSelected
-                                    ? 'bg-white/20 text-white'
-                                    : 'bg-black/5 dark:bg-white/10 text-muted'
-                                }`}
-                              >
-                                {family.tractorCount}
-                              </span>
-                            )}
-                            {isSelected && <Check size={13} strokeWidth={2.5} />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                </div>
-              )}
-            </div>
-          )}
-
           {/* ===================== LISTINGS / CARDS ===================== */}
           {loading ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -1398,6 +1564,442 @@ function TractorsListingContent() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* ===================== MOBILE FILTER MODAL (DRAWER / BOTTOM SHEET) ===================== */}
+      {showMobileFilterModal && (
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end lg:hidden animate-fade-in">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm -z-10"
+            onClick={() => setShowMobileFilterModal(false)}
+          />
+          <div className="relative flex max-h-[88vh] w-full flex-col overflow-hidden rounded-t-[2.25rem] border-t border-black/10 dark:border-white/10 bg-background shadow-2xl animate-slide-up">
+            {/* Grab Handle */}
+            <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-foreground/20" />
+
+            {/* Header */}
+            <div className="flex shrink-0 items-center justify-between border-b border-black/5 dark:border-white/5 px-5 py-4">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)]">
+                  <SlidersHorizontal size={16} />
+                </div>
+                <h3 className="text-lg font-black tracking-tight text-foreground">Filters</h3>
+                {activeFiltersCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-brand-green)] px-1.5 text-[10px] font-black text-white">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                {activeFiltersCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearAll}
+                    className="text-xs font-bold text-[var(--color-brand-orange)] hover:underline px-2 py-1 cursor-pointer"
+                  >
+                    Clear All
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowMobileFilterModal(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/5 text-muted hover:text-foreground cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Filter Content */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
+              {/* SECTION 1: Series / Family */}
+              {selectedBrand !== '' && families.length > 0 && (
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted text-[11px] font-black tracking-widest uppercase">
+                      {activeBrandDetails?.name || 'Brand'} Series / Family
+                    </span>
+                    {selectedFamily !== '' && (
+                      <button
+                        type="button"
+                        onClick={() => handleSelectFamily('')}
+                        className="text-[11px] font-bold text-[var(--color-brand-orange)]"
+                      >
+                        Clear Family
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectFamily('')}
+                      className={`flex items-center justify-between rounded-xl p-3 text-left text-xs font-bold transition-all cursor-pointer ${
+                        selectedFamily === ''
+                          ? 'border-2 border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]'
+                          : 'border border-black/8 dark:border-white/10 bg-foreground/[0.02] text-foreground/80'
+                      }`}
+                    >
+                      <span>All Models</span>
+                      {selectedFamily === '' && <Check size={14} className="text-[var(--color-brand-green)]" />}
+                    </button>
+
+                    {families.map((family) => {
+                      const isSelected = selectedFamily === family.id;
+                      return (
+                        <button
+                          key={family.id}
+                          type="button"
+                          onClick={() => handleSelectFamily(family.id)}
+                          className={`flex items-center justify-between rounded-xl p-3 text-left text-xs font-bold transition-all cursor-pointer ${
+                            isSelected
+                              ? 'border-2 border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-sm'
+                              : 'border border-black/8 dark:border-white/10 bg-foreground/[0.02] text-foreground/80'
+                          }`}
+                        >
+                          <div className="flex flex-col truncate pr-1">
+                            <span className="truncate">{family.name}</span>
+                            {family.tractorCount !== undefined && family.tractorCount > 0 && (
+                              <span className="text-[10px] text-muted font-normal">
+                                {family.tractorCount} Models
+                              </span>
+                            )}
+                          </div>
+                          {isSelected && <Check size={14} className="text-[var(--color-brand-green)] shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 2: Horsepower (HP) */}
+              <div className="space-y-2.5">
+                <span className="text-muted text-[11px] font-black tracking-widest uppercase">
+                  Horsepower (HP Range)
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: '', label: 'All HP Range', desc: 'Any Horsepower' },
+                    { value: 'under30', label: '< 30 HP', desc: 'Mini & Orchard' },
+                    { value: '30to50', label: '30 - 50 HP', desc: 'Utility & Farm' },
+                    { value: 'over50', label: '> 50 HP', desc: 'Heavy Duty' },
+                  ].map((hp) => {
+                    const isSelected = selectedHp === hp.value;
+                    return (
+                      <button
+                        key={hp.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedHp(isSelected && hp.value !== '' ? '' : hp.value);
+                          setPage(1);
+                        }}
+                        className={`flex flex-col rounded-xl p-3 text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? 'border-2 border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-sm'
+                            : 'border border-black/8 dark:border-white/10 bg-foreground/[0.02] text-foreground/80'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-xs font-black">{hp.label}</span>
+                          {isSelected && <Check size={14} className="text-[var(--color-brand-green)]" />}
+                        </div>
+                        <span className="text-[10px] text-muted mt-0.5">{hp.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* SECTION 3: Drive Type */}
+              <div className="space-y-2.5">
+                <span className="text-muted text-[11px] font-black tracking-widest uppercase">
+                  Drive Type
+                </span>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: '', label: 'All' },
+                    { value: 'TWO_WD', label: '2WD' },
+                    { value: 'FOUR_WD', label: '4WD' },
+                  ].map((drive) => {
+                    const isSelected = selectedDrive === drive.value;
+                    return (
+                      <button
+                        key={drive.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDrive(isSelected && drive.value !== '' ? '' : drive.value);
+                          setPage(1);
+                        }}
+                        className={`rounded-xl py-3 text-center text-xs font-black transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                            : 'border border-black/8 dark:border-white/10 bg-foreground/[0.02] text-foreground/80'
+                        }`}
+                      >
+                        {drive.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* SECTION 4: Budget / Price Range */}
+              <div className="space-y-2.5">
+                <span className="text-muted text-[11px] font-black tracking-widest uppercase">
+                  Budget / Price Range
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: '', label: 'All Price Ranges' },
+                    { value: 'under5', label: 'Under ₹5 Lakh' },
+                    { value: '5to10', label: '₹5 - 10 Lakh' },
+                    { value: 'over10', label: 'Above ₹10 Lakh' },
+                  ].map((price) => {
+                    const isSelected = selectedPrice === price.value;
+                    return (
+                      <button
+                        key={price.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPrice(isSelected && price.value !== '' ? '' : price.value);
+                          setPage(1);
+                        }}
+                        className={`flex items-center justify-between rounded-xl p-3 text-left text-xs font-black transition-all cursor-pointer ${
+                          isSelected
+                            ? 'border-2 border-[var(--color-brand-green)] bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] shadow-sm'
+                            : 'border border-black/8 dark:border-white/10 bg-foreground/[0.02] text-foreground/80'
+                        }`}
+                      >
+                        <span>{price.label}</span>
+                        {isSelected && <Check size={14} className="text-[var(--color-brand-green)]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* SECTION 5: Brand Filter */}
+              <div className="space-y-2.5">
+                <span className="text-muted text-[11px] font-black tracking-widest uppercase">
+                  Brand Selection
+                </span>
+                <div className="relative">
+                  <Search size={14} className="text-muted absolute top-1/2 left-3 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search brand (Mahindra, Swaraj, etc.)..."
+                    value={brandSearchInput}
+                    onChange={(e) => setBrandSearchInput(e.target.value)}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-foreground/[0.03] py-2 pr-8 pl-9 text-xs font-bold text-foreground focus:outline-none focus:border-[var(--color-brand-green)]"
+                  />
+                  {brandSearchInput && (
+                    <button
+                      type="button"
+                      onClick={() => setBrandSearchInput('')}
+                      className="text-muted absolute top-1/2 right-2.5 -translate-y-1/2"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="custom-scrollbar max-h-40 overflow-y-auto space-y-1 pr-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedBrand('');
+                      setSelectedFamily('');
+                      setPage(1);
+                      if (typeof window !== 'undefined') {
+                        const url = new URL(window.location.href);
+                        url.searchParams.delete('brand');
+                        url.searchParams.delete('family');
+                        window.history.replaceState(null, '', url.pathname + (url.search ? url.search : ''));
+                      }
+                    }}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-bold transition-all cursor-pointer ${
+                      selectedBrand === ''
+                        ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                        : 'text-foreground/80 hover:bg-black/5 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <span>All Brands</span>
+                    {selectedBrand === '' && <Check size={13} strokeWidth={2.5} />}
+                  </button>
+
+                  {brands
+                    .filter((b) =>
+                      !brandSearchInput || b.name.toLowerCase().includes(brandSearchInput.toLowerCase())
+                    )
+                    .map((b) => {
+                      const isSelected = selectedBrand === b.id;
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={() => {
+                            const nextBrand = isSelected ? '' : b.id;
+                            setSelectedBrand(nextBrand);
+                            setSelectedFamily('');
+                            setPage(1);
+                            if (typeof window !== 'undefined') {
+                              const url = new URL(window.location.href);
+                              if (nextBrand !== '') {
+                                url.searchParams.set('brand', String(nextBrand));
+                              } else {
+                                url.searchParams.delete('brand');
+                              }
+                              url.searchParams.delete('family');
+                              window.history.replaceState(null, '', url.pathname + (url.search ? url.search : ''));
+                            }
+                          }}
+                          className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-bold transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                              : 'text-foreground/80 hover:bg-black/5 dark:hover:bg-white/5'
+                          }`}
+                        >
+                          <span className="truncate">{b.name}</span>
+                          {isSelected && <Check size={13} strokeWidth={2.5} />}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* SECTION 6: Fuel Type */}
+              <div className="space-y-2.5">
+                <span className="text-muted text-[11px] font-black tracking-widest uppercase">
+                  Fuel Type
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: '', label: 'All Fuel Types' },
+                    { value: 'DIESEL', label: 'Diesel' },
+                    { value: 'ELECTRIC', label: 'Electric' },
+                    { value: 'CNG', label: 'CNG' },
+                  ].map((fuel) => {
+                    const isSelected = selectedFuel === fuel.value;
+                    return (
+                      <button
+                        key={fuel.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedFuel(isSelected && fuel.value !== '' ? '' : fuel.value);
+                          setPage(1);
+                        }}
+                        className={`rounded-xl py-2.5 text-center text-xs font-black transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                            : 'border border-black/8 dark:border-white/10 bg-foreground/[0.02] text-foreground/80'
+                        }`}
+                      >
+                        {fuel.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Sticky Action Footer */}
+            <div className="flex shrink-0 items-center gap-3 border-t border-black/10 dark:border-white/10 bg-background/95 backdrop-blur-md p-4">
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="flex-1 rounded-full border border-black/10 dark:border-white/15 bg-foreground/5 py-3 text-xs font-black text-foreground hover:bg-foreground/10 transition-colors cursor-pointer"
+              >
+                Reset All
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowMobileFilterModal(false)}
+                className="flex-[2] rounded-full bg-[var(--color-brand-green)] py-3 text-xs font-black text-white shadow-lg shadow-[var(--color-brand-green)]/25 hover:bg-[var(--color-brand-green-dark)] transition-all cursor-pointer"
+              >
+                Apply Filters ({totalTractors} Tractors)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== MOBILE SORT MODAL ===================== */}
+      {showMobileSortModal && (
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end lg:hidden animate-fade-in">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm -z-10"
+            onClick={() => setShowMobileSortModal(false)}
+          />
+          <div className="relative flex w-full flex-col overflow-hidden rounded-t-[2.25rem] border-t border-black/10 dark:border-white/10 bg-background shadow-2xl animate-slide-up p-5 space-y-4">
+            <div className="mx-auto h-1.5 w-12 rounded-full bg-foreground/20" />
+            <div className="flex items-center justify-between pb-2 border-b border-black/5 dark:border-white/5">
+              <h3 className="text-base font-black text-foreground">Sort Tractors</h3>
+              <button
+                type="button"
+                onClick={() => setShowMobileSortModal(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/5 text-muted hover:text-foreground cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="space-y-1">
+              {[
+                { value: 'featured', label: 'Featured (Default)' },
+                { value: 'price_asc', label: 'Price: Low to High' },
+                { value: 'price_desc', label: 'Price: High to Low' },
+                { value: 'hp_desc', label: 'Horsepower: High to Low' },
+                { value: 'hp_asc', label: 'Horsepower: Low to High' },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    setSortBy(opt.value as any);
+                    setShowMobileSortModal(false);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-xl p-3 text-xs font-bold transition-all cursor-pointer ${
+                    sortBy === opt.value
+                      ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] font-black'
+                      : 'text-foreground/80 hover:bg-foreground/5'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {sortBy === opt.value && <Check size={14} className="text-[var(--color-brand-green)]" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== MOBILE FLOATING ACTION BAR ===================== */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#151c17]/95 px-5 py-2.5 shadow-2xl backdrop-blur-xl lg:hidden">
+        <button
+          type="button"
+          onClick={() => setShowMobileFilterModal(true)}
+          className="flex items-center gap-1.5 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] transition-colors cursor-pointer"
+        >
+          <SlidersHorizontal size={15} className="text-[var(--color-brand-green)]" />
+          <span>Filters</span>
+          {activeFiltersCount > 0 && (
+            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-brand-green)] px-1 text-[10px] font-black text-white">
+              {activeFiltersCount}
+            </span>
+          )}
+        </button>
+
+        <span className="h-4 w-px bg-foreground/15" />
+
+        <button
+          type="button"
+          onClick={() => setShowMobileSortModal(true)}
+          className="flex items-center gap-1.5 text-xs font-black text-foreground hover:text-[var(--color-brand-green)] transition-colors cursor-pointer"
+        >
+          <ArrowUpDown size={14} className="text-muted" />
+          <span className="max-w-[120px] truncate">{currentSortLabel}</span>
+        </button>
       </div>
     </div>
   );

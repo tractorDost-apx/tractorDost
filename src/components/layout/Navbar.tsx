@@ -23,7 +23,16 @@ import {
   Newspaper,
   Sparkles,
   ChevronRight,
+  ChevronDown,
   HelpCircle,
+  Flame,
+  Zap,
+  Clock,
+  Compass,
+  BookOpen,
+  Film,
+  Building2,
+  Phone,
 } from 'lucide-react';
 import { DashboardNavbar } from './DashboardNavbar';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -36,9 +45,41 @@ import { implementAPI, Implement } from '@/lib/api/implements';
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
+  const [mobileBrands, setMobileBrands] = useState<Brand[]>([]);
+  const [mobileEqBrands, setMobileEqBrands] = useState<EquipmentBrand[]>([]);
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuth();
+
+  useEffect(() => {
+    let isMounted = true;
+    brandAPI
+      .getAllBrands({ isActive: 'true', limit: 20 })
+      .then((res) => {
+        if (isMounted && res.success) {
+          setMobileBrands(res.data.data || []);
+        }
+      })
+      .catch(() => {});
+
+    equipmentBrandAPI
+      .getAllEquipmentBrands({ isActive: 'true', limit: 20 })
+      .then((res) => {
+        if (isMounted && res.success) {
+          setMobileEqBrands(res.data.data || []);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const toggleMobileSubmenu = (key: string) => {
+    setExpandedMobileMenu((prev) => (prev === key ? null : key));
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,6 +105,7 @@ export function Navbar() {
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setExpandedMobileMenu(null);
   }, [pathname]);
 
   const isDashboardRoute = /^\/(dashboard|admin|dealer|agent)(\/|$)/.test(pathname || '');
@@ -396,54 +438,356 @@ export function Navbar() {
           />
         </div>
 
-        {/* Navigation Categories */}
-        <div className="flex flex-col gap-1 text-sm font-bold">
-          <Link
-            href="/tractors"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <TractorIcon size={15} />
+        {/* Navigation Categories with Accordion Submenus */}
+        <div className="flex flex-col gap-1 text-sm">
+          {/* Tractors (Accordion) */}
+          <div className="flex flex-col">
+            <button
+              type="button"
+              suppressHydrationWarning
+              onClick={() => toggleMobileSubmenu('tractors')}
+              className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 transition-colors cursor-pointer ${
+                expandedMobileMenu === 'tractors'
+                  ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] font-black'
+                  : 'text-foreground hover:bg-black/5 dark:hover:bg-white/5 font-bold'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                  <TractorIcon size={15} />
+                </div>
+                <span className="text-xs">New Tractors</span>
               </div>
-              <span className="text-xs">New Tractors</span>
-            </div>
-            <ChevronRight size={15} className="text-muted" />
-          </Link>
-
-          <Link
-            href="/implements"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <Wrench size={15} />
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-semibold text-muted">
+                  {expandedMobileMenu === 'tractors' ? 'Hide' : 'Explore'}
+                </span>
+                <ChevronDown
+                  size={15}
+                  className={`text-muted transition-transform duration-300 ${
+                    expandedMobileMenu === 'tractors'
+                      ? 'rotate-180 text-[var(--color-brand-green)]'
+                      : ''
+                  }`}
+                />
               </div>
-              <span className="text-xs">Farm Equipment</span>
-            </div>
-            <ChevronRight size={15} className="text-muted" />
-          </Link>
+            </button>
 
-          <Link
-            href="/used-tractors"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
-                <Handshake size={15} />
+            {/* Submenu Content */}
+            {expandedMobileMenu === 'tractors' && (
+              <div className="ml-3 my-1 flex flex-col gap-1 border-l-2 border-[var(--color-brand-green)]/30 pl-3 py-1.5 animate-fadeIn">
+                <Link
+                  href="/tractors"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg bg-[var(--color-brand-green)]/10 px-3 py-2 text-xs font-black text-[var(--color-brand-green)] transition-all hover:bg-[var(--color-brand-green)]/15 active:scale-98"
+                >
+                  <span>All Tractors Overview</span>
+                  <ChevronRight size={14} />
+                </Link>
+
+                <Link
+                  href="/tractors/popular"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Flame size={14} className="text-orange-500" />
+                    <span>Popular Tractors</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/tractors/latest"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles size={14} className="text-amber-500" />
+                    <span>Latest Tractors</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/tractors/upcoming"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Clock size={14} className="text-blue-500" />
+                    <span>Upcoming Tractors</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/tractors/electric"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap size={14} className="text-emerald-500" />
+                    <span>Electric Tractors</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/tractors/cng"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap size={14} className="text-teal-500" />
+                    <span>CNG Tractors</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                {/* Popular Brands Quick Chips */}
+                <div className="mt-2 rounded-xl border border-black/5 bg-foreground/[0.02] p-2.5 dark:border-white/5">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-muted">
+                      Popular Brands
+                    </span>
+                    <Link
+                      href="/brands"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[10px] font-black text-[var(--color-brand-green)] hover:underline"
+                    >
+                      All Brands →
+                    </Link>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(mobileBrands.length > 0
+                      ? mobileBrands.slice(0, 8)
+                      : [
+                          { id: 1, name: 'Mahindra' },
+                          { id: 2, name: 'Swaraj' },
+                          { id: 3, name: 'Sonalika' },
+                          { id: 4, name: 'John Deere' },
+                          { id: 5, name: 'Massey Ferguson' },
+                          { id: 6, name: 'Farmtrac' },
+                          { id: 7, name: 'Kubota' },
+                          { id: 8, name: 'Eicher' },
+                        ]
+                    ).map((b) => (
+                      <Link
+                        key={b.id}
+                        href={`/tractors?brand=${b.id}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="rounded-lg border border-black/5 bg-background px-2.5 py-1 text-[11px] font-bold text-foreground/90 shadow-2xs transition-all hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)] active:scale-95 dark:border-white/10 dark:bg-white/5"
+                      >
+                        {b.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <span className="text-xs">Used Tractors</span>
-            </div>
-            <ChevronRight size={15} className="text-muted" />
-          </Link>
+            )}
+          </div>
 
+          {/* Farm Equipment (Accordion) */}
+          <div className="flex flex-col">
+            <button
+              type="button"
+              suppressHydrationWarning
+              onClick={() => toggleMobileSubmenu('implements')}
+              className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 transition-colors cursor-pointer ${
+                expandedMobileMenu === 'implements'
+                  ? 'bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)] font-black'
+                  : 'text-foreground hover:bg-black/5 dark:hover:bg-white/5 font-bold'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                  <Wrench size={15} />
+                </div>
+                <span className="text-xs">Farm Equipment</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-semibold text-muted">
+                  {expandedMobileMenu === 'implements' ? 'Hide' : 'Explore'}
+                </span>
+                <ChevronDown
+                  size={15}
+                  className={`text-muted transition-transform duration-300 ${
+                    expandedMobileMenu === 'implements'
+                      ? 'rotate-180 text-[var(--color-brand-green)]'
+                      : ''
+                  }`}
+                />
+              </div>
+            </button>
+
+            {/* Submenu Content */}
+            {expandedMobileMenu === 'implements' && (
+              <div className="ml-3 my-1 flex flex-col gap-1 border-l-2 border-[var(--color-brand-green)]/30 pl-3 py-1.5 animate-fadeIn">
+                <Link
+                  href="/implements"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg bg-[var(--color-brand-green)]/10 px-3 py-2 text-xs font-black text-[var(--color-brand-green)] transition-all hover:bg-[var(--color-brand-green)]/15 active:scale-98"
+                >
+                  <span>All Implements Overview</span>
+                  <ChevronRight size={14} />
+                </Link>
+
+                <Link
+                  href="/implements/popular"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Flame size={14} className="text-orange-500" />
+                    <span>Popular Implements</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/implements/latest"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles size={14} className="text-amber-500" />
+                    <span>Latest Implements</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/implements/electric"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap size={14} className="text-emerald-500" />
+                    <span>Electric Implements</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/implements/cng"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap size={14} className="text-teal-500" />
+                    <span>CNG Implements</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                {/* Popular Machinery Categories */}
+                <div className="mt-2 rounded-xl border border-black/5 bg-foreground/[0.02] p-2.5 dark:border-white/5">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-muted">
+                      Popular Machinery
+                    </span>
+                    <Link
+                      href="/implements"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[10px] font-black text-[var(--color-brand-green)] hover:underline"
+                    >
+                      All Implements →
+                    </Link>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { label: 'Rotavator', href: '/implements/rotavator' },
+                      { label: 'Cultivator', href: '/implements/cultivator' },
+                      { label: 'Thresher', href: '/implements/thresher' },
+                      { label: 'Harvester', href: '/implements/combine-harvester' },
+                      { label: 'Plough', href: '/implements/plough' },
+                      { label: 'Trailer', href: '/implements/trailer' },
+                      { label: 'Straw Reaper', href: '/implements/straw-reaper' },
+                    ].map((cat, idx) => (
+                      <Link
+                        key={idx}
+                        href={cat.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="rounded-lg border border-black/5 bg-background px-2.5 py-1 text-[11px] font-bold text-foreground/90 shadow-2xs transition-all hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)] active:scale-95 dark:border-white/10 dark:bg-white/5"
+                      >
+                        {cat.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Used Tractors (Accordion) */}
+          <div className="flex flex-col">
+            <button
+              type="button"
+              suppressHydrationWarning
+              onClick={() => toggleMobileSubmenu('used')}
+              className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 transition-colors cursor-pointer ${
+                expandedMobileMenu === 'used'
+                  ? 'bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] font-black'
+                  : 'text-foreground hover:bg-black/5 dark:hover:bg-white/5 font-bold'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
+                  <Handshake size={15} />
+                </div>
+                <span className="text-xs">Used Tractors</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-semibold text-muted">
+                  {expandedMobileMenu === 'used' ? 'Hide' : 'Explore'}
+                </span>
+                <ChevronDown
+                  size={15}
+                  className={`text-muted transition-transform duration-300 ${
+                    expandedMobileMenu === 'used'
+                      ? 'rotate-180 text-[var(--color-brand-orange)]'
+                      : ''
+                  }`}
+                />
+              </div>
+            </button>
+
+            {/* Submenu Content */}
+            {expandedMobileMenu === 'used' && (
+              <div className="ml-3 my-1 flex flex-col gap-1 border-l-2 border-[var(--color-brand-orange)]/30 pl-3 py-1.5 animate-fadeIn">
+                <Link
+                  href="/used-tractors"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg bg-[var(--color-brand-orange)]/10 px-3 py-2 text-xs font-black text-[var(--color-brand-orange)] transition-all hover:bg-[var(--color-brand-orange)]/15 active:scale-98"
+                >
+                  <div>
+                    <span className="block">Buy Used Tractors</span>
+                    <span className="text-[10px] font-normal opacity-80">Verified second-hand tractors</span>
+                  </div>
+                  <ChevronRight size={14} />
+                </Link>
+
+                <Link
+                  href="/used-tractor-valuation"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div>
+                    <span className="block">Valuation Tool</span>
+                    <span className="text-[10px] font-normal text-muted">Check true market price for free</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Direct Link: Compare Tractors */}
           <Link
             href="/compare"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors font-bold"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
@@ -459,10 +803,11 @@ export function Navbar() {
             <ChevronRight size={15} className="text-muted" />
           </Link>
 
+          {/* Direct Link: Explore Brands */}
           <Link
             href="/brands"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors font-bold"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
@@ -473,10 +818,11 @@ export function Navbar() {
             <ChevronRight size={15} className="text-muted" />
           </Link>
 
+          {/* Direct Link: EMI Calculator */}
           <Link
             href="/emi-calculator"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors font-bold"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
@@ -487,10 +833,11 @@ export function Navbar() {
             <ChevronRight size={15} className="text-muted" />
           </Link>
 
+          {/* Direct Link: Find Verified Dealers */}
           <Link
             href="/dealers"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors font-bold"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)]">
@@ -501,33 +848,126 @@ export function Navbar() {
             <ChevronRight size={15} className="text-muted" />
           </Link>
 
-          <Link
-            href="/news"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
-                <Newspaper size={15} />
+          {/* More & Resources (Accordion) */}
+          <div className="flex flex-col">
+            <button
+              type="button"
+              suppressHydrationWarning
+              onClick={() => toggleMobileSubmenu('more')}
+              className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 transition-colors cursor-pointer ${
+                expandedMobileMenu === 'more'
+                  ? 'bg-foreground/10 text-foreground font-black'
+                  : 'text-foreground hover:bg-black/5 dark:hover:bg-white/5 font-bold'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-500/10 text-zinc-500">
+                  <Compass size={15} />
+                </div>
+                <span className="text-xs">More & Resources</span>
               </div>
-              <span className="text-xs">News, Reviews & Guides</span>
-            </div>
-            <ChevronRight size={15} className="text-muted" />
-          </Link>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-semibold text-muted">
+                  {expandedMobileMenu === 'more' ? 'Hide' : 'Explore'}
+                </span>
+                <ChevronDown
+                  size={15}
+                  className={`text-muted transition-transform duration-300 ${
+                    expandedMobileMenu === 'more' ? 'rotate-180' : ''
+                  }`}
+                />
+              </div>
+            </button>
 
-          <Link
-            href="/faq"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-500/10 text-zinc-500">
-                <HelpCircle size={15} />
+            {/* Submenu Content */}
+            {expandedMobileMenu === 'more' && (
+              <div className="ml-3 my-1 flex flex-col gap-1 border-l-2 border-zinc-400/30 pl-3 py-1.5 animate-fadeIn">
+                <Link
+                  href="/news"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Newspaper size={14} className="text-[var(--color-brand-green)]" />
+                    <span>News & Industry Updates</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/blogs"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <BookOpen size={14} className="text-amber-500" />
+                    <span>Farming Blogs & Tips</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/web-stories"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles size={14} className="text-purple-500" />
+                    <span>Web Stories</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/videos"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Film size={14} className="text-rose-500" />
+                    <span>Videos & Tutorials</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/faq"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <HelpCircle size={14} className="text-blue-500" />
+                    <span>FAQ & Support</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/about"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Building2 size={14} className="text-emerald-500" />
+                    <span>About TractorDost</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
+
+                <Link
+                  href="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold text-foreground/85 transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Phone size={14} className="text-indigo-500" />
+                    <span>Contact Us</span>
+                  </div>
+                  <ChevronRight size={13} className="text-muted/60" />
+                </Link>
               </div>
-              <span className="text-xs">FAQ & Support</span>
-            </div>
-            <ChevronRight size={15} className="text-muted" />
-          </Link>
+            )}
+          </div>
         </div>
 
         {/* Bottom User Account Section */}
@@ -540,35 +980,75 @@ export function Navbar() {
                 router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] py-2.5 text-xs font-bold text-white shadow-md transition-all active:scale-98"
+              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-brand-green)] py-2.5 text-xs font-bold text-white shadow-md transition-all active:scale-98 cursor-pointer"
             >
               <span>Log In to Account</span>
               <ChevronRight size={15} />
             </button>
           ) : (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <UserAvatar photoUrl={user?.profilePhoto} name={user?.fullName} size={36} />
-                <div>
-                  <p className="text-xs font-bold text-foreground truncate max-w-[180px]">
-                    {user?.fullName || 'User'}
-                  </p>
-                  <p className="text-[10px] text-muted">
-                    {user?.role?.name || 'Customer'}
-                  </p>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between rounded-xl bg-foreground/[0.04] p-2.5">
+                <div className="flex items-center gap-3">
+                  <UserAvatar photoUrl={user?.profilePhoto} name={user?.fullName} size={36} />
+                  <div>
+                    <p className="text-xs font-bold text-foreground truncate max-w-[160px]">
+                      {user?.fullName || 'User'}
+                    </p>
+                    <p className="text-[10px] text-muted">
+                      {user?.role?.name || 'Customer'}
+                    </p>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  suppressHydrationWarning
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-xs font-bold text-red-500 rounded-lg px-2.5 py-1 hover:bg-red-500/10 transition-colors cursor-pointer"
+                >
+                  Log Out
+                </button>
               </div>
-              <button
-                type="button"
-                suppressHydrationWarning
-                onClick={() => {
-                  logout();
-                  setMobileMenuOpen(false);
-                }}
-                className="text-xs font-bold text-red-500 rounded-lg px-2.5 py-1 hover:bg-red-500/10 transition-colors"
-              >
-                Log Out
-              </button>
+
+              {/* Quick Profile & Dashboard links for Mobile User */}
+              <div className="grid grid-cols-2 gap-1.5 pt-1">
+                {(() => {
+                  const r = user?.role?.name?.toUpperCase();
+                  let dashboardHref = '/dashboard';
+                  let dashboardLabel = 'Dashboard';
+                  if (r === 'ADMIN' || r === 'SUPER_ADMIN') {
+                    dashboardHref = '/admin/dashboard';
+                    dashboardLabel = 'Admin Panel';
+                  } else if (r === 'DEALER' || r === 'DEALER_STAFF' || r === 'SELLER') {
+                    dashboardHref = '/dealer/dashboard';
+                    dashboardLabel = 'Dealer Hub';
+                  } else if (r === 'AGENT') {
+                    dashboardHref = '/agent/dashboard';
+                    dashboardLabel = 'Agent Portal';
+                  }
+                  return (
+                    <Link
+                      href={dashboardHref}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-black/5 dark:border-white/5 bg-foreground/[0.02] py-2 text-[11px] font-bold text-foreground hover:bg-[var(--color-brand-green)]/10 hover:text-[var(--color-brand-green)] transition-all"
+                    >
+                      <LayoutDashboard size={13} />
+                      <span>{dashboardLabel}</span>
+                    </Link>
+                  );
+                })()}
+
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-black/5 dark:border-white/5 bg-foreground/[0.02] py-2 text-[11px] font-bold text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                >
+                  <UserIcon size={13} />
+                  <span>My Profile</span>
+                </Link>
+              </div>
             </div>
           )}
         </div>
