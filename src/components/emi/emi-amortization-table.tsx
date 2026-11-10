@@ -174,8 +174,8 @@ export const EmiAmortizationTable: React.FC<EmiAmortizationTableProps> = ({
                       </div>
                     </div>
 
-                    {/* Table of Months within Year */}
-                    <div className="overflow-x-auto">
+                    {/* Table of Months within Year - Edge-to-edge scrollable */}
+                    <div className="overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain w-[calc(100%+1rem)] -mx-2 px-2 sm:w-full sm:mx-0 sm:px-0">
                       <table className="w-full border-collapse text-left text-xs">
                         <thead>
                           <tr className="text-muted border-b border-[var(--border-subtle)] text-[10px] font-black tracking-wider uppercase">
@@ -224,7 +224,7 @@ export const EmiAmortizationTable: React.FC<EmiAmortizationTableProps> = ({
       ) : (
         /* MONTH-WISE PAGINATED TABLE */
         <div className="flex flex-col gap-4">
-          <div className="bg-foreground/5 overflow-x-auto rounded-2xl border border-[var(--border-subtle)]">
+          <div className="bg-foreground/5 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain rounded-2xl border border-[var(--border-subtle)] w-[calc(100%+1.5rem)] -mx-3 px-3 sm:w-full sm:mx-0 sm:px-0">
             <table className="w-full border-collapse text-left text-xs">
               <thead>
                 <tr className="text-muted bg-background/50 border-b border-[var(--border-subtle)] text-[10px] font-black tracking-wider uppercase">

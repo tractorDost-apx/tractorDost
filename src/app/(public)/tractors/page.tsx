@@ -443,8 +443,8 @@ function TractorsListingContent() {
                 and transparent ex-showroom pricing for your farmland.
               </p>
 
-              {/* Quick Filter Shortcuts (Horizontal scrollable on mobile, wrapping on desktop) */}
-              <div className="mt-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap">
+              {/* Quick Filter Shortcuts (Horizontal scrollable edge-to-edge on mobile, wrapping on desktop) */}
+              <div className="mt-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full w-[calc(100%+2rem)] -mx-4 px-4 sm:w-full sm:mx-0 sm:px-0 sm:flex-wrap scroll-smooth overscroll-x-contain">
                 <span className="text-muted text-[10px] sm:text-xs font-bold tracking-wider uppercase shrink-0">
                   Quick Filters:
                 </span>
@@ -553,8 +553,8 @@ function TractorsListingContent() {
             )}
           </div>
 
-          {/* Horizontal Scrollable Families Pills (Touch-optimized for Mobile) */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-1 px-1 sm:mx-0 sm:px-0">
+          {/* Horizontal Scrollable Families Pills (Touch-optimized Edge-to-Edge) */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 w-[calc(100%+2rem)] -mx-4 px-4 sm:w-full sm:mx-0 sm:px-0 scroll-smooth overscroll-x-contain">
             {loadingFamilies ? (
               <div className="flex items-center gap-2 py-1">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -616,8 +616,8 @@ function TractorsListingContent() {
         </div>
       )}
 
-      {/* ===================== MOBILE QUICK FILTERS STRIP (Visible only on Mobile) ===================== */}
-      <div className="mb-4 flex w-full items-center gap-2 overflow-x-auto no-scrollbar py-1 lg:hidden">
+      {/* ===================== MOBILE QUICK FILTERS STRIP (Sticky & True Edge-to-Edge) ===================== */}
+      <div className="sticky top-[4.25rem] sm:top-[4.75rem] z-20 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 py-2 mb-4 bg-background/95 dark:bg-[#0c100e]/95 backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain lg:hidden">
         {/* All Filters Button */}
         <button
           type="button"
@@ -774,6 +774,7 @@ function TractorsListingContent() {
             <RotateCcw size={12} /> Clear
           </button>
         )}
+        <div className="w-2 shrink-0" aria-hidden="true" />
       </div>
 
       {/* ===================== MAIN CONTENT & SIDEBAR ===================== */}

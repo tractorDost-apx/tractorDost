@@ -120,15 +120,15 @@ export default function NewsListClient() {
           />
         </div>
 
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Category Pills - Edge-to-edge scrollable on mobile, wrapping on desktop */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain py-1 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 sm:w-full sm:mx-0 sm:px-0 sm:flex-wrap">
           <button
             type="button"
             onClick={() => {
               setSelectedCategory('all');
               setPage(1);
             }}
-            className={`rounded-full px-4 py-2 text-xs font-bold transition-all ${
+            className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition-all ${
               selectedCategory === 'all'
                 ? 'bg-[var(--color-brand-green)] text-white shadow-md'
                 : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
@@ -144,7 +144,7 @@ export default function NewsListClient() {
                 setSelectedCategory(cat.id.toString());
                 setPage(1);
               }}
-              className={`rounded-full px-4 py-2 text-xs font-bold transition-all ${
+              className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition-all ${
                 selectedCategory === cat.id.toString()
                   ? 'bg-[var(--color-brand-green)] text-white shadow-md'
                   : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
@@ -153,6 +153,7 @@ export default function NewsListClient() {
               {cat.name}
             </button>
           ))}
+          <div className="w-1 shrink-0 sm:hidden" aria-hidden="true" />
         </div>
       </div>
 

@@ -313,6 +313,118 @@ function UsedTractorsListingContent() {
         </div>
       </div>
 
+      {/* ===================== MOBILE QUICK FILTERS STRIP (Sticky & True Edge-to-Edge) ===================== */}
+      <div className="sticky top-[4.25rem] sm:top-[4.75rem] z-20 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 py-2 mb-4 bg-background/95 dark:bg-[#0c100e]/95 backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain lg:hidden">
+        {/* Toggle Filters Button */}
+        <button
+          type="button"
+          onClick={() => setShowFilters(!showFilters)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 dark:border-white/15 bg-white/95 dark:bg-[#151c17] px-3.5 py-2 text-xs font-black text-foreground shadow-sm backdrop-blur-md active:scale-95 transition-all cursor-pointer"
+        >
+          <SlidersHorizontal size={14} className="text-[var(--color-brand-green)]" />
+          <span>{showFilters ? 'Hide Filters' : 'Filters'}</span>
+          {hasActiveFilters && (
+            <span className="flex h-2 w-2 rounded-full bg-[var(--color-brand-green)]" />
+          )}
+        </button>
+
+        {/* Certified Badge Pill */}
+        <button
+          type="button"
+          onClick={() => {
+            setIsCertifiedOnly(!isCertifiedOnly);
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            isCertifiedOnly
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <ShieldCheck size={13} className={isCertifiedOnly ? 'text-white' : 'text-emerald-500'} />
+          <span>Verified</span>
+          {isCertifiedOnly && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Quick Budget Pills */}
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedPrice(selectedPrice === 'under3' ? '' : 'under3');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === 'under3'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&lt; ₹3 Lakh</span>
+          {selectedPrice === 'under3' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedPrice(selectedPrice === '3to5' ? '' : '3to5');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === '3to5'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>₹3 - 5 Lakh</span>
+          {selectedPrice === '3to5' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedPrice(selectedPrice === 'over5' ? '' : 'over5');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === 'over5'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&gt; ₹5 Lakh</span>
+          {selectedPrice === 'over5' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Quick Year Pill */}
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedYear(selectedYear === '2021' ? '' : '2021');
+            setPage(1);
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedYear === '2021'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>2021+ Models</span>
+          {selectedYear === '2021' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Clear All pill on Mobile if any filters active */}
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearAllFilters}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-red-500/10 px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-500/20 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <RotateCcw size={12} /> Clear
+          </button>
+        )}
+        <div className="w-2 shrink-0" aria-hidden="true" />
+      </div>
+
       <div className="flex flex-col items-start gap-8 lg:flex-row">
         {/* MOBILE FILTER TOGGLE */}
         <button

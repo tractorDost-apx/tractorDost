@@ -247,14 +247,14 @@ export function VideosListClient() {
 
       {/* Filter and Search Bar */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Category Pills */}
-        <div className="flex flex-wrap gap-2">
+        {/* Category Pills - Edge-to-edge scrollable on mobile */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain py-1 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 sm:w-auto sm:mx-0 sm:px-0 sm:flex-wrap">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 py-2 text-xs font-bold transition-all ${
+              className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition-all ${
                 activeCategory === cat
                   ? 'bg-[var(--color-brand-green)] text-white shadow-md'
                   : 'bg-card/60 text-muted-foreground hover:bg-secondary border border-border/40'
@@ -263,6 +263,7 @@ export function VideosListClient() {
               {cat}
             </button>
           ))}
+          <div className="w-1 shrink-0 sm:hidden" aria-hidden="true" />
         </div>
 
         {/* Search Input */}

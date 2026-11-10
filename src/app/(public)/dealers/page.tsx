@@ -164,22 +164,52 @@ export default function DealersPage() {
         </p>
       </div>
 
-      {/* Mobile Filter Toggle Button */}
-      <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
+      {/* ===================== MOBILE QUICK DEALERS BAR (Sticky & True Edge-to-Edge) ===================== */}
+      <div className="sticky top-[4.25rem] sm:top-[4.75rem] z-20 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 py-2 mb-4 bg-background/95 dark:bg-[#0c100e]/95 backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain lg:hidden">
         <button
+          type="button"
           suppressHydrationWarning
           onClick={() => setShowMobileFilters((prev) => !prev)}
-          className="flex items-center gap-2 rounded-2xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#151c18]/90 px-5 py-3 text-xs font-black text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 cursor-pointer"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 dark:border-white/15 bg-white/95 dark:bg-[#151c17] px-3.5 py-2 text-xs font-black text-foreground shadow-sm backdrop-blur-md active:scale-95 transition-all cursor-pointer"
         >
-          <Filter size={16} className="text-[var(--color-brand-green)]" />
-          <span>{showMobileFilters ? 'Hide Filters' : 'Filter Dealers'}</span>
+          <Filter size={14} className="text-[var(--color-brand-green)]" />
+          <span>{showMobileFilters ? 'Hide' : 'Filters'}</span>
           {(selectedBrand || selectedState || showOnlyOpen || searchQuery) && (
-            <span className="h-2 w-2 rounded-full bg-[var(--color-brand-green)]" />
+            <span className="flex h-2 w-2 rounded-full bg-[var(--color-brand-green)]" />
           )}
         </button>
-        <span className="text-xs font-bold text-muted">
-          {dealers.length} Found
-        </span>
+
+        {/* All Brands Pill */}
+        <button
+          type="button"
+          onClick={() => setSelectedBrand(null)}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedBrand === null
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>All Brands</span>
+        </button>
+
+        {/* Top Brands Quick Pills */}
+        {brands.slice(0, 10).map((b) => (
+          <button
+            key={b.id}
+            type="button"
+            onClick={() => setSelectedBrand(selectedBrand === b.id ? null : b.id)}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              selectedBrand === b.id
+                ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+                : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+            }`}
+          >
+            <span>{b.name}</span>
+            {selectedBrand === b.id && <X size={12} strokeWidth={2.5} />}
+          </button>
+        ))}
+
+        <div className="w-2 shrink-0" aria-hidden="true" />
       </div>
 
       <div className="flex flex-col gap-8 lg:flex-row">

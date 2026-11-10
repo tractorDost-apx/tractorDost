@@ -47,8 +47,9 @@ export default function CompareTable({ tractors, onAddMore }: CompareTableProps)
     <div className="relative w-full pb-20">
       <CompareStickyBar tractors={tractors} isSticky={isSticky} />
 
-      <div className="glass-panel overflow-hidden rounded-3xl" ref={tableRef}>
-        {/* Header Row */}
+      <div className="glass-panel overflow-x-auto no-scrollbar rounded-2xl sm:rounded-3xl w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 sm:w-full sm:mx-0 sm:px-0 scroll-smooth overscroll-x-contain" ref={tableRef}>
+        <div className={tractors.length >= 3 ? 'min-w-[620px] md:min-w-0' : 'w-full'}>
+          {/* Header Row */}
         <div className="bg-foreground/5 flex flex-col border-b border-[var(--border-subtle)] md:flex-row">
           <div className="hidden flex-col justify-center gap-2 border-r border-[var(--border-subtle)] p-6 md:flex md:w-1/4">
             <h2 className="text-foreground text-2xl font-black tracking-tight uppercase">
@@ -189,6 +190,7 @@ export default function CompareTable({ tractors, onAddMore }: CompareTableProps)
           values={tractors.map((t) => t.financeAvailable)}
           highlightBest="boolean"
         />
+        </div>
       </div>
     </div>
   );

@@ -350,8 +350,8 @@ function ImplementDetailsView({
               )}
             </div>
 
-            {/* Media Tabs / Action Bar */}
-            <div className="custom-scrollbar flex items-center gap-3 overflow-x-auto pb-1">
+            {/* Media Tabs / Action Bar - Edge-to-edge scrollable on mobile */}
+            <div className="flex w-[calc(100%+1.5rem)] -mx-3 px-3 sm:w-full sm:mx-0 sm:px-0 items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain pb-1">
               <button
                 onClick={() => setActiveMediaTab('image')}
                 className={`rounded-xl border px-4 py-2 text-xs font-bold transition-all ${activeMediaTab === 'image' ? 'border-[var(--color-brand-green)] bg-[var(--color-brand-green)] text-white shadow-md' : 'bg-background text-muted hover:text-foreground border-[var(--border-subtle)]'}`}
@@ -378,6 +378,7 @@ function ImplementDetailsView({
                   <FileText size={14} /> Download Brochure PDF
                 </a>
               )}
+              <div className="w-1 shrink-0 sm:hidden" aria-hidden="true" />
             </div>
           </div>
 
@@ -713,8 +714,8 @@ function ImplementDetailsView({
         </div>
       </div>
 
-      {/* Mobile Sticky Action Bar */}
-      <div className="bg-background/90 fixed bottom-0 left-0 z-50 flex w-full items-center justify-between border-t border-[var(--border-subtle)] p-3.5 sm:p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] backdrop-blur-xl lg:hidden">
+      {/* Mobile Sticky Action Bar - Pinned edge-to-edge */}
+      <div className="bg-background/95 fixed bottom-0 left-0 right-0 z-40 flex w-full items-center justify-between border-t border-[var(--border-subtle)] p-3.5 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl lg:hidden">
         <div className="flex flex-col">
           <span className="text-muted text-[10px] font-bold tracking-widest uppercase">
             Estimated Price

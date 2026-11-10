@@ -12,11 +12,11 @@ export default function CompareStickyBar({ tractors, isSticky }: CompareStickyBa
   if (!isSticky) return null;
 
   return (
-    <div className="bg-background/95 animate-fade-in-down fixed top-16 right-0 left-0 z-40 border-b border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-all">
-      <div className="mx-auto flex w-full max-w-7xl px-4 py-3">
+    <div className="bg-background/95 animate-fade-in-down fixed top-[4.25rem] sm:top-[4.75rem] right-0 left-0 z-30 border-b border-[var(--border-subtle)] shadow-xs backdrop-blur-xl transition-all">
+      <div className="mx-auto flex w-full max-w-7xl px-3.5 sm:px-4 py-2.5 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain">
         {/* Empty left space to align with table headers */}
         <div className="hidden md:block md:w-1/4"></div>
-        <div className="flex flex-1 flex-row">
+        <div className={`flex flex-1 flex-row ${tractors.length >= 3 ? 'min-w-[560px] md:min-w-0' : ''}`}>
           {tractors.map((tractor, idx) => (
             <div
               key={idx}

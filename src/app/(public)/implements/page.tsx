@@ -25,6 +25,7 @@ import {
   Star,
   SlidersHorizontal,
   Tractor,
+  RotateCcw,
 } from 'lucide-react';
 import { implementAPI, Implement } from '@/lib/api/implements';
 import { equipmentBrandAPI, EquipmentBrand } from '@/lib/api/equipmentBrands';
@@ -504,8 +505,8 @@ function ImplementsListingContent() {
                 machinery to enhance your farming output.
               </p>
 
-              {/* Quick Filter Shortcuts (Horizontal scrollable on mobile, wrapping on desktop) */}
-              <div className="mt-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap">
+              {/* Quick Filter Shortcuts (Horizontal scrollable edge-to-edge on mobile, wrapping on desktop) */}
+              <div className="mt-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full w-[calc(100%+2rem)] -mx-4 px-4 sm:w-full sm:mx-0 sm:px-0 sm:flex-wrap scroll-smooth overscroll-x-contain">
                 <span className="text-muted text-[10px] sm:text-xs font-bold tracking-wider uppercase shrink-0">
                   Quick Filters:
                 </span>
@@ -592,6 +593,127 @@ function ImplementsListingContent() {
           </div>
         </div>
       )}
+
+      {/* ===================== MOBILE QUICK FILTERS STRIP (Sticky & True Edge-to-Edge) ===================== */}
+      <div className="sticky top-[4.25rem] sm:top-[4.75rem] z-20 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 py-2 mb-4 bg-background/95 dark:bg-[#0c100e]/95 backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth overscroll-x-contain lg:hidden">
+        {/* Toggle Sidebar Filters */}
+        <button
+          type="button"
+          onClick={() => setShowFilters(!showFilters)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 dark:border-white/15 bg-white/95 dark:bg-[#151c17] px-3.5 py-2 text-xs font-black text-foreground shadow-sm backdrop-blur-md active:scale-95 transition-all cursor-pointer"
+        >
+          <SlidersHorizontal size={14} className="text-[var(--color-brand-green)]" />
+          <span>{showFilters ? 'Hide Filters' : 'Filters'}</span>
+        </button>
+
+        {/* Quick HP Pills */}
+        <button
+          type="button"
+          onClick={() => {
+            const next = selectedHp === 'under30' ? '' : 'under30';
+            setSelectedHp(next);
+            setPage(1);
+            updateUrlParams({ hp: next || null, page: 1 });
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedHp === 'under30'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&lt; 30 HP</span>
+          {selectedHp === 'under30' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            const next = selectedHp === '30to50' ? '' : '30to50';
+            setSelectedHp(next);
+            setPage(1);
+            updateUrlParams({ hp: next || null, page: 1 });
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedHp === '30to50'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>30-50 HP</span>
+          {selectedHp === '30to50' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            const next = selectedHp === 'over50' ? '' : 'over50';
+            setSelectedHp(next);
+            setPage(1);
+            updateUrlParams({ hp: next || null, page: 1 });
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedHp === 'over50'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&gt; 50 HP</span>
+          {selectedHp === 'over50' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Quick Price Pills */}
+        <button
+          type="button"
+          onClick={() => {
+            const next = selectedPrice === 'under50k' ? '' : 'under50k';
+            setSelectedPrice(next);
+            setPage(1);
+            updateUrlParams({ price: next || null, page: 1 });
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === 'under50k'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>&lt; ₹50,000</span>
+          {selectedPrice === 'under50k' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            const next = selectedPrice === '50kto1l' ? '' : '50kto1l';
+            setSelectedPrice(next);
+            setPage(1);
+            updateUrlParams({ price: next || null, page: 1 });
+          }}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            selectedPrice === '50kto1l'
+              ? 'bg-[var(--color-brand-green)] text-white shadow-sm'
+              : 'border border-black/8 dark:border-white/10 bg-white/80 dark:bg-white/5 text-foreground/80'
+          }`}
+        >
+          <span>₹50k - 1 Lakh</span>
+          {selectedPrice === '50kto1l' && <X size={12} strokeWidth={2.5} />}
+        </button>
+
+        {/* Clear Filter pill if active */}
+        {(selectedBrand !== '' ||
+          selectedCategory !== '' ||
+          selectedHp !== '' ||
+          selectedPrice !== '' ||
+          selectedUsage !== '') && (
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-red-500/10 px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-500/20 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <RotateCcw size={12} /> Clear
+          </button>
+        )}
+        <div className="w-2 shrink-0" aria-hidden="true" />
+      </div>
 
       {/* MAIN CONTAINER: SIDEBAR + CONTENT */}
       <div className="flex flex-col items-start gap-8 lg:flex-row">

@@ -286,9 +286,9 @@ export default function UsedTractorDetailPage({
               )}
             </div>
 
-            {/* Thumbnail Strip */}
+            {/* Thumbnail Strip - Edge-to-edge scrollable */}
             {mediaList.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto p-4 custom-scrollbar">
+              <div className="flex w-[calc(100%+1.5rem)] -mx-3 px-3 sm:w-full sm:mx-0 sm:px-4 gap-2 overflow-x-auto py-3 no-scrollbar scroll-smooth overscroll-x-contain">
                 {mediaList.map((img: any, idx: number) => (
                   <button
                     key={idx}
@@ -302,6 +302,7 @@ export default function UsedTractorDetailPage({
                     <img src={img.url} alt={`View ${idx + 1}`} className="h-full w-full object-cover" />
                   </button>
                 ))}
+                <div className="w-1 shrink-0 sm:hidden" aria-hidden="true" />
               </div>
             )}
           </div>
@@ -713,7 +714,7 @@ export default function UsedTractorDetailPage({
             </div>
 
             {/* Inquiry / Lead Generation Form */}
-            <div className="bg-foreground/[0.03] rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm">
+            <div id="enquiry-form-section" className="bg-foreground/[0.03] rounded-[2rem] border border-[var(--border-subtle)] p-6 shadow-sm scroll-mt-28">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
                   <MessageCircle size={18} />
@@ -815,6 +816,30 @@ export default function UsedTractorDetailPage({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Sticky Action Bar - Pinned edge-to-edge */}
+      <div className="bg-background/95 fixed bottom-0 left-0 right-0 z-40 flex w-full items-center justify-between border-t border-[var(--border-subtle)] p-3.5 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl lg:hidden">
+        <div className="flex flex-col">
+          <span className="text-muted text-[10px] font-bold tracking-widest uppercase">
+            Asking Price
+          </span>
+          <span className="text-foreground text-base sm:text-lg leading-none font-black text-[var(--color-brand-green)]">
+            ₹ {tractor.price.toLocaleString('en-IN')}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            const formEl = document.getElementById('enquiry-form-section');
+            if (formEl) {
+              formEl.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          className="flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-5 py-2.5 text-xs sm:text-sm font-black text-white shadow-lg transition-colors hover:bg-[var(--color-brand-orange)] active:scale-95 cursor-pointer"
+        >
+          <MessageCircle size={15} /> Contact Seller
+        </button>
       </div>
     </div>
   );
