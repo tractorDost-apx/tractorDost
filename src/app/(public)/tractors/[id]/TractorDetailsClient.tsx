@@ -17,6 +17,8 @@ import {
   Flame,
   Star,
   Tractor as TractorIcon,
+  Store,
+  Repeat,
   ArrowLeft,
   ArrowRightLeft,
   Download,
@@ -2009,6 +2011,181 @@ function TractorDetailsView({
               <span>Compare with Any Other Tractor</span>
             </Link>
           </div>
+
+          {/* 4. RIGHT COLUMN: Authorized Brand Dealerships */}
+          <div className="spatial-panel flex flex-col gap-3.5 overflow-hidden rounded-[2.5rem] border border-emerald-500/20 p-5 sm:p-6 shadow-xl">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                  <Store size={18} />
+                </div>
+                <div>
+                  <h3 className="text-foreground text-sm sm:text-base font-black">
+                    Authorized {tractor.brand?.name || ''} Dealers
+                  </h3>
+                  <p className="text-muted text-[10px] sm:text-[11px] font-bold">
+                    Verified showrooms & service centers in {selectedState || 'India'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 text-xs">
+              <div className="flex items-center gap-2 text-muted text-[11px]">
+                <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                <span>Authorized factory pricing & official manufacturer warranty</span>
+              </div>
+              <div className="flex items-center gap-2 text-muted text-[11px]">
+                <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                <span>Immediate doorstep delivery & agricultural loan support</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <Link
+                href={`/dealers?brand=${tractor.brandId}`}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 text-xs font-black shadow-sm transition-all active:scale-98 cursor-pointer"
+              >
+                <MapPin size={13} />
+                <span>Find Dealers</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setIsGetPriceOpen(true)}
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 py-2.5 text-xs font-black transition-all active:scale-98 cursor-pointer"
+              >
+                <span>Book Test Drive</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 5. RIGHT COLUMN: Old Tractor Exchange & Valuation */}
+          <div className="spatial-panel flex flex-col gap-3.5 overflow-hidden rounded-[2.5rem] border border-amber-500/20 p-5 sm:p-6 shadow-xl">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+                  <Repeat size={18} />
+                </div>
+                <div>
+                  <h3 className="text-foreground text-sm sm:text-base font-black">
+                    Exchange Old Tractor
+                  </h3>
+                  <p className="text-muted text-[10px] sm:text-[11px] font-bold">
+                    Upgrade to {tractor.modelName} at best resale value
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-muted text-[11px] leading-relaxed">
+              Have an old tractor to sell? Calculate exact market valuation in 2 minutes backed by TractorDost pricing engine.
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 pt-0.5">
+              <Link
+                href="/used-tractor-valuation"
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white py-2.5 text-xs font-black shadow-sm transition-all active:scale-98 cursor-pointer"
+              >
+                <span>Check Value</span>
+                <ChevronRight size={13} strokeWidth={3} />
+              </Link>
+              <Link
+                href="/sell-used-tractor"
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-200 py-2.5 text-xs font-black transition-all active:scale-98 cursor-pointer"
+              >
+                <span>Sell Used</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* 6. RIGHT COLUMN: Official PDF Brochure Download */}
+          <div className="spatial-panel flex flex-col gap-3.5 overflow-hidden rounded-[2.5rem] border border-purple-500/20 p-5 sm:p-6 shadow-xl">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <h3 className="text-foreground text-sm sm:text-base font-black">
+                    Official PDF Brochure
+                  </h3>
+                  <p className="text-muted text-[10px] sm:text-[11px] font-bold">
+                    Technical specifications & factory feature sheet
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-muted text-[11px] leading-relaxed">
+              Download the official {fullModelTitle} specifications document to inspect engine curves, dimensions, PTO speeds, and hydraulic capacity.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleDownloadBrochure}
+              disabled={isGeneratingPdf}
+              className={`flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black transition-all active:scale-98 shadow-sm cursor-pointer ${
+                brochureSuccess
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-purple-600 hover:bg-purple-700 text-white hover:shadow-purple-500/20 hover:shadow-md'
+              }`}
+            >
+              {isGeneratingPdf ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  <span>Generating Official PDF...</span>
+                </>
+              ) : brochureSuccess ? (
+                <>
+                  <Check size={15} strokeWidth={3} />
+                  <span>Brochure Downloaded Successfully!</span>
+                </>
+              ) : (
+                <>
+                  <Download size={15} />
+                  <span>Download Free PDF Brochure</span>
+                </>
+              )}
+            </button>
+            {brochureError && (
+              <p className="text-red-500 text-[10px] font-bold text-center">{brochureError}</p>
+            )}
+          </div>
+
+          {/* 7. RIGHT COLUMN: Video Review & Field Performance (if videoUrl exists) */}
+          {tractor.videoUrl && (
+            <div className="spatial-panel flex flex-col gap-3.5 overflow-hidden rounded-[2.5rem] border border-red-500/20 p-5 sm:p-6 shadow-xl">
+              <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500/10 text-red-500 shrink-0">
+                    <Play size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-foreground text-sm sm:text-base font-black">
+                      Field Test Drive Video
+                    </h3>
+                    <p className="text-muted text-[10px] sm:text-[11px] font-bold">
+                      Watch {tractor.modelName} performance in real fields
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href={tractor.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex h-36 w-full items-center justify-center overflow-hidden rounded-2xl bg-black/80 border border-[var(--border-subtle)] shadow-inner transition-transform active:scale-98 cursor-pointer"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition-transform group-hover:scale-110">
+                  <Play size={20} className="ml-1 fill-white" />
+                </div>
+                <span className="absolute bottom-2.5 left-3 text-[10px] font-black text-white/90 bg-black/60 px-2 py-0.5 rounded-md backdrop-blur-xs">
+                  Watch on YouTube →
+                </span>
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
