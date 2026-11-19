@@ -18,6 +18,7 @@ import {
   Star,
   Tractor as TractorIcon,
   ArrowLeft,
+  ArrowRightLeft,
   Download,
   Play,
   Percent,
@@ -152,6 +153,23 @@ function TractorDetailsView({
     () => getCleanModelTitle(tractor.brand?.name, tractor.modelName),
     [tractor.brand?.name, tractor.modelName]
   );
+
+  // Comparison candidates for desktop & mobile
+  const comparisonCandidates = useMemo(() => {
+    if (rivals && rivals.length > 0) {
+      return rivals
+        .slice(0, 3)
+        .map((rival) => {
+          const isLeftMe = rival.tractorLeft?.id === tractor.id;
+          return isLeftMe ? rival.tractorRight : rival.tractorLeft;
+        })
+        .filter(Boolean);
+    }
+    if (similarTractors && similarTractors.length > 0) {
+      return similarTractors.slice(0, 3);
+    }
+    return [];
+  }, [rivals, similarTractors, tractor.id]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -465,8 +483,9 @@ function TractorDetailsView({
       'section-gallery',
       'section-quick-specs',
       'section-price-check',
-      'section-emi-calc',
+      ...(tractor.overview ? ['section-overview'] : []),
       'section-all-specs',
+      'section-emi-calc',
       'section-implements',
       'section-pros-cons',
       'section-competitors',
@@ -477,9 +496,16 @@ function TractorDetailsView({
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
+          const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
           const scrollPos = window.scrollY + 130;
           for (let i = sectionIds.length - 1; i >= 0; i--) {
-            const el = document.getElementById(sectionIds[i]);
+            let targetId = sectionIds[i];
+            if (isDesktop && targetId === 'section-emi-calc') {
+              targetId = 'section-emi-calc-desktop';
+            } else if (isDesktop && targetId === 'section-competitors') {
+              targetId = 'section-competitors-desktop';
+            }
+            const el = document.getElementById(targetId) || document.getElementById(sectionIds[i]);
             if (el) {
               const top = el.offsetTop;
               if (scrollPos >= top) {
@@ -496,11 +522,18 @@ function TractorDetailsView({
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [tractor.overview]);
 
   const scrollToSection = (id: string) => {
     setActiveJumpSection(id);
-    const el = document.getElementById(id);
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+    let targetId = id;
+    if (isDesktop && id === 'section-emi-calc') {
+      targetId = 'section-emi-calc-desktop';
+    } else if (isDesktop && id === 'section-competitors') {
+      targetId = 'section-competitors-desktop';
+    }
+    const el = document.getElementById(targetId) || document.getElementById(id);
     if (el) {
       const isMobile = window.innerWidth < 640;
       const yOffset = isMobile ? -110 : -130;
@@ -582,8 +615,9 @@ function TractorDetailsView({
             { id: 'section-gallery', label: 'Photos' },
             { id: 'section-quick-specs', label: 'Key Specs' },
             { id: 'section-price-check', label: 'On-Road Price' },
-            { id: 'section-emi-calc', label: 'EMI Calc' },
+            ...(tractor.overview ? [{ id: 'section-overview', label: 'Overview' }] : []),
             { id: 'section-all-specs', label: 'Detailed Specs' },
+            { id: 'section-emi-calc', label: 'EMI Calc' },
             { id: 'section-implements', label: 'Implements' },
             { id: 'section-pros-cons', label: 'Pros & Cons' },
             { id: 'section-competitors', label: 'Competitors' },
@@ -990,130 +1024,11 @@ function TractorDetailsView({
             )}
           </div>
 
-          {/* INTERACTIVE REAL-TIME EMI CALCULATOR WIDGET */}
-          <div id="section-emi-calc" className="spatial-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col gap-4 border border-blue-500/20 shadow-md scroll-mt-32">
-            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 shrink-0">
-                  <IndianRupee size={18} />
-                </div>
-                <div>
-                  <h3 className="text-foreground text-sm sm:text-base font-black">
-                    Live Tractor Loan EMI Calculator
-                  </h3>
-                  <p className="text-muted text-[10px] sm:text-[11px] font-bold">
-                    Adjust down payment & tenure to customize your monthly installment
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Result Highlight Pill */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-xl bg-blue-500/5 border border-blue-500/15 p-3">
-              <div>
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
-                  Monthly EMI
-                </span>
-                <span className="text-base sm:text-xl font-black text-[var(--color-brand-green)]">
-                  ₹ {calculatedEmi.toLocaleString('en-IN')}
-                  <span className="text-xs font-normal text-muted">/mo</span>
-                </span>
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
-                  Loan Amount
-                </span>
-                <span className="text-xs sm:text-sm font-black text-foreground">
-                  ₹ {loanAmount.toLocaleString('en-IN')}
-                </span>
-              </div>
-              <div className="col-span-2 sm:col-span-1">
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
-                  Total Interest
-                </span>
-                <span className="text-xs sm:text-sm font-bold text-[var(--color-brand-orange)]">
-                  ₹ {totalInterest.toLocaleString('en-IN')}
-                </span>
-              </div>
-            </div>
-
-            {/* Down Payment Slider */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-foreground">Down Payment:</span>
-                <span className="font-black text-blue-600 dark:text-blue-400">
-                  ₹ {downPayment.toLocaleString('en-IN')} ({Math.round((downPayment / basePriceForLoan) * 100)}%)
-                </span>
-              </div>
-              <input
-                type="range"
-                min={Math.round(basePriceForLoan * 0.1)}
-                max={Math.round(basePriceForLoan * 0.6)}
-                step={10000}
-                value={downPayment}
-                onChange={(e) => setDownPayment(Number(e.target.value))}
-                className="w-full accent-[var(--color-brand-green)] cursor-pointer h-2 bg-foreground/10 rounded-lg"
-              />
-              <div className="flex justify-between text-[10px] text-muted font-bold">
-                <span>Min: ₹ {Math.round(basePriceForLoan * 0.1 / 100000)}L</span>
-                <span>Max: ₹ {Math.round(basePriceForLoan * 0.6 / 100000)}L</span>
-              </div>
-            </div>
-
-            {/* Loan Tenure Selector */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs font-bold text-foreground">Loan Tenure:</span>
-              <div className="grid grid-cols-4 gap-1.5">
-                {[3, 4, 5, 7].map((yr) => (
-                  <button
-                    key={yr}
-                    type="button"
-                    onClick={() => setTenureYears(yr)}
-                    className={`rounded-xl py-2 text-xs font-bold transition-all cursor-pointer ${
-                      tenureYears === yr
-                        ? 'bg-[var(--color-brand-green)] text-white shadow-2xs font-black'
-                        : 'bg-foreground/[0.04] text-foreground/80 hover:bg-foreground/[0.08]'
-                    }`}
-                  >
-                    {yr} Years
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Interest Rate Selector */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-foreground">Interest Rate (% p.a.):</span>
-                <span className="font-black text-foreground">{interestRate}%</span>
-              </div>
-              <input
-                type="range"
-                min={8.0}
-                max={14.0}
-                step={0.25}
-                value={interestRate}
-                onChange={(e) => setInterestRate(Number(e.target.value))}
-                className="w-full accent-[var(--color-brand-orange)] cursor-pointer h-2 bg-foreground/10 rounded-lg"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setIsGetPriceOpen(true)}
-              className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-3 text-xs sm:text-sm font-black text-white shadow-md transition-all active:scale-98 hover:shadow-lg cursor-pointer"
-            >
-              <IndianRupee size={16} className="shrink-0" />
-              <span>Apply for Low Interest Tractor Loan</span>
-              <ChevronRight size={14} className="shrink-0 opacity-80" strokeWidth={3} />
-            </button>
-          </div>
-
           {/* OVERVIEW & DETAILED SPECS */}
           <div className="spatial-panel flex flex-col gap-6 sm:gap-8 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-7 md:p-8">
             {/* 1. OVERVIEW */}
             {tractor.overview && (
-              <div className="flex flex-col gap-2.5">
+              <div id="section-overview" className="flex flex-col gap-2.5 scroll-mt-32">
                 <h3 className="text-foreground text-base sm:text-lg font-black">Overview</h3>
                 <div
                   className={`text-muted text-xs sm:text-sm leading-relaxed font-medium transition-all ${
@@ -1360,9 +1275,131 @@ function TractorDetailsView({
                 </AccordionSection>
               </div>
             </div>
+          </div>
 
+          {/* INTERACTIVE REAL-TIME EMI CALCULATOR WIDGET (Mobile & Tablet) */}
+          <div id="section-emi-calc" className="lg:hidden spatial-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col gap-4 border border-blue-500/20 shadow-md scroll-mt-32">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 shrink-0">
+                  <IndianRupee size={18} />
+                </div>
+                <div>
+                  <h3 className="text-foreground text-sm sm:text-base font-black">
+                    Live Tractor Loan EMI Calculator
+                  </h3>
+                  <p className="text-muted text-[10px] sm:text-[11px] font-bold">
+                    Adjust down payment & tenure to customize your monthly installment
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Result Highlight Pill */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-xl bg-blue-500/5 border border-blue-500/15 p-3">
+              <div>
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                  Monthly EMI
+                </span>
+                <span className="text-base sm:text-xl font-black text-[var(--color-brand-green)]">
+                  ₹ {calculatedEmi.toLocaleString('en-IN')}
+                  <span className="text-xs font-normal text-muted">/mo</span>
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                  Loan Amount
+                </span>
+                <span className="text-xs sm:text-sm font-black text-foreground">
+                  ₹ {loanAmount.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                  Total Interest
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-[var(--color-brand-orange)]">
+                  ₹ {totalInterest.toLocaleString('en-IN')}
+                </span>
+              </div>
+            </div>
+
+            {/* Down Payment Slider */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-foreground">Down Payment:</span>
+                <span className="font-black text-blue-600 dark:text-blue-400">
+                  ₹ {downPayment.toLocaleString('en-IN')} ({Math.round((downPayment / basePriceForLoan) * 100)}%)
+                </span>
+              </div>
+              <input
+                type="range"
+                min={Math.round(basePriceForLoan * 0.1)}
+                max={Math.round(basePriceForLoan * 0.6)}
+                step={10000}
+                value={downPayment}
+                onChange={(e) => setDownPayment(Number(e.target.value))}
+                className="w-full accent-[var(--color-brand-green)] cursor-pointer h-2 bg-foreground/10 rounded-lg"
+              />
+              <div className="flex justify-between text-[10px] text-muted font-bold">
+                <span>Min: ₹ {Math.round(basePriceForLoan * 0.1 / 100000)}L</span>
+                <span>Max: ₹ {Math.round(basePriceForLoan * 0.6 / 100000)}L</span>
+              </div>
+            </div>
+
+            {/* Loan Tenure Selector */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-foreground">Loan Tenure:</span>
+              <div className="grid grid-cols-4 gap-1.5">
+                {[3, 4, 5, 7].map((yr) => (
+                  <button
+                    key={yr}
+                    type="button"
+                    onClick={() => setTenureYears(yr)}
+                    className={`rounded-xl py-2 text-xs font-bold transition-all cursor-pointer ${
+                      tenureYears === yr
+                        ? 'bg-[var(--color-brand-green)] text-white shadow-2xs font-black'
+                        : 'bg-foreground/[0.04] text-foreground/80 hover:bg-foreground/[0.08]'
+                    }`}
+                  >
+                    {yr} Years
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Interest Rate Selector */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-foreground">Interest Rate (% p.a.):</span>
+                <span className="font-black text-foreground">{interestRate}%</span>
+              </div>
+              <input
+                type="range"
+                min={8.0}
+                max={14.0}
+                step={0.25}
+                value={interestRate}
+                onChange={(e) => setInterestRate(Number(e.target.value))}
+                className="w-full accent-[var(--color-brand-orange)] cursor-pointer h-2 bg-foreground/10 rounded-lg"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsGetPriceOpen(true)}
+              className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-3 text-xs sm:text-sm font-black text-white shadow-md transition-all active:scale-98 hover:shadow-lg cursor-pointer"
+            >
+              <IndianRupee size={16} className="shrink-0" />
+              <span>Apply for Low Interest Tractor Loan</span>
+              <ChevronRight size={14} className="shrink-0 opacity-80" strokeWidth={3} />
+            </button>
+          </div>
+
+          {/* IMPLEMENTS, PROS & CONS, COMPETITORS & FAQS */}
+          <div className="spatial-panel flex flex-col gap-6 sm:gap-8 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-7 md:p-8">
             {/* 3. IMPLEMENT COMPATIBILITY GUIDE */}
-            <div id="section-implements" className="flex flex-col gap-3.5 border-t border-[var(--border-subtle)] pt-5 scroll-mt-32">
+            <div id="section-implements" className="flex flex-col gap-3.5 scroll-mt-32">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-foreground text-base sm:text-lg font-black">
@@ -1460,9 +1497,9 @@ function TractorDetailsView({
               </div>
             )}
 
-            {/* 5. TOP COMPETITORS */}
+            {/* 5. TOP COMPETITORS (Mobile & Tablet) */}
             {rivals.length > 0 && (
-              <div id="section-competitors" className="flex flex-col gap-3.5 border-t border-[var(--border-subtle)] pt-5 scroll-mt-32">
+              <div id="section-competitors" className="lg:hidden flex flex-col gap-3.5 border-t border-[var(--border-subtle)] pt-5 scroll-mt-32">
                 <div className="flex items-center gap-2">
                   <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-red-500/10">
                     <Flame size={16} className="text-red-500" />
@@ -1585,9 +1622,9 @@ function TractorDetailsView({
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Desktop Sticky Information & Leads */}
-        <div className="hidden lg:flex w-full lg:w-[40%] flex-col">
-          <div className="spatial-panel group sticky top-24 flex flex-col gap-4 overflow-hidden rounded-[2.5rem] border border-[var(--color-brand-green)]/20 p-6 shadow-2xl">
+        {/* RIGHT COLUMN: Desktop Information, Leads, EMI & Comparison */}
+        <div className="hidden lg:flex w-full lg:w-[40%] flex-col gap-6">
+          <div className="spatial-panel group flex flex-col gap-4 overflow-hidden rounded-[2.5rem] border border-[var(--color-brand-green)]/20 p-6 shadow-2xl">
             <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-[var(--color-brand-orange)]/10 blur-[50px] transition-all duration-1000 group-hover:bg-[var(--color-brand-orange)]/20" />
 
             <div className="flex flex-col gap-1">
@@ -1760,6 +1797,217 @@ function TractorDetailsView({
             <p className="text-muted flex items-center justify-center gap-1.5 text-center text-[10px] font-bold">
               <Shield size={12} className="text-[var(--color-brand-green)]" /> 100% Verified Dealers & Secure Financing
             </p>
+          </div>
+
+          {/* 2. RIGHT COLUMN: Live Tractor Loan EMI Calculator */}
+          <div
+            id="section-emi-calc-desktop"
+            className="spatial-panel flex flex-col gap-4 overflow-hidden rounded-[2.5rem] border border-blue-500/20 p-5 sm:p-6 shadow-xl scroll-mt-32"
+          >
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 shrink-0">
+                  <IndianRupee size={18} />
+                </div>
+                <div>
+                  <h3 className="text-foreground text-sm sm:text-base font-black">
+                    Live Tractor Loan EMI Calculator
+                  </h3>
+                  <p className="text-muted text-[10px] sm:text-[11px] font-bold">
+                    Adjust down payment & tenure to customize your monthly installment
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Result Highlight Pill */}
+            <div className="grid grid-cols-2 gap-2.5 rounded-2xl bg-blue-500/5 border border-blue-500/15 p-3.5">
+              <div>
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                  Monthly EMI
+                </span>
+                <span className="text-xl sm:text-2xl font-black text-[var(--color-brand-green)]">
+                  ₹ {calculatedEmi.toLocaleString('en-IN')}
+                  <span className="text-xs font-normal text-muted">/mo</span>
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                  Loan Amount
+                </span>
+                <span className="text-xs sm:text-sm font-black text-foreground">
+                  ₹ {loanAmount.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <div className="col-span-2 pt-2 border-t border-blue-500/10 flex items-center justify-between">
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
+                  Total Interest
+                </span>
+                <span className="text-xs sm:text-sm font-black text-[var(--color-brand-orange)]">
+                  ₹ {totalInterest.toLocaleString('en-IN')}
+                </span>
+              </div>
+            </div>
+
+            {/* Down Payment Slider */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-foreground">Down Payment:</span>
+                <span className="font-black text-blue-600 dark:text-blue-400">
+                  ₹ {downPayment.toLocaleString('en-IN')} ({Math.round((downPayment / basePriceForLoan) * 100)}%)
+                </span>
+              </div>
+              <input
+                type="range"
+                min={Math.round(basePriceForLoan * 0.1)}
+                max={Math.round(basePriceForLoan * 0.6)}
+                step={10000}
+                value={downPayment}
+                onChange={(e) => setDownPayment(Number(e.target.value))}
+                className="w-full accent-[var(--color-brand-green)] cursor-pointer h-2 bg-foreground/10 rounded-lg"
+              />
+              <div className="flex justify-between text-[10px] text-muted font-bold">
+                <span>Min: ₹ {Math.round(basePriceForLoan * 0.1 / 100000)}L</span>
+                <span>Max: ₹ {Math.round(basePriceForLoan * 0.6 / 100000)}L</span>
+              </div>
+            </div>
+
+            {/* Loan Tenure Selector */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-foreground">Loan Tenure:</span>
+              <div className="grid grid-cols-4 gap-1.5">
+                {[3, 4, 5, 7].map((yr) => (
+                  <button
+                    key={yr}
+                    type="button"
+                    onClick={() => setTenureYears(yr)}
+                    className={`rounded-xl py-2 text-xs font-bold transition-all cursor-pointer ${
+                      tenureYears === yr
+                        ? 'bg-[var(--color-brand-green)] text-white shadow-2xs font-black'
+                        : 'bg-foreground/[0.04] text-foreground/80 hover:bg-foreground/[0.08]'
+                    }`}
+                  >
+                    {yr} Years
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Interest Rate Selector */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-foreground">Interest Rate (% p.a.):</span>
+                <span className="font-black text-foreground">{interestRate}%</span>
+              </div>
+              <input
+                type="range"
+                min={8.0}
+                max={14.0}
+                step={0.25}
+                value={interestRate}
+                onChange={(e) => setInterestRate(Number(e.target.value))}
+                className="w-full accent-[var(--color-brand-orange)] cursor-pointer h-2 bg-foreground/10 rounded-lg"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsGetPriceOpen(true)}
+              className="w-full flex items-center justify-center gap-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 px-4 py-3 text-xs sm:text-sm font-black text-white shadow-md transition-all active:scale-98 hover:shadow-lg cursor-pointer"
+            >
+              <IndianRupee size={16} className="shrink-0" />
+              <span>Apply for Low Interest Tractor Loan</span>
+              <ChevronRight size={14} className="shrink-0 opacity-80" strokeWidth={3} />
+            </button>
+          </div>
+
+          {/* 3. RIGHT COLUMN: Tractor Comparison */}
+          <div
+            id="section-competitors-desktop"
+            className="spatial-panel flex flex-col gap-4 overflow-hidden rounded-[2.5rem] border border-[var(--color-brand-orange)]/25 p-5 sm:p-6 shadow-xl scroll-mt-32"
+          >
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500/10 text-red-500 shrink-0">
+                  <ArrowRightLeft size={18} />
+                </div>
+                <div>
+                  <h3 className="text-foreground text-sm sm:text-base font-black">
+                    Tractor Comparison
+                  </h3>
+                  <p className="text-muted text-[10px] sm:text-[11px] font-bold">
+                    Compare {fullModelTitle} with popular rivals
+                  </p>
+                </div>
+              </div>
+              <Link
+                href={`/compare?ids=${tractor.id}`}
+                className="text-xs font-black text-[var(--color-brand-green)] hover:underline shrink-0"
+              >
+                Full Compare →
+              </Link>
+            </div>
+
+            {/* Comparison List */}
+            {comparisonCandidates.length > 0 ? (
+              <div className="flex flex-col gap-2.5">
+                {comparisonCandidates.map((comp: any, idx: number) => {
+                  const compImage =
+                    comp.media?.find((m: any) => m.isPrimary)?.url ||
+                    comp.media?.[0]?.url;
+
+                  return (
+                    <Link
+                      key={idx}
+                      href={`/compare?ids=${tractor.id},${comp.id}`}
+                      className="group flex items-center justify-between gap-3 rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-2.5 transition-all hover:border-[var(--color-brand-orange)]/40 hover:bg-foreground/[0.04] hover:shadow-md cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="from-foreground/5 flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-gradient-to-br to-transparent p-1">
+                          {compImage ? (
+                            <img
+                              src={compImage}
+                              alt={comp.modelName}
+                              className="h-full w-full object-contain mix-blend-multiply transition-transform group-hover:scale-105 dark:mix-blend-normal"
+                            />
+                          ) : (
+                            <TractorIcon className="text-muted h-6 w-6" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[9px] font-black tracking-wider text-[var(--color-brand-green)] uppercase">
+                            {comp.brand?.name}
+                          </p>
+                          <h4 className="text-foreground truncate text-xs font-black">
+                            {comp.modelName}
+                          </h4>
+                          <p className="text-muted text-[10px] font-bold">
+                            {comp.hp || '--'} HP {comp.exShowroomPriceMin ? `• ₹${formatLakh(comp.exShowroomPriceMin)}` : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex h-7 px-2.5 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-orange)]/10 text-[10px] font-black text-[var(--color-brand-orange)] transition-colors group-hover:bg-[var(--color-brand-orange)] group-hover:text-white">
+                        VS
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-muted text-xs font-bold text-center py-2">
+                Explore side-by-side specifications against other popular tractors.
+              </p>
+            )}
+
+            {/* Custom Tractor Comparison CTA */}
+            <Link
+              href={`/compare?ids=${tractor.id}`}
+              className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--border-subtle)] hover:border-[var(--color-brand-green)] bg-foreground/[0.02] hover:bg-foreground/[0.05] p-2.5 text-xs font-black text-foreground transition-all cursor-pointer"
+            >
+              <ArrowRightLeft size={14} className="text-[var(--color-brand-green)]" />
+              <span>Compare with Any Other Tractor</span>
+            </Link>
           </div>
         </div>
       </div>
