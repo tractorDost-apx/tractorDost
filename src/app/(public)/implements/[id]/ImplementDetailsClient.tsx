@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ChevronRight,
@@ -164,6 +164,10 @@ export default function ImplementDetailsClient({
 }) {
   const { state } = useDetailAccess(teaser.id, implementAPI.getImplementById, 'IMPLEMENT');
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [teaser?.id]);
+
   if (state.status === 'unavailable') {
     return (
       <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-0 sm:pt-1 lg:pt-2 pb-24">
@@ -191,6 +195,10 @@ function ImplementDetailsView({
   similarImplements?: Implement[];
 }) {
   const [activeMediaTab, setActiveMediaTab] = useState<'image' | 'video'>('image');
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [implement?.id]);
 
   const formatPrice = (min?: number | null, max?: number | null) => {
     if (!min && !max) return 'Price on Request';
@@ -679,6 +687,12 @@ function ImplementDetailsView({
                   <Link
                     key={t.id}
                     href={`/tractors/${t.id}`}
+                    scroll={true}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                      }
+                    }}
                     className="bg-background group flex items-center justify-between rounded-2xl border border-[var(--border-subtle)] p-4 transition-colors hover:border-[var(--color-brand-green)]"
                   >
                     <div className="flex items-center gap-3">

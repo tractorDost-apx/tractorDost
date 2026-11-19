@@ -79,6 +79,12 @@ export function PublicUsedTractorCard({
               <div>
                 <Link
                   href={`/used-tractors/details/${listing.id}`}
+                  scroll={true}
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                    }
+                  }}
                   className="text-foreground hover:text-[var(--color-brand-green)] transition-colors"
                 >
                   <h3 className="text-lg font-black tracking-tight md:text-xl">{fullTitle}</h3>
@@ -139,6 +145,12 @@ export function PublicUsedTractorCard({
             </button>
             <Link
               href={`/used-tractors/details/${listing.id}`}
+              scroll={true}
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                }
+              }}
               className="bg-[var(--color-brand-green)] hover:opacity-90 text-white flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold shadow-md shadow-[var(--color-brand-green)]/20 transition-all"
             >
               View Details <ChevronRight size={14} />
@@ -195,6 +207,12 @@ export function PublicUsedTractorCard({
         <div className="mt-3.5">
           <Link
             href={`/used-tractors/details/${listing.id}`}
+            scroll={true}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              }
+            }}
             className="text-foreground hover:text-[var(--color-brand-green)] transition-colors block"
           >
             <h3 className="text-base font-black tracking-tight line-clamp-1">{fullTitle}</h3>
@@ -249,6 +267,12 @@ export function PublicUsedTractorCard({
         </button>
         <Link
           href={`/used-tractors/details/${listing.id}`}
+          scroll={true}
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }
+          }}
           className="bg-[var(--color-brand-green)] hover:opacity-90 text-white flex items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold shadow-md shadow-[var(--color-brand-green)]/20 transition-all"
         >
           View Details

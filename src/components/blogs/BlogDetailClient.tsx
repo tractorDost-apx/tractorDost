@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Calendar,
@@ -27,6 +27,10 @@ interface BlogDetailClientProps {
 }
 
 export default function BlogDetailClient({ post }: BlogDetailClientProps) {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [post?.id, post?.slug]);
+
   // Dynamic state for translated content
   const [displayedTitle, setDisplayedTitle] = useState(post.title);
   const [displayedExcerpt, setDisplayedExcerpt] = useState(post.excerpt || '');

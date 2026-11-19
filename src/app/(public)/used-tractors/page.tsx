@@ -923,7 +923,10 @@ function UsedTractorsListingContent() {
                 limit={limit}
                 totalCount={totalTractors}
                 totalPages={totalPages}
-                onPageChange={(p) => setPage(p)}
+                onPageChange={(p) => {
+                  setPage(p);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 onLimitChange={(l) => {
                   setLimit(l);
                   setPage(1);

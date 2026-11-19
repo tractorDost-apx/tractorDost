@@ -94,6 +94,11 @@ export default function TractorDetailsClient({
 }) {
   const { state } = useDetailAccess(teaser.id, tractorAPI.getTractorById, 'TRACTOR');
 
+  // Strictly reset scroll to the top when navigating to or loading a tractor
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [teaser?.id]);
+
   if (state.status === 'unavailable') {
     return (
       <div className="animate-fade-in relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-3.5 sm:px-6 lg:px-8 pt-12 sm:pt-16 lg:pt-20 pb-24">
@@ -147,6 +152,10 @@ function TractorDetailsView({
     () => getCleanModelTitle(tractor.brand?.name, tractor.modelName),
     [tractor.brand?.name, tractor.modelName]
   );
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [tractor.id]);
 
   useEffect(() => {
     if (!selectedState && tractor.priceByState && tractor.priceByState.length > 0) {

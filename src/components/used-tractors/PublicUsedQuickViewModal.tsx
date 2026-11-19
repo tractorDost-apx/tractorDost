@@ -254,6 +254,13 @@ export function PublicUsedQuickViewModal({
               </button>
               <Link
                 href={`/used-tractors/details/${listing.id}`}
+                scroll={true}
+                onClick={() => {
+                  onClose();
+                  if (typeof window !== 'undefined') {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                  }
+                }}
                 className="flex items-center gap-1.5 rounded-xl bg-[var(--color-brand-green)] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-[var(--color-brand-green)]/20 transition-all hover:bg-[var(--color-brand-green-dark)] hover:shadow-lg"
               >
                 Full Details Page <ChevronRight size={14} />

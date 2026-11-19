@@ -217,7 +217,13 @@ export function TractorCategoryClient({
                 {/* Actions */}
                 <div className="mt-auto flex items-center gap-2 pt-2">
                   <Link
-                    href={`/tractors/${tractor.slug}`}
+                    href={`/tractors/${tractor.slug || tractor.id}`}
+                    scroll={true}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                      }
+                    }}
                     className="flex-1 rounded-xl bg-foreground/5 py-2.5 text-center text-xs font-bold text-foreground transition-all hover:bg-[var(--color-brand-green)] hover:text-white"
                   >
                     View Details

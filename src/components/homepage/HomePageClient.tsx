@@ -703,6 +703,12 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                   <Link
                     key={post.id}
                     href={postHref}
+                    scroll={true}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                      }
+                    }}
                     className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[calc(100%-0.5rem)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2*1.25rem)/3)] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.75rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
                   >
                     <div className="group/img relative mb-3 h-40 sm:h-44 w-full overflow-hidden rounded-xl bg-foreground/5">
@@ -805,6 +811,12 @@ export default function HomePageClient({ children, banners }: HomePageClientProp
                   <Link
                     key={idx}
                     href={`/compare?ids=${comp.tractorLeft?.id},${comp.tractorRight?.id}`}
+                    scroll={true}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                      }
+                    }}
                     className="bg-background group flex cursor-pointer flex-col gap-4 rounded-2xl border border-[var(--border-subtle)] p-5 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--border-brand-alt)] hover:shadow-md"
                   >
                     <div className="flex items-center justify-between">
@@ -1042,6 +1054,12 @@ function TractorCarouselSection({
                 <Link
                   key={tractor.id}
                   href={`/tractors/${tractor.id}`}
+                  scroll={true}
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                    }
+                  }}
                   className="group bg-white dark:bg-card/90 relative flex shrink-0 w-[calc(100%-0.5rem)] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2*1rem)/3)] lg:w-[calc((100%-3*1rem)/4)] snap-start cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border-subtle)] p-3 sm:p-3.5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-lg"
                 >
                   <div className="group/img relative mb-3 h-36 sm:h-40 w-full overflow-hidden rounded-xl bg-foreground/5">

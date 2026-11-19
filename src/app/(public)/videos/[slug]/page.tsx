@@ -57,6 +57,7 @@ export default function SingleVideoPage({ params }: { params: Promise<{ slug: st
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     async function loadPost() {
       try {
         setLoading(true);

@@ -19,6 +19,7 @@ export default function CompareSlugPage({ params }: { params: Promise<{ slug: st
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     async function resolveComparison() {
       try {
         setLoading(true);

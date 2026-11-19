@@ -69,6 +69,7 @@ export default function UsedTractorDetailPage({
   const [enquiryError, setEnquiryError] = useState<string | null>(null);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     usedTractorListingAPI.getListingById(unwrappedParams.id).then((res) => {
       if (res.success && res.data) {
         setTractor(res.data);

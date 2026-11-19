@@ -1326,6 +1326,12 @@ function TractorsListingContent() {
                     <Link
                       key={tractor.id}
                       href={`/tractors/${tractor.id}`}
+                      scroll={true}
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                        }
+                      }}
                       className="group relative flex flex-col gap-6 overflow-hidden rounded-[2.25rem] border border-black/8 dark:border-white/10 bg-white/90 dark:bg-[#121814]/90 p-6 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-green)]/40 hover:shadow-xl sm:flex-row"
                     >
                       {/* Image Box */}
@@ -1421,6 +1427,12 @@ function TractorsListingContent() {
                   <Link
                     key={tractor.id}
                     href={`/tractors/${tractor.id}`}
+                    scroll={true}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                      }
+                    }}
                     className="group relative flex flex-col overflow-hidden rounded-[2.25rem] border border-black/8 dark:border-white/10 bg-white/90 dark:bg-[#121814]/90 p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-[var(--color-brand-green)]/40 hover:shadow-2xl hover:shadow-[var(--color-brand-green)]/10"
                   >
                     {/* Image Area */}

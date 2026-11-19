@@ -236,6 +236,10 @@ export default function RootLayout({
                 if (localStorage.getItem('tractorDost_splash_shown')) {
                   document.documentElement.classList.add('hide-splash')
                 }
+
+                if ('scrollRestoration' in history) {
+                  history.scrollRestoration = 'manual';
+                }
               } catch (_) {}
             `,
           }}

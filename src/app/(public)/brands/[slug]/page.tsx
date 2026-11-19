@@ -34,6 +34,7 @@ export default function SingleBrandPage({
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     async function loadBrandAndTractors() {
       try {
         setLoading(true);
@@ -257,6 +258,12 @@ export default function SingleBrandPage({
               <div className="mt-4 pt-3 border-t border-border/40 flex items-center gap-2">
                 <Link
                   href={`/tractors/${tractor.slug || tractor.id}`}
+                  scroll={true}
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                    }
+                  }}
                   className="flex-1 text-center rounded-xl bg-emerald-600/15 border border-emerald-500/30 py-2 text-xs font-bold text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all active:scale-95"
                 >
                   View Details

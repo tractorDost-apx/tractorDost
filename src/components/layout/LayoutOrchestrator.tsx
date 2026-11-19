@@ -6,6 +6,7 @@ import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { DashboardFooter } from './DashboardFooter';
 import { LeadAttributionTracker } from '@/components/analytics/LeadAttributionTracker';
+import { ScrollToTop } from './ScrollToTop';
 
 export function LayoutOrchestrator({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,6 +15,7 @@ export function LayoutOrchestrator({ children }: { children: React.ReactNode }) 
   return (
     <div className={`flex w-full flex-1 flex-col ${isDashboardRoute ? 'spatial-background' : ''}`}>
       <Suspense fallback={null}>
+        <ScrollToTop />
         <LeadAttributionTracker />
       </Suspense>
       <Navbar />

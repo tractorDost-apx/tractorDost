@@ -45,6 +45,7 @@ export default function SingleDealerPublicPage({
   const [leadSuccess, setLeadSuccess] = useState(false);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     async function loadDealerData() {
       if (!dealerId || isNaN(dealerId)) return;
       try {
