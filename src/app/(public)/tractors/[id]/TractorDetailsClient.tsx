@@ -610,224 +610,267 @@ function TractorDetailsView({
       <div className="flex flex-col gap-5 lg:gap-8 lg:flex-row items-start">
         {/* LEFT COLUMN: Gallery, Highlights, On-Road Check (mobile), Specs & Features */}
         <div className="flex w-full flex-col gap-5 sm:gap-7 lg:w-[60%]">
-          {/* MEDIA GALLERY */}
-          <div id="section-gallery" className="spatial-panel flex flex-col gap-2.5 sm:gap-4 rounded-2xl sm:rounded-[2.5rem] p-2.5 sm:p-4 scroll-mt-32">
-            {/* Main Image Viewport */}
-            <div className="from-foreground/5 group relative flex h-[230px] sm:h-[340px] md:h-[440px] w-full items-center justify-center overflow-hidden rounded-xl sm:rounded-2xl border border-[var(--border-subtle)] bg-gradient-to-br to-transparent">
-              {/* Top-Right Gallery Actions (Share & Video) */}
-              <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5" ref={shareDropdownRef}>
-                {tractor.videoUrl && (
-                  <a
-                    href={tractor.videoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="bg-background/80 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[var(--color-brand-orange)] shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-[var(--color-brand-orange)] hover:text-white"
-                    title="Watch Video"
-                  >
-                    <Play size={14} className="ml-0.5" />
-                  </a>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => setIsShareOpen(!isShareOpen)}
-                  aria-expanded={isShareOpen}
-                  aria-label="Share and Download"
-                  className={`bg-background/80 text-foreground relative flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-[var(--color-brand-green)] hover:text-white ${
-                    isShareOpen
-                      ? 'bg-[var(--color-brand-green)] text-white shadow-md ring-2 ring-[var(--color-brand-green)]/30'
-                      : ''
-                  }`}
-                  title="Share & Download Brochure"
-                >
-                  <Share2 size={14} />
-                </button>
-
-                {/* Share Dropdown Menu */}
-                {isShareOpen && (
-                  <div className="bg-background/95 border-[var(--border-subtle)] animate-in fade-in zoom-in-95 duration-150 absolute top-10 right-0 z-50 w-64 origin-top-right rounded-2xl border p-2 shadow-2xl backdrop-blur-xl sm:w-72">
-                    <div className="text-muted border-b border-[var(--border-subtle)]/60 px-3 py-1.5 text-[10px] font-black tracking-widest uppercase">
-                      Share & Download
-                    </div>
-
-                    <div className="mt-1 flex flex-col gap-1">
-                      {/* WhatsApp Share */}
-                      <button
-                        type="button"
-                        onClick={handleShareWhatsApp}
-                        className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-colors hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15 cursor-pointer"
+          {/* MEDIA GALLERY & QUICK SPECS CONTAINER */}
+          <div id="section-gallery" className="spatial-panel flex flex-col gap-3 sm:gap-4 rounded-2xl sm:rounded-[2.5rem] p-3 sm:p-4 md:p-5 scroll-mt-32">
+            <div className="flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch">
+              {/* LEFT: Main Tractor Image Viewport (Refined & more compact) */}
+              <div className="flex flex-col gap-2.5 flex-1 md:w-[58%] lg:w-[60%] min-w-0">
+                <div className="from-foreground/5 group relative flex h-[210px] sm:h-[270px] md:h-[320px] lg:h-[340px] w-full items-center justify-center overflow-hidden rounded-xl sm:rounded-2xl border border-[var(--border-subtle)] bg-gradient-to-br to-transparent">
+                  {/* Top-Right Gallery Actions (Share & Video) */}
+                  <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5" ref={shareDropdownRef}>
+                    {tractor.videoUrl && (
+                      <a
+                        href={tractor.videoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="bg-background/80 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[var(--color-brand-orange)] shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-[var(--color-brand-orange)] hover:text-white"
+                        title="Watch Video"
                       >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 transition-transform group-hover:scale-105 dark:text-emerald-400">
-                          <WhatsAppIcon className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-foreground text-xs font-bold leading-snug">
-                            Share via WhatsApp
-                          </p>
-                          <p className="text-muted text-[10px] leading-tight">
-                            Send specs & price to friends
-                          </p>
-                        </div>
-                        <ChevronRight
-                          size={14}
-                          className="text-muted transition-transform group-hover:translate-x-0.5"
-                        />
-                      </button>
+                        <Play size={14} className="ml-0.5" />
+                      </a>
+                    )}
 
-                      <div className="bg-[var(--border-subtle)]/60 my-0.5 h-[1px] w-full" />
+                    <button
+                      type="button"
+                      onClick={() => setIsShareOpen(!isShareOpen)}
+                      aria-expanded={isShareOpen}
+                      aria-label="Share and Download"
+                      className={`bg-background/80 text-foreground relative flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-subtle)] shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-[var(--color-brand-green)] hover:text-white ${
+                        isShareOpen
+                          ? 'bg-[var(--color-brand-green)] text-white shadow-md ring-2 ring-[var(--color-brand-green)]/30'
+                          : ''
+                      }`}
+                      title="Share & Download Brochure"
+                    >
+                      <Share2 size={14} />
+                    </button>
 
-                      {/* Download Brochure */}
-                      <button
-                        type="button"
-                        disabled={isGeneratingPdf}
-                        onClick={handleDownloadBrochure}
-                        className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-colors hover:bg-[var(--color-brand-green)]/10 disabled:opacity-75 cursor-pointer"
-                      >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)] transition-transform group-hover:scale-105">
-                          {isGeneratingPdf ? (
-                            <Loader2
-                              size={16}
-                              className="animate-spin text-[var(--color-brand-green)]"
+                    {/* Share Dropdown Menu */}
+                    {isShareOpen && (
+                      <div className="bg-background/95 border-[var(--border-subtle)] animate-in fade-in zoom-in-95 duration-150 absolute top-10 right-0 z-50 w-64 origin-top-right rounded-2xl border p-2 shadow-2xl backdrop-blur-xl sm:w-72">
+                        <div className="text-muted border-b border-[var(--border-subtle)]/60 px-3 py-1.5 text-[10px] font-black tracking-widest uppercase">
+                          Share & Download
+                        </div>
+
+                        <div className="mt-1 flex flex-col gap-1">
+                          {/* WhatsApp Share */}
+                          <button
+                            type="button"
+                            onClick={handleShareWhatsApp}
+                            className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-colors hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15 cursor-pointer"
+                          >
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 transition-transform group-hover:scale-105 dark:text-emerald-400">
+                              <WhatsAppIcon className="h-4 w-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-foreground text-xs font-bold leading-snug">
+                                Share via WhatsApp
+                              </p>
+                              <p className="text-muted text-[10px] leading-tight">
+                                Send specs & price to friends
+                              </p>
+                            </div>
+                            <ChevronRight
+                              size={14}
+                              className="text-muted transition-transform group-hover:translate-x-0.5"
                             />
-                          ) : brochureSuccess ? (
-                            <CheckCircle2
-                              size={16}
-                              className="text-[var(--color-brand-green)]"
+                          </button>
+
+                          <div className="bg-[var(--border-subtle)]/60 my-0.5 h-[1px] w-full" />
+
+                          {/* Download Brochure */}
+                          <button
+                            type="button"
+                            disabled={isGeneratingPdf}
+                            onClick={handleDownloadBrochure}
+                            className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-colors hover:bg-[var(--color-brand-green)]/10 disabled:opacity-75 cursor-pointer"
+                          >
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-green)]/15 text-[var(--color-brand-green)] transition-transform group-hover:scale-105">
+                              {isGeneratingPdf ? (
+                                <Loader2
+                                  size={16}
+                                  className="animate-spin text-[var(--color-brand-green)]"
+                                />
+                              ) : brochureSuccess ? (
+                                <CheckCircle2
+                                  size={16}
+                                  className="text-[var(--color-brand-green)]"
+                                />
+                              ) : (
+                                <Download size={16} />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-foreground text-xs font-bold leading-snug">
+                                {brochureSuccess ? 'Brochure Downloaded!' : 'Download PDF Brochure'}
+                              </p>
+                              <p className="text-muted text-[10px] leading-tight">
+                                {isGeneratingPdf
+                                  ? 'Generating PDF...'
+                                  : brochureSuccess
+                                  ? 'Saved to your device'
+                                  : 'Official spec sheet'}
+                              </p>
+                            </div>
+                            <ChevronRight
+                              size={14}
+                              className="text-muted transition-transform group-hover:translate-x-0.5"
                             />
-                          ) : (
-                            <Download size={16} />
+                          </button>
+
+                          {brochureError && (
+                            <p className="px-3 py-1.5 text-[11px] font-semibold text-red-500">
+                              {brochureError}
+                            </p>
                           )}
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-foreground text-xs font-bold leading-snug">
-                            {brochureSuccess ? 'Brochure Downloaded!' : 'Download PDF Brochure'}
-                          </p>
-                          <p className="text-muted text-[10px] leading-tight">
-                            {isGeneratingPdf
-                              ? 'Generating PDF...'
-                              : brochureSuccess
-                              ? 'Saved to your device'
-                              : 'Official spec sheet'}
-                          </p>
-                        </div>
-                        <ChevronRight
-                          size={14}
-                          className="text-muted transition-transform group-hover:translate-x-0.5"
-                        />
-                      </button>
-
-                      {brochureError && (
-                        <p className="px-3 py-1.5 text-[11px] font-semibold text-red-500">
-                          {brochureError}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Top-Left Featured Badge */}
-              {tractor.isFeatured && (
-                <div className="absolute top-2.5 left-2.5 z-10 rounded-full bg-[var(--color-brand-orange)] px-2.5 py-0.5 text-[9px] font-black tracking-widest text-white uppercase shadow-md">
-                  Featured
-                </div>
-              )}
-
-              {/* Main Media Rendering */}
-              {activeMedia ? (
-                activeMedia.mediaType === 'VIDEO' ? (
-                  <div className="flex h-full w-full items-center justify-center rounded-xl bg-black/10">
-                    <Play size={44} className="text-[var(--color-brand-orange)] opacity-80" />
-                  </div>
-                ) : activeMedia.mediaType === 'PDF' ? (
-                  <div className="bg-foreground/5 flex h-full w-full flex-col items-center justify-center gap-3 rounded-xl">
-                    <FileText size={44} className="text-muted" />
-                    <span className="text-muted text-xs font-bold">PDF Document</span>
-                  </div>
-                ) : (
-                  <img
-                    src={activeMediaUrl}
-                    alt={activeMedia.altText || fullModelTitle}
-                    className="h-full w-full object-contain p-2 sm:p-4 transition-transform duration-500 group-hover:scale-105"
-                  />
-                )
-              ) : (
-                <TractorIcon className="text-foreground/20 h-24 w-24 sm:h-32 sm:w-32" strokeWidth={1} />
-              )}
-
-              {/* Photo Counter Badge */}
-              {mediaList.length > 1 && (
-                <div className="absolute bottom-2.5 right-2.5 z-10 rounded-full bg-black/60 px-2 py-0.5 text-[9px] font-bold text-white backdrop-blur-md">
-                  {activeMediaIndex + 1} / {mediaList.length}
-                </div>
-              )}
-
-              {activeMedia?.caption && (
-                <div className="pointer-events-none absolute right-0 bottom-2.5 left-0 text-center">
-                  <span className="bg-background/80 rounded-full border border-[var(--border-subtle)] px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md">
-                    {activeMedia.caption}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Thumbnails Row - Edge-to-edge scrollable */}
-            {mediaList.length > 1 && (
-              <div className="flex w-[calc(100%+1.25rem)] -mx-2.5 px-2.5 sm:w-full sm:mx-0 sm:px-0 gap-2 overflow-x-auto pb-0.5 no-scrollbar scroll-smooth overscroll-x-contain">
-                {mediaList.map((media, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActiveMediaIndex(idx)}
-                    className={`relative h-14 w-14 sm:h-18 sm:w-18 shrink-0 overflow-hidden rounded-xl border-2 transition-all cursor-pointer ${
-                      activeMediaIndex === idx
-                        ? 'border-[var(--color-brand-green)] shadow-md ring-2 ring-[var(--color-brand-green)]/20 scale-95'
-                        : 'border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/50 opacity-75 hover:opacity-100'
-                    }`}
-                  >
-                    {media.mediaType === 'VIDEO' ? (
-                      <div className="flex h-full w-full items-center justify-center bg-black/10">
-                        <Play size={18} className="text-[var(--color-brand-orange)]" />
                       </div>
-                    ) : media.mediaType === 'PDF' ? (
-                      <div className="flex h-full w-full items-center justify-center bg-foreground/5">
-                        <FileText size={18} className="text-muted" />
+                    )}
+                  </div>
+
+                  {/* Top-Left Featured Badge */}
+                  {tractor.isFeatured && (
+                    <div className="absolute top-2.5 left-2.5 z-10 rounded-full bg-[var(--color-brand-orange)] px-2.5 py-0.5 text-[9px] font-black tracking-widest text-white uppercase shadow-md">
+                      Featured
+                    </div>
+                  )}
+
+                  {/* Main Media Rendering */}
+                  {activeMedia ? (
+                    activeMedia.mediaType === 'VIDEO' ? (
+                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-black/10">
+                        <Play size={44} className="text-[var(--color-brand-orange)] opacity-80" />
+                      </div>
+                    ) : activeMedia.mediaType === 'PDF' ? (
+                      <div className="bg-foreground/5 flex h-full w-full flex-col items-center justify-center gap-3 rounded-xl">
+                        <FileText size={44} className="text-muted" />
+                        <span className="text-muted text-xs font-bold">PDF Document</span>
                       </div>
                     ) : (
                       <img
-                        src={media.url}
-                        alt={media.altText || `Thumbnail ${idx}`}
-                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                        src={activeMediaUrl}
+                        alt={activeMedia.altText || fullModelTitle}
+                        className="h-full w-full object-contain p-2 sm:p-3 transition-transform duration-500 group-hover:scale-105"
                       />
-                    )}
-                  </button>
-                ))}
-                <div className="w-1 shrink-0 sm:hidden" aria-hidden="true" />
-              </div>
-            )}
-          </div>
+                    )
+                  ) : (
+                    <TractorIcon className="text-foreground/20 h-20 w-20 sm:h-28 sm:w-28" strokeWidth={1} />
+                  )}
 
-          {/* QUICK KEY SPECS STRIP */}
-          {quickSpecs.length > 0 && (
-            <div id="section-quick-specs" className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-2.5 scroll-mt-32">
-              {quickSpecs.map((spec, idx) => (
-                <div
-                  key={idx}
-                  className="bg-background flex flex-col items-center justify-center rounded-xl sm:rounded-2xl border border-[var(--border-subtle)] p-2 sm:p-2.5 text-center shadow-2xs hover:border-[var(--color-brand-green)]/40 transition-colors"
-                >
-                  <div className={`mb-1 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full ${spec.color}`}>
-                    {spec.icon}
-                  </div>
-                  <span className="text-foreground text-xs sm:text-sm font-black leading-tight">
-                    {spec.value}
-                  </span>
-                  <span className="text-muted text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mt-0.5">
-                    {spec.label}
-                  </span>
+                  {/* Photo Counter Badge */}
+                  {mediaList.length > 1 && (
+                    <div className="absolute bottom-2.5 right-2.5 z-10 rounded-full bg-black/60 px-2 py-0.5 text-[9px] font-bold text-white backdrop-blur-md">
+                      {activeMediaIndex + 1} / {mediaList.length}
+                    </div>
+                  )}
+
+                  {activeMedia?.caption && (
+                    <div className="pointer-events-none absolute right-0 bottom-2.5 left-0 text-center">
+                      <span className="bg-background/80 rounded-full border border-[var(--border-subtle)] px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md">
+                        {activeMedia.caption}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              ))}
+
+                {/* Thumbnails Row - Edge-to-edge scrollable */}
+                {mediaList.length > 1 && (
+                  <div className="flex w-full gap-2 overflow-x-auto pb-0.5 no-scrollbar scroll-smooth overscroll-x-contain">
+                    {mediaList.map((media, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveMediaIndex(idx)}
+                        className={`relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl border-2 transition-all cursor-pointer ${
+                          activeMediaIndex === idx
+                            ? 'border-[var(--color-brand-green)] shadow-md ring-2 ring-[var(--color-brand-green)]/20 scale-95'
+                            : 'border-[var(--border-subtle)] hover:border-[var(--color-brand-green)]/50 opacity-75 hover:opacity-100'
+                        }`}
+                      >
+                        {media.mediaType === 'VIDEO' ? (
+                          <div className="flex h-full w-full items-center justify-center bg-black/10">
+                            <Play size={14} className="text-[var(--color-brand-orange)]" />
+                          </div>
+                        ) : media.mediaType === 'PDF' ? (
+                          <div className="flex h-full w-full items-center justify-center bg-foreground/5">
+                            <FileText size={14} className="text-muted" />
+                          </div>
+                        ) : (
+                          <img
+                            src={media.url}
+                            alt={media.altText || `Thumbnail ${idx}`}
+                            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                          />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT: Quick Key Specs / Features Panel (Placed right beside image as per user marking) */}
+              {quickSpecs.length > 0 && (
+                <div
+                  id="section-quick-specs"
+                  className="flex flex-col justify-between rounded-xl sm:rounded-2xl border border-[var(--border-subtle)] bg-foreground/[0.02] p-3 sm:p-3.5 md:w-[42%] lg:w-[40%] shrink-0 scroll-mt-32"
+                >
+                  <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex h-5 w-5 items-center justify-center rounded-md bg-[var(--color-brand-green)]/10 text-[var(--color-brand-green)]">
+                        <Sparkles size={12} />
+                      </div>
+                      <span className="text-[11px] font-black tracking-wider text-foreground uppercase">
+                        Key Features
+                      </span>
+                    </div>
+                    <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-[9px] font-bold text-muted uppercase tracking-wider">
+                      Verified
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 sm:gap-2 py-2 flex-1 content-center">
+                    {quickSpecs.map((spec, idx) => {
+                      const isOddLast = quickSpecs.length % 2 !== 0 && idx === quickSpecs.length - 1;
+                      return (
+                        <div
+                          key={idx}
+                          className={`group/spec flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-background/95 p-2 sm:p-2.5 shadow-2xs transition-all hover:border-[var(--color-brand-green)]/40 hover:shadow-xs ${
+                            isOddLast ? 'col-span-2' : ''
+                          }`}
+                        >
+                          <div className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg ${spec.color}`}>
+                            {spec.icon}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <span className="text-foreground text-xs sm:text-sm font-black leading-tight block truncate">
+                              {spec.value}
+                            </span>
+                            <span className="text-muted text-[9px] sm:text-[10px] font-bold tracking-wider uppercase block truncate">
+                              {spec.label}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px] font-bold">
+                    <span className="text-muted text-[10px] flex items-center gap-1">
+                      <CheckCircle2 size={11} className="text-[var(--color-brand-green)]" /> Factory Standards
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection('section-all-specs')}
+                      className="text-[var(--color-brand-green)] hover:text-[var(--color-brand-orange)] transition-colors cursor-pointer flex items-center gap-0.5"
+                    >
+                      <span>Full Specs</span>
+                      <ChevronDown size={11} />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           {/* MOBILE ON-ROAD PRICING CARD (Visible on Mobile only) */}
           <div id="section-price-check" className="lg:hidden spatial-panel rounded-2xl p-3.5 sm:p-4 flex flex-col gap-3 border border-[var(--color-brand-green)]/20 shadow-md scroll-mt-32">
